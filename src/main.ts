@@ -375,6 +375,11 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
     onMenu: () => {
       if (!hud.closeAll()) hud.toggleOptionsMenu();
     },
+    onSocial: () => hud.toggleSocial(),
+    onArena: () => hud.toggleArena(),
+    onSpellbook: () => hud.toggleSpellbook(),
+    onMeters: () => hud.toggleMeters(),
+    onMap: () => hud.toggleMap(),
   });
   mobileControls.start();
 
@@ -919,6 +924,13 @@ function openDeleteCharacterDialog(character: CharacterSummary): void {
 }
 
 async function refreshCharacters(): Promise<void> {
+  const panel = $('#charselect-panel');
+  panel.dataset.mobileTab = 'characters';
+  document.querySelectorAll<HTMLButtonElement>('#charselect-panel .mobile-char-tab').forEach((btn) => {
+    const on = btn.dataset.charTab === 'characters';
+    btn.classList.toggle('active', on);
+    btn.setAttribute('aria-selected', String(on));
+  });
   const listEl = $('#char-list');
   listEl.innerHTML = '<li class="char-list-message">Loading…</li>';
   try {
@@ -1704,6 +1716,18 @@ function wireStartScreens(): void {
   });
   $('#btn-realm-back').addEventListener('click', () => show('#mode-select'));
   $('#btn-change-realm').addEventListener('click', () => showRealmList());
+  document.querySelectorAll<HTMLButtonElement>('#charselect-panel .mobile-char-tab').forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const panel = $('#charselect-panel');
+      const activeTab = tab.dataset.charTab === 'create' ? 'create' : 'characters';
+      panel.dataset.mobileTab = activeTab;
+      document.querySelectorAll<HTMLButtonElement>('#charselect-panel .mobile-char-tab').forEach((btn) => {
+        const on = btn.dataset.charTab === activeTab;
+        btn.classList.toggle('active', on);
+        btn.setAttribute('aria-selected', String(on));
+      });
+    });
+  });
 
   // character creation
   document.querySelectorAll('#charselect-panel .mini-class').forEach((el) => {

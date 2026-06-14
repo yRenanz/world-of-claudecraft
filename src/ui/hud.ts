@@ -147,6 +147,7 @@ export class Hud {
     $('#mm-spell').addEventListener('click', () => this.toggleSpellbook());
     $('#mm-quest').addEventListener('click', () => this.toggleQuestLog());
     $('#mm-map').addEventListener('click', () => this.toggleMap());
+    $('#map-close').addEventListener('click', () => { $('#map-window').style.display = 'none'; });
     $('#mm-bag').addEventListener('click', () => this.toggleBags());
     $('#social-fab').addEventListener('click', () => this.toggleSocial());
     $('#mm-arena').addEventListener('click', () => this.toggleArena());
@@ -556,6 +557,9 @@ export class Hud {
         p.eating && p.drinking ? 'Eating & Drinking…' : p.eating ? 'Eating…' : 'Drinking…';
     } else {
       cb.style.display = 'none';
+      cb.classList.remove('channel');
+      (cb.querySelector('.fill') as HTMLElement).style.width = '0%';
+      (cb.querySelector('.label') as HTMLElement).textContent = '';
     }
 
     // action bar

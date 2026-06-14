@@ -10,6 +10,11 @@ export interface MobileControlCallbacks {
   onInteract(): void;
   onChat(): void;
   onMenu(): void;
+  onSocial(): void;
+  onArena(): void;
+  onSpellbook(): void;
+  onMeters(): void;
+  onMap(): void;
 }
 
 export function isPhoneTouchDevice(win: Pick<Window, 'matchMedia'> = window): boolean {
@@ -63,6 +68,11 @@ export class MobileControls {
     this.bindButton('mobile-interact', () => this.callbacks.onInteract());
     this.bindButton('mobile-chat', () => this.toggleChat());
     this.bindButton('mobile-menu', () => this.callbacks.onMenu());
+    this.bindButton('mobile-social', () => this.callbacks.onSocial());
+    this.bindButton('mobile-arena', () => this.callbacks.onArena());
+    this.bindButton('mobile-spellbook', () => this.callbacks.onSpellbook());
+    this.bindButton('mobile-meters', () => this.callbacks.onMeters());
+    this.bindButton('mobile-map', () => this.callbacks.onMap());
     this.bindButton('mobile-more', () => {
       this.root?.classList.toggle('expanded');
       document.body.classList.toggle('mobile-more-open', this.root?.classList.contains('expanded') ?? false);
@@ -83,10 +93,15 @@ export class MobileControls {
   }
 
   private bindButton(id: string, cb: () => void): void {
-    document.getElementById(id)?.addEventListener('click', (e) => {
+    const button = document.getElementById(id);
+    button?.addEventListener('click', (e) => {
       if (!this.active) return;
       e.preventDefault();
       cb();
+      if (button.closest('#mobile-extra-controls')) {
+        this.root?.classList.remove('expanded');
+        document.body.classList.remove('mobile-more-open');
+      }
     });
   }
 

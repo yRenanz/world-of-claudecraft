@@ -388,6 +388,18 @@
     text-shadow: 1px 1px 1px #000; font-weight: bold; }
   .mt-num { position: absolute; right: 5px; top: 0; line-height: 17px; font-size: 10px; color: #ffe;
     text-shadow: 1px 1px 1px #000; }
+  body.mobile-touch #meters-window .mt-rows {
+    max-height: 82px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  body.mobile-touch #meters-window .panel-title {
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  body.mobile-touch #meters-window .mt-tab {
+    padding: 1px 5px;
+  }
 
   /* ---------- minimap ---------- */
   #minimap-wrap { position: absolute; right: 12px; top: 10px; width: 170px; text-align: center; }
@@ -549,6 +561,12 @@
 
   /* map */
   #map-window { left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 14px; }
+  #map-close {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    z-index: 2;
+  }
 
   /* ---------- Ashen Coliseum (arena) ---------- */
   #arena-window { left: 50%; top: 50%; transform: translate(-50%, -50%); width: 360px; padding: 14px; }
@@ -580,7 +598,7 @@
   #arena-status .as-timer { font-size: 11px; color: #d8cba0; margin-top: 1px; }
 
   /* ---------- The World Market (the Merchant's auction house) ---------- */
-  #market-window { left: 50%; top: 12%; transform: translateX(-50%); width: 470px; max-height: 76%; display: flex; flex-direction: column; }
+  #market-window { left: 50%; top: 12%; transform: translateX(-50%); width: 470px; max-height: 76%; flex-direction: column; }
   .mkt-tabs { display: flex; gap: 4px; margin: 2px 0 8px; }
   .mkt-tab { flex: 1; text-align: center; font-family: var(--title-font); font-size: 12px; color: #cabb8c;
     padding: 5px 4px; border-radius: 4px 4px 0 0; cursor: pointer; background: #ffffff08; border-bottom: 2px solid transparent; }
@@ -2417,7 +2435,7 @@
   #rotate-device { display: none; }
   body.mobile-touch #game-canvas { touch-action: none; }
   body.mobile-touch #ui { touch-action: none; }
-  body.mobile-touch #mobile-controls { position: absolute; inset: 0; display: block; pointer-events: none; z-index: 17; }
+  body.mobile-touch #mobile-controls { position: absolute; inset: 0; display: block; pointer-events: none; z-index: 60; }
   body.mobile-touch .mobile-joystick {
     position: absolute; left: max(18px, env(safe-area-inset-left)); bottom: calc(26px + env(safe-area-inset-bottom));
     width: 122px; height: 122px; border-radius: 50%; pointer-events: auto; touch-action: none;
@@ -2448,18 +2466,79 @@
     font-size: 22px; font-weight: bold; text-shadow: 1px 1px 2px #000; box-shadow: inset 0 1px 0 #ffffff14, 0 2px 8px #0009;
   }
   body.mobile-touch #mobile-attack-nearest { width: 124px; color: #ffdf9c; border-color: #8b4e2c; }
+  body.mobile-touch #mobile-more {
+    position: fixed;
+    left: calc(50% + 190px);
+    bottom: calc(4px + env(safe-area-inset-bottom));
+    z-index: 19;
+  }
   body.mobile-touch .mobile-btn:active { transform: translateY(1px); border-color: var(--gold); color: #fff; }
   body.mobile-touch .mobile-btn .mobile-label { display: block; margin-top: 1px; font-size: 8px; font-family: var(--ui-font); color: #bfb28a; }
   body.mobile-touch #mobile-extra-controls {
-    position: fixed; left: 50%; bottom: calc(66px + env(safe-area-inset-bottom)); transform: translateX(-50%);
-    display: none; grid-template-columns: repeat(3, 58px); gap: 8px;
+    position: fixed;
+    left: calc(50% + 190px);
+    bottom: calc(66px + env(safe-area-inset-bottom));
+    display: none;
+    grid-template-columns: repeat(2, 112px);
+    grid-auto-rows: 42px;
+    gap: 7px;
+    pointer-events: auto;
+    z-index: 70;
   }
   body.mobile-touch.mobile-more-open #mobile-extra-controls { display: grid; }
-  body.mobile-touch #bottom-bar {
-    left: 50%; right: auto; bottom: calc(62px + env(safe-area-inset-bottom));
-    transform: translateX(-50%); z-index: 18;
+  body.mobile-touch #mobile-extra-controls .mobile-btn {
+    width: 112px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 0 10px;
+    font-size: 17px;
   }
-  body.mobile-touch #xpbar { display: none; }
+  body.mobile-touch #mobile-extra-controls .mobile-label {
+    display: inline;
+    margin: 0;
+    font-size: 10px;
+    color: #e6d8ae;
+  }
+  body.mobile-touch #bottom-bar {
+    left: 0; right: 0; bottom: calc(62px + env(safe-area-inset-bottom));
+    width: 100%;
+    transform: none;
+    z-index: 18;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+  body.mobile-touch #actionbar-row { pointer-events: auto; }
+  body.mobile-touch #xpbar {
+    position: fixed;
+    left: calc(max(18px, env(safe-area-inset-left)) + 132px);
+    bottom: calc(7px + env(safe-area-inset-bottom));
+    width: min(170px, calc(50vw - 164px));
+    min-width: 112px;
+    height: 6px;
+    display: block;
+    margin: 0;
+    z-index: 19;
+    opacity: 0.86;
+  }
+  body.mobile-touch #xpbar .label { display: none; }
+  body.mobile-touch #castbar {
+    position: fixed;
+    left: calc(max(18px, env(safe-area-inset-left)) + 132px);
+    bottom: calc(17px + env(safe-area-inset-bottom));
+    width: min(170px, calc(50vw - 164px));
+    min-width: 112px;
+    height: 6px;
+    transform: none;
+    z-index: 19;
+    border-width: 1px;
+    border-radius: 2px;
+    opacity: 0.9;
+  }
+  body.mobile-touch #castbar .label { display: none; }
   body.mobile-touch #actionbar-row { display: block; }
   body.mobile-touch #side-buttons { display: none; }
   body.mobile-touch #actionbar {
@@ -2480,7 +2559,7 @@
   body.mobile-touch .action-btn.empty { display: none; }
   body.mobile-touch #community-hud {
     right: 8px;
-    top: 112px;
+    top: 130px;
     width: 70px;
     padding: 5px;
     flex-direction: column;
@@ -2494,17 +2573,49 @@
     width: 22px;
     height: 22px;
   }
+  body.mobile-touch #social-fab { display: none; }
   body.mobile-touch #chatlog-wrap { left: 10px; bottom: calc(160px + env(safe-area-inset-bottom)); width: min(340px, calc(100vw - 20px)); display: none; z-index: 24; }
   body.mobile-touch.mobile-chat-open #chatlog-wrap { display: block; }
   body.mobile-touch #chatlog-frame { height: 126px; }
   body.mobile-touch #chatlog-tabs { transform: scale(0.92); transform-origin: left bottom; }
   body.mobile-touch #chat-input { left: 10px; bottom: calc(296px + env(safe-area-inset-bottom)); width: min(360px, calc(100vw - 20px)); }
-  body.mobile-touch #player-frame { left: 8px; top: 8px; transform: scale(0.82); transform-origin: left top; }
-  body.mobile-touch #target-frame { left: 8px; top: 72px; transform: scale(0.82); transform-origin: left top; }
+  body.mobile-touch #player-frame {
+    position: fixed;
+    left: max(8px, env(safe-area-inset-left));
+    top: max(8px, env(safe-area-inset-top));
+    width: 300px;
+    margin: 0;
+    display: flex;
+    justify-content: flex-start;
+    transform: scale(0.82);
+    transform-origin: left top;
+  }
+  body.mobile-touch #player-frame .uf-bars {
+    width: 224px;
+    max-width: 224px;
+    flex: none;
+  }
+  body.mobile-touch #target-frame {
+    left: max(8px, env(safe-area-inset-left));
+    top: calc(max(8px, env(safe-area-inset-top)) + 64px);
+    transform: scale(0.82);
+    transform-origin: left top;
+  }
   body.mobile-touch #buff-bar { right: 10px; top: 140px; max-width: 180px; }
   body.mobile-touch #minimap-wrap { right: 8px; top: 8px; transform: scale(0.72); transform-origin: right top; }
   body.mobile-touch #quest-tracker { right: 10px; top: 150px; width: 190px; font-size: 11px; }
-  body.mobile-touch #meters-window { right: 8px; top: 190px; width: 210px; }
+  body.mobile-touch #meters-window {
+    position: fixed;
+    left: calc(max(18px, env(safe-area-inset-left)) + 132px);
+    right: auto;
+    top: auto;
+    bottom: calc(31px + env(safe-area-inset-bottom));
+    width: min(220px, calc(50vw - 144px));
+    min-width: 142px;
+    max-height: min(170px, calc(100vh - 128px));
+    overflow: hidden;
+    z-index: 25;
+  }
   body.mobile-touch .window { max-width: calc(100vw - 20px); max-height: calc(100vh - 40px); }
   body.mobile-touch #options-menu,
   body.mobile-touch #quest-log-window,
@@ -2513,12 +2624,58 @@
   body.mobile-touch #quest-dialog {
     left: 10px; right: 10px; top: 10px; width: auto; transform: none;
   }
-  body.mobile-touch #map-window { left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.62); }
+  body.mobile-touch #spellbook,
+  body.mobile-touch #options-menu {
+    left: 50%;
+    right: auto;
+    top: 12px;
+    width: min(560px, calc(100vw - 170px));
+    max-height: calc(100vh - 92px);
+    transform: translateX(-50%);
+  }
+  body.mobile-touch #social-window {
+    left: 50%;
+    right: auto;
+    top: 44%;
+    bottom: auto;
+    width: min(360px, calc(100vw - 170px));
+    height: min(380px, calc(100vh - 116px));
+    max-height: calc(100vh - 116px);
+    transform: translate(-50%, -50%);
+    z-index: 45;
+  }
+  body.mobile-touch #map-window {
+    left: 50%;
+    top: calc(46% - env(safe-area-inset-bottom));
+    width: min(46vw, 330px);
+    max-width: calc(100vw - 220px);
+    padding: 8px;
+    transform: translate(-50%, -50%);
+  }
+  body.mobile-touch #map-canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  body.mobile-touch #map-close {
+    right: 5px;
+    top: 5px;
+  }
   body.mobile-touch #controls-hint {
     max-width: min(360px, 92vw); margin-top: 18px; line-height: 1.45; font-size: 10px;
   }
-  body.mobile-touch .mode-row { flex-direction: column; gap: 12px; }
-  body.mobile-touch .mode-card { width: min(320px, 88vw); padding: 18px 16px; }
+  body.mobile-touch .mode-row {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+  }
+  body.mobile-touch .mode-card {
+    width: min(280px, calc(100vw - 96px));
+    margin-inline: auto;
+    padding: 18px 16px;
+  }
   body.mobile-touch .class-row { grid-template-columns: repeat(2, minmax(138px, 1fr)); gap: 8px; width: min(340px, 92vw); }
   body.mobile-touch .class-card { padding: 9px 8px 8px; }
   body.mobile-touch #title-logo { width: min(360px, 82vw); margin-bottom: 18px; }
@@ -2576,25 +2733,77 @@
     }
     body.mobile-touch .mobile-btn { width: 54px; height: 48px; font-size: 20px; background: radial-gradient(circle at 35% 30%, #2d3048bf, #11121ec2 72%); }
     body.mobile-touch #mobile-attack-nearest { width: 115px; }
-    body.mobile-touch #mobile-extra-controls {
-      bottom: calc(58px + env(safe-area-inset-bottom)); grid-template-columns: repeat(3, 54px); gap: 7px;
+    body.mobile-touch #mobile-more {
+      left: calc(50% + 176px);
+      bottom: calc(2px + env(safe-area-inset-bottom));
     }
+    body.mobile-touch #mobile-extra-controls {
+      left: calc(50% + 176px);
+      bottom: calc(58px + env(safe-area-inset-bottom));
+      grid-template-columns: repeat(2, 104px);
+      grid-auto-rows: 38px;
+      gap: 6px;
+    }
+    body.mobile-touch #mobile-extra-controls .mobile-btn {
+      width: 104px;
+      height: 38px;
+      font-size: 16px;
+      padding: 0 9px;
+    }
+    body.mobile-touch #mobile-extra-controls .mobile-label { font-size: 9px; }
     body.mobile-touch #bottom-bar { bottom: calc(50px + env(safe-area-inset-bottom)); }
     body.mobile-touch #actionbar { grid-template-columns: repeat(5, 38px); grid-auto-rows: 38px; gap: 4px; padding: 4px; width: max-content; background: linear-gradient(170deg, #15151fa8, #08080db8); }
     body.mobile-touch #actionbar.many-spells { grid-template-columns: repeat(6, 38px); }
     body.mobile-touch .action-btn { width: 38px; height: 38px; }
-    body.mobile-touch #community-hud { top: 92px; right: 8px; width: 62px; padding: 4px; gap: 4px; }
+    body.mobile-touch #xpbar {
+      left: calc(max(20px, env(safe-area-inset-left)) + 112px);
+      bottom: calc(6px + env(safe-area-inset-bottom));
+      width: min(160px, calc(50vw - 166px));
+      min-width: 100px;
+      height: 5px;
+    }
+    body.mobile-touch #castbar {
+      left: calc(max(20px, env(safe-area-inset-left)) + 112px);
+      bottom: calc(15px + env(safe-area-inset-bottom));
+      width: min(160px, calc(50vw - 166px));
+      min-width: 100px;
+      height: 5px;
+    }
+    body.mobile-touch #community-hud { top: 108px; right: 8px; width: 62px; padding: 4px; gap: 4px; }
     body.mobile-touch .community-link { height: 40px; }
     body.mobile-touch .community-link svg { width: 20px; height: 20px; }
     body.mobile-touch #chatlog-wrap { left: 10px; bottom: calc(112px + env(safe-area-inset-bottom)); width: min(330px, 44vw); }
     body.mobile-touch #chatlog-frame { height: 92px; }
     body.mobile-touch #chat-input { left: 10px; bottom: calc(213px + env(safe-area-inset-bottom)); width: min(330px, 44vw); }
-    body.mobile-touch #player-frame { left: 6px; top: 6px; transform: scale(0.6); }
-    body.mobile-touch #target-frame { left: 6px; top: 56px; transform: scale(0.6); }
+    body.mobile-touch #player-frame {
+      left: max(6px, env(safe-area-inset-left));
+      top: max(6px, env(safe-area-inset-top));
+      width: 300px;
+      transform: scale(0.6);
+    }
+    body.mobile-touch #player-frame .uf-bars {
+      width: 224px;
+      max-width: 224px;
+    }
+    body.mobile-touch #target-frame {
+      left: max(6px, env(safe-area-inset-left));
+      top: calc(max(6px, env(safe-area-inset-top)) + 50px);
+      transform: scale(0.6);
+    }
     body.mobile-touch #buff-bar { right: 98px; top: 8px; max-width: 160px; transform: scale(0.85); transform-origin: right top; }
     body.mobile-touch #minimap-wrap { right: 6px; top: 6px; transform: scale(0.46); }
     body.mobile-touch #quest-tracker { display: none; }
-    body.mobile-touch #meters-window { right: 8px; top: 88px; width: 190px; transform: scale(0.9); transform-origin: right top; }
+    body.mobile-touch #meters-window {
+      position: fixed;
+      left: calc(max(20px, env(safe-area-inset-left)) + 112px);
+      right: auto;
+      top: auto;
+      bottom: calc(26px + env(safe-area-inset-bottom));
+      width: min(190px, calc(50vw - 142px));
+      min-width: 128px;
+      max-height: min(135px, calc(100vh - 112px));
+      transform: none;
+    }
     body.mobile-touch #banner { top: 18%; font-size: 30px; }
     body.mobile-touch #error-msg { top: 16%; font-size: 16px; }
     body.mobile-touch #mobile-preflight .preflight-panel { width: min(520px, 84vw); padding: 18px 22px; }
@@ -2693,6 +2902,10 @@
     padding: 6px var(--spacing-sm);
   }
 
+  .mobile-char-tabs {
+    display: none;
+  }
+
   @media (min-width: 900px) {
     #charselect-panel,
     #offline-select {
@@ -2769,6 +2982,99 @@
     }
   }
 
+  body.mobile-touch #charselect-panel {
+    width: min(380px, calc(100vw - 48px));
+    max-height: calc(100vh - 112px);
+    overflow-y: auto;
+  }
+  body.mobile-touch #charselect-panel .auth-title {
+    font-size: 21px;
+    margin-bottom: 8px;
+    overflow-wrap: anywhere;
+  }
+  body.mobile-touch #charselect-panel .cs-realm,
+  body.mobile-touch #btn-change-realm {
+    font-size: 11px;
+  }
+  body.mobile-touch .mobile-char-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin: 12px 0;
+  }
+  body.mobile-touch .mobile-char-tab {
+    height: 34px;
+    border: 1px solid #4a3d1d;
+    border-radius: 5px;
+    background: linear-gradient(#201b28, #100e16);
+    color: #c9b27a;
+    font-family: var(--title-font);
+    font-size: 12px;
+    cursor: pointer;
+  }
+  body.mobile-touch .mobile-char-tab.active {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+    background: linear-gradient(#2a2436, #161220);
+    box-shadow: inset 0 -2px 0 #cc9a3c;
+  }
+  body.mobile-touch #charselect-panel[data-mobile-tab="characters"] .char-create,
+  body.mobile-touch #charselect-panel[data-mobile-tab="characters"] .charselect-col-right,
+  body.mobile-touch #charselect-panel[data-mobile-tab="create"] #char-list {
+    display: none;
+  }
+  body.mobile-touch #charselect-panel[data-mobile-tab="create"] .char-create {
+    border-top: 0;
+    margin-top: 0;
+    padding-top: 0;
+  }
+  body.mobile-touch #charselect-panel #char-list {
+    max-height: none;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+  }
+  body.mobile-touch .char-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 10px;
+    margin-bottom: 8px;
+    border: 1px solid rgba(78, 61, 29, 0.35);
+    background: rgba(0, 0, 0, 0.2);
+  }
+  body.mobile-touch .char-row .char-name {
+    min-width: 0;
+    font-size: 15px;
+    overflow-wrap: anywhere;
+  }
+  body.mobile-touch .char-row .char-sub {
+    font-size: 11px;
+  }
+  body.mobile-touch .char-row .char-actions {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: 7px;
+    width: 100%;
+  }
+  body.mobile-touch .char-row .btn {
+    width: 100%;
+    padding: 7px 8px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  body.mobile-touch #charselect-panel .mini-class-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+  body.mobile-touch #charselect-panel .mini-class {
+    min-width: 0;
+    padding: 9px 6px;
+    text-align: center;
+  }
+
   @media (max-width: 760px) {
     #community-hud { top: 208px; width: 146px; padding: 6px; gap: 5px; }
     .community-link { height: 32px; }
@@ -2838,16 +3144,20 @@
 
     /* Mobile First Responsive Footer */
     .footer-social-row {
-      flex-direction: column;
-      width: 100%;
+      flex-direction: row;
+      width: auto;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      gap: 10px;
     }
     .social-link {
-      width: 100%;
-      max-width: 220px;
+      width: 42px;
+      height: 36px;
+      padding: 0;
       justify-content: center;
     }
+    .social-link span { display: none; }
+    .social-link svg { width: 18px; height: 18px; }
   }
 </style>
 </head>
@@ -2963,7 +3273,10 @@
     <div id="spellbook" class="window panel"></div>
     <div id="quest-log-window" class="window panel"></div>
     <div id="vendor-window" class="window panel"></div>
-    <div id="map-window" class="window panel"><canvas id="map-canvas" width="560" height="560"></canvas></div>
+    <div id="map-window" class="window panel">
+      <button class="x-btn" id="map-close" title="Close map" aria-label="Close map">&times;</button>
+      <canvas id="map-canvas" width="560" height="560"></canvas>
+    </div>
     <div id="arena-window" class="window panel"></div>
     <div id="market-window" class="window panel"></div>
     <div id="arena-status"></div>
@@ -3157,10 +3470,14 @@
           </div>
         </div>
 
-        <div id="charselect-panel" class="panel auth-panel auth-panel-premium" hidden>
+        <div id="charselect-panel" class="panel auth-panel auth-panel-premium" data-mobile-tab="characters" hidden>
           <h2 class="auth-title"><span data-i18n="auth.characters">Characters:</span> <span id="charselect-user" class="gold"></span></h2>
           <div class="cs-realm" id="charselect-realm"></div>
           <button type="button" class="btn btn-secondary btn-small" id="btn-change-realm" data-i18n="auth.changeRealm">Change Realm</button>
+          <div class="mobile-char-tabs" role="tablist" aria-label="Character actions">
+            <button type="button" class="mobile-char-tab active" data-char-tab="characters" role="tab" aria-selected="true">Characters</button>
+            <button type="button" class="mobile-char-tab" data-char-tab="create" role="tab" aria-selected="false">Create</button>
+          </div>
           <div class="charselect-layout">
             <!-- Left Column: Character List & Creation Controls -->
             <div class="charselect-col-left">
@@ -3369,12 +3686,17 @@
     </div>
     <div id="mobile-combat-controls">
       <button class="mobile-btn" id="mobile-attack-nearest" title="Attack nearest enemy" aria-label="Attack nearest enemy">⚔<span class="mobile-label">Attack</span></button>
-      <button class="mobile-btn" id="mobile-more" title="More abilities" aria-label="Show more abilities">⋯<span class="mobile-label">More</span></button>
+      <button class="mobile-btn" id="mobile-target" title="Target nearest enemy" aria-label="Target nearest enemy">◎<span class="mobile-label">Target</span></button>
       <button class="mobile-btn" id="mobile-chat" title="Chat" aria-label="Open chat">⌕<span class="mobile-label">Chat</span></button>
+      <button class="mobile-btn" id="mobile-more" title="More menus" aria-label="Show more menus">⋯<span class="mobile-label">More</span></button>
       <div id="mobile-extra-controls">
-        <button class="mobile-btn" id="mobile-target" title="Target nearest enemy" aria-label="Target nearest enemy">◎<span class="mobile-label">Target</span></button>
-        <button class="mobile-btn" id="mobile-interact" title="Interact or loot" aria-label="Interact or loot">✦<span class="mobile-label">Use</span></button>
+        <button class="mobile-btn" id="mobile-social" title="Social" aria-label="Social">♟<span class="mobile-label">Social</span></button>
+        <button class="mobile-btn" id="mobile-arena" title="Arena" aria-label="Arena">⚔<span class="mobile-label">Arena</span></button>
         <button class="mobile-btn" id="mobile-menu" title="Game menu" aria-label="Game menu">☰<span class="mobile-label">Menu</span></button>
+        <button class="mobile-btn" id="mobile-interact" title="Interact or loot" aria-label="Interact or loot">✦<span class="mobile-label">Use</span></button>
+        <button class="mobile-btn" id="mobile-spellbook" title="Spellbook" aria-label="Spellbook">✹<span class="mobile-label">Spellbook</span></button>
+        <button class="mobile-btn" id="mobile-meters" title="Meters" aria-label="Meters">▦<span class="mobile-label">Meters</span></button>
+        <button class="mobile-btn" id="mobile-map" title="Map" aria-label="Map">◇<span class="mobile-label">Map</span></button>
       </div>
     </div>
   </div>

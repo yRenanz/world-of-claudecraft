@@ -3,7 +3,7 @@ import type { IWorld, MarketInfo } from '../world_api';
 import { Renderer } from '../render/renderer';
 import {
   ABILITIES, CLASSES, DUNGEON_LIST, DUNGEON_X_THRESHOLD, ITEMS, MOBS, NPCS, QUESTS,
-  WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z, ZONES, dungeonAt, zoneAt,
+  WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z, ZONES, dungeonAt, questRewardItem, zoneAt,
   zoneWelcomeText,
 } from '../sim/data';
 import type { ZoneDef } from '../sim/data';
@@ -1443,7 +1443,7 @@ export class Hud {
     }
     html += `<div class="qd-sub">Rewards</div>`;
     html += `<div class="qd-obj">${quest.xpReward} experience &nbsp; ${this.moneyHtml(quest.copperReward)}</div>`;
-    const rewardItem = quest.itemRewards[this.sim.cfg.playerClass];
+    const rewardItem = questRewardItem(quest, this.sim.cfg.playerClass);
     if (rewardItem) {
       const item = ITEMS[rewardItem];
       html += `<div class="qd-reward-row" data-reward>${this.itemIcon(item)}<span style="color:${QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff'};font-size:12px">${item.name}</span></div>`;

@@ -1,7 +1,7 @@
 import {
   ABILITIES, ARENA_SLOT_COUNT, CAMPS, CLASSES, DUNGEONS, DUNGEON_LIST, DungeonDef, arenaOrigin, dungeonAt,
   DUNGEON_X_THRESHOLD, GROUND_OBJECTS, GROUP_XP_BONUS, INSTANCE_SLOT_COUNT, isArenaPos,
-  ITEMS, MOBS, NPCS, PLAYER_START, QUESTS, REWARD_ARCHETYPE, abilitiesKnownAt, instanceOrigin,
+  ITEMS, MOBS, NPCS, PLAYER_START, QUESTS, questRewardItem, abilitiesKnownAt, instanceOrigin,
   zoneAt,
 } from './data';
 import { ARENA_SPAWN_A, ARENA_SPAWN_B } from './dungeon_layout';
@@ -3078,7 +3078,7 @@ export class Sim {
       meta.copper += quest.copperReward;
       this.emit({ type: 'loot', text: `You receive ${formatMoney(quest.copperReward)}.`, pid: meta.entityId });
     }
-    const rewardItem = quest.itemRewards[meta.cls] ?? quest.itemRewards[REWARD_ARCHETYPE[meta.cls]];
+    const rewardItem = questRewardItem(quest, meta.cls);
     if (rewardItem) this.addItem(rewardItem, 1, meta.entityId);
     this.grantXp(quest.xpReward, meta);
     this.emit({ type: 'questDone', questId, pid: meta.entityId });

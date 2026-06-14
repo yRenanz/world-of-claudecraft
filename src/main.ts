@@ -390,6 +390,7 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
     },
     onSocial: () => hud.toggleSocial(),
     onArena: () => hud.toggleArena(),
+    onQuestLog: () => hud.toggleQuestLog(),
     onSpellbook: () => hud.toggleSpellbook(),
     onMeters: () => hud.toggleMeters(),
     onMap: () => hud.toggleMap(),

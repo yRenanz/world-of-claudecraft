@@ -1,7 +1,7 @@
 import {
   ABILITIES, ARENA_SLOT_COUNT, CAMPS, CLASSES, DUNGEONS, DUNGEON_LIST, DungeonDef, arenaOrigin, dungeonAt,
   DUNGEON_X_THRESHOLD, GROUND_OBJECTS, GROUP_XP_BONUS, INSTANCE_SLOT_COUNT, isArenaPos,
-  ITEMS, MOBS, NPCS, PLAYER_START, QUESTS, REWARD_ARCHETYPE, abilitiesKnownAt, instanceOrigin,
+  ITEMS, MOBS, NPCS, PLAYER_START, QUESTS, questRewardItem, abilitiesKnownAt, instanceOrigin,
   zoneAt,
 } from './data';
 import { ARENA_SPAWN_A, ARENA_SPAWN_B } from './dungeon_layout';
@@ -2858,22 +2858,26 @@ export class Sim {
     this.emit({ type: 'vendor', action: 'buy', itemId, pid: meta.entityId });
   }
 
-  sellItem(itemId: string, pid?: number): void {
+  sellItem(itemId: string, count = 1, pid?: number): void {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta, e: p } = r;
     const def = ITEMS[itemId];
-    if (!def || this.countItem(itemId, meta.entityId) <= 0) { this.error(meta.entityId, "You don't have that item."); return; }
+    const available = this.countItem(itemId, meta.entityId);
+    if (!def || available <= 0) { this.error(meta.entityId, "You don't have that item."); return; }
     if (p.dead) { this.error(meta.entityId, "You can't do that while dead."); return; }
+    const sellCount = Number.isFinite(count) ? Math.min(Math.floor(count), available) : 0;
+    if (sellCount <= 0) return;
     // mirror buyItem's gate: selling requires a vendor in interact range
     const nearVendor = [...this.entities.values()].some((e) =>
       e.kind === 'npc' && e.vendorItems.length > 0 && dist2d(p.pos, e.pos) <= INTERACT_RANGE + 2);
     if (!nearVendor) { this.error(meta.entityId, 'There is no merchant nearby.'); return; }
     if (def.kind === 'quest') { this.error(meta.entityId, 'You cannot sell quest items.'); return; }
-    this.removeItem(itemId, 1, meta.entityId);
-    meta.copper += def.sellValue;
+    this.removeItem(itemId, sellCount, meta.entityId);
+    const payout = def.sellValue * sellCount;
+    meta.copper += payout;
     this.emit({ type: 'vendor', action: 'sell', itemId, pid: meta.entityId });
-    this.emit({ type: 'loot', text: `Sold ${def.name} for ${formatMoney(def.sellValue)}.`, pid: meta.entityId });
+    this.emit({ type: 'loot', text: `Sold ${def.name}${sellCount > 1 ? ' x' + sellCount : ''} for ${formatMoney(payout)}.`, pid: meta.entityId });
   }
 
   private addItemSilent(itemId: string, count: number, meta: PlayerMeta): void {
@@ -3074,7 +3078,7 @@ export class Sim {
       meta.copper += quest.copperReward;
       this.emit({ type: 'loot', text: `You receive ${formatMoney(quest.copperReward)}.`, pid: meta.entityId });
     }
-    const rewardItem = quest.itemRewards[meta.cls] ?? quest.itemRewards[REWARD_ARCHETYPE[meta.cls]];
+    const rewardItem = questRewardItem(quest, meta.cls);
     if (rewardItem) this.addItem(rewardItem, 1, meta.entityId);
     this.grantXp(quest.xpReward, meta);
     this.emit({ type: 'questDone', questId, pid: meta.entityId });

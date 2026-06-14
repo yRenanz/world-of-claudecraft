@@ -131,6 +131,24 @@ describe('delta snapshots', () => {
     }
   });
 
+  it('sell command forwards bounded stack quantities', () => {
+    const player = server.sim.entities.get(session.pid)!;
+    const vendor = [...server.sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
+    player.pos = { ...vendor.pos, x: vendor.pos.x + 2 };
+    player.prevPos = { ...player.pos };
+    server.sim.addItem('wolf_fang', 5, session.pid);
+
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'sell', item: 'wolf_fang', count: 3 }));
+
+    expect(server.sim.meta(session.pid)?.copper).toBe(12);
+    expect(server.sim.countItem('wolf_fang', session.pid)).toBe(2);
+
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'sell', item: 'wolf_fang', count: 99 }));
+
+    expect(server.sim.meta(session.pid)?.copper).toBe(20);
+    expect(server.sim.countItem('wolf_fang', session.pid)).toBe(0);
+  });
+
   it('resends a heavy field once it changes', () => {
     broadcast(server);
     fc.sent.length = 0;
@@ -155,6 +173,20 @@ describe('delta snapshots', () => {
     expect(snap.self).toHaveProperty('qlog');
     expect(snap.self).toHaveProperty('qdone');
     expect(snap.self).not.toHaveProperty('inv');
+  });
+
+  it('rejected distant quest accepts resync the authoritative quest state', () => {
+    broadcast(server);
+    fc.sent.length = 0;
+    const player = server.sim.entities.get(session.pid)!;
+    player.pos.x = 0;
+    player.pos.z = -40;
+
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'accept', quest: 'q_wolves' }));
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.qlog).toEqual([]);
+    expect(snap.self.qdone).toEqual([]);
   });
 
   it('each client gets full state on its own first snapshot', () => {

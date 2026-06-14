@@ -39,6 +39,7 @@ export class Input {
   suspendMovement = false;
   private dragDistance = 0;
   private downButton = -1;
+  private pointerLockRequestedForDrag = false;
   // one-shot key capture for the rebind UI: the next keydown is delivered here
   // (Escape cancels with null) instead of being dispatched as an action
   private captureCb: ((code: string | null) => void) | null = null;
@@ -157,7 +158,7 @@ export class Input {
     if (e.button === 2) this.rightDown = true;
     this.downButton = e.button;
     this.dragDistance = 0;
-    this.canvas.requestPointerLock?.();
+    this.pointerLockRequestedForDrag = false;
   }
 
   private onMouseUp(e: MouseEvent): void {
@@ -171,12 +172,17 @@ export class Input {
       this.cb.onClickPick(e.clientX, e.clientY, e.button);
     }
     this.downButton = -1;
+    this.pointerLockRequestedForDrag = false;
   }
 
   private onMouseMove(e: MouseEvent): void {
     if (!this.leftDown && !this.rightDown) return;
     const mx = e.movementX ?? 0, my = e.movementY ?? 0;
     this.dragDistance += Math.abs(mx) + Math.abs(my);
+    if (this.dragDistance > 5 && !this.pointerLockRequestedForDrag) {
+      this.pointerLockRequestedForDrag = true;
+      this.canvas.requestPointerLock?.();
+    }
     this.camYaw -= mx * this.lookSensitivity;
     this.camPitch = Math.min(1.35, Math.max(-0.4, this.camPitch + my * this.lookSensitivity));
   }

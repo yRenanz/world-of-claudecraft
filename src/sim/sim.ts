@@ -18,7 +18,7 @@ import { groundHeight, WATER_LEVEL } from './world';
 import {
   AbilityDef, AbilityEffect, Aura, AuraKind, CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION, CONSUME_DURATION,
   CONSUME_TICKS, CrowdControlDrCategory, DT, Entity, EquipSlot, FISHING_CAST_ID, FISHING_CAST_TIME, GCD,
-  INTERACT_RANGE, InvSlot, MELEE_RANGE, MAX_LEVEL, MobFamily,
+  INTERACT_RANGE, InvSlot, LootEntry, LootSlot, MELEE_RANGE, MAX_LEVEL, MobFamily,
   MoveInput, PlayerClass, QuestProgress, QuestState, RUN_SPEED, SimConfig, SimEvent, TURN_SPEED, Vec3,
   angleTo, armorReduction, dist2d, emptyMoveInput, isConsuming, meleeMissChance, mobXpValue, normAngle,
   rageFromDealing, rageFromTaking, spellHitChance, xpForLevel,
@@ -319,6 +319,9 @@ export class Sim {
   partyByPid = new Map<number, number>(); // pid -> party id
   partyInvites = new Map<number, { fromPid: number; expires: number }>(); // invitee pid -> invite
   nextPartyId = 1;
+  // raid/target markers: partyId -> (enemy entityId -> markerId 0..7). A
+  // cosmetic, party-scoped overlay — never read by tick()/obs/persistence.
+  partyMarkers = new Map<number, Map<number, number>>();
   trades = new Map<number, TradeSession>(); // pid -> shared session (both pids point at it)
   tradeInvites = new Map<number, { fromPid: number; expires: number }>();
   duels = new Map<number, DuelState>(); // pid -> shared duel (both pids)
@@ -362,8 +365,8 @@ export class Sim {
     // Mobs from camps
     for (const camp of CAMPS) {
       const template = MOBS[camp.mobId];
-      // murlocs may wade in the shallows; everyone else spawns on dry land
-      const minHeight = template.family === 'murloc' ? WATER_LEVEL - 0.5 : WATER_LEVEL + 0.4;
+      // Swimmers may wade in the shallows; everyone else spawns on dry land.
+      const minHeight = this.mobCanSwim(template) ? WATER_LEVEL - 0.5 : WATER_LEVEL + 0.4;
       for (let i = 0; i < camp.count; i++) {
         const ang = this.rng.range(0, Math.PI * 2);
         const r = Math.sqrt(this.rng.next()) * camp.radius;
@@ -416,6 +419,7 @@ export class Sim {
   }
 
   private dropEntity(id: number): void {
+    this.clearEntityMarker(id); // a despawned entity keeps no raid marker
     const e = this.entities.get(id);
     if (!e) return;
     this.grid.remove(e);
@@ -797,6 +801,16 @@ export class Sim {
   }
   private isRooted(e: Entity): boolean {
     return this.isStunned(e) || e.auras.some((a) => a.kind === 'root');
+  }
+  private mobCanSwim(template: { family?: string; canSwim?: boolean } | undefined): boolean {
+    return !!template && (template.canSwim === true || template.family === 'murloc');
+  }
+  private isControlAura(kind: AuraKind): boolean {
+    return kind === 'stun' || kind === 'root' || kind === 'incapacitate' || kind === 'polymorph';
+  }
+  private itemRequiresGroupRoll(itemId: string): boolean {
+    const q = ITEMS[itemId]?.quality ?? 'common';
+    return q === 'uncommon' || q === 'rare' || q === 'epic';
   }
   private moveSpeedMult(e: Entity): number {
     let slow = 1, speed = 1;
@@ -1804,6 +1818,7 @@ export class Sim {
 
   private applyAura(target: Entity, aura: Aura): void {
     if (target.kind === 'npc' && isRejectedFriendlyNpcAura(aura)) return;
+    if (target.kind === 'mob' && MOBS[target.templateId]?.ccImmune && this.isControlAura(aura.kind)) return;
     const existing = target.auras.findIndex((a) => a.id === aura.id && a.sourceId === aura.sourceId);
     if (existing >= 0) {
       this.applyNonPlayerStatAura(target, target.auras[existing], -1);
@@ -1921,6 +1936,7 @@ export class Sim {
     target.lootable = false;
     target.wanderTarget = null;
     clearThreat(target);
+    this.clearEntityMarker(target.id); // a tamed pet is no longer a markable enemy
     // it's friendly now: nobody keeps swinging at it, other mobs forget it
     for (const other of this.players.values()) {
       const e = this.entities.get(other.entityId);
@@ -2232,6 +2248,10 @@ export class Sim {
     e.castingAbility = null;
     this.emit({ type: 'death', entityId: e.id, killerId: killer?.id ?? -1 });
 
+    // a dead mob keeps no raid marker — respawnMob reuses the same entity id,
+    // so a stale mark would otherwise reappear on the respawn
+    if (e.kind === 'mob') this.clearEntityMarker(e.id);
+
     // the dead drop off every hate table (and any taunt lock on them)
     for (const m of this.entities.values()) {
       if (m.kind !== 'mob' || m.id === e.id) continue;
@@ -2264,9 +2284,10 @@ export class Sim {
     }
 
     if (e.kind === 'mob') {
+      const template = MOBS[e.templateId];
       e.aiState = 'dead';
       e.corpseTimer = CORPSE_DURATION;
-      e.respawnTimer = this.cfg.respawnSeconds * (MOBS[e.templateId]?.rare ? 4 : 1);
+      e.respawnTimer = this.cfg.respawnSeconds * (template?.respawnMult ?? (template?.rare ? 4 : 1));
       e.aggroTargetId = null;
       clearThreat(e);
       if (e.ownerId !== null) {
@@ -2308,7 +2329,7 @@ export class Sim {
           if (xpGain > 0 && mE.level < MAX_LEVEL) this.grantXp(xpGain, member);
           this.onMobKilledForQuests(e, member);
         }
-        this.rollLoot(e, meta);
+        this.rollLoot(e, meta, eligible);
       }
     }
   }
@@ -2332,15 +2353,24 @@ export class Sim {
     if (p.level >= MAX_LEVEL) meta.xp = 0;
   }
 
-  private rollLoot(mob: Entity, meta: PlayerMeta): void {
+  private needsQuestDrop(entry: LootEntry, meta: PlayerMeta): boolean {
+    if (!entry.questId || !entry.itemId) return false;
+    const qp = meta.questLog.get(entry.questId);
+    if (!qp || qp.state !== 'active') return false;
+    const quest = QUESTS[entry.questId];
+    const objIdx = quest.objectives.findIndex((o) => o.type === 'collect' && o.itemId === entry.itemId);
+    return objIdx < 0 || this.countItem(entry.itemId, meta.entityId) < quest.objectives[objIdx].count;
+  }
+
+  private rollLoot(mob: Entity, meta: PlayerMeta, eligible: PlayerMeta[] = [meta]): void {
     const template = MOBS[mob.templateId];
     if (!template) return;
     let copper = 0;
-    const items: InvSlot[] = [];
+    const items: LootSlot[] = [];
     const rolledGroups = new Set<string>();
     for (const entry of template.loot) {
-      // exclusive groups (boss "one of three" tables): a single rng draw is
-      // partitioned by the group entries' chances so exactly one drops.
+      // Exclusive groups: a single rng draw is partitioned by the group
+      // entries' chances, so at most one matching entry drops.
       // Exactly one rng.next() per group keeps replays deterministic.
       if (entry.rollGroup) {
         if (rolledGroups.has(entry.rollGroup)) continue;
@@ -2358,11 +2388,11 @@ export class Sim {
         continue;
       }
       if (entry.questId) {
-        const qp = meta.questLog.get(entry.questId);
-        if (!qp || qp.state !== 'active') continue;
-        const quest = QUESTS[entry.questId];
-        const objIdx = quest.objectives.findIndex((o) => o.type === 'collect' && o.itemId === entry.itemId);
-        if (objIdx >= 0 && this.countItem(entry.itemId!, meta.entityId) >= quest.objectives[objIdx].count) continue;
+        const questRecipients = eligible.filter((m) => this.needsQuestDrop(entry, m));
+        if (questRecipients.length === 0) continue;
+        if (!this.rng.chance(entry.chance)) continue;
+        items.push({ itemId: entry.itemId!, count: 1, personalFor: questRecipients.map((m) => m.entityId) });
+        continue;
       }
       if (!this.rng.chance(entry.chance)) continue;
       if (entry.copper) copper += this.rng.int(Math.ceil(entry.copper * 0.6), Math.ceil(entry.copper * 1.4));
@@ -2371,6 +2401,48 @@ export class Sim {
     if (copper > 0 || items.length > 0) {
       mob.loot = { copper, items };
       mob.lootable = true;
+    }
+  }
+
+  private rollGroupLoot(itemId: string, mob: Entity, looter: PlayerMeta): boolean {
+    if (!this.itemRequiresGroupRoll(itemId) || mob.tappedById === null) return false;
+    const party = this.partyOf(mob.tappedById);
+    if (!party || party.members.length <= 1) return false;
+    const candidates: PlayerMeta[] = [];
+    for (const pid of party.members) {
+      const candidate = this.players.get(pid);
+      const e = this.entities.get(pid);
+      if (candidate && e && !e.dead && dist2d(e.pos, mob.pos) <= PARTY_XP_RANGE) candidates.push(candidate);
+    }
+    if (candidates.length <= 1) return false;
+    let winner = candidates[0];
+    let bestRoll = -1;
+    for (const candidate of candidates) {
+      const roll = this.rng.int(1, 100);
+      if (roll > bestRoll) {
+        bestRoll = roll;
+        winner = candidate;
+      }
+    }
+    const itemName = ITEMS[itemId]?.name ?? itemId;
+    for (const candidate of candidates) {
+      this.emit({ type: 'loot', text: `${winner.name} wins ${itemName} (${bestRoll})`, pid: candidate.entityId });
+    }
+    this.addItem(itemId, 1, winner.entityId);
+    return true;
+  }
+
+  private lootSlotVisibleTo(slot: LootSlot, pid: number): boolean {
+    return !slot.personalFor || slot.personalFor.includes(pid);
+  }
+
+  private pruneCorpseLoot(mob: Entity): void {
+    if (!mob.loot) return;
+    mob.loot.items = mob.loot.items.filter((s) => s.count > 0 && (!s.personalFor || s.personalFor.length > 0));
+    if (mob.loot.copper <= 0 && mob.loot.items.length === 0) {
+      mob.loot = null;
+      mob.lootable = false;
+      mob.corpseTimer = Math.min(mob.corpseTimer, 4);
     }
   }
 
@@ -2591,18 +2663,19 @@ export class Sim {
           this.mobSwing(mob, target);
           mob.swingTimer = mob.weapon.speed * this.swingIntervalMult(mob);
         }
-        // boss pulse mechanic (Morthen's Shadow Pulse)
+        // Boss/miniboss pulse mechanic.
         const pulse = MOBS[mob.templateId]?.aoePulse;
         if (pulse) {
           mob.pulseTimer -= DT;
           if (mob.pulseTimer <= 0) {
             mob.pulseTimer = pulse.every;
-            this.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school: 'shadow', fx: 'nova' });
+            const school = pulse.school ?? 'shadow';
+            this.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: pulse.fx ?? 'nova' });
             for (const meta of this.players.values()) {
               const pe = this.entities.get(meta.entityId);
               if (pe && !pe.dead && dist2d(pe.pos, mob.pos) <= pulse.radius) {
                 const dmg = Math.round(this.rng.range(pulse.min, pulse.max));
-                this.dealDamage(mob, pe, dmg, false, 'shadow', pulse.name, 'hit', true);
+                this.dealDamage(mob, pe, dmg, false, school, pulse.name, 'hit', true);
               }
             }
           }
@@ -2730,7 +2803,7 @@ export class Sim {
     const nx = e.pos.x + Math.sin(e.facing) * step;
     const nz = e.pos.z + Math.cos(e.facing) * step;
     const ground = groundHeight(nx, nz, this.cfg.seed);
-    const canSwim = MOBS[e.templateId]?.family === 'murloc';
+    const canSwim = this.mobCanSwim(MOBS[e.templateId]);
     // landlocked creatures stop at the waterline instead of walking under it
     if (!canSwim && ground < WATER_LEVEL - SWIM_DEPTH) return false;
     const resolved = resolvePosition(this.cfg.seed, nx, nz, BODY_RADIUS);
@@ -3147,11 +3220,21 @@ export class Sim {
       meta.copper += mob.loot.copper;
       meta.counters.lootCopper += mob.loot.copper;
       this.emit({ type: 'loot', text: `You loot ${formatMoney(mob.loot.copper)}.`, pid: meta.entityId });
+      mob.loot.copper = 0;
     }
-    for (const s of mob.loot.items) this.addItem(s.itemId, s.count, meta.entityId);
-    mob.loot = null;
-    mob.lootable = false;
-    mob.corpseTimer = Math.min(mob.corpseTimer, 4);
+    for (const s of [...mob.loot.items]) {
+      if (!this.lootSlotVisibleTo(s, meta.entityId)) continue;
+      if (s.personalFor) {
+        this.addItem(s.itemId, 1, meta.entityId);
+        s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
+        continue;
+      }
+      for (let i = 0; i < s.count; i++) {
+        if (!this.rollGroupLoot(s.itemId, mob, meta)) this.addItem(s.itemId, 1, meta.entityId);
+      }
+      s.count = 0;
+    }
+    this.pruneCorpseLoot(mob);
     if (p.targetId === mobId) p.targetId = null;
   }
 
@@ -3609,6 +3692,7 @@ export class Sim {
         this.emit({ type: 'log', text: 'Your party has disbanded.', color: '#aaf', pid: mPid });
       }
       this.parties.delete(party.id);
+      this.partyMarkers.delete(party.id);
     } else if (party.leader === pid) {
       party.leader = party.members[0];
       const newLeader = this.players.get(party.leader);
@@ -3616,6 +3700,62 @@ export class Sim {
         this.emit({ type: 'log', text: `${newLeader?.name ?? 'Someone'} is now the party leader.`, color: '#aaf', pid: mPid });
       }
     }
+  }
+
+  // -------------------------------------------------------------------------
+  // Raid markers (party-scoped target markers)
+  // -------------------------------------------------------------------------
+
+  // Every mark visible to the actor's party, as { entityId: markerId }. Empty
+  // when the actor is not in a party. Pure read — cleanup happens on the
+  // death/despawn/disband hooks, never here.
+  markersFor(pid: number): Record<number, number> {
+    const party = this.partyOf(pid);
+    if (!party) return {};
+    const marks = this.partyMarkers.get(party.id);
+    if (!marks) return {};
+    const out: Record<number, number> = {};
+    for (const [eid, mid] of marks) out[eid] = mid;
+    return out;
+  }
+
+  setMarker(entityId: number, markerId: number, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const party = this.partyOf(r.meta.entityId);
+    if (!party) { this.error(r.meta.entityId, 'You must be in a party to use raid markers.'); return; }
+    if (!Number.isInteger(markerId) || markerId < 0 || markerId > 7) return;
+    // markable: a live, wild, hostile mob (not players, NPCs, corpses, or pets)
+    const target = this.entities.get(entityId);
+    if (!target || target.kind !== 'mob' || target.dead || !target.hostile || target.ownerId !== null) return;
+    let marks = this.partyMarkers.get(party.id);
+    if (!marks) { marks = new Map(); this.partyMarkers.set(party.id, marks); }
+    // re-applying the same symbol to the same mob toggles it off
+    if (marks.get(entityId) === markerId) { marks.delete(entityId); return; }
+    // a symbol is unique within the party: take it off whatever held it
+    for (const [eid, mid] of marks) { if (mid === markerId) marks.delete(eid); }
+    marks.set(entityId, markerId);
+  }
+
+  clearMarker(entityId: number, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const party = this.partyOf(r.meta.entityId);
+    if (!party) return;
+    this.partyMarkers.get(party.id)?.delete(entityId);
+  }
+
+  // The local player's view of one entity's mark (for the renderer). Direct
+  // lookup, no per-call allocation.
+  markerFor(entityId: number): number | null {
+    const party = this.partyOf(this.primaryId);
+    if (!party) return null;
+    return this.partyMarkers.get(party.id)?.get(entityId) ?? null;
+  }
+
+  // Strip an entity's mark from every party — used when it dies or despawns.
+  private clearEntityMarker(entityId: number): void {
+    for (const marks of this.partyMarkers.values()) marks.delete(entityId);
   }
 
   // -------------------------------------------------------------------------

@@ -57,6 +57,8 @@
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 <link rel="preload" as="image" href="/loading-screen.jpg" />
+<link rel="preload" as="image" href="./ui/cursors/hand-default.png" />
+<link rel="preload" as="image" href="./ui/cursors/attack-sword.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Inter:wght@300..700&display=swap" rel="stylesheet">
@@ -121,6 +123,11 @@
     --scrollbar-border: #7c6233;
     --app-vw: 100vw;
     --app-vh: 100vh;
+    /* Shared with src/game/cursors.ts — keep hotspots in sync. */
+    --cursor-hand: url('./ui/cursors/hand-default.png') 12 2, default;
+    --cursor-sword: url('./ui/cursors/attack-sword.png') 4 4, pointer;
+    --cursor-shield: url('./ui/cursors/friendly-shield.png') 13 30, default;
+    --cursor-grab: url('./ui/cursors/hand-grab.png') 11 16, grabbing;
   }
   * { 
     box-sizing: border-box; 
@@ -175,6 +182,22 @@
     -webkit-text-size-adjust: 100%;
   }
   #game-canvas { position: fixed; left: 0; top: 0; width: var(--app-vw); height: var(--app-vh); display: block; }
+
+  /* Pre-game screens use the same hand / sword cursors as in-world (cursors.ts). */
+  #start-screen,
+  #loading-screen.visible {
+    cursor: var(--cursor-hand);
+  }
+  #start-screen :is(
+    .btn, .mode-card, .social-link, .realm-row, .char-row, .class-card,
+    .password-toggle, #btn-toggle-controls, .btn-close-drawer
+  ) {
+    cursor: var(--cursor-sword);
+  }
+  #start-screen :is(input, textarea) {
+    cursor: text;
+  }
+
   #nameplates { position: fixed; left: 0; top: 0; width: var(--app-vw); height: var(--app-vh); overflow: hidden; pointer-events: none; }
   #ui { position: fixed; left: 0; top: 0; width: var(--app-vw); height: var(--app-vh); pointer-events: none; }
   #ui > * { pointer-events: auto; }
@@ -215,6 +238,12 @@
   .np-marker.ready { color: var(--gold); text-shadow: 0 0 6px #ffd10088, 1px 1px 2px #000; }
   .np-marker.active { color: #b9b9b9; }
   .np-marker.loot { color: var(--gold); font-size: 14px; }
+  /* party raid/target marker — floats above the name; display toggled in JS so
+     it reserves no vertical space when absent. Drop-shadow adds a dark halo on
+     top of the icon's baked outline for legibility against the bright world. */
+  .np-raidmark { width: 30px; height: 30px; margin: 0 auto 1px; background-size: contain;
+    background-repeat: no-repeat; background-position: center;
+    filter: drop-shadow(0 0 2px #000) drop-shadow(0 1px 1px #000); }
 
   /* ---------- chat bubbles (/say, /yell) ---------- */
   .chat-bubble { position: absolute; left: 0; top: 0; max-width: 220px; pointer-events: none;
@@ -662,6 +691,22 @@
     background: linear-gradient(#2c2c3a, #15151f); color: #ffd9a0; border-color: #4a3d1d; }
   .kb-key.capturing { border-color: var(--gold); color: #fff; box-shadow: 0 0 8px #ffd100aa; }
   .kb-note { font-size: 11px; color: #b9ac82; margin: 2px 0 6px; min-height: 14px; line-height: 1.4; }
+  .kb-toggle-row { margin-bottom: 6px; background: #ffffff0a; border-radius: 4px; }
+  .kb-toggle-row .kb-toggle {
+    grid-column: 2;
+    width: 78px;
+    min-width: 78px;
+    max-width: 78px;
+    margin: 0;
+    padding: 3px 6px;
+    text-align: center;
+    font-size: 12px;
+    font-family: var(--ui-font);
+    line-height: 1.2;
+    justify-self: start;
+    box-sizing: border-box;
+  }
+  .kb-toggle.off { filter: grayscale(0.6) brightness(0.8); color: #b9ac82; }
   .set-rows { display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px; }
   .set-row { display: grid; grid-template-columns: 120px 1fr 48px; align-items: center; gap: 10px; padding: 3px 6px; }
   .set-name { font-size: 12.5px; color: #e8e0c8; }
@@ -1911,6 +1956,8 @@
   #ctx-menu .ctx-title { font-family: var(--title-font); color: var(--gold); font-size: 13px; padding: 3px 8px; border-bottom: 1px solid #463a1c; margin-bottom: 4px; }
   #ctx-menu .ctx-item { padding: 5px 10px; font-size: 12.5px; color: #e8d8a8; cursor: pointer; border-radius: 4px; }
   #ctx-menu .ctx-item:hover { background: #ffffff18; color: #fff; }
+  #ctx-menu .ctx-mark { display: inline-block; width: 18px; height: 18px; vertical-align: middle;
+    margin-right: 8px; background-size: contain; background-repeat: no-repeat; background-position: center; }
 
   /* ---------- prompts (invite/trade/duel) ---------- */
   #prompt-stack { position: absolute; left: 50%; top: 34%; transform: translateX(-50%); z-index: 80;

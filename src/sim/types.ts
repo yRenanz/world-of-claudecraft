@@ -108,13 +108,23 @@ export interface InvSlot {
   count: number;
 }
 
+export interface LootSlot extends InvSlot {
+  // Quest corpse loot can be personal: each listed player can take one copy.
+  personalFor?: number[];
+}
+
+export interface CorpseLoot {
+  copper: number;
+  items: LootSlot[];
+}
+
 export interface LootEntry {
   itemId?: string;
   copper?: number;
   chance: number; // 0..1
   questId?: string; // only drops while this quest is active and not complete
   // Entries sharing a rollGroup are exclusive: one rng draw is partitioned by
-  // their chances so exactly one drops (group chances should sum to 1.0).
+  // their chances, so at most one matching entry drops.
   rollGroup?: string;
 }
 
@@ -143,8 +153,12 @@ export interface MobTemplate {
   rare?: boolean;
   // Elite scaling, vanilla-style: ~2.3x health, ~1.5x damage, double XP.
   elite?: boolean;
+  // Rare/miniboss controls.
+  canSwim?: boolean;
+  ccImmune?: boolean;
+  respawnMult?: number;
   // Boss mechanic: periodic AoE pulse around the mob while in combat.
-  aoePulse?: { min: number; max: number; radius: number; every: number; name: string };
+  aoePulse?: { min: number; max: number; radius: number; every: number; name: string; school?: string; fx?: 'nova' | 'projectile' };
   // Boss mechanic: spawn adds when hp first drops below each threshold (descending fractions).
   summonAdds?: { mobId: string; count: number; atHpPct: number[] };
   // Boss mechanic: damage multiplier once hp drops below the threshold.
@@ -466,7 +480,7 @@ export interface Entity {
   respawnTimer: number;
   corpseTimer: number;
   lootable: boolean;
-  loot: { copper: number; items: InvSlot[] } | null;
+  loot: CorpseLoot | null;
   xpValue: number;
   // npc
   questIds: string[];

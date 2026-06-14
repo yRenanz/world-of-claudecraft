@@ -16,9 +16,9 @@ import { terrainHeight, WATER_LEVEL, roadDistance } from '../sim/world';
 import { Meters } from './meters';
 import { audio } from '../game/audio';
 import { music } from '../game/music';
-import { iconDataUrl, QUALITY_COLOR } from './icons';
+import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl, RAID_MARKER_NAMES } from './icons';
 import { Keybinds, BIND_ACTIONS, BIND_CATEGORIES, isReservedCode, keyLabel } from '../game/keybinds';
-import { Settings, GameSettings, SETTING_RANGES } from '../game/settings';
+import { Settings, GameSettings, BoolSettingKey, NumericSettingKey, SETTING_RANGES } from '../game/settings';
 import { chatPlayerContextActions } from './player_context_menu';
 import {
   clearHotbarSlot, encodeHotbarAction, HOTBAR_ACTION_MIME, HotbarAction, parseHotbarAction, parseHotbarActions,
@@ -31,7 +31,7 @@ export interface OptionsHooks {
   logout(): void;
   captureKey(cb: (code: string | null) => void): void;
   settings: Settings;
-  onSettingChange(key: keyof GameSettings, value: number): void;
+  onSettingChange(key: keyof GameSettings, value: GameSettings[keyof GameSettings]): void;
 }
 
 export interface ReportHooks {
@@ -152,6 +152,11 @@ export class Hud {
       const t = tid !== null ? this.sim.entities.get(tid) : null;
       if (t && t.kind === 'player' && t.id !== this.sim.playerId) {
         this.openContextMenu(t.id, t.name, (ev as MouseEvent).clientX, (ev as MouseEvent).clientY);
+      } else if (t && t.kind === 'mob' && !t.dead && t.hostile && t.ownerId === null && this.sim.partyInfo) {
+        // classic WoW: right-click an enemy's unit frame to set a raid marker.
+        // Mirror Sim.setMarker's markable criteria (live wild hostile mob) so the
+        // menu never appears for a pet/non-hostile mob where it would be a no-op.
+        this.openMarkerMenu(t.id, t.name, (ev as MouseEvent).clientX, (ev as MouseEvent).clientY);
       }
     });
     $('#mm-char').addEventListener('click', () => this.toggleChar());
@@ -1622,13 +1627,15 @@ export class Hud {
   openLoot(mobId: number, screenX: number, screenY: number): void {
     const mob = this.sim.entities.get(mobId);
     if (!mob?.loot) return;
+    const visibleItems = mob.loot.items.filter((s) => !s.personalFor || s.personalFor.includes(this.sim.playerId));
+    if (mob.loot.copper <= 0 && visibleItems.length === 0) return;
     this.openLootMobId = mobId;
     const el = $('#loot-window');
     let html = `<div class="panel-title"><span>${mob.name}</span><span class="x-btn" data-close>✕</span></div>`;
     if (mob.loot.copper > 0) {
       html += `<div class="loot-item"><img class="item-icon q-common" src="${iconDataUrl('item', 'coin_gold')}" alt="" draggable="false"><span>${this.moneyHtml(mob.loot.copper)}</span></div>`;
     }
-    for (const s of mob.loot.items) {
+    for (const s of visibleItems) {
       const item = ITEMS[s.itemId];
       html += `<div class="loot-item" data-item="${s.itemId}">${this.itemIcon(item)}<span style="font-size:12px">${item.name}${s.count > 1 ? ' x' + s.count : ''}</span></div>`;
     }
@@ -2332,6 +2339,34 @@ export class Hud {
     });
   }
 
+  // Raid/target marker picker for an enemy, opened from its target unit frame.
+  // Party-only (markers are a coordination feature); shows the 8 symbols with a
+  // check on the one currently on this mob, plus Clear and Cancel.
+  openMarkerMenu(entityId: number, name: string, x: number, y: number): void {
+    if (!this.sim.partyInfo) return;
+    const el = $('#ctx-menu');
+    const current = this.sim.markerFor(entityId);
+    let html = `<div class="ctx-title">${esc(name)}</div>`;
+    for (let i = 0; i < RAID_MARKER_NAMES.length; i++) {
+      const check = current === i ? ' ✓' : '';
+      html += `<div class="ctx-item" data-act="m${i}"><span class="ctx-mark" style="background-image:url(${raidMarkerDataUrl(i)})"></span>${RAID_MARKER_NAMES[i]}${check}</div>`;
+    }
+    html += `<div class="ctx-item" data-act="clear">Clear Marker</div>`;
+    html += `<div class="ctx-item" data-act="close">Cancel</div>`;
+    el.innerHTML = html;
+    el.style.left = `${Math.min(window.innerWidth - 170, x)}px`;
+    el.style.top = `${Math.min(window.innerHeight - 340, y)}px`;
+    el.style.display = 'block';
+    el.querySelectorAll('.ctx-item').forEach((item) => {
+      item.addEventListener('click', () => {
+        const act = (item as HTMLElement).dataset.act;
+        el.style.display = 'none';
+        if (act === 'clear') this.sim.clearMarker(entityId);
+        else if (act && act.startsWith('m')) this.sim.setMarker(entityId, Number(act.slice(1)));
+      });
+    });
+  }
+
   private openChatPlayerContextMenu(name: string, x: number, y: number): void {
     const el = $('#ctx-menu');
     const online = this.sim.socialInfo !== null;
@@ -2964,7 +2999,7 @@ export class Hud {
   }
 
   // A labelled slider bound to a numeric setting; live-applies via the hook.
-  private settingSlider(parent: HTMLElement, label: string, key: keyof GameSettings): void {
+  private settingSlider(parent: HTMLElement, label: string, key: NumericSettingKey): void {
     const hooks = this.optionsHooks;
     if (!hooks) return;
     const r = SETTING_RANGES[key];
@@ -2992,7 +3027,7 @@ export class Hud {
     parent.appendChild(row);
   }
 
-  private settingToggle(parent: HTMLElement, label: string, key: keyof GameSettings): void {
+  private settingToggle(parent: HTMLElement, label: string, key: 'fullscreen'): void {
     const hooks = this.optionsHooks;
     if (!hooks) return;
     const row = document.createElement('div');
@@ -3094,12 +3129,42 @@ export class Hud {
     return item ? item.name : fallback;
   }
 
+  private settingBoolToggleKeybind(parent: HTMLElement, label: string, key: BoolSettingKey): void {
+    const hooks = this.optionsHooks;
+    if (!hooks) return;
+    const row = document.createElement('div');
+    row.className = 'kb-row kb-toggle-row';
+    const name = document.createElement('span');
+    name.className = 'kb-name';
+    name.textContent = label;
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'btn kb-key kb-toggle';
+    const sync = () => {
+      const on = hooks.settings.get(key);
+      toggle.textContent = on ? 'On' : 'Off';
+      toggle.classList.toggle('off', !on);
+      toggle.setAttribute('aria-pressed', on ? 'true' : 'false');
+    };
+    sync();
+    toggle.addEventListener('click', () => {
+      audio.click();
+      const next = !hooks.settings.get(key);
+      hooks.onSettingChange(key, hooks.settings.set(key, next));
+      sync();
+    });
+    row.append(name, toggle);
+    parent.appendChild(row);
+  }
+
   private renderKeybinds(): void {
     const el = $('#options-menu');
     el.innerHTML = `<div class="panel-title"><span>Key Bindings</span><span class="x-btn" data-close>✕</span></div>`;
+    this.settingBoolToggleKeybind(el, 'Mouse Camera', 'mouseCamera');
     const note = document.createElement('div');
     note.className = 'kb-note';
-    note.textContent = this.keybindNote || 'Click a key cell, then press a key to bind it. Esc cancels. Each action has a primary and an alternate key.';
+    note.textContent = this.keybindNote
+      || 'Mouse Camera off: A/D turns, drag to orbit (classic). On: camera-relative WASD, A/D strafes. Click a key cell to rebind; Esc cancels.';
     el.appendChild(note);
     const rows = document.createElement('div');
     rows.className = 'kb-rows';

@@ -153,8 +153,10 @@ describe('nine classes', () => {
     const sim = new Sim({ seed: 42, playerClass: 'hunter' });
     const p = sim.player;
     const wolf = nearestMob(sim, 'forest_wolf');
-    wolf.hp = 30;
-    teleport(sim, p.id, wolf.pos.x + 20, wolf.pos.z);
+    p.maxHp = 500;
+    p.hp = 500;
+    wolf.hp = 60;
+    teleport(sim, p.id, wolf.pos.x + 35, wolf.pos.z);
     sim.targetEntity(wolf.id);
     face(sim, p.id, wolf.id);
     sim.startAutoAttack();

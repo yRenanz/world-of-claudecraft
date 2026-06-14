@@ -75,12 +75,32 @@ describe("i18n Localization Key Coverage", () => {
     "hud.errors.chatCooldown",
     "hud.logs.lootReceiveItem",
   ];
+  const phaseThreeAbilityKeys: TranslationKey[] = [
+    "abilityUi.actionBar.attackName",
+    "abilityUi.actionBar.attackTooltip",
+    "abilityUi.actionBar.emptySlot",
+    "abilityUi.spellbook.title",
+    "abilityUi.spellbook.classSubtitle",
+    "abilityUi.spellbook.trainableAtLevel",
+    "abilityUi.spellbook.learnAtLevel",
+    "abilityUi.tooltip.rank",
+    "abilityUi.tooltip.cost",
+    "abilityUi.tooltip.rangeWithMin",
+    "abilityUi.tooltip.channeledSeconds",
+    "abilityUi.tooltip.cooldownSeconds",
+    "abilityUi.tooltip.requiresForm",
+    "abilityUi.tooltip.requiresCombo",
+    "abilityUi.tooltip.finisherDamage",
+    "abilityUi.resources.mana",
+  ];
   const interpolationValues: Record<string, string | number> = {
     ability: "Fireball",
     action: "Open Chat",
     amount: 42,
+    base: 14,
     className: "Mage",
     command: "/dance",
+    cost: 30,
     current: 120,
     delta: "+13",
     duration: "15s",
@@ -92,17 +112,23 @@ describe("i18n Localization Key Coverage", () => {
     label: "Wolf",
     level: 10,
     loser: "Mira",
+    max: 25,
     message: "Meet at the inn",
+    min: 16,
     money: "12 copper",
     name: "Aki",
     needed: 400,
+    perCombo: 7,
     percent: 30,
     position: 3,
     rating: 1513,
-    resource: "mana",
+    range: 30,
+    rank: 2,
+    resource: "Mana",
     seconds: 7,
     slot: 5,
     source: "Wolf",
+    summary: "30 Mana / Instant",
     tab: "Damage",
     target: "Wolf",
     view: "Current",
@@ -226,6 +252,17 @@ describe("i18n Localization Key Coverage", () => {
     setLanguage("en");
   });
 
+  it("should include current phase action bar, spellbook, and ability tooltip keys in every locale", () => {
+    for (const key of phaseThreeAbilityKeys) {
+      for (const lang of supportedLanguages) {
+        setLanguage(lang);
+        expect(t(key), `${lang}.${key}`).not.toBe(key);
+        expect(t(key).trim().length, `${lang}.${key}`).toBeGreaterThan(0);
+      }
+    }
+    setLanguage("en");
+  });
+
   it("should preserve and render every Phase 2 HUD interpolation placeholder in every locale", () => {
     const phaseTwoDynamicKeys = flattenStrings(en.hud, "hud")
       .map(({ key, value }) => ({ key, expected: placeholders(value) }))
@@ -233,6 +270,30 @@ describe("i18n Localization Key Coverage", () => {
     const allLocales: Record<string, typeof en> = { en, ...locales };
 
     for (const { key, expected } of phaseTwoDynamicKeys) {
+      for (const [lang, locale] of Object.entries(allLocales)) {
+        const template = nestedString(locale, key);
+        expect(placeholders(template), `${lang}.${key} placeholders`).toEqual(expected);
+        expect(isSupportedLanguage(lang)).toBe(true);
+        if (!isSupportedLanguage(lang)) continue;
+        setLanguage(lang);
+        const rendered = t(key, interpolationValues);
+        expect(rendered, `${lang}.${key} should not leave placeholders unresolved`).not.toMatch(/\{[A-Za-z][A-Za-z0-9]*\}/);
+        for (const placeholder of expected) {
+          expect(rendered, `${lang}.${key} should include ${placeholder}`).toContain(String(interpolationValues[placeholder]));
+        }
+      }
+    }
+
+    setLanguage("en");
+  });
+
+  it("should preserve and render every Phase 3 ability UI interpolation placeholder in every locale", () => {
+    const phaseThreeDynamicKeys = flattenStrings(en.abilityUi, "abilityUi")
+      .map(({ key, value }) => ({ key, expected: placeholders(value) }))
+      .filter(({ expected }) => expected.length > 0);
+    const allLocales: Record<string, typeof en> = { en, ...locales };
+
+    for (const { key, expected } of phaseThreeDynamicKeys) {
       for (const [lang, locale] of Object.entries(allLocales)) {
         const template = nestedString(locale, key);
         expect(placeholders(template), `${lang}.${key} placeholders`).toEqual(expected);
@@ -262,6 +323,28 @@ describe("i18n Localization Key Coverage", () => {
 
     setLanguage("zh_CN");
     expect(t("hud.logs.lootReceiveItem", { item: "粗糙护腕" })).toContain("粗糙护腕");
+
+    setLanguage("en");
+  });
+
+  it("should format Phase 3 ability tooltip templates without dropping dynamic values", () => {
+    setLanguage("de_DE");
+    expect(t("abilityUi.tooltip.cooldownSeconds", { seconds: 8 })).toContain("8");
+    expect(t("abilityUi.spellbook.trainableAtLevel", { level: 10 })).toContain("10");
+
+    setLanguage("ko_KR");
+    const knownAbility = t("abilityUi.spellbook.knownAbilityAria", {
+      name: "Fireball",
+      rank: 2,
+      summary: "30 Mana / Instant",
+    });
+    expect(knownAbility).toContain("Fireball");
+    expect(knownAbility).toContain("2");
+
+    setLanguage("ja_JP");
+    const finisher = t("abilityUi.tooltip.finisherDamage", { base: 14, perCombo: 7 });
+    expect(finisher).toContain("14");
+    expect(finisher).toContain("7");
 
     setLanguage("en");
   });

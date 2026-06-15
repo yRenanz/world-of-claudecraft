@@ -422,6 +422,7 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
     onAttackNearest: () => attackNearest(),
     onTarget: () => world.tabTarget(),
     onInteract: () => interactKey(),
+    onAutorun: () => input.toggleAutorun(),
     onChat: () => openChat(),
     onMenu: () => {
       if (!hud.closeAll()) hud.toggleOptionsMenu();

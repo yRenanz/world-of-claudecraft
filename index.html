@@ -3123,7 +3123,7 @@
   body.mobile-touch .action-btn:first-child { display: none; }
   body.mobile-touch .action-btn.empty { display: none; }
   body.mobile-touch #community-hud {
-    right: 8px;
+    right: max(8px, env(safe-area-inset-right));
     top: 130px;
     bottom: auto;
     width: 70px;
@@ -3384,7 +3384,7 @@
       min-width: 100px;
       height: 5px;
     }
-    body.mobile-touch #community-hud { top: 108px; right: 8px; width: 62px; padding: 4px; gap: 4px; }
+    body.mobile-touch #community-hud { top: 108px; right: max(8px, env(safe-area-inset-right)); width: 62px; padding: 4px; gap: 4px; }
     body.mobile-touch .community-link { height: 40px; }
     body.mobile-touch .community-link svg { width: 20px; height: 20px; }
     body.mobile-touch #chatlog-wrap { left: 10px; bottom: calc(112px + env(safe-area-inset-bottom)); width: min(330px, 44vw); }

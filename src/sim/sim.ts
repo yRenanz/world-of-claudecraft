@@ -4319,6 +4319,12 @@ export class Sim {
     // (no server interceptor).
     if (/^\/(?:completed|questsdone|qdone)(?:\s|$)/i.test(raw)) {
       this.error(r.meta.entityId, this.completedReadout(r.meta));
+    // "/listings" (aliases /mylistings, /auctions) — self-only readout of your
+    // own active World Market listings: item, asking price, and time left.
+    // Self-only error reply, returns null so it is neither logged nor spoken;
+    // works online for free (no server interceptor).
+    if (/^\/(?:listings|mylistings|auctions)(?:\s|$)/i.test(raw)) {
+      this.error(r.meta.entityId, this.listingsReadout(r.meta));
       return null;
     }
 
@@ -5879,6 +5885,23 @@ export class Sim {
     const names = [...meta.questsDone].map((id) => QUESTS[id]?.name ?? id);
     if (names.length === 0) return 'You have not completed any quests yet.';
     return `Completed quests (${names.length}): ${names.join(', ')}.`;
+  // Readout for "/listings": your own active World Market listings (house stock
+  // and other sellers excluded), each with item, asking price, and time left
+  // before it returns unsold. Reads only the live marketListings, ITEMS names,
+  // and this.time (no new fields); the count is shown against MARKET_MAX_LISTINGS
+  // so you know how much room you have left, mirroring the cap in marketList.
+  private listingsReadout(meta: PlayerMeta): string {
+    const mine = this.marketListings.filter((l) => !l.house && l.sellerKey === meta.name);
+    if (mine.length === 0) return 'You have no goods on the World Market.';
+    const parts = mine.map((l) => {
+      const name = ITEMS[l.itemId]?.name ?? l.itemId;
+      const qty = l.count > 1 ? ` x${l.count}` : '';
+      const secs = Math.max(0, Math.ceil(l.expiresAt - this.time));
+      const h = Math.floor(secs / 3600), m = Math.floor((secs % 3600) / 60);
+      const left = h > 0 ? `${h}h ${m}m` : m > 0 ? `${m}m` : `${secs}s`;
+      return `${name}${qty} — ${formatMoney(l.price)} (${left} left)`;
+    });
+    return `Your market listings (${parts.length}/${MARKET_MAX_LISTINGS}): ${parts.join(', ')}.`;
   }
 
   private error(pid: number, text: string): void {

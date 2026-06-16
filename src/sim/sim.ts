@@ -1126,6 +1126,11 @@ export class Sim {
   private isRooted(e: Entity): boolean {
     return this.isStunned(e) || e.auras.some((a) => a.kind === 'root');
   }
+  // Silence locks out spell (non-physical) casts but leaves physical abilities,
+  // movement and melee untouched — unlike a stun, which freezes everything.
+  private isSilenced(e: Entity): boolean {
+    return e.auras.some((a) => a.kind === 'silence');
+  }
   private mobCanSwim(template: { family?: string; canSwim?: boolean } | undefined): boolean {
     return !!template && (template.canSwim === true || template.family === 'murloc');
   }
@@ -1474,6 +1479,12 @@ export class Sim {
   private updateCasting(p: Entity, meta: PlayerMeta): void {
     if (!p.castingAbility) return;
     if (this.isStunned(p)) { this.cancelCast(p); return; }
+    // a silence breaks an in-progress spell, but never the fishing cast or a
+    // physical channel (e.g. an aimed-shot kind) — those aren't spells.
+    if (this.isSilenced(p) && p.castingAbility !== FISHING_CAST_ID) {
+      const cast = this.resolvedAbility(p.castingAbility, p.id);
+      if (cast && cast.def.school !== 'physical') { this.cancelCast(p); return; }
+    }
     p.castRemaining -= DT;
 
     if (p.channeling) {
@@ -1536,6 +1547,7 @@ export class Sim {
     if (!res || p.dead) return;
     const ability = res.def;
     if (this.isStunned(p)) { this.error(p.id, 'You are stunned!'); return; }
+    if (ability.school !== 'physical' && this.isSilenced(p)) { this.error(p.id, 'You are silenced!'); return; }
     if (p.castingAbility) { this.error(p.id, 'You are busy.'); return; }
     if (!ability.offGcd && p.gcdRemaining > 0) return; // silent, classic spams this
     const togglingOff = isToggleBuff(ability) && p.auras.some((a) => a.id === ability.id);
@@ -3137,6 +3149,17 @@ export class Sim {
     if (mob.enraged && enrage) dmg *= enrage.dmgMult;
     dmg *= 1 - armorReduction(this.effectiveArmor(target), mob.level);
     this.dealDamage(mob, target, Math.max(1, Math.round(dmg)), crit, 'physical', null, 'hit');
+    // silencing shriek: anti-caster mobs can lock the victim's spells on a hit.
+    // Guard on hostile + alive so a friendly pet (the other mobSwing caller)
+    // never silences the party. updateCasting interrupts any live spell next tick.
+    const silence = MOBS[mob.templateId]?.silence;
+    if (silence && mob.hostile && !target.dead && this.rng.chance(silence.chance)) {
+      this.applyAura(target, {
+        id: `silence_${mob.templateId}`, name: silence.name, kind: 'silence',
+        remaining: silence.duration, duration: silence.duration, value: 0,
+        sourceId: mob.id, school: (silence.school ?? 'shadow') as Aura['school'],
+      });
+    }
     // thorns / lightning shield on the defender
     if (!mob.dead) {
       for (const a of target.auras) {

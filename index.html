@@ -401,6 +401,13 @@
   .np-raidmark { width: 30px; height: 30px; margin: 0 auto 1px; background-size: contain;
     background-repeat: no-repeat; background-position: center;
     filter: drop-shadow(0 0 2px #000) drop-shadow(0 1px 1px #000); }
+  /* rogue/druid combo points — a centered row of pips over the nameplate,
+     display toggled in JS so it reserves no space when the player has none. */
+  .np-combo { display: flex; justify-content: center; gap: 3px; margin: 0 auto 2px; height: 7px; }
+  .np-combo-pip { width: 7px; height: 7px; border-radius: 50%; background: #3a1010;
+    border: 1px solid #000; box-sizing: border-box; }
+  .np-combo-pip.lit { background: radial-gradient(circle at 35% 30%, #ffe07a, #e8453a 70%);
+    box-shadow: 0 0 4px #ff6a3caa; border-color: #5a0c08; }
   .np-emote { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-width: 62px; height: 42px;
     padding: 3px 9px 3px 4px; margin: 0 auto 5px; border-radius: 999px; border: 2px solid #f2d27a;
     background: linear-gradient(#3a2a16, #16100a); color: #ffe9a3; font: 800 11px/1 var(--title-font);

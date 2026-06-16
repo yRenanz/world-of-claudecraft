@@ -3,7 +3,8 @@
 // polymorphed into a baby llama" griefing path can never regress.
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import type { Entity, Vec3 } from '../src/sim/types';
+import { dist2d } from '../src/sim/types';
 
 function twoPlayers(clsA = 'mage', clsB = 'warrior') {
   const sim = new Sim({ seed: 42, playerClass: clsA as any, playerName: 'Caster', autoEquip: true });
@@ -43,6 +44,8 @@ function finishCast(sim: Sim, pid: number) {
     if (!sim.entities.get(pid)!.castingAbility) return;
   }
 }
+
+const pos = (e: Entity): Vec3 => ({ ...e.pos });
 
 const hasCc = (e: Entity) =>
   e.auras.some((au) => au.kind === 'polymorph' || au.kind === 'stun' || au.kind === 'incapacitate' || au.kind === 'root');
@@ -143,5 +146,45 @@ describe('PvP control abilities in active duels', () => {
     for (let i = 0; i < 20 * 61; i++) sim.tick();
 
     expect(castPolymorph()).toBe(10);
+  });
+
+  it('makes feared hostile players run in a deterministic panic direction', () => {
+    const { sim, aPid, b } = startDuel('warlock', 'warrior', 20);
+
+    const start = pos(b);
+    sim.castAbility('fear', aPid);
+    finishCast(sim, aPid);
+
+    const fear = b.auras.find((aura) => aura.id === 'fear_incap' && aura.kind === 'incapacitate');
+    expect(fear?.duration).toBe(8);
+
+    for (let i = 0; i < 20; i++) sim.tick();
+
+    expect(dist2d(start, b.pos)).toBeGreaterThan(2);
+    expect(b.auras.some((aura) => aura.id === 'fear_incap')).toBe(true);
+  });
+
+  it('diminishes repeated duel Fears to 8s, 4s, 2s, 1s and resets after 60s', () => {
+    const { sim, aPid, b } = startDuel('warlock', 'warrior', 20);
+
+    const castFear = () => {
+      b.auras = b.auras.filter((aura) => aura.id !== 'fear_incap');
+      const warlock = sim.entities.get(aPid)!;
+      warlock.gcdRemaining = 0;
+      warlock.resource = warlock.maxResource;
+      sim.castAbility('fear', aPid);
+      finishCast(sim, aPid);
+      return b.auras.find((aura) => aura.id === 'fear_incap')?.duration ?? 0;
+    };
+
+    expect(castFear()).toBe(8);
+    expect(castFear()).toBe(4);
+    expect(castFear()).toBe(2);
+    expect(castFear()).toBe(1);
+
+    b.auras = b.auras.filter((aura) => aura.id !== 'fear_incap');
+    for (let i = 0; i < 20 * 61; i++) sim.tick();
+
+    expect(castFear()).toBe(8);
   });
 });

@@ -78,8 +78,10 @@ const ARENA_K_FACTOR = 32; // Elo sensitivity per match
 const ARENA_LADDER_SIZE = 10; // live online standings shipped to clients
 const PVP_ROOT_DR_RESET = 18; // seconds before a repeated PvP root is fresh again
 const PVP_POLYMORPH_DR_RESET = 60;
+const PVP_FEAR_DR_RESET = 60;
 const PVP_CC_DR_MULTIPLIERS = [1, 0.5, 0.25] as const;
 const PVP_POLYMORPH_DR_DURATIONS = [10, 5, 1] as const;
+const PVP_FEAR_DR_DURATIONS = [8, 4, 2, 1] as const;
 const SHAMAN_SHOCK_COOLDOWN_IDS = ['earth_shock', 'flame_shock', 'frost_shock'] as const;
 const DEMON_HEAL_CAST_ID = 'demon_heal';
 const SAY_RANGE = 25; // /say carries a short distance; /yell across a camp
@@ -1294,6 +1296,17 @@ export class Sim {
   private isRooted(e: Entity): boolean {
     return this.isStunned(e) || e.auras.some((a) => a.kind === 'root');
   }
+  private fearAura(e: Entity): Aura | undefined {
+    return e.auras.find((a) => a.id === 'fear_incap' && a.kind === 'incapacitate');
+  }
+  private updateFearMovement(e: Entity): boolean {
+    const aura = this.fearAura(e);
+    if (!aura || e.auras.some((a) => a.kind === 'root')) return false;
+    const angle = Number.isFinite(aura.value) ? aura.value : e.facing;
+    const dest = this.groundPos(e.pos.x + Math.sin(angle) * 10, e.pos.z + Math.cos(angle) * 10);
+    this.moveToward(e, dest, e.moveSpeed * FLEE_SPEED_MULT * this.moveSpeedMult(e));
+    return true;
+  }
   private mobCanSwim(template: { family?: string; canSwim?: boolean } | undefined): boolean {
     return !!template;
   }
@@ -1503,6 +1516,7 @@ export class Sim {
   private updatePlayerMovement(p: Entity, meta: PlayerMeta): void {
     if (this.updateChargeMovement(p)) return;
     if (this.updateFollowMovement(p, meta)) return;
+    if (this.updateFearMovement(p)) return;
     const inp = meta.moveInput;
     // Convention: facing f points along (sin f, cos f); the camera sits behind
     // the player, so screen-right is the world vector (-cos f, sin f).
@@ -2330,9 +2344,14 @@ export class Sim {
         }
         case 'incapacitate': {
           if (!target || target.dead) break;
+          const remaining = ability.id === 'fear'
+            ? this.diminishedCrowdControlDuration(p, target, 'fear', eff.duration)
+            : eff.duration;
+          if (remaining === null) break;
           this.applyAura(target, {
             id: ability.id + '_incap', name: ability.name, kind: 'incapacitate',
-            remaining: eff.duration, duration: eff.duration, value: 0,
+            remaining, duration: remaining,
+            value: ability.id === 'fear' ? this.rng.range(-Math.PI, Math.PI) : 0,
             sourceId: p.id, school: ability.school, breaksOnDamage: true,
           });
           if (ability.awardsCombo && !comboAwarded) { this.awardCombo(p, target, ability.awardsCombo); comboAwarded = true; }
@@ -2565,10 +2584,18 @@ export class Sim {
     }
     const existing = target.ccDr.get(category);
     const stage = existing && existing.resetAt > this.time ? existing.stage : 0;
-    const reset = category === 'polymorph' ? PVP_POLYMORPH_DR_RESET : PVP_ROOT_DR_RESET;
+    const reset = category === 'polymorph'
+      ? PVP_POLYMORPH_DR_RESET
+      : category === 'fear'
+        ? PVP_FEAR_DR_RESET
+        : PVP_ROOT_DR_RESET;
     if (category === 'polymorph') {
       target.ccDr.set(category, { stage: stage + 1, resetAt: this.time + reset });
       return PVP_POLYMORPH_DR_DURATIONS[Math.min(stage, PVP_POLYMORPH_DR_DURATIONS.length - 1)];
+    }
+    if (category === 'fear') {
+      target.ccDr.set(category, { stage: stage + 1, resetAt: this.time + reset });
+      return PVP_FEAR_DR_DURATIONS[Math.min(stage, PVP_FEAR_DR_DURATIONS.length - 1)];
     }
     if (stage >= PVP_CC_DR_MULTIPLIERS.length) return null;
     target.ccDr.set(category, { stage: stage + 1, resetAt: this.time + reset });
@@ -3745,6 +3772,7 @@ export class Sim {
     if (mob.inCombat) this.updateBossMechanics(mob);
 
     if (this.isStunned(mob)) {
+      if (this.updateFearMovement(mob)) return;
       if (mob.auras.some((a) => a.kind === 'polymorph')) {
         mob.wanderTimer -= DT;
         if (mob.wanderTimer <= 0) {

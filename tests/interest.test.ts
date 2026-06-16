@@ -497,6 +497,30 @@ describe('client crowd protocol', () => {
     expect(client.entities.has(subject.pid)).toBe(false);
   });
 
+  it('prunes a previously visible duel opponent when they enter stealth', () => {
+    const rogueFc = fakeWs();
+    const rogue = joinServer(server, rogueFc, 3, 'ClientSneak', 'rogue');
+    server.sim.setPlayerLevel(10, viewer.pid);
+    server.sim.setPlayerLevel(10, rogue.pid);
+    const v = server.sim.entities.get(viewer.pid)!;
+    placeAt(server, rogue.pid, v.pos.x + 6, v.pos.z);
+
+    broadcast(server);
+    apply();
+    expect(client.entities.has(rogue.pid)).toBe(true);
+
+    server.sim.duelRequest(rogue.pid, viewer.pid);
+    server.sim.duelAccept(rogue.pid);
+    for (let i = 0; i < 20 * 5 && server.sim.duelFor(viewer.pid)?.state !== 'active'; i++) server.sim.tick();
+    server.sim.castAbility('stealth', rogue.pid);
+
+    viewerFc.sent.length = 0;
+    step(server);
+    apply();
+
+    expect(client.entities.has(rogue.pid)).toBe(false);
+  });
+
   it('merges lite records preserving identity fields', () => {
     broadcast(server);
     apply();

@@ -1,5 +1,5 @@
 // Procedural orchestral soundtrack — no audio files, pure WebAudio synthesis.
-// Inspired by vanilla-WoW zone scoring: a pastoral town theme, a wilderness
+// Inspired by classic-era MMO zone scoring: a pastoral town theme, a wilderness
 // theme per biome (vale, marsh, peaks), a dread-laden dungeon theme, and a
 // percussion layer that fades in during combat. Each theme is a composed
 // multi-track loop scheduled with a lookahead timer; zone changes crossfade.

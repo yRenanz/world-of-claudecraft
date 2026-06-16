@@ -1073,8 +1073,9 @@ function loginError(text: string): void {
 
 const LAST_REALM_KEY = 'woc_last_realm';
 
-// WoW population bands, derived from the realm's current online count (WoW's
-// own labels are relative to peak; current count is a fair local stand-in).
+// Classic-MMO population bands, derived from the realm's current online count
+// (the classic MMO's own labels are relative to peak; current count is a fair
+// local stand-in).
 function realmPopulation(online: boolean, players: number): { labelKey: TranslationKey; cls: string } {
   if (!online) return { labelKey: 'realm.offline', cls: 'offline' };
   if (players >= 80) return { labelKey: 'realm.full', cls: 'full' };
@@ -1083,7 +1084,7 @@ function realmPopulation(online: boolean, players: number): { labelKey: Translat
   return { labelKey: 'realm.low', cls: 'low' };
 }
 
-// After login WoW drops you onto a Realm List screen (then character select for
+// After login the classic MMO drops you onto a Realm List screen (then character select for
 // the chosen realm). We remember the last realm and jump straight to its
 // characters, with a "Change Realm" button back to this list.
 async function enterRealmFlow(): Promise<void> {
@@ -1103,7 +1104,7 @@ function showRealmList(dir?: import('./net/online').RealmDirectory): void {
       listEl.innerHTML = `<div class="realm-loading">${escapeHtml(t('realm.noRealms'))}</div>`;
       return;
     }
-    // recommend the lowest-population online realm (WoW nudges new players there)
+    // recommend the lowest-population online realm (classic MMOs nudge new players there)
     const realmTypeKeys = { 'Normal': 'realmTypes.normal', 'PvP': 'realmTypes.pvp', 'RP': 'realmTypes.rp', 'RP-PvP': 'realmTypes.rpPvp' } as const;
     listEl.innerHTML = d.realms.map((r) => {
       const chars = d.characters[r.name] ?? 0;

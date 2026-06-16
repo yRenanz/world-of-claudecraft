@@ -4020,7 +4020,7 @@ export class Sim {
 
     // "/wave", "/dance [name]" — predefined social emotes. An optional name
     // targets an online player (in range or not); unknown names fall back to
-    // the untargeted form, matching WoW.
+    // the untargeted form, matching the classic-MMO convention.
     const emMatch = /^\/([a-z]+)(?:\s+(\S+))?\s*$/i.exec(raw);
     if (emMatch) {
       const key = EMOTE_ALIASES[emMatch[1].toLowerCase()] ?? emMatch[1].toLowerCase();

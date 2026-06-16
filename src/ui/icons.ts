@@ -1340,7 +1340,7 @@ function compose(recipe: IconRecipe, seedKey: string, size: number): HTMLCanvasE
 // Public API
 // ---------------------------------------------------------------------------
 
-// classic WoW item-name quality colors (shared by tooltips, bags, rewards)
+// classic-MMO item-name quality colors (shared by tooltips, bags, rewards)
 export const QUALITY_COLOR: Record<string, string> = {
   poor: '#9d9d9d',
   common: '#ffffff',

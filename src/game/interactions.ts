@@ -52,7 +52,7 @@ export function handlePickedEntity(
   if (button === 2) {
     const d = dist2d(world.player.pos, e.pos);
     // players: right-click only targets — the interaction menu lives on the
-    // target portrait (right-click it), like classic WoW unit frames
+    // target portrait (right-click it), like classic-MMO unit frames
     if (e.kind === 'object') {
       if (d > INTERACT_RANGE + 1) { hud.showError('Too far away.'); return; }
       if (e.templateId === 'dungeon_door' && e.dungeonId) world.enterDungeon(e.dungeonId);

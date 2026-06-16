@@ -261,7 +261,7 @@ localeText.fr_CA = localeText.fr_FR;
 
 
 // Single authoritative table of per-name talent-title translations using official
-// WoW-Classic terminology. translateTitle() consults this after ability-name
+// classic-MMO terminology. translateTitle() consults this after ability-name
 // resolution. To add a talent or locale, add its localized name here for each
 // locale — there is no secondary additions/corrections layer.
 const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>> = {

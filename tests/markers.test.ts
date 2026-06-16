@@ -14,7 +14,7 @@ import { Sim } from '../src/sim/sim';
 import { GameServer } from '../server/game';
 import type { Entity } from '../src/sim/types';
 
-// Raid marker ids (0..7), WoW order: Star, Circle, Diamond, Triangle, Moon,
+// Raid marker ids (0..7), the classic raid-marker order: Star, Circle, Diamond, Triangle, Moon,
 // Square, Cross, Skull.
 const STAR = 0;
 const SKULL = 7;

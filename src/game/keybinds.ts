@@ -170,7 +170,7 @@ export class Keybinds {
   /**
    * Bind a code to (action, index). Reserved keys are refused (returns false).
    * The code is first removed from wherever else it lives so it is never on
-   * two actions at once (WoW-style).
+   * two actions at once (classic-MMO-style).
    */
   bind(id: string, index: number, code: string): boolean {
     const codes = this.map.get(id);

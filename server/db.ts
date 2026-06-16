@@ -277,7 +277,7 @@ export async function deleteCharacter(accountId: number, characterId: number): P
 
 // How many characters this account has on each realm — deliberately NOT
 // realm-scoped, so the realm-list screen can show "N characters" per realm
-// like WoW. Keyed by realm name.
+// like classic MMOs. Keyed by realm name.
 export async function characterCountsByRealm(accountId: number): Promise<Record<string, number>> {
   const res = await pool.query(
     'SELECT realm, count(*)::int AS n FROM characters WHERE account_id = $1 GROUP BY realm',

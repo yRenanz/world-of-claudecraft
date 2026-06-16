@@ -202,7 +202,7 @@ describe("H3: DICT key parity, non-empty values, placeholder integrity", () => {
     "admin::de_DE::detail.lengthHours",
     "admin::pt_BR::app.title", "admin::pt_BR::detail.status", "admin::pt_BR::moderation.colStatus",
     "admin::pt_BR::moderation.badgeOnline", "admin::pt_BR::detail.lengthHours",
-    // Class names: "Paladin" is the canonical German/French WoW class name (cognate).
+    // Class names: "Paladin" is the canonical German/French class name (cognate).
     "admin::de_DE::class.paladin", "admin::fr_FR::class.paladin", "admin::fr_CA::class.paladin",
   ]);
   function checkNoCopiedEnglish(dict: Record<string, Record<string, string>>, label: string) {

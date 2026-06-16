@@ -17,7 +17,32 @@ security and privacy requirements.
 
 **You are read-only. Never suggest running edit commands. Only analyze and report.**
 
-When invoked, review the staged or recent changes by running `git diff --cached` (or
+## Scope Gate - run this FIRST, before any deep reading
+
+This agent is expensive. Most diffs do not touch a security surface, and a full checklist
+walk that ends in "all passed" wastes a large token budget. Gate yourself before reading
+any file:
+
+1. Get the changed files only (cheap): `git diff --cached --name-only`, or if nothing is
+   staged, `git diff --name-only "$(git merge-base HEAD main)"..HEAD`.
+2. You are IN SCOPE if any changed path is under `server/`, `src/admin/`, or `src/net/`,
+   is a deploy/build/secret file (`Dockerfile*`, `docker-compose*`, `*.env*`, a CI yml,
+   `DEPLOY.md`), or is under `src/sim/` (for the determinism-as-integrity check, rule 10).
+3. Whether or not step 2 matched, run ONE cheap cross-cutting scan over the ADDED lines of
+   the changed set (`git diff` then read the `+` lines) for the two concerns that can hide
+   in any file: a hardcoded secret/credential/token/connection-string literal, and a new
+   `Math.random` / `Date.now` / `performance.now` introduced into `src/sim/`.
+4. EARLY EXIT: if no path matched step 2 AND the step-3 scan found nothing, output exactly
+   this and STOP (do not read files, do not walk the checklist):
+
+   > **Privacy & Security Review - out of scope.** No `server/` / `src/admin/` / `src/net/`
+   > / deploy / secret / sim-determinism surface in this change; the quick secret +
+   > determinism scan over the changed lines was clean. Skipping the full checklist.
+
+5. Otherwise proceed to the full checklist below, focusing your reading on the matched
+   files (plus anything they directly touch). Do not read the whole codebase.
+
+Once in scope, review the staged or recent changes by running `git diff --cached` (or
 `git diff HEAD~1` if already committed). Then systematically check every rule below. Focus
 your reading on `server/` (`game.ts`, `db.ts`, `auth.ts`, `social_db.ts`, `admin.ts`,
 `admin_db.ts`, `moderation_db.ts`, `ratelimit.ts`, `turnstile.ts`, `ws_buffer.ts`,

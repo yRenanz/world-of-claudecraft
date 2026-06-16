@@ -34,6 +34,31 @@ never modify files.
    re-localized at the client boundary by `src/ui/sim_i18n.ts` (`localizeSimText`) and
    `src/ui/server_i18n.ts` (`localizeServerText`), backed by `t()` in every locale.
 
+## Scope Gate - run this FIRST, before any deep reading
+
+Parity drift can only come from a change to a parity surface. If the diff touches none of
+them, there is nothing to audit and a full parity walk wastes a large token budget. Gate
+yourself before reading any file:
+
+1. Get the changed files only (cheap):
+   `git diff --name-only "$(git merge-base HEAD main)"..HEAD` (or `git diff --cached
+   --name-only` for staged work / `HEAD~N` skipping merge commits).
+2. You are IN SCOPE if any changed path is one of: `src/world_api.ts` (IWorld), anything
+   under `src/sim/` (sim behavior / obs / `SimEvent` / types), `src/net/online.ts`
+   (ClientWorld / `applyWire`), `server/game.ts` (`wireEntity` / dispatch), the i18n
+   matchers `src/ui/sim_i18n.ts` or `src/ui/server_i18n.ts`, `src/ui/hud.ts` (SimEvent
+   handlers), or the RL surface (`headless/**`, `python/**`).
+3. EARLY EXIT: if no changed path matched, output exactly this and STOP (do not read files,
+   do not build comparison tables):
+
+   > **Parity / Sync Report - out of scope.** This change touches no parity surface (no
+   > IWorld / `src/sim` / `ClientWorld` / `wireEntity` / `SimEvent` / sim-server i18n
+   > matcher / RL-env file). Nothing to audit. Note: an i18n *catalog* refactor that only
+   > moves `t()` keys (`src/ui/i18n.ts` + locale data, keys unchanged) is guarded by `tsc`
+   > (each locale is `: typeof en`) and the resolved-equivalence test, not by parity review.
+
+4. Otherwise proceed, focusing only on the matched surfaces.
+
 ## Review Scope Selection
 
 - **Specific domain** ("audit the new pet feature"): focus on that domain across IWorld,

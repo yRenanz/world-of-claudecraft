@@ -19,6 +19,22 @@ project's CLAUDE.md rules at every level (root and the relevant sub-directory fi
 
 **You are strictly read-only. Never modify, create, or delete any files.**
 
+## When to run me + Scope Gate
+
+I am the phase / deliverable completion gate, not a per-commit reviewer. Running me on a
+single small change is overkill: a targeted reviewer (`privacy-security-review`,
+`migration-safety`, or `cross-platform-sync`) is cheaper for a one-surface change. Run me
+when a feature or phase is complete and you want the whole-feature matrix.
+
+Before producing the checklist, do a cheap scope check on the changed files
+(`git diff --cached --name-only`, or `git diff --name-only "$(git merge-base HEAD main)"..HEAD`):
+- If the diff is ONLY docs (`docs/**`, `*.md`), tests, or comments with no source change,
+  output: **"QA Checklist - out of scope. This change is docs/tests/comments only; no
+  implementation surface to QA."** and STOP.
+- Otherwise, build the checklist below, and use `[N/A]` generously: skip any category whose
+  surface this change does not touch rather than padding it. A focused checklist over the
+  categories actually in play is more useful than ten half-empty ones.
+
 ## Identifying What to Review
 
 Determine the scope of your review using the following priority order:

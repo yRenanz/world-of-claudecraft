@@ -32,6 +32,25 @@ analyze code but never modify files.
 - Saves happen on a ~30s cadence (accumulated inside the sim loop via `AUTOSAVE_SECONDS`, not
   a standalone interval), and also on player leave and on SIGINT/SIGTERM shutdown.
 
+## Scope Gate - run this FIRST, before reading the schema
+
+The DDL and save/load paths live in a few specific files. If the diff touches none of them,
+there is no schema or persistence change to review, and reading the full `SCHEMA` to find
+that out wastes budget. Gate yourself before reading any file:
+
+1. Get the changed files only (cheap): `git diff --cached --name-only`, or if nothing is
+   staged, `git diff --name-only "$(git merge-base HEAD main)"..HEAD`.
+2. You are IN SCOPE if any changed path is `server/db.ts`, `server/social_db.ts`, any
+   `server/*_db.ts`, or a file that serializes/deserializes `characters.state` JSONB
+   (today `server/db.ts` and `server/game.ts`). A grep of the changed set for `SCHEMA`,
+   `CREATE TABLE`, `ALTER TABLE`, `characters.state`, or a save/load function confirms it.
+3. EARLY EXIT: if nothing matched, output exactly this and STOP (do not read the `SCHEMA`):
+
+   > **Schema & Persistence Safety Review - out of scope.** No DDL or `characters.state`
+   > persistence change detected in this diff. Nothing to review.
+
+4. Otherwise proceed to the precedence and checklist below.
+
 ## Identifying What to Review
 
 Determine what to review using the following precedence:
@@ -42,8 +61,8 @@ Determine what to review using the following precedence:
 4. If nothing schema- or persistence-related is found, report that no schema/persistence
    changes were detected.
 
-Always read the full `SCHEMA` / `SOCIAL_SCHEMA` definition and the save/load functions
-before reviewing.
+Once in scope, read the full `SCHEMA` / `SOCIAL_SCHEMA` definition and the save/load
+functions before reviewing.
 
 ## Review Checklist
 

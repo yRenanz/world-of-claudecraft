@@ -159,12 +159,26 @@ Every phase runs on **Opus 4.8 at max effort** (1m context variant where the fil
 3. **Step 2 - Choose Orchestration + Execute**: Pick the lightest tool from the Orchestration Toolbox. Default: parallel Agent fan-out, one agent per vertical slice (give each ONLY the Explore summary, not raw planning docs). For batch-heavy/audit/content-sweep phases, run an `ultracode` Workflow (pipeline + adversarial-verify) instead. Use `isolation: "worktree"` only when agents mutate overlapping files in parallel.
 4. **Step 3 - Validation + Multi-Agent Review Dispatch**:
    - Run validation (see the matrix in `state.md`): `npx tsc --noEmit`; `npx vitest run tests/<affected>.ts` (or `npm test` for broad changes). If any player-visible text was added or an emit changed, run `npx vitest run tests/localization_fixes.test.ts` (the S3 i18n drift guard). If the wire protocol / snapshots changed, run `npx vitest run tests/snapshots.test.ts tests/env_protocol.test.ts tests/bandwidth.test.ts`. If assets changed, `npm run asset:budget`. Before a big merge, mirror CI: `npm test && npx tsc --noEmit && npm run build:env && npm run build:server && npm run build`.
-   - Spawn review agents in parallel based on the change surface:
-     - Any code change: `privacy-security-review`
-     - Server schema / DDL / persisted JSONB-state change: also `migration-safety`
-     - Feature added to the sim, or any change to `IWorld` / the wire protocol / `SimEvent` / the i18n matchers: also `cross-platform-sync`
-     - Phase completion: also `qa-checklist`
-   - Prompt every review agent for COVERAGE not filtering ("report every issue including low-severity and uncertain ones"). Do not commit until each reports no BLOCKING issues. Resume any agent that truncates with: *"Stop reading more files. Output the full report now based on what you've already seen. No more tool calls. Format: BLOCKING / SHOULD-FIX / NICE-TO-HAVE / VERDICT."*
+   - Spawn review agents using the **Review Dispatch Matrix** below. Spawn ONLY the agents
+     whose surface this change actually touches. Most phases trigger one or two, not all
+     four; a docs/test-only change triggers none. (Each agent also self-gates and exits
+     cheaply if mis-dispatched, but spawning an out-of-scope agent still costs tokens, so
+     gate at dispatch too.)
+   - Prompt every review agent you DO spawn for COVERAGE not filtering ("report every issue including low-severity and uncertain ones"). Do not commit until each reports no BLOCKING issues. Resume any agent that truncates with: *"Stop reading more files. Output the full report now based on what you've already seen. No more tool calls. Format: BLOCKING / SHOULD-FIX / NICE-TO-HAVE / VERDICT."*
+
+#### Review Dispatch Matrix (single source of truth - keep the starter-prompt copies below in sync)
+
+Match the change surface to the agent. Spawn an agent ONLY when its row matches the diff:
+
+| Agent | Spawn ONLY when the diff touches | Skip it for |
+|-------|----------------------------------|-------------|
+| `privacy-security-review` | `server/`, `src/admin/`, `src/net/`, a deploy/secret file (Docker/compose/env/CI yml/`DEPLOY.md`), OR introduces SQL / auth / a secret / `ALLOW_DEV_COMMANDS` / a new `Math.random`\|`Date.now`\|`performance.now` in `src/sim/` | a pure `src/ui` / `src/render` / `src/game` / `src/sim/content` / docs / test change |
+| `migration-safety` | `server/db.ts`, `server/social_db.ts`, a `server/*_db.ts`, or a `characters.state` JSONB serialize/deserialize path | any diff with no DDL and no persisted-state shape change |
+| `cross-platform-sync` | `src/world_api.ts` (IWorld), `src/sim/` behavior/obs/`SimEvent`, `src/net/online.ts`, `server/game.ts` wire/dispatch, the matchers `src/ui/sim_i18n.ts`\|`src/ui/server_i18n.ts`, or the RL surface (`headless/`, `python/`) | a pure i18n *catalog* refactor (only `src/ui/i18n.ts` + locale data, `t()` keys unchanged) - `tsc` (`: typeof en`) + the resolved-equivalence test already cover it |
+| `qa-checklist` | a phase / deliverable set is COMPLETE (it self-scales via its per-category Skip rules) | per-commit / mid-phase work, or a docs/test-only change |
+
+If NO row matches (e.g. a docs-only, test-only, or comment change), spawn NO review agent.
+Do not default to "run `privacy-security-review` anyway."
 5. **Step 4 - Update Docs + Memory**: Update `progress.md` (mark phase complete; note deferrals) and `state.md` (new `IWorld` members, `SimEvent`s, wire fields, endpoints, tables, i18n keys, locked decisions). If you use Claude Code memory, record any surprising rules learned or current-state notes there for the next session. Commit doc updates in the same logical commit as the implementation (EXPLICIT paths).
 
 **Agent Scaling Guidelines (include in Team Workflow):**
@@ -250,13 +264,24 @@ STEP 3 - VALIDATION + MULTI-AGENT REVIEW:
   (baseline: `npx tsc --noEmit` + `npx vitest run tests/<affected>.ts`; add
   `npx vitest run tests/localization_fixes.test.ts` if any player text changed; add the
   wire/snapshot suites if the protocol changed).
-- Spawn review agents in parallel (prompt each for COVERAGE not filtering):
-  - `privacy-security-review` (always)
-  - `migration-safety` (if server schema/DDL/persisted-state changed)
-  - `cross-platform-sync` (if `IWorld` / wire protocol / `SimEvent` / i18n matchers changed,
-    or a player-facing behavior was added to the sim)
-  - `qa-checklist` (when this phase completes a deliverable set)
-- Resume any review agent that truncates with the "Stop reading. Output verdict now." message.
+- Spawn review agents in parallel, but ONLY the ones whose surface this diff touches
+  (check `git diff --name-only` against the phase-start commit). Spawning an out-of-scope
+  agent wastes tokens; most phases trigger one or two, not all four.
+  - `privacy-security-review` - ONLY if the diff touches `server/`, `src/admin/`, `src/net/`,
+    a deploy/secret file (Docker/compose/env/CI), or introduces SQL / auth / a secret /
+    `ALLOW_DEV_COMMANDS` / a new `Math.random`|`Date.now`|`performance.now` in `src/sim/`.
+    NOT for a pure `src/ui` / `src/render` / `src/game` / content / docs / test change.
+  - `migration-safety` - ONLY if `server/db.ts`, `server/social_db.ts`, a `server/*_db.ts`,
+    or a `characters.state` JSONB serialize/deserialize path changed.
+  - `cross-platform-sync` - ONLY if `src/world_api.ts`, `src/sim/` behavior/obs/`SimEvent`,
+    `src/net/online.ts`, `server/game.ts` wire/dispatch, the matchers `src/ui/sim_i18n.ts`
+    |`src/ui/server_i18n.ts`, or the RL surface (`headless/`, `python/`) changed. A pure
+    i18n catalog refactor (only `src/ui/i18n.ts` + locale data, keys unchanged) is NOT in
+    scope - `tsc` + the resolved-equivalence test cover it.
+  - `qa-checklist` - when this phase completes a deliverable set.
+  - If none of the above match, spawn no review agent.
+- Prompt each agent you spawn for COVERAGE not filtering. Resume any that truncates with the
+  "Stop reading. Output verdict now." message.
 - Do not commit until each reports no BLOCKING issues.
 
 STEP 4 - COMMIT CADENCE:
@@ -343,11 +368,18 @@ Dead code & cleanup agent:
 - Verify no TODO/FIXME items were left unresolved
 - Check for inconsistent naming or patterns vs the rest of the codebase
 
-Multi-agent review dispatch:
-- `privacy-security-review` (always)
-- `migration-safety` (if server schema/DDL/persisted-state changed)
-- `cross-platform-sync` (if IWorld / wire protocol / SimEvent / i18n matchers changed, or sim behavior was added)
-- `qa-checklist` (always for phase completion)
+Multi-agent review dispatch (spawn ONLY the agents whose surface the Phase N diff touches;
+check `git diff --name-only` against the phase-start commit - do not run all four by default):
+- `privacy-security-review` - ONLY if the diff touches `server/`, `src/admin/`, `src/net/`,
+  a deploy/secret file, or introduces SQL / auth / a secret / `ALLOW_DEV_COMMANDS` / a new
+  `Math.random`|`Date.now`|`performance.now` in `src/sim/`. NOT for a pure UI/render/game/
+  content/docs/test change.
+- `migration-safety` - ONLY if server schema/DDL or a `characters.state` persisted-state
+  shape changed.
+- `cross-platform-sync` - ONLY if IWorld / `src/sim` behavior/obs/`SimEvent` / `ClientWorld`
+  / `wireEntity` dispatch / the `sim_i18n`|`server_i18n` matchers / the RL surface changed.
+  A pure i18n catalog refactor (keys unchanged) is NOT in scope.
+- `qa-checklist` - yes (this is the phase-completion QA gate).
 Resume any review agent that truncates mid-analysis with: *"Stop reading more files. Output the full report now. No more tool calls. Format: BLOCKING / SHOULD-FIX / NICE-TO-HAVE / VERDICT."*
 
 STEP 3 - FIX: Apply all BLOCKING and SHOULD-FIX items. Run the full validation matrix from state.md

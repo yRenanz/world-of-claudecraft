@@ -16,6 +16,7 @@ import {
   dist2d, xpForLevel, MAX_LEVEL, MELEE_RANGE, MILESTONES, virtualLevel, canPrestige, xpUntilNextPrestige,
 } from '../sim/types';
 import { xpBarView, formatXp } from './xp_bar';
+import { compassView } from './compass';
 import { terrainHeight, WATER_LEVEL, roadDistance, generateDecorations } from '../sim/world';
 import type { Decoration } from '../sim/world';
 import { Meters } from './meters';
@@ -272,6 +273,10 @@ export class Hud {
   private hotDomSkippedWrites = 0;
   private minimapCtx: CanvasRenderingContext2D;
   private minimapBg: HTMLCanvasElement;
+  // heading compass: a pool of rose-label spans built once, repositioned per frame
+  private compassMarks = new Map<string, HTMLElement>();
+  private compassHeadingEl: HTMLElement | null = null;
+  private lastCompassHeading = '';
   private mapBg: HTMLCanvasElement | null = null;
   private openLootMobId: number | null = null;
   private openVendorNpcId: number | null = null;
@@ -366,6 +371,7 @@ export class Hud {
       if (target && (this.emoteWheelEl?.contains(target) || document.getElementById('mm-emote')?.contains(target) || document.getElementById('mobile-emote')?.contains(target))) return;
       this.hideEmoteWheel();
     });
+    this.initCompass();
     this.releaseSpiritBtnEl.addEventListener('click', () => {
       if (this.sim.arenaInfo?.match) return;
       this.sim.releaseSpirit();
@@ -1816,7 +1822,7 @@ export class Hud {
       $('#arena-window').style.display = 'none';
     }
     this.arenaMatchSeen = inArenaMatch;
-    if (fastHud) this.updateMinimap();
+    if (fastHud) { this.updateMinimap(); this.updateCompass(); }
     if (slowHud && $('#social-window').classList.contains('open')) {
       const struct = this.socialStructSig();
       if (struct !== this.lastSocialStruct) {
@@ -1926,6 +1932,43 @@ export class Hud {
     }
     ctx.putImageData(img, 0, 0);
     return c;
+  }
+
+  // Build the compass rose-label pool once. Each of the 8 points gets a span
+  // that we later slide horizontally; positioning happens in updateCompass().
+  private initCompass(): void {
+    const track = $('#compass-track');
+    if (!track) return;
+    for (const label of ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']) {
+      const el = document.createElement('span');
+      el.className = 'compass-mark' + (label.length === 1 ? ' major' : '');
+      el.textContent = label;
+      track.appendChild(el);
+      this.compassMarks.set(label, el);
+    }
+    this.compassHeadingEl = $('#compass-heading');
+  }
+
+  private updateCompass(): void {
+    if (this.compassMarks.size === 0) return;
+    const view = compassView(this.sim.player.facing);
+    const visible = new Set<string>();
+    for (const m of view.marks) {
+      const el = this.compassMarks.get(m.label);
+      if (!el) continue;
+      visible.add(m.label);
+      // offsetFrac -1..1 → 0..100% across the strip; fade marks near the edges
+      el.style.left = `${(m.offsetFrac * 0.5 + 0.5) * 100}%`;
+      el.style.opacity = `${Math.max(0.2, 1 - Math.abs(m.offsetFrac) * 0.85)}`;
+      el.style.display = 'block';
+    }
+    for (const [label, el] of this.compassMarks) {
+      if (!visible.has(label)) el.style.display = 'none';
+    }
+    if (this.compassHeadingEl && view.heading !== this.lastCompassHeading) {
+      this.lastCompassHeading = view.heading;
+      this.compassHeadingEl.textContent = view.heading;
+    }
   }
 
   private updateMinimap(): void {

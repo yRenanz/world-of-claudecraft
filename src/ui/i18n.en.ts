@@ -11081,6 +11081,11 @@ export const en = {
   },
 };
 
+// The authoritative en shape. The generated dense table
+// (src/ui/i18n.resolved.generated.ts) types every locale ": EnTranslations" so
+// tsc still red-fails any missing or renamed key.
+export type EnTranslations = typeof en;
+
 export type TranslationKey = Leaves<typeof en>;
 export type InterpolationValue = string | number;
 export type InterpolationValues = Record<string, InterpolationValue>;

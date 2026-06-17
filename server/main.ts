@@ -39,6 +39,8 @@ const CHAT_LOG_RETENTION_DAYS = Number(process.env.CHAT_LOG_RETENTION_DAYS ?? 90
 // Cloudflare Turnstile secret. When unset (local dev / tests) registration and
 // login skip human verification entirely — see requireTurnstile below.
 const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET ?? '';
+// Hard WS connection limit per IP. Soft threshold (adds bot evidence) is in game.ts.
+const MAX_WS_PER_IP_HARD = Number(process.env.MAX_WS_PER_IP_HARD ?? '20');
 
 const game = new GameServer();
 
@@ -628,6 +630,14 @@ async function main(): Promise<void> {
       return;
     }
     const chatMute = await chatMuteStatusForAccount(accountId);
+    // Hard per-IP WS connection limit. The soft threshold (composite score evidence)
+    // is handled inside game.join(); this guard blocks egregious bot farms before
+    // they consume a session slot.
+    const ip = requestMetadata(req).ip;
+    if (game.countIpSessions(ip) >= MAX_WS_PER_IP_HARD) {
+      ws.close(1008, 'Too many connections from your network');
+      return;
+    }
     const result = game.join(
       ws,
       accountId,

@@ -113,7 +113,12 @@ const GRASS_SLOPE_EPS = 1.2;
 export interface FoliageView {
   group: THREE.Group;
   /** per-frame: grass fade + ring rebuild, fog culling of far tree buckets */
-  update(px: number, pz: number, camX: number, camZ: number, fogFar: number): void;
+  update(
+    px: number, pz: number,
+    camX: number, camY: number, camZ: number,
+    eyeX: number, eyeY: number, eyeZ: number,
+    fogFar: number,
+  ): void;
 }
 
 // deterministic 0..1 hash on integer grid cells / world coords
@@ -131,6 +136,22 @@ interface BucketMesh {
   radius: number;
   minDist?: number;
   maxDist?: number;
+}
+
+interface TreeHidePart {
+  mesh: THREE.InstancedMesh;
+  index: number;
+  visibleMatrix: THREE.Matrix4;
+  hiddenMatrix: THREE.Matrix4;
+}
+
+interface TreeHideable {
+  x: number;
+  z: number;
+  r: number;
+  topY: number;
+  hidden: boolean;
+  parts: TreeHidePart[];
 }
 
 // distance caps for the LOD windows. The dense sculpted barks are ~70% of a
@@ -389,10 +410,23 @@ const up = new THREE.Vector3(0, 1, 0);
 const v = new THREE.Vector3();
 const sv = new THREE.Vector3();
 const c = new THREE.Color();
+const zeroScale = new THREE.Vector3(0, 0, 0);
+const shadowOnlyMaterialCache = new WeakMap<THREE.Material, THREE.Material>();
+
+function makeShadowOnlyMaterial(src: THREE.Material): THREE.Material {
+  const cached = shadowOnlyMaterialCache.get(src);
+  if (cached) return cached;
+  const mat = src.clone();
+  mat.colorWrite = false;
+  mat.depthWrite = false;
+  shadowOnlyMaterialCache.set(src, mat);
+  return mat;
+}
 
 function placeSpecies(
   parent: THREE.Group, seed: number, bucket: Bucket, items: Decoration[],
   spec: SpeciesSpec, register: (mesh: THREE.InstancedMesh, minDist?: number, maxDist?: number) => void,
+  hideRegistry: TreeHideable[],
 ): void {
   if (items.length === 0) return;
   const subset = variantSubset(spec.perBucket, spec.sets.length, bucket.band, bucket.col, spec.salt);
@@ -403,6 +437,15 @@ function placeSpecies(
   }
   groups.forEach((list, gi) => {
     if (list.length === 0) return;
+    const handles: TreeHideable[] = list.map((d) => ({
+      x: d.x,
+      z: d.z,
+      r: 0.55 * d.scale,
+      topY: terrainHeight(d.x, d.z, seed) + 7.5 * d.scale,
+      hidden: false,
+      parts: [],
+    }));
+    hideRegistry.push(...handles);
     for (const part of spec.sets[subset[gi]]) {
       const im = new THREE.InstancedMesh(part.geometry, part.material, list.length);
       list.forEach((d, i) => {
@@ -412,6 +455,9 @@ function placeSpecies(
         q.setFromAxisAngle(up, d.variant * 2.1 + hashAt(d.x, d.z, 11) * Math.PI * 2);
         m.compose(v.set(d.x, y - spec.sink * s, d.z), q, sv.set(s, s * heightJitter, s));
         im.setMatrixAt(i, m);
+        const visibleMatrix = new THREE.Matrix4().copy(m);
+        const hiddenMatrix = new THREE.Matrix4().copy(m).scale(zeroScale);
+        handles[i].parts.push({ mesh: im, index: i, visibleMatrix, hiddenMatrix });
         if (part.isLeaf) {
           const hex = typeof spec.leafTint === 'number' ? spec.leafTint : spec.leafTint[d.biome];
           im.setColorAt(i, softTint(d.x, d.z, hex, c, LEAF_TINT_SOFTEN));
@@ -420,15 +466,32 @@ function placeSpecies(
         }
       });
       // canopy owns the tree shadow; bark casts only when there is no canopy
-      im.castShadow = part.isLeaf || spec.castBarkShadow;
+      const castsShadow = part.isLeaf || spec.castBarkShadow;
+      im.castShadow = false;
       im.receiveShadow = true;
       parent.add(im);
       const { barkFar } = lodDists();
       const cullBark = !part.isLeaf && (spec.cullBarkFar || spec.farTrunkProxy);
       register(im, undefined, cullBark ? barkFar : undefined);
+      if (castsShadow) {
+        const shadow = cloneInstancedTo(im, part.geometry, makeShadowOnlyMaterial(part.material));
+        shadow.castShadow = true;
+        shadow.receiveShadow = false;
+        parent.add(shadow);
+        register(shadow, undefined, cullBark ? barkFar : undefined);
+      }
       if (!part.isLeaf && spec.farTrunkProxy) {
         const proxy = cloneInstancedTo(im, farTrunkGeo(part.geometry), part.material);
         proxy.receiveShadow = true;
+        for (let i = 0; i < list.length; i++) {
+          const source = handles[i].parts[handles[i].parts.length - 1];
+          handles[i].parts.push({
+            mesh: proxy,
+            index: i,
+            visibleMatrix: source.visibleMatrix,
+            hiddenMatrix: source.hiddenMatrix,
+          });
+        }
         parent.add(proxy);
         register(proxy, barkFar, undefined);
       }
@@ -436,7 +499,7 @@ function placeSpecies(
   });
 }
 
-function buildTrees(parent: THREE.Group, seed: number, registry: BucketMesh[]): void {
+function buildTrees(parent: THREE.Group, seed: number, registry: BucketMesh[], hideRegistry: TreeHideable[]): void {
   const decos = generateDecorations(seed);
   const sourceDecos = GFX.standardMaterials
     ? decos
@@ -533,10 +596,10 @@ function buildTrees(parent: THREE.Group, seed: number, registry: BucketMesh[]): 
       registry.push({ mesh, x: bx, z: bz, radius: bRadius, minDist, maxDist });
     };
 
-    placeSpecies(parent, seed, bucket, pines, pineSpec, register);
-    placeSpecies(parent, seed, bucket, oaks, oakSpec, register);
-    placeSpecies(parent, seed, bucket, twisteds, twistedSpec, register);
-    placeSpecies(parent, seed, bucket, deads, deadSpec, register);
+    placeSpecies(parent, seed, bucket, pines, pineSpec, register, hideRegistry);
+    placeSpecies(parent, seed, bucket, oaks, oakSpec, register, hideRegistry);
+    placeSpecies(parent, seed, bucket, twisteds, twistedSpec, register, hideRegistry);
+    placeSpecies(parent, seed, bucket, deads, deadSpec, register, hideRegistry);
 
     if (rocks.length > 0) {
       const isCluster = (r: Decoration): boolean => hashAt(r.x, r.z, 7) > 0.72;
@@ -865,17 +928,75 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
 // Entry point
 // ---------------------------------------------------------------------------
 
+function pointInsideTree(t: TreeHideable, x: number, z: number): boolean {
+  const dx = x - t.x, dz = z - t.z;
+  return dx * dx + dz * dz < t.r * t.r;
+}
+
+function segmentCircleEntry(
+  ax: number, az: number, bx: number, bz: number,
+  cx: number, cz: number, r: number,
+): number {
+  const dx = bx - ax, dz = bz - az;
+  const a = dx * dx + dz * dz;
+  if (a < 1e-12) return Infinity;
+  const fx = ax - cx, fz = az - cz;
+  const c0 = fx * fx + fz * fz - r * r;
+  if (c0 < 0) return 0;
+  const b = 2 * (fx * dx + fz * dz);
+  const disc = b * b - 4 * a * c0;
+  if (disc < 0) return Infinity;
+  return (-b - Math.sqrt(disc)) / (2 * a);
+}
+
+function cameraSegmentHitsTree(
+  t: TreeHideable,
+  eyeX: number, eyeY: number, eyeZ: number,
+  camX: number, camY: number, camZ: number,
+): boolean {
+  if ((eyeY < t.topY && pointInsideTree(t, eyeX, eyeZ))
+    || (camY < t.topY && pointInsideTree(t, camX, camZ))) {
+    return true;
+  }
+  const hitT = segmentCircleEntry(eyeX, eyeZ, camX, camZ, t.x, t.z, t.r);
+  if (hitT < 0 || hitT > 1) return false;
+  return eyeY + (camY - eyeY) * hitT < t.topY;
+}
+
+function updateTreeHides(
+  trees: TreeHideable[],
+  eyeX: number, eyeY: number, eyeZ: number,
+  camX: number, camY: number, camZ: number,
+): void {
+  for (const t of trees) {
+    const hide = cameraSegmentHitsTree(t, eyeX, eyeY, eyeZ, camX, camY, camZ);
+    if (hide === t.hidden) continue;
+    t.hidden = hide;
+    for (const part of t.parts) {
+      part.mesh.setMatrixAt(part.index, hide ? part.hiddenMatrix : part.visibleMatrix);
+      part.mesh.instanceMatrix.needsUpdate = true;
+    }
+  }
+}
+
 export function buildFoliage(seed: number): FoliageView {
   const group = new THREE.Group();
   group.name = 'foliage';
   const bucketMeshes: BucketMesh[] = [];
-  buildTrees(group, seed, bucketMeshes);
+  const treeHideables: TreeHideable[] = [];
+  buildTrees(group, seed, bucketMeshes, treeHideables);
   if (GFX.standardMaterials) buildDressing(group, seed, bucketMeshes);
   const grass = buildGrassRing(group, seed);
   return {
     group,
-    update(px: number, pz: number, camX: number, camZ: number, fogFar: number): void {
+    update(
+      px: number, pz: number,
+      camX: number, camY: number, camZ: number,
+      eyeX: number, eyeY: number, eyeZ: number,
+      fogFar: number,
+    ): void {
       grass.update(px, pz);
+      updateTreeHides(treeHideables, eyeX, eyeY, eyeZ, camX, camY, camZ);
       // buckets fully behind the fog wall are pure overdraw; the optional
       // [minDist, maxDist) window uses the bucket-CENTER distance so a bark
       // mesh and its far-trunk proxy are never drawn together

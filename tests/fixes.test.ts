@@ -4,7 +4,7 @@ import { ACTIONS, encodeObs } from '../src/sim/obs';
 import { Entity, dist2d } from '../src/sim/types';
 import { CLASSES, CRYPT_DOOR_POS, DUNGEON_LIST, DUNGEON_X_THRESHOLD, ITEMS, LAKE, MOBS, NPCS, QUESTS, instanceOrigin, zoneAt, zoneWelcomeText } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
-import { groundHeight, WATER_LEVEL } from '../src/sim/world';
+import { generateDecorations, groundHeight, WATER_LEVEL } from '../src/sim/world';
 import { cameraOcclusion, isBlocked, lineOfSightClear, resolvePosition } from '../src/sim/colliders';
 
 const SEED = 20061;
@@ -164,15 +164,37 @@ describe('collision & terrain', () => {
     expect(overhead).toBe(1);
   });
 
-  it('camera occlusion ignores campfires when the ray is above their visual height', () => {
+  it('camera ghosts through campfires while movement still collides', () => {
     const groundY = groundHeight(3, -4, SEED);
 
     const eyeHeightRay = cameraOcclusion(SEED, 3, groundY + 2.0, -12, 3, groundY + 2.2, 4, 0.35);
     expect(eyeHeightRay).toBe(1);
 
     const lowRay = cameraOcclusion(SEED, 3, groundY + 0.8, -12, 3, groundY + 0.9, 4, 0.35);
-    expect(lowRay).toBeGreaterThan(0);
-    expect(lowRay).toBeLessThan(1);
+    expect(lowRay).toBe(1);
+
+    const blocked = resolvePosition(SEED, 3, -4, 0.5);
+    expect(Math.abs(blocked.x - 3) + Math.abs(blocked.z + 4)).toBeGreaterThan(0.5);
+  });
+
+  it('camera ghosts through trees while movement still collides', () => {
+    const tree = generateDecorations(SEED).find((d) => d.kind !== 'rock')!;
+    const groundY = groundHeight(tree.x, tree.z, SEED);
+
+    const through = cameraOcclusion(
+      SEED,
+      tree.x,
+      groundY + 1.0,
+      tree.z - 8,
+      tree.x,
+      groundY + 1.2,
+      tree.z + 8,
+      0.35,
+    );
+    expect(through).toBe(1);
+
+    const blocked = resolvePosition(SEED, tree.x, tree.z, 0.5);
+    expect(Math.abs(blocked.x - tree.x) + Math.abs(blocked.z - tree.z)).toBeGreaterThan(0.5);
   });
 });
 

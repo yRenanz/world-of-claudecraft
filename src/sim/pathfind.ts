@@ -1,5 +1,5 @@
-import { isBlocked } from './colliders';
-import { groundHeight } from './world';
+import { isBlocked, resolvePosition } from './colliders';
+import { groundHeight, WATER_LEVEL } from './world';
 
 // Local A* over a 1-yard grid, used for short forced moves (warrior Charge).
 // The search window is the start/goal bounding box plus a margin, so cost
@@ -12,11 +12,16 @@ export interface PathOpts {
   bodyRadius: number;
   maxClimbSlope: number; // rise/run above which an uphill step is a wall
   minGround: number; // ground below this height is impassable (deep water)
+  maxSpan?: number; // max searched cells per axis
 }
 
 const CELL = 1; // yards
 const MARGIN = 8; // yards of slack around the start/goal bounding box
 const MAX_SPAN = 64; // cells per axis; beyond this fall back to a straight line
+
+export const PLAYER_BODY_RADIUS = 0.5;
+export const PLAYER_MAX_CLIMB_SLOPE = 1.5;
+export const PLAYER_SWIM_DEPTH = 0.8;
 
 // Returns world-space waypoints from `from` to `to`, excluding the start and
 // ending exactly at `to`. Falls back to [to] (straight line) when the window
@@ -28,7 +33,8 @@ export function findPath(
   const minZ = Math.min(from.z, to.z) - MARGIN;
   const W = Math.ceil((Math.max(from.x, to.x) + MARGIN - minX) / CELL);
   const H = Math.ceil((Math.max(from.z, to.z) + MARGIN - minZ) / CELL);
-  if (W > MAX_SPAN || H > MAX_SPAN) return [{ x: to.x, z: to.z }];
+  const maxSpan = o.maxSpan ?? MAX_SPAN;
+  if (W > maxSpan || H > maxSpan) return [{ x: to.x, z: to.z }];
   const cx = (gx: number) => minX + (gx + 0.5) * CELL;
   const cz = (gz: number) => minZ + (gz + 0.5) * CELL;
   const toCell = (x: number, z: number) => ({
@@ -139,4 +145,54 @@ export function findPath(
   }
   path.push({ x: to.x, z: to.z });
   return path;
+}
+
+export function findPlayerPath(
+  seed: number,
+  from: { x: number; z: number },
+  to: { x: number; z: number },
+  maxSpan = 128,
+): { x: number; z: number }[] {
+  return findPath(from, to, {
+    seed,
+    bodyRadius: PLAYER_BODY_RADIUS,
+    maxClimbSlope: PLAYER_MAX_CLIMB_SLOPE,
+    minGround: WATER_LEVEL - PLAYER_SWIM_DEPTH,
+    maxSpan,
+  });
+}
+
+function playerDestinationWalkable(seed: number, p: { x: number; z: number }): boolean {
+  return groundHeight(p.x, p.z, seed) >= WATER_LEVEL - PLAYER_SWIM_DEPTH
+    && !isBlocked(seed, p.x, p.z, PLAYER_BODY_RADIUS);
+}
+
+export function resolvePlayerDestination(seed: number, target: { x: number; z: number }): { x: number; z: number } {
+  const pushed = resolvePosition(seed, target.x, target.z, PLAYER_BODY_RADIUS);
+  if (playerDestinationWalkable(seed, pushed)) return pushed;
+
+  let best: { x: number; z: number } | null = null;
+  let bestD2 = Infinity;
+  const rings = 24;
+  for (let ring = 1; ring <= rings; ring++) {
+    const radius = ring * 0.75;
+    const samples = Math.max(12, Math.ceil(radius * 10));
+    for (let i = 0; i < samples; i++) {
+      const a = (i / samples) * Math.PI * 2;
+      const raw = {
+        x: target.x + Math.sin(a) * radius,
+        z: target.z + Math.cos(a) * radius,
+      };
+      const p = resolvePosition(seed, raw.x, raw.z, PLAYER_BODY_RADIUS);
+      if (!playerDestinationWalkable(seed, p)) continue;
+      const dx = p.x - target.x, dz = p.z - target.z;
+      const d2 = dx * dx + dz * dz;
+      if (d2 < bestD2) {
+        best = p;
+        bestD2 = d2;
+      }
+    }
+    if (best) return best;
+  }
+  return pushed;
 }

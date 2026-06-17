@@ -8,9 +8,10 @@ import { Hud } from './ui/hud';
 import { audio } from './game/audio';
 import { music } from './game/music';
 import { handlePickedEntity, hoverCursorKind } from './game/interactions';
-import { clickMoveShouldCancel, clickMoveStep, stepAngleToward } from './game/click_move';
+import { clickMoveShouldCancel, clickMoveStep, distance2d, stepAngleToward } from './game/click_move';
 import { Api, ClientWorld, CharacterSummary, type ReleaseEntry } from './net/online';
 import type { IWorld, LeaderboardEntry } from './world_api';
+import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { formatXp } from './ui/xp_bar';
 import { assetsReady } from './render/assets/preload';
 import { CharacterPreview } from './render/characters';
@@ -29,6 +30,8 @@ import { updateFollowCameraYaw, wrapAngle } from './game/camera_follow';
 
 const WORLD_SEED = 20061; // fixed: World of ClaudeCraft is a persistent place
 const CLICK_MOVE_TURN_RATE = 4.2; // rad/sec; responsive turning while the camera stays decoupled from click spam
+const CLICK_MOVE_WAYPOINT_STOP = 0.8; // yards; intermediate A* corners should roll through, not stutter-stop
+const CLICK_MOVE_REROUTE_DISTANCE = 4; // yards; live entity targets can move this far before we recompute the path
 const HOMEPAGE_MUSIC_MUTED_KEY = 'woc_homepage_music_muted';
 const HOMEPAGE_MUSIC_VOLUME = 0.225;
 
@@ -743,6 +746,14 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
     world.startAutoAttack();
   }
 
+  function clickMovePathTo(target: { x: number; z: number }): { x: number; z: number }[] {
+    return findPlayerPath(world.cfg.seed, world.player.pos, target);
+  }
+
+  function resolvedClickMoveTarget(target: { x: number; z: number }): { x: number; z: number } {
+    return resolvePlayerDestination(world.cfg.seed, target);
+  }
+
   function handlePick(x: number, y: number, button: number): void {
     const id = renderer.pick(x, y);
     const clickToMove = settings.get('clickToMove') > 0 && !world.player.dead;
@@ -754,7 +765,10 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
       }
       if (isClickMoveButton) {
         const g = renderer.groundPoint(x, y, world.player.pos.y);
-        if (g) input.setClickMoveTarget(g, 0.5);
+        if (g) {
+          const target = resolvedClickMoveTarget(g);
+          input.setClickMoveTarget(target, 0.5, null, clickMovePathTo(target));
+        }
       }
       return;
     }
@@ -762,7 +776,10 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
     // regular click handler still performs target/interact behavior.
     if (isClickMoveButton) {
       const e = world.entities.get(id);
-      if (e && e.id !== world.player.id) input.setClickMoveTarget({ x: e.pos.x, z: e.pos.z }, 3.5, e.id);
+      if (e && e.id !== world.player.id) {
+        const target = resolvedClickMoveTarget({ x: e.pos.x, z: e.pos.z });
+        input.setClickMoveTarget(target, 3.5, e.id, clickMovePathTo(target));
+      }
     }
     handlePickedEntity(world, hud, id, button, x, y);
   }
@@ -775,7 +792,7 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
       lastClickMoveMarkerPulse = input.clickMovePulse;
       clickMoveMarkerHideAt = nowMs + 300;
     }
-    const target = input.clickMoveTarget ?? input.clickMovePulseTarget;
+    const target = input.clickMoveGoal ?? input.clickMovePulseTarget;
     const show = !!target && settings.get('clickToMove') > 0 && !world.player.dead
       && (!!input.clickMoveTarget || nowMs < clickMoveMarkerHideAt);
     if (!show) {
@@ -850,11 +867,29 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
             input.clearClickMove();
             return { mi, facing };
           }
-          input.clickMoveTarget = { x: e.pos.x, z: e.pos.z };
+          const target = resolvedClickMoveTarget({ x: e.pos.x, z: e.pos.z });
+          if (!input.clickMoveGoal || distance2d(input.clickMoveGoal, target) > CLICK_MOVE_REROUTE_DISTANCE) {
+            input.rerouteClickMoveTarget(target, clickMovePathTo(target));
+          }
         }
-        const step = clickMoveStep(playerPos, input.clickMoveTarget, input.clickMoveStop);
+        let waypoint = input.clickMoveTarget;
+        if (!waypoint) return { mi, facing };
+        let step = clickMoveStep(
+          playerPos,
+          waypoint,
+          input.isClickMoveFinalWaypoint() ? input.clickMoveStop : CLICK_MOVE_WAYPOINT_STOP,
+        );
+        while (step.arrived && input.advanceClickMoveWaypoint()) {
+          waypoint = input.clickMoveTarget;
+          if (!waypoint) break;
+          step = clickMoveStep(
+            playerPos,
+            waypoint,
+            input.isClickMoveFinalWaypoint() ? input.clickMoveStop : CLICK_MOVE_WAYPOINT_STOP,
+          );
+        }
         if (step.arrived) {
-          input.clearClickMove();
+          if (!input.advanceClickMoveWaypoint()) input.clearClickMove();
         } else {
           mi.forward = true;
           const fromFacing = input.clickMoveFacing ?? playerFacing;

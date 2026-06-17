@@ -18,8 +18,8 @@ export interface CircleCollider {
   cameraTopY?: number;
   /**
    * When true the chase cam ray passes straight through this collider (no
-   * pull-in). Movement still collides. Used for village structures, which the
-   * renderer hides while the camera sits inside them instead of zooming in.
+   * pull-in). Movement still collides. Used for props that the renderer hides
+   * when they cross the eye-to-camera segment instead of zooming in.
    */
   camGhost?: boolean;
 }
@@ -56,10 +56,9 @@ function rotY(lx: number, lz: number, rot: number): { x: number; z: number } {
 function staticWorldColliders(seed: number): Collider[] {
   const out: Collider[] = [];
 
-  // Village structures (buildings, wells, stalls, mine mounds, dock huts,
-  // tents) are `camGhost`: they keep blocking movement but the chase cam no
-  // longer pulls in for them — the renderer hides whichever one the camera is
-  // standing inside instead.
+  // Hideable render props are `camGhost`: they keep blocking movement but the
+  // chase cam no longer pulls in for them; the renderer hides whichever one
+  // crosses the eye-to-camera segment instead.
   for (const b of PROPS.buildings) {
     const height = b.kind === 'chapel' ? 10.8 : b.kind === 'inn' ? 7.8 : 8.0;
     out.push({ type: 'obb', x: b.x, z: b.z, hw: b.w / 2, hd: b.d / 2, rot: b.rot, cameraTopY: topY(seed, b.x, b.z, height), camGhost: true });
@@ -82,15 +81,31 @@ function staticWorldColliders(seed: number): Collider[] {
   }
 
   for (const t of PROPS.tents) out.push({ type: 'circle', x: t.x, z: t.z, r: 1.5 * t.scale, cameraTopY: topY(seed, t.x, t.z, 3.4 * t.scale), camGhost: true });
-  for (const [x, z] of PROPS.crates) out.push({ type: 'circle', x, z, r: 0.65, cameraTopY: topY(seed, x, z, 1.35) });
-  for (const [x, z] of PROPS.campfires) out.push({ type: 'circle', x, z, r: 0.85, cameraTopY: topY(seed, x, z, 1.45) });
-  for (const [x, z] of PROPS.mudHuts) out.push({ type: 'circle', x, z, r: 1.1, cameraTopY: topY(seed, x, z, 12.5) });
+  for (const [x, z] of PROPS.crates) out.push({ type: 'circle', x, z, r: 0.65, cameraTopY: topY(seed, x, z, 1.35), camGhost: true });
+  for (const [x, z] of PROPS.campfires) out.push({ type: 'circle', x, z, r: 0.85, cameraTopY: topY(seed, x, z, 1.45), camGhost: true });
+  for (const [x, z] of PROPS.mudHuts) out.push({ type: 'circle', x, z, r: 1.1, cameraTopY: topY(seed, x, z, 12.5), camGhost: true });
   for (const ruin of PROPS.ruinRings) {
     for (let i = 0; i < ruin.columns; i++) {
       const ang = (i / ruin.columns) * Math.PI * 2;
       const x = ruin.x + Math.sin(ang) * ruin.ringR, z = ruin.z + Math.cos(ang) * ruin.ringR;
-      out.push({ type: 'circle', x, z, r: 0.6, cameraTopY: topY(seed, x, z, 4.3) });
+      out.push({ type: 'circle', x, z, r: 0.6, cameraTopY: topY(seed, x, z, 4.3), camGhost: true });
     }
+  }
+  for (const f of PROPS.fences) {
+    const dx = f.x2 - f.x1, dz = f.z2 - f.z1;
+    const len = Math.hypot(dx, dz);
+    if (len < 1e-6) continue;
+    const x = (f.x1 + f.x2) / 2, z = (f.z1 + f.z2) / 2;
+    out.push({
+      type: 'obb',
+      x,
+      z,
+      hw: len / 2 + FENCE_END_PAD,
+      hd: FENCE_HALF_DEPTH,
+      rot: Math.atan2(-dz, dx),
+      cameraTopY: topY(seed, x, z, 2.8),
+      camGhost: true,
+    });
   }
 
   // trees & large rocks from the deterministic decoration field
@@ -99,7 +114,7 @@ function staticWorldColliders(seed: number): Collider[] {
       if (d.scale >= 0.8) out.push({ type: 'circle', x: d.x, z: d.z, r: 0.7 * d.scale, cameraTopY: topY(seed, d.x, d.z, 1.25 * d.scale) });
     } else {
       // tree trunks only — canopies don't block
-      out.push({ type: 'circle', x: d.x, z: d.z, r: 0.55 * d.scale, cameraTopY: topY(seed, d.x, d.z, 7.5 * d.scale) });
+      out.push({ type: 'circle', x: d.x, z: d.z, r: 0.55 * d.scale, cameraTopY: topY(seed, d.x, d.z, 7.5 * d.scale), camGhost: true });
     }
   }
   return out;
@@ -127,6 +142,8 @@ const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
 
 const GRID_CELL = 16;
 const MAX_BODY_RADIUS = 0.8; // largest mover we resolve for
+const FENCE_HALF_DEPTH = 0.35;
+const FENCE_END_PAD = 0.35;
 
 interface ColliderGrid {
   cells: Map<string, Collider[]>;
@@ -241,6 +258,63 @@ export function resolvePosition(seed: number, x: number, z: number, r = 0.5): { 
   return resolveAgainst(list, x, z, r);
 }
 
+function crossesFence(fromX: number, fromZ: number, toX: number, toZ: number, r: number): boolean {
+  for (const f of PROPS.fences) {
+    const dx = f.x2 - f.x1, dz = f.z2 - f.z1;
+    const len = Math.hypot(dx, dz);
+    if (len < 1e-6) continue;
+    const ux = dx / len, uz = dz / len;
+    const nx = -uz, nz = ux;
+    const fromRelX = fromX - f.x1, fromRelZ = fromZ - f.z1;
+    const toRelX = toX - f.x1, toRelZ = toZ - f.z1;
+    const fromSide = fromRelX * nx + fromRelZ * nz;
+    const toSide = toRelX * nx + toRelZ * nz;
+    if (fromSide === 0 && toSide === 0) continue;
+    if (fromSide * toSide > 0) continue;
+    const denom = fromSide - toSide;
+    const t = Math.abs(denom) < 1e-6 ? 0 : fromSide / denom;
+    if (t < 0 || t > 1) continue;
+    const hitX = fromX + (toX - fromX) * t;
+    const hitZ = fromZ + (toZ - fromZ) * t;
+    const along = (hitX - f.x1) * ux + (hitZ - f.z1) * uz;
+    if (along >= -FENCE_END_PAD - r && along <= len + FENCE_END_PAD + r) return true;
+  }
+  return false;
+}
+
+export function resolveMovement(
+  seed: number,
+  fromX: number,
+  fromZ: number,
+  toX: number,
+  toZ: number,
+  r = 0.5,
+): { x: number; z: number } {
+  const dx = toX - fromX;
+  const dz = toZ - fromZ;
+  const d = Math.hypot(dx, dz);
+  if (d < 1e-6) return resolvePosition(seed, toX, toZ, r);
+  const steps = Math.max(1, Math.ceil(d / 0.2));
+  let x = fromX, z = fromZ;
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    const nextX = fromX + dx * t;
+    const nextZ = fromZ + dz * t;
+    if (crossesFence(x, z, nextX, nextZ, r)) break;
+    const resolved = resolvePosition(seed, nextX, nextZ, r);
+    x = resolved.x;
+    z = resolved.z;
+    if (Math.hypot(x - nextX, z - nextZ) > r * 0.25) {
+      const remainingX = toX - nextX;
+      const remainingZ = toZ - nextZ;
+      const correctionX = x - nextX;
+      const correctionZ = z - nextZ;
+      if (remainingX * correctionX + remainingZ * correctionZ < 0) break;
+    }
+  }
+  return { x, z };
+}
+
 export function isBlocked(seed: number, x: number, z: number, r = 0.5): boolean {
   const res = resolvePosition(seed, x, z, r);
   return Math.abs(res.x - x) > 1e-4 || Math.abs(res.z - z) > 1e-4;
@@ -251,13 +325,13 @@ export function isBlocked(seed: number, x: number, z: number, r = 0.5): boolean 
 // ---------------------------------------------------------------------------
 // The renderer sweeps a ray from the player's head (`a`) toward the desired
 // camera position (`b`) and pulls the camera in to the surface of the first
-// static obstacle in between, so the chase cam never sits inside a wall/trunk.
+// static obstacle in between, so the chase cam never sits inside a wall.
 // Pure XZ math against the SAME colliders movement uses (what you see is what
 // you collide with). Returns the fraction of the a->b segment the camera may
 // travel before the first occluder (1 = unobstructed). Open-world colliders
-// carry precomputed `cameraTopY` values, so low props like campfires only block
-// low rays while trees and trunks still pull the camera in. Village structures
-// are flagged `camGhost` and skipped entirely (the renderer hides them instead).
+// carry precomputed `cameraTopY` values, so large rocks still pull the camera
+// in only when the ray passes below their visual top. Hideable props are
+// flagged `camGhost` and skipped entirely (the renderer hides them instead).
 
 // First entry param t along a->b for a circle (radius already padded).
 // Infinity = no hit; we also bail when `a` is already inside (never slam the

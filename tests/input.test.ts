@@ -113,6 +113,45 @@ describe('Input click-to-move marker pulses', () => {
     expect(input.clickMovePulse).toBe(2);
     expect(input.clickMovePulseTarget).toEqual({ x: 2, z: 3 });
   });
+
+  it('stores and advances pathfound click-move waypoints', () => {
+    const { input } = makeInput();
+    input.setClickMoveTarget({ x: 3, z: 0 }, 0.5, null, [
+      { x: 1, z: 0 },
+      { x: 2, z: 0 },
+      { x: 3, z: 0 },
+    ]);
+    expect(input.clickMoveGoal).toEqual({ x: 3, z: 0 });
+    expect(input.clickMoveTarget).toEqual({ x: 1, z: 0 });
+    expect(input.isClickMoveFinalWaypoint()).toBe(false);
+    expect(input.advanceClickMoveWaypoint()).toBe(true);
+    expect(input.clickMoveTarget).toEqual({ x: 2, z: 0 });
+    expect(input.advanceClickMoveWaypoint()).toBe(true);
+    expect(input.clickMoveTarget).toEqual({ x: 3, z: 0 });
+    expect(input.isClickMoveFinalWaypoint()).toBe(true);
+    expect(input.advanceClickMoveWaypoint()).toBe(false);
+  });
+
+  it('reroutes an active click-move path without pulsing the marker', () => {
+    const { input } = makeInput();
+    input.setClickMoveTarget({ x: 3, z: 0 }, 0.5, 42, [{ x: 1, z: 0 }, { x: 3, z: 0 }]);
+    input.advanceClickMoveWaypoint();
+    input.rerouteClickMoveTarget({ x: 8, z: 0 }, [{ x: 5, z: 0 }, { x: 8, z: 0 }]);
+    expect(input.clickMovePulse).toBe(1);
+    expect(input.clickMoveGoal).toEqual({ x: 8, z: 0 });
+    expect(input.clickMoveTarget).toEqual({ x: 5, z: 0 });
+    expect(input.clickMovePathIndex).toBe(0);
+  });
+
+  it('clears path state when click-to-move stops', () => {
+    const { input } = makeInput();
+    input.setClickMoveTarget({ x: 3, z: 0 }, 0.5, null, [{ x: 1, z: 0 }, { x: 3, z: 0 }]);
+    input.clearClickMove();
+    expect(input.clickMoveTarget).toBeNull();
+    expect(input.clickMoveGoal).toBeNull();
+    expect(input.clickMovePath).toEqual([]);
+    expect(input.clickMovePathIndex).toBe(0);
+  });
 });
 
 describe('Input pointer lock', () => {

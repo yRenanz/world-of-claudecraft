@@ -57,8 +57,13 @@ export class Input {
   suspendMovement = false;
   // click-to-move (#95): a world destination the player clicked; the frame loop
   // walks toward it until arrival or until the player takes manual control.
-  // null when inactive. clickMoveStop is how close counts as "there".
+  // null when inactive. clickMoveTarget is the current waypoint; clickMoveGoal
+  // is the final clicked location or live entity position. clickMoveStop is how
+  // close counts as "there" at the final waypoint.
   clickMoveTarget: { x: number; z: number } | null = null;
+  clickMoveGoal: { x: number; z: number } | null = null;
+  clickMovePath: { x: number; z: number }[] = [];
+  clickMovePathIndex = 0;
   clickMoveEntityId: number | null = null;
   clickMoveStop = 0.5;
   clickMoveFacing: number | null = null;
@@ -286,8 +291,13 @@ export class Input {
     this.controllerFacing = null;
   }
 
-  setClickMoveTarget(target: { x: number; z: number }, stopDistance: number, entityId: number | null = null): void {
-    this.clickMoveTarget = target;
+  setClickMoveTarget(
+    target: { x: number; z: number },
+    stopDistance: number,
+    entityId: number | null = null,
+    path: { x: number; z: number }[] = [target],
+  ): void {
+    this.applyClickMovePath(target, path);
     this.clickMoveStop = stopDistance;
     this.clickMoveEntityId = entityId;
     this.clickMoveFacing = null;
@@ -297,12 +307,40 @@ export class Input {
     this.noteIntent('move');
   }
 
+  rerouteClickMoveTarget(target: { x: number; z: number }, path: { x: number; z: number }[] = [target]): void {
+    if (!this.clickMoveTarget) return;
+    this.applyClickMovePath(target, path);
+  }
+
+  advanceClickMoveWaypoint(): boolean {
+    if (!this.clickMoveTarget) return false;
+    if (this.clickMovePathIndex >= this.clickMovePath.length - 1) return false;
+    this.clickMovePathIndex++;
+    this.clickMoveTarget = this.clickMovePath[this.clickMovePathIndex];
+    return true;
+  }
+
+  isClickMoveFinalWaypoint(): boolean {
+    return !!this.clickMoveTarget && this.clickMovePathIndex >= this.clickMovePath.length - 1;
+  }
+
   clearClickMove(): void {
     if (!this.clickMoveTarget && this.clickMoveEntityId === null) return;
     this.clickMoveTarget = null;
+    this.clickMoveGoal = null;
+    this.clickMovePath = [];
+    this.clickMovePathIndex = 0;
     this.clickMoveEntityId = null;
     this.clickMoveFacing = null;
     this.noteIntent('move');
+  }
+
+  private applyClickMovePath(target: { x: number; z: number }, path: { x: number; z: number }[]): void {
+    this.clickMoveGoal = target;
+    const cleaned = path.filter((p) => Number.isFinite(p.x) && Number.isFinite(p.z));
+    this.clickMovePath = cleaned.length > 0 ? cleaned : [target];
+    this.clickMovePathIndex = 0;
+    this.clickMoveTarget = this.clickMovePath[0];
   }
 
   controllerFacingOverride(): number | null {

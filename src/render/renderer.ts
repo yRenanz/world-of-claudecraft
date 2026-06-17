@@ -67,11 +67,9 @@ const LIGHT_BUDGET_RANGE_SQ = 55 * 55;
 const SELECTION_RING_BOOST = 1.5;
 const SPARKLE_BOOST = 1.5;
 const PORTAL_BOOST = 2;
-// Third-person camera collision (see updateCamera). HARD_PAD keeps the camera
-// just off the surface; SOFT_PAD starts easing before the hard ray hits;
-// MIN_DIST never slams it onto the player. When the hard limit still appears
-// suddenly, lens/FOV compensation smooths the perceived zoom while the physical
-// camera remains clamped outside geometry.
+// Third-person camera collision (see updateCamera). Prop colliders marked
+// camGhost are hidden by props.ts/foliage.ts instead; this path is for
+// non-hideable blockers such as large rocks and interior walls.
 const CAMERA_COLLIDER_PAD = 0.35;
 const CAMERA_SOFT_COLLIDER_PAD = 1.65;
 const CAMERA_MIN_DIST = 1.2;
@@ -223,6 +221,7 @@ export class Renderer {
   private tmpV = new THREE.Vector3();
   private viewCandidates: { e: Entity; d2: number }[] = [];
   private tmpV2 = new THREE.Vector3();
+  private cameraLookAt = new THREE.Vector3();
   // floating /say-/yell bubbles, keyed by speaker entity id
   private chatBubbles = new Map<number, { el: HTMLDivElement; until: number }>();
   private sun: THREE.DirectionalLight;
@@ -240,7 +239,13 @@ export class Renderer {
   private fogScratch = new THREE.Color();
   private flames: THREE.Mesh[];
   private fireLights: THREE.PointLight[];
-  private propsView!: { update(camX: number, camY: number, camZ: number, fogFar: number): void };
+  private propsView!: {
+    update(
+      camX: number, camY: number, camZ: number,
+      eyeX: number, eyeY: number, eyeZ: number,
+      fogFar: number,
+    ): void;
+  };
   private lightRank: { light: THREE.PointLight; d2: number; worldPos: THREE.Vector3 }[] = [];
   private doomedIds: number[] = [];
   private dungeons: DungeonInteriors | null = null;
@@ -1291,17 +1296,26 @@ export class Renderer {
 
     // water shimmer (low-tier texture scroll; shader water rides uTime)
     this.waterView.update(this.time);
-    // fully-fogged terrain chunks / tree buckets are dropped before the
-    // frustum; the grass ring follows the player
-    const fogFar = (this.scene.fog as THREE.Fog).far;
-    this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
-    this.propsView.update(this.camera.position.x, this.camera.position.y, this.camera.position.z, fogFar);
-    this.foliage.update(p.pos.x, p.pos.z, this.camera.position.x, this.camera.position.z, fogFar);
-    this.fish.update(p.pos.x, p.pos.z, dt);
-
     this.vfx.update(dt);
 
     this.updateCamera(alpha, dt);
+    // Fully-fogged terrain chunks / tree buckets are dropped before the
+    // frustum; camera-ghost props hide against the current eye-to-camera ray.
+    const fogFar = (this.scene.fog as THREE.Fog).far;
+    this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
+    this.propsView.update(
+      this.camera.position.x, this.camera.position.y, this.camera.position.z,
+      this.cameraLookAt.x, this.cameraLookAt.y, this.cameraLookAt.z,
+      fogFar,
+    );
+    this.foliage.update(
+      p.pos.x, p.pos.z,
+      this.camera.position.x, this.camera.position.y, this.camera.position.z,
+      this.cameraLookAt.x, this.cameraLookAt.y, this.cameraLookAt.z,
+      fogFar,
+    );
+    this.fish.update(p.pos.x, p.pos.z, dt);
+
     this.updateAmbience(p.pos.x, this.camera.position.y, dt);
     // shadow frustum follows the player
     const pv = this.views.get(p.id);
@@ -1404,11 +1418,8 @@ export class Renderer {
       cx = Math.min(Math.max(cx, o.x - DUNGEON_WALL_X + m), o.x + DUNGEON_WALL_X - m);
       cz = Math.min(Math.max(cz, o.z + ARENA_LAYOUT.zMin + m), o.z + ARENA_LAYOUT.zMax - m);
     }
-    // Camera collision: pull the cam in to the surface of any building/object
-    // between the player's head and the desired position so it never sits
-    // inside geometry. A soft sweep starts the pull slightly before the hard
-    // collider hits; if the hard limit appears suddenly, the physical camera is
-    // clamped safe and the lens eases the perceived zoom instead of clipping.
+    // Camera collision for non-hideable blockers. Camera-ghost props are left
+    // at the requested zoom and hidden in props.ts while keeping their shadows.
     let hardT = cameraOcclusion(seed, px, eyeY, pz, cx, cy, cz, CAMERA_COLLIDER_PAD);
     let softT = cameraOcclusion(seed, px, eyeY, pz, cx, cy, cz, CAMERA_SOFT_COLLIDER_PAD);
     const segLen = Math.hypot(cx - px, cy - eyeY, cz - pz);
@@ -1438,7 +1449,8 @@ export class Renderer {
       this.camera.fov = this.camOcclusion.fov;
       this.camera.updateProjectionMatrix();
     }
-    this.camera.lookAt(px, eyeY, pz);
+    this.cameraLookAt.set(px, eyeY, pz);
+    this.camera.lookAt(this.cameraLookAt);
     this.camera.updateMatrixWorld();
   }
 

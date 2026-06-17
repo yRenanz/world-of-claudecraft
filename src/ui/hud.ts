@@ -1223,18 +1223,36 @@ export class Hud {
     if (barSlot === 0) {
       if (this.sim.player.autoAttack) this.sim.stopAutoAttack();
       else this.sim.startAutoAttack();
+      this.flashActionSlot(barSlot);
       return;
     }
     const action = this.actionForSlot(barSlot);
     if (action?.type === 'ability') {
       // cast by ability id: the server validates against its own known list,
       // so the client-side slot remap never desyncs slot semantics
-      if (this.abilityForSlot(barSlot)) this.sim.castAbility(action.id);
+      if (this.abilityForSlot(barSlot)) {
+        this.sim.castAbility(action.id);
+        this.flashActionSlot(barSlot);
+      }
     } else if (action?.type === 'item' && this.isHotbarItemId(action.id)) {
       if (this.tradeOpen) return;
       this.sim.useItem(action.id);
       if ($('#bags').style.display !== 'none') this.renderBags();
+      this.flashActionSlot(barSlot);
     }
+  }
+
+  private flashActionSlot(barSlot: number): void {
+    const btn = this.abilityButtons[barSlot]?.btn;
+    if (!btn) return;
+    this.flashActionButton(btn);
+  }
+
+  private flashActionButton(btn: HTMLButtonElement): void {
+    btn.classList.remove('used');
+    void btn.offsetWidth;
+    btn.classList.add('used');
+    window.setTimeout(() => btn.classList.remove('used'), 180);
   }
 
   private writeDraggedAction(dt: DataTransfer | null, action: Exclude<HotbarAction, null>): void {
@@ -1275,9 +1293,15 @@ export class Hud {
       btn.addEventListener('click', () => {
         // On touch, the click that ends a long-press peek inspects the slot
         // (tooltip already shown) instead of casting — release dismisses it.
-        if (this.peekGuard.consume()) { this.hideTooltip(); return; }
+        if (this.peekGuard.consume()) { this.hideTooltip(); btn.blur(); return; }
         audio.click();
         this.castSlot(slot);
+        btn.blur();
+      });
+      btn.addEventListener('keydown', (e) => {
+        if (e.key !== ' ' && e.key !== 'Spacebar') return;
+        e.preventDefault();
+        e.stopPropagation();
       });
       this.attachTooltip(btn, () => {
         if (slot === 0) {
@@ -5897,11 +5921,11 @@ export class Hud {
       this.capturingKey = null;
       if (code === null) {
         this.keybindNote = t('hud.options.keybindCancelled');
-      } else if (isReservedCode(code)) {
-        this.keybindNote = t('hud.options.keybindReserved', { key: keyLabel(code) });
       } else if (this.keybinds.bind(actionId, index, code)) {
         this.keybindNote = t('hud.options.keybindBound', { action: name, key: keyLabel(code) });
         this.refreshKeybindLabels();
+      } else if (isReservedCode(code)) {
+        this.keybindNote = t('hud.options.keybindReserved', { key: keyLabel(code) });
       }
       // re-render only if the menu is still open (player may have closed it)
       if (this.optionsOpen) this.renderKeybinds();

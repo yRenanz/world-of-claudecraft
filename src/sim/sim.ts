@@ -487,6 +487,10 @@ function isShamanShock(abilityId: string): boolean {
   return (SHAMAN_SHOCK_COOLDOWN_IDS as readonly string[]).includes(abilityId) || abilityId === 'lightning_shock';
 }
 
+function ignoresDamagePushback(abilityId: string): boolean {
+  return abilityId === 'ghost_wolf';
+}
+
 function isPetClass(cls: PlayerClass): boolean {
   return cls === 'hunter' || cls === 'warlock';
 }
@@ -3132,11 +3136,13 @@ export class Sim {
     const ranged = CLASSES[meta.cls].ranged;
     if (ranged && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange)) {
       if (!this.hasLineOfSight(p, t)) return;
+      this.breakGhostWolf(p);
       this.rangedSwing(p, t, ranged);
       p.swingTimer = ranged.speed * this.swingIntervalMult(p);
       return;
     }
     if (d > MELEE_RANGE) return;
+    this.breakGhostWolf(p);
 
     let bonus = 0;
     let abilityName: string | null = null;
@@ -3237,7 +3243,17 @@ export class Sim {
   // Damage / death
   // -------------------------------------------------------------------------
 
-  private dealDamage(source: Entity | null, target: Entity, amount: number, crit: boolean, school: string, ability: string | null, kind: 'hit' | 'miss' | 'dodge', noRage = false, threatOpts?: { flat?: number; mult?: number }): void {
+  private dealDamage(
+    source: Entity | null,
+    target: Entity,
+    amount: number,
+    crit: boolean,
+    school: string,
+    ability: string | null,
+    kind: 'hit' | 'miss' | 'dodge',
+    noRage = false,
+    threatOpts?: { flat?: number; mult?: number },
+  ): void {
     if (target.dead) return;
     if (target.gm) return; // GM characters are invulnerable — every damage path funnels here
     // A mob that broke leash (or a pet freed to the wild) is in 'evade': it has
@@ -3318,10 +3334,8 @@ export class Sim {
     // taking or dealing real damage breaks stealth
     if (amount > 0) {
       this.breakStealth(target);
-      this.breakGhostWolf(target);
       if (source && source.id !== target.id) {
         this.breakStealth(source);
-        this.breakGhostWolf(source);
       }
     }
 
@@ -3361,7 +3375,7 @@ export class Sim {
       // cancelling it (misses and fully absorbed hits don't push back)
       if (target.castingAbility && source && source.id !== target.id && amount > 0 && kind === 'hit') {
         if (target.castingAbility === FISHING_CAST_ID) this.cancelCast(target);
-        else this.pushbackCast(target);
+        else if (!ignoresDamagePushback(target.castingAbility)) this.pushbackCast(target);
       }
     }
 
@@ -5333,6 +5347,8 @@ export class Sim {
     p.hp = p.maxHp;
     p.resource = p.resourceType === 'mana' ? p.maxResource : p.resourceType === 'energy' ? 100 : 0;
     p.targetId = null;
+    p.autoAttack = false;
+    p.queuedOnSwing = null;
     p.combatTimer = 99;
     p.inCombat = false;
     this.emit({ type: 'respawn', pid: meta.entityId });

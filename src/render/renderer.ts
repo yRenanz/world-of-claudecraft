@@ -1203,6 +1203,7 @@ export class Renderer {
         moving,
         airborne,
         backwards: loco.backwards,
+        reverseBackpedal: ghostWolf,
         dead: visuallyDead,
         casting: e.castingAbility !== null && !visuallyDead,
         swimming,

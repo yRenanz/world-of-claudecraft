@@ -34,6 +34,7 @@ vi.mock('../server/moderation_db', () => ({
 }));
 vi.mock('../server/chat_filter_db', () => ({
   addFilterWord: vi.fn(),
+  chatModeratedAccounts: vi.fn(async () => []),
   chatModerationForAccount: vi.fn(),
   getFilterConfig: vi.fn(),
   liftChatMute: vi.fn(),

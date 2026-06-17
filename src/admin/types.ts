@@ -181,8 +181,17 @@ export interface EscalationConfig {
   muteLadderSeconds: number[];
 }
 
+export interface ChatModeratedAccount {
+  id: number;
+  username: string;
+  isAdmin: boolean;
+  chatStrikes: number;
+  chatMutedUntil: string | null;
+}
+
 export interface ChatFilterData {
   soft: FilterWord[];
   hard: FilterWord[];
   config: EscalationConfig;
+  accounts: ChatModeratedAccount[];
 }

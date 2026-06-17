@@ -1,8 +1,8 @@
 import { escapeHtml, fmtCopper, fmtDate, fmtDuration, fmtRelative } from './format';
 import { classLabel, zoneLabel, t } from './i18n';
 import type {
-  AccountDetail, AccountRow, CharacterRow, ChatFilterData, ChatModerationDetail, FilterWord,
-  LivePlayer, ModerationAccountDetail, ModerationQueueRow,
+  AccountDetail, AccountRow, CharacterRow, ChatFilterData, ChatModeratedAccount,
+  ChatModerationDetail, FilterWord, LivePlayer, ModerationAccountDetail, ModerationQueueRow,
 } from './types';
 
 // Pure HTML-string renderers for the dashboard tables. All dynamic values go
@@ -312,7 +312,29 @@ export function renderChatFilter(data: ChatFilterData): string {
       <div class="panel-title">Hard words <span class="hint">slurs — message blocked + escalating mutes; never shown to anyone, not toggleable</span></div>
       <form class="word-add" data-add-tier="hard"><input placeholder="add a hard word" maxlength="64" /><button>Add</button></form>
       ${renderWordChips(data.hard)}
+    </div>
+    <div class="panel">
+      <div class="panel-title">Chat-moderated accounts <span class="hint">currently muted or carrying strikes — lift or reset here</span></div>
+      ${renderChatModeratedAccounts(data.accounts)}
     </div>`;
+}
+
+function renderChatModeratedAccounts(accounts: ChatModeratedAccount[]): string {
+  if (accounts.length === 0) return '<div class="empty">no muted or striked accounts</div>';
+  const rows = accounts.map((a) => {
+    const muted = a.chatMutedUntil !== null && new Date(a.chatMutedUntil).getTime() > Date.now();
+    const muteCell = muted
+      ? `<span class="badge warn">muted until ${fmtDate(a.chatMutedUntil)}</span>`
+      : '<span class="badge">not muted</span>';
+    const actions = `${muted ? '<button data-lift-mute="1">Lift mute</button>' : ''}${a.chatStrikes > 0 ? ' <button data-reset-strikes="1">Reset strikes</button>' : ''}`;
+    return `<tr data-action-account-id="${a.id}">
+      <td>${escapeHtml(a.username)}${a.isAdmin ? ' <span class="badge">admin</span>' : ''}</td>
+      <td class="num">${a.chatStrikes}</td>
+      <td>${muteCell}</td>
+      <td>${actions}</td>
+    </tr>`;
+  }).join('');
+  return `<table><thead><tr><th>Account</th><th class="num">Strikes</th><th>Mute</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function reasonLabel(reason: string): string {

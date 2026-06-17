@@ -587,9 +587,19 @@ function wireChatFilterEvents(): void {
       .catch((err: unknown) => chatFilterError(err, 'add word'));
   });
 
-  // Remove a word, or save the escalation config.
+  // Remove a word, save the escalation config, or lift/reset an account's chat mute.
   $('chat-filter').addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
+    const chatModBtn = target.closest('button[data-lift-mute], button[data-reset-strikes]') as HTMLButtonElement | null;
+    if (chatModBtn) {
+      const accountId = Number((chatModBtn.closest('[data-action-account-id]') as HTMLElement | null)?.dataset.actionAccountId);
+      if (!Number.isFinite(accountId)) return;
+      const endpoint = chatModBtn.dataset.liftMute !== undefined ? 'lift-mute' : 'reset-strikes';
+      void apiPost(`/admin/api/moderation/accounts/${accountId}/${endpoint}`, {})
+        .then(() => refreshChatFilter())
+        .catch((err: unknown) => chatFilterError(err, 'chat moderation'));
+      return;
+    }
     const del = target.closest('button[data-del-word]') as HTMLButtonElement | null;
     if (del) {
       void apiPost(`/admin/api/chat-filter/words/${Number(del.dataset.delWord)}/delete`, {})

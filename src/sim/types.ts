@@ -210,6 +210,14 @@ export interface MobTemplate {
   // opens. Resets on evade/respawn. Routes through the normal heal path, so it
   // shows green floating text and grants no threat to the menders themselves.
   mendAlly?: { healMin: number; healMax: number; radius: number; every: number; name: string; school?: Aura['school'] };
+  // Commander mechanic ("Rallying Banner"): periodically empowers every friendly
+  // mob in range (including the caster) with a refreshing `buff_ap` aura worth
+  // `ap` attack power for `duration`s — the support twin of mendAlly, granting
+  // offense instead of healing. Rides the existing buff_ap aura that
+  // effectiveAttackPower already folds for mobs, so no new aura kind or combat
+  // math. Telegraphed like stomp/mendAlly: the first rally only lands one full
+  // interval after combat opens.
+  rally?: { radius: number; every: number; ap: number; duration: number; name: string; school?: Aura['school'] };
   // Boss mechanic ("War Stomp"): periodic ground slam that stuns nearby players
   // for `duration`s (and optionally deals min..max damage). Telegraphed: the
   // first slam only lands one full `every` interval after combat starts.
@@ -670,6 +678,7 @@ export interface Entity {
   stoneskinTimer: number; // periodic self-absorb barrier countdown
   detonateTimer: number; // Death Throes fuse on a volatile corpse; Infinity = no pending detonation
   mendTimer: number; // mendAlly support-heal cast countdown
+  rallyTimer: number; // rally commander-buff cast countdown
   firedSummons: number; // summonAdds thresholds already triggered
   summonedIds: number[]; // live adds this boss summoned; despawned on reset
   enraged: boolean; // enrage mechanic active

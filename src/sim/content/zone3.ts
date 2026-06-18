@@ -80,6 +80,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 38, moveSpeed: 7, aggroRadius: 12,
     aoePulse: { min: 28, max: 38, radius: 8, every: 10, name: 'Powder Keg', school: 'fire' },
     summonAdds: { mobId: 'ironvein_sapper', count: 2, atHpPct: [0.50] },
+    rally: { radius: 14, every: 12, ap: 40, duration: 10, name: 'Rallying Banner' },
     enrage: { belowHpPct: 0.30, dmgMult: 1.45, hasteMult: 1.3 },
     loot: [
       { copper: 420, chance: 1 },

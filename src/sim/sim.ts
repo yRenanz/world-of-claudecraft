@@ -4158,6 +4158,7 @@ export class Sim {
     mob.stompTimer = MOBS[mob.templateId]?.stomp?.every ?? 0;
     mob.mendTimer = MOBS[mob.templateId]?.mendAlly?.every ?? 0;
     mob.stoneskinTimer = MOBS[mob.templateId]?.stoneskin?.every ?? 0;
+    mob.rallyTimer = MOBS[mob.templateId]?.rally?.every ?? 0;
     mob.wanderTimer = this.rng.range(2, 8);
   }
 
@@ -4815,6 +4816,7 @@ export class Sim {
     mob.stompTimer = MOBS[mob.templateId]?.stomp?.every ?? 0;
     mob.mendTimer = MOBS[mob.templateId]?.mendAlly?.every ?? 0;
     mob.stoneskinTimer = MOBS[mob.templateId]?.stoneskin?.every ?? 0;
+    mob.rallyTimer = MOBS[mob.templateId]?.rally?.every ?? 0;
     mob.wanderTimer = this.rng.range(2, 8);
     for (const meta of this.players.values()) {
       const e = this.entities.get(meta.entityId);
@@ -4908,7 +4910,7 @@ export class Sim {
   // and reset on evade/respawn.
   private updateBossMechanics(mob: Entity): void {
     const tmpl = MOBS[mob.templateId];
-    if (!tmpl || (!tmpl.summonAdds && !tmpl.enrage && !tmpl.desperateHeal && !tmpl.mendAlly)) return;
+    if (!tmpl || (!tmpl.summonAdds && !tmpl.enrage && !tmpl.desperateHeal && !tmpl.mendAlly && !tmpl.rally)) return;
     const hpFrac = mob.hp / Math.max(1, mob.maxHp);
     if (tmpl.summonAdds) {
       const thresholds = tmpl.summonAdds.atHpPct;
@@ -4954,6 +4956,40 @@ export class Sim {
           for (const ally of wounded) {
             const amount = Math.round(this.rng.range(tmpl.mendAlly.healMin, tmpl.mendAlly.healMax));
             this.applyHeal(mob, ally, amount, tmpl.mendAlly.name);
+          }
+        }
+      }
+    }
+    // Commander "Rally": periodically empower every friendly mob in range
+    // (including the caster) with a refreshing attack-power buff. The offensive
+    // twin of mendAlly — same telegraphed timer, same same-faction ally scan —
+    // but it grants buff_ap (folded by effectiveAttackPower) instead of healing.
+    if (tmpl.rally) {
+      mob.rallyTimer -= DT;
+      if (mob.rallyTimer <= 0) {
+        mob.rallyTimer = tmpl.rally.every;
+        const allies: Entity[] = [];
+        for (const ally of this.entities.values()) {
+          if (ally.kind !== 'mob' || ally.dead || ally.ownerId !== null) continue; // skip players, pets, corpses
+          if (ally.hostile !== mob.hostile) continue; // only same-faction mobs
+          if (dist2d(ally.pos, mob.pos) > tmpl.rally.radius) continue;
+          allies.push(ally);
+        }
+        if (allies.length > 0) {
+          const school = tmpl.rally.school ?? 'physical';
+          this.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
+          this.emit({ type: 'log', text: `${mob.name} unleashes ${tmpl.rally.name}!`, color: '#ffcc33', entityId: mob.id });
+          for (const ally of allies) {
+            this.applyAura(ally, {
+              id: `rally_${mob.templateId}`,
+              name: tmpl.rally.name,
+              kind: 'buff_ap',
+              remaining: tmpl.rally.duration,
+              duration: tmpl.rally.duration,
+              value: tmpl.rally.ap,
+              sourceId: mob.id,
+              school,
+            });
           }
         }
       }

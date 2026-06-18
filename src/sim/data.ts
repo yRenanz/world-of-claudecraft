@@ -10,7 +10,7 @@ import type {
 } from './types';
 import { BASE_ITEMS } from './content/items';
 import {
-  GRAVEYARD_POS, LAKE, TOWN_RADIUS, ZONE1_CAMPS, ZONE1_MOBS, ZONE1_NPCS, ZONE1_OBJECTS,
+  GRAVEYARD_POS, LAKE, TOWN_RADIUS, ZONE1_CAMPS, ZONE1_CHAPEL_CAMPS, ZONE1_MOBS, ZONE1_NPCS, ZONE1_OBJECTS,
   ZONE1_PROPS, ZONE1_QUESTS, ZONE1_QUEST_ORDER, ZONE1_ROADS, ZONE1_ZONE,
 } from './content/zone1';
 import {
@@ -69,7 +69,10 @@ export const QUEST_ORDER: string[] = [
   ...ZONE1_QUEST_ORDER, ...ZONE2_QUEST_ORDER, ...ZONE3_QUEST_ORDER, ...TEMPLE_QUEST_ORDER,
 ];
 
-export const CAMPS: CampDef[] = [...ZONE1_CAMPS, ...ZONE2_CAMPS, ...ZONE3_CAMPS, ...TEMPLE_CAMPS];
+// ZONE1_CHAPEL_CAMPS is appended LAST so the rare elite's spawn draws fall after
+// every other camp — see the note on its export in content/zone1.ts (keeps
+// fixed-seed determinism stable when adding it).
+export const CAMPS: CampDef[] = [...ZONE1_CAMPS, ...ZONE2_CAMPS, ...ZONE3_CAMPS, ...TEMPLE_CAMPS, ...ZONE1_CHAPEL_CAMPS];
 
 export const GROUND_OBJECTS: GroundObjectDef[] = [...ZONE1_OBJECTS, ...ZONE2_OBJECTS, ...ZONE3_OBJECTS, ...TEMPLE_OBJECTS];
 

@@ -304,6 +304,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     id: 'gravewardens_shiv', name: "Gravewarden's Shiv", kind: 'weapon', slot: 'mainhand', quality: 'rare',
     weapon: { min: 7, max: 11, speed: 1.7, dagger: true }, stats: { agi: 4, sta: 2 }, sellValue: 880, requiredClass: ROG,
   },
+  maldrecs_soulbinder: {
+    id: 'maldrecs_soulbinder', name: "Maldrec's Soulbinder", kind: 'weapon', slot: 'mainhand', quality: 'rare',
+    weapon: { min: 11, max: 18, speed: 3.0 }, stats: { int: 4, spi: 3 }, sellValue: 850,
+  },
   // --- quest items ---
   boar_hide: { id: 'boar_hide', name: 'Bristly Boar Hide', kind: 'quest', sellValue: 0, questId: 'q_boars' },
   gravecaller_sigil: { id: 'gravecaller_sigil', name: "Gravecaller's Sigil", kind: 'quest', sellValue: 0, questId: 'q_whispers' },

@@ -240,6 +240,27 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.26, color: 0x3b4a5a,
   },
+  wraithbinder_maldrec: {
+    id: 'wraithbinder_maldrec', name: 'Wraithbinder Maldrec', minLevel: 7, maxLevel: 7, family: 'undead', rare: true,
+    elite: true, ccImmune: true, respawnMult: 432,
+    hpBase: 320, hpPerLevel: 60, dmgBase: 12, dmgPerLevel: 3.4, attackSpeed: 2.3,
+    armorPerLevel: 28, moveSpeed: 6.8, aggroRadius: 13,
+    // A fallen Gravecaller who bound his own soul to the chapel dead. A pulse of
+    // grave-cold shadow rolls off him, and he tears the restless bones from the
+    // ground to fight at his side, growing frantic as he is unmade.
+    aoePulse: { min: 13, max: 19, radius: 9, every: 9, name: 'Grave Chill', school: 'shadow' },
+    summonAdds: { mobId: 'restless_bones', count: 2, atHpPct: [0.65, 0.35] },
+    enrage: { belowHpPct: 0.30, dmgMult: 1.5, hasteMult: 1.3 },
+    loot: [
+      { copper: 160, chance: 1 },
+      { itemId: 'bone_fragments', chance: 1 },
+      { itemId: 'maldrecs_soulbinder', chance: 0.25 },
+      { itemId: 'hollowbone_hauberk', chance: 0.25, rollGroup: 'maldrec_chase' },
+      { itemId: 'gravewoven_raiment', chance: 0.25, rollGroup: 'maldrec_chase' },
+      { itemId: 'cryptstalker_jerkin', chance: 0.25, rollGroup: 'maldrec_chase' },
+    ],
+    scale: 1.22, color: 0x6f7f8f,
+  },
   gorrak: {
     id: 'gorrak', name: 'Gorrak the Ruthless', minLevel: 6, maxLevel: 6, family: 'humanoid',
     hpBase: 160, hpPerLevel: 30, dmgBase: 8, dmgPerLevel: 2.4, attackSpeed: 2.4,
@@ -558,6 +579,17 @@ export const ZONE1_CAMPS: CampDef[] = [
   // Undead: ruins northeast
   { mobId: 'restless_bones', center: { x: 80, z: 78 }, radius: 18, count: 8 },
   { mobId: 'captain_verlan', center: { x: 92, z: 90 }, radius: 4, count: 1 },
+];
+
+// Spawned LAST in the merged CAMPS array (see data.ts) so these appended draws
+// fall after every other zone's camp spawns — and the camp loop is the final
+// RNG consumer at construction (ground objects, dungeon doors and addPlayer draw
+// none). Keeping the rare elite at the tail means adding it shifts no other
+// content's deterministic spawn rolls, so fixed-seed tests stay stable.
+export const ZONE1_CHAPEL_CAMPS: CampDef[] = [
+  // A pair of bone guardians flank the chapel's broken altar; their binder lurks within.
+  { mobId: 'restless_bones', center: { x: 88, z: 90 }, radius: 6, count: 2 },
+  { mobId: 'wraithbinder_maldrec', center: { x: 88, z: 92 }, radius: 3, count: 1 },
 ];
 
 

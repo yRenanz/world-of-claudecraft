@@ -101,7 +101,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startWeapon: 'rusty_hatchet',
     startChest: 'footpad_jerkin',
     ranged: { min: 5, max: 9, speed: 2.3, maxRange: 35, minRange: 8 },
-    abilities: ['raptor_strike', 'aspect_of_the_hawk', 'serpent_sting', 'arcane_shot', 'concussive_shot', 'mongoose_bite', 'wing_clip', 'tame_beast', 'dismiss_pet', 'revive_pet', 'aspect_of_the_cheetah', 'aimed_shot', 'rapid_fire'],
+    abilities: ['raptor_strike', 'aspect_of_the_hawk', 'serpent_sting', 'arcane_shot', 'concussive_shot', 'mongoose_bite', 'wing_clip', 'tame_beast', 'dismiss_pet', 'revive_pet', 'aspect_of_the_monkey', 'aspect_of_the_cheetah', 'aimed_shot', 'rapid_fire'],
     color: 0xabd473,
   },
   priest: {
@@ -732,6 +732,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 3, max: 5 }, { type: 'slow', mult: 0.6, duration: 10 }],
     description: 'Inflicts a wound that slows the enemy by 40% for 10 sec.',
+  },
+  aspect_of_the_monkey: {
+    id: 'aspect_of_the_monkey', name: 'Aspect of the Monkey', class: 'hunter', learnLevel: 10,
+    cost: 20, castTime: 0, cooldown: 0, range: 0, school: 'nature',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'buff_dodge', value: 0.08, duration: 1800 }],
+    description: 'Take on the aspect of the monkey, increasing your dodge chance by 8% for 30 min.',
   },
   aspect_of_the_cheetah: {
     id: 'aspect_of_the_cheetah', name: 'Aspect of the Cheetah', class: 'hunter', learnLevel: 14,

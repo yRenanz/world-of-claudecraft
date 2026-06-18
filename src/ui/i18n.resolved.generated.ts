@@ -1454,6 +1454,10 @@ export const en: EnTranslations = {
         "name": "Wing Clip",
         "description": "Inflicts a wound that slows the enemy by 40% for 10 sec."
       },
+      "aspect_of_the_monkey": {
+        "name": "Aspect of the Monkey",
+        "description": "Take on the aspect of the monkey, increasing your dodge chance by 8% for 30 min."
+      },
       "aspect_of_the_cheetah": {
         "name": "Aspect of the Cheetah",
         "description": "Take on the aspect of the cheetah, increasing movement speed by 30% for 30 min."
@@ -4991,6 +4995,10 @@ export const es: EnTranslations = {
       "wing_clip": {
         "name": "Cortar alas",
         "description": "Inflige una herida que ralentiza al enemigo un 40% durante 10 s."
+      },
+      "aspect_of_the_monkey": {
+        "name": "Aspect of the Monkey",
+        "description": "Take on the aspect of the monkey, increasing your dodge chance by 8% for 30 min."
       },
       "aspect_of_the_cheetah": {
         "name": "Aspecto del guepardo",
@@ -8530,6 +8538,10 @@ export const es_ES: EnTranslations = {
         "name": "Cortar alas",
         "description": "Inflige una herida que ralentiza al enemigo un 40% durante 10 s."
       },
+      "aspect_of_the_monkey": {
+        "name": "Aspect of the Monkey",
+        "description": "Take on the aspect of the monkey, increasing your dodge chance by 8% for 30 min."
+      },
       "aspect_of_the_cheetah": {
         "name": "Aspecto del guepardo",
         "description": "Adoptas el aspecto del guepardo y aumentas la velocidad de movimiento un 30% durante 30 min."
@@ -12067,6 +12079,10 @@ export const fr_FR: EnTranslations = {
       "wing_clip": {
         "name": "Coupure d'ailes",
         "description": "Inflige une blessure qui ralentit l'ennemi de 40% pendant 10 s."
+      },
+      "aspect_of_the_monkey": {
+        "name": "Aspect of the Monkey",
+        "description": "Take on the aspect of the monkey, increasing your dodge chance by 8% for 30 min."
       },
       "aspect_of_the_cheetah": {
         "name": "Aspect du guépard",
@@ -15606,6 +15622,10 @@ export const fr_CA: EnTranslations = {
         "name": "Coupure d'ailes",
         "description": "Inflige une blessure qui ralentit l'ennemi de 40% pendant 10 s."
       },
+      "aspect_of_the_monkey": {
+        "name": "Aspect of the Monkey",
+        "description": "Take on the aspect of the monkey, increasing your dodge chance by 8% for 30 min."
+      },
       "aspect_of_the_cheetah": {
         "name": "Aspect du guépard",
         "description": "Adopte l'aspect du guépard et augmente la vitesse de déplacement de 30% pendant 30 min."
@@ -19143,6 +19163,10 @@ export const en_CA: EnTranslations = {
       "wing_clip": {
         "name": "Wing Clip",
         "description": "Inflicts a wound that slows the enemy by 40% for 10 sec."
+      },
+      "aspect_of_the_monkey": {
+        "name": "Aspect of the Monkey",
+        "description": "Take on the aspect of the monkey, increasing your dodge chance by 8% for 30 min."
       },
       "aspect_of_the_cheetah": {
         "name": "Aspect of the Cheetah",
@@ -22682,6 +22706,10 @@ export const it_IT: EnTranslations = {
         "name": "Taglia Ali",
         "description": "Infligge una ferita che rallenta il nemico del 40% per 10 s."
       },
+      "aspect_of_the_monkey": {
+        "name": "Aspect of the Monkey",
+        "description": "Take on the aspect of the monkey, increasing your dodge chance by 8% for 30 min."
+      },
       "aspect_of_the_cheetah": {
         "name": "Aspetto del Ghepardo",
         "description": "Assumi l'aspetto del ghepardo, aumentando la velocità di movimento del 30% per 30 min."
@@ -26219,6 +26247,10 @@ export const de_DE: EnTranslations = {
       "wing_clip": {
         "name": "Zurechtstutzen",
         "description": "Verursacht eine Wunde, die den Gegner 10 Sek. lang um 40% verlangsamt."
+      },
+      "aspect_of_the_monkey": {
+        "name": "Aspect of the Monkey",
+        "description": "Take on the aspect of the monkey, increasing your dodge chance by 8% for 30 min."
       },
       "aspect_of_the_cheetah": {
         "name": "Aspekt des Geparden",
@@ -29758,6 +29790,10 @@ export const zh_CN: EnTranslations = {
         "name": "摔绊",
         "description": "造成伤口，使敌人移动速度降低 40%，持续 10 秒。"
       },
+      "aspect_of_the_monkey": {
+        "name": "Aspect of the Monkey",
+        "description": "Take on the aspect of the monkey, increasing your dodge chance by 8% for 30 min."
+      },
       "aspect_of_the_cheetah": {
         "name": "猎豹守护",
         "description": "获得猎豹守护，使移动速度提高 30%，持续 30 分钟。"
@@ -33295,6 +33331,10 @@ export const zh_TW: EnTranslations = {
       "wing_clip": {
         "name": "摔絆",
         "description": "造成傷口，使敵人移動速度降低 40%，持續 10 秒。"
+      },
+      "aspect_of_the_monkey": {
+        "name": "Aspect of the Monkey",
+        "description": "Take on the aspect of the monkey, increasing your dodge chance by 8% for 30 min."
       },
       "aspect_of_the_cheetah": {
         "name": "獵豹守護",
@@ -36834,6 +36874,10 @@ export const ko_KR: EnTranslations = {
         "name": "날개 절단",
         "description": "상처를 내어 10초 동안 적의 이동 속도를 40%만큼 감소시킵니다."
       },
+      "aspect_of_the_monkey": {
+        "name": "Aspect of the Monkey",
+        "description": "Take on the aspect of the monkey, increasing your dodge chance by 8% for 30 min."
+      },
       "aspect_of_the_cheetah": {
         "name": "치타의 상",
         "description": "치타의 상을 취해 30분 동안 이동 속도가 30%만큼 증가합니다."
@@ -40371,6 +40415,10 @@ export const ja_JP: EnTranslations = {
       "wing_clip": {
         "name": "ウィングクリップ",
         "description": "傷を負わせ、10秒間、敵の移動速度を40%低下させます。"
+      },
+      "aspect_of_the_monkey": {
+        "name": "Aspect of the Monkey",
+        "description": "Take on the aspect of the monkey, increasing your dodge chance by 8% for 30 min."
       },
       "aspect_of_the_cheetah": {
         "name": "チーターの相",
@@ -43910,6 +43958,10 @@ export const pt_BR: EnTranslations = {
         "name": "Cortar Asas",
         "description": "Inflige um ferimento que reduz a velocidade do inimigo em 40% por 10 s."
       },
+      "aspect_of_the_monkey": {
+        "name": "Aspect of the Monkey",
+        "description": "Take on the aspect of the monkey, increasing your dodge chance by 8% for 30 min."
+      },
       "aspect_of_the_cheetah": {
         "name": "Aspecto da Chita",
         "description": "Assume o aspecto da chita, aumentando a velocidade de movimento em 30% por 30 min."
@@ -47448,6 +47500,10 @@ export const ru_RU: EnTranslations = {
         "name": "Подрезать крылья",
         "description": "Наносит рану, замедляющую врага на 40% на 10 сек."
       },
+      "aspect_of_the_monkey": {
+        "name": "Aspect of the Monkey",
+        "description": "Take on the aspect of the monkey, increasing your dodge chance by 8% for 30 min."
+      },
       "aspect_of_the_cheetah": {
         "name": "Дух гепарда",
         "description": "Вы принимаете дух гепарда, повышая скорость передвижения на 30% на 30 мин."
@@ -49560,24 +49616,32 @@ export const translations = {
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.abilities.aspect_of_the_monkey.description",
+    "entities.abilities.aspect_of_the_monkey.name",
     "itemUi.slots.gloves",
     "itemUi.slots.helmet",
     "itemUi.slots.shoulder",
     "itemUi.slots.waist"
   ],
   "es_ES": [
+    "entities.abilities.aspect_of_the_monkey.description",
+    "entities.abilities.aspect_of_the_monkey.name",
     "itemUi.slots.gloves",
     "itemUi.slots.helmet",
     "itemUi.slots.shoulder",
     "itemUi.slots.waist"
   ],
   "fr_FR": [
+    "entities.abilities.aspect_of_the_monkey.description",
+    "entities.abilities.aspect_of_the_monkey.name",
     "itemUi.slots.gloves",
     "itemUi.slots.helmet",
     "itemUi.slots.shoulder",
     "itemUi.slots.waist"
   ],
   "fr_CA": [
+    "entities.abilities.aspect_of_the_monkey.description",
+    "entities.abilities.aspect_of_the_monkey.name",
     "itemUi.slots.gloves",
     "itemUi.slots.helmet",
     "itemUi.slots.shoulder",
@@ -49585,48 +49649,64 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.abilities.aspect_of_the_monkey.description",
+    "entities.abilities.aspect_of_the_monkey.name",
     "itemUi.slots.gloves",
     "itemUi.slots.helmet",
     "itemUi.slots.shoulder",
     "itemUi.slots.waist"
   ],
   "de_DE": [
+    "entities.abilities.aspect_of_the_monkey.description",
+    "entities.abilities.aspect_of_the_monkey.name",
     "itemUi.slots.gloves",
     "itemUi.slots.helmet",
     "itemUi.slots.shoulder",
     "itemUi.slots.waist"
   ],
   "zh_CN": [
+    "entities.abilities.aspect_of_the_monkey.description",
+    "entities.abilities.aspect_of_the_monkey.name",
     "itemUi.slots.gloves",
     "itemUi.slots.helmet",
     "itemUi.slots.shoulder",
     "itemUi.slots.waist"
   ],
   "zh_TW": [
+    "entities.abilities.aspect_of_the_monkey.description",
+    "entities.abilities.aspect_of_the_monkey.name",
     "itemUi.slots.gloves",
     "itemUi.slots.helmet",
     "itemUi.slots.shoulder",
     "itemUi.slots.waist"
   ],
   "ko_KR": [
+    "entities.abilities.aspect_of_the_monkey.description",
+    "entities.abilities.aspect_of_the_monkey.name",
     "itemUi.slots.gloves",
     "itemUi.slots.helmet",
     "itemUi.slots.shoulder",
     "itemUi.slots.waist"
   ],
   "ja_JP": [
+    "entities.abilities.aspect_of_the_monkey.description",
+    "entities.abilities.aspect_of_the_monkey.name",
     "itemUi.slots.gloves",
     "itemUi.slots.helmet",
     "itemUi.slots.shoulder",
     "itemUi.slots.waist"
   ],
   "pt_BR": [
+    "entities.abilities.aspect_of_the_monkey.description",
+    "entities.abilities.aspect_of_the_monkey.name",
     "itemUi.slots.gloves",
     "itemUi.slots.helmet",
     "itemUi.slots.shoulder",
     "itemUi.slots.waist"
   ],
   "ru_RU": [
+    "entities.abilities.aspect_of_the_monkey.description",
+    "entities.abilities.aspect_of_the_monkey.name",
     "itemUi.slots.gloves",
     "itemUi.slots.helmet",
     "itemUi.slots.shoulder",
@@ -51078,6 +51158,10 @@ export const en_XA: EnTranslations = {
       "wing_clip": {
         "name": "[Ŵíñĝ Çļíþ]",
         "description": "[Íñƒļíçţš á ŵóúñð ţĥáţ šļóŵš ţĥé éñéɱý ƀý 40% ƒóŕ 10 šéç.]"
+      },
+      "aspect_of_the_monkey": {
+        "name": "[Ášþéçţ óƒ ţĥé Ɱóñķéý]",
+        "description": "[Ţáķé óñ ţĥé ášþéçţ óƒ ţĥé ɱóñķéý, íñçŕéášíñĝ ýóúŕ ðóðĝé çĥáñçé ƀý 8% ƒóŕ 30 ɱíñ.]"
       },
       "aspect_of_the_cheetah": {
         "name": "[Ášþéçţ óƒ ţĥé Çĥééţáĥ]",

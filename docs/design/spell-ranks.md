@@ -181,6 +181,7 @@
 
 | Ability | Learn | Cost | Cast/CD | Effects |
 |---|---|---|---|---|
+| `aspect_of_the_monkey` | 10 | 20 | inst | selfBuff buff_dodge +0.08, 30min |
 | `aspect_of_the_cheetah` | 14 | 20 | inst | selfBuff buff_speed 1.3, 30min (replaces Hawk while active; daze rider omitted) |
 | `aimed_shot` | 16 | 50 | 3.0s cast, 6cd, 8–35yd | directDamage 50–62 |
 | `rapid_fire` | 20 | 0 | inst, 300cd, offGcd | selfBuff buff_haste 1.4, 15s |

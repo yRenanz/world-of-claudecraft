@@ -142,6 +142,9 @@ describe('client HTML shell', () => {
     expect(html).toContain('body.game-active {\n    overflow: hidden;\n    touch-action: none;');
     expect(html).toContain('-webkit-overflow-scrolling: touch;');
     expect(html).toContain('body.mobile-touch .homepage-header {\n    display: flex;\n    position: sticky;\n    top: 0;\n    z-index: 120;');
+    expect(html).toContain('padding-top: calc(var(--spacing-sm) + env(safe-area-inset-top));');
+    expect(html).toContain('padding-right: max(var(--spacing-md), env(safe-area-inset-right));');
+    expect(html).toContain('body.mobile-touch #homepage-views-container {\n    padding-top: var(--spacing-lg);\n    padding-right: max(var(--spacing-md), env(safe-area-inset-right));');
     expect(html).not.toContain('body.mobile-touch .homepage-header {\n    display: flex;\n    position: relative;');
     expect(mainTs).not.toContain("visualViewport?.addEventListener('scroll', syncAppViewport)");
   });
@@ -193,8 +196,10 @@ describe('client HTML shell', () => {
     expect(html).toContain('id="btn-offline"');
     expect(html).not.toContain('class="mode-card');
     expect(html).not.toContain('.mode-row {');
+    expect(html).toContain('body.mobile-touch #mode-select {\n    width: 100%;\n    max-width: min(440px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));\n    margin-inline: auto;');
     // Landscape compacts the single play console instead of splitting two cards.
     expect(html).toContain('@media (orientation: landscape) {\n    body.mobile-touch .play-console {');
+    expect(html).toContain('@media (orientation: landscape) {\n    body.mobile-touch .play-console {\n      width: 100%;\n      max-width: 460px;');
   });
 
   it('ships a looping cinematic backdrop with a poster fallback', () => {

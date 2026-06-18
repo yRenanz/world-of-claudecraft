@@ -4598,7 +4598,9 @@
     max-width: min(360px, 92vw); margin-top: 18px; line-height: 1.45; font-size: 10px;
   }
   body.mobile-touch #mode-select {
-    max-width: min(440px, calc(100vw - 24px));
+    width: 100%;
+    max-width: min(440px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+    margin-inline: auto;
     padding: 20px 18px 18px;
   }
   body.mobile-touch .play-console {
@@ -4730,7 +4732,8 @@
 
   @media (orientation: landscape) {
     body.mobile-touch .play-console {
-      width: min(460px, calc(100vw - 80px));
+      width: 100%;
+      max-width: 460px;
       gap: 12px;
     }
     body.mobile-touch .server-select-caption { margin-bottom: 5px; }
@@ -5621,7 +5624,16 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding-top: calc(var(--spacing-sm) + env(safe-area-inset-top));
+    padding-right: max(var(--spacing-md), env(safe-area-inset-right));
+    padding-bottom: var(--spacing-sm);
+    padding-left: max(var(--spacing-md), env(safe-area-inset-left));
+  }
+  body.mobile-touch #homepage-views-container {
+    padding-top: var(--spacing-lg);
+    padding-right: max(var(--spacing-md), env(safe-area-inset-right));
+    padding-bottom: var(--spacing-lg);
+    padding-left: max(var(--spacing-md), env(safe-area-inset-left));
   }
   body.mobile-touch .header-menu-container {
     display: none;
@@ -5685,7 +5697,16 @@
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
-      padding: var(--spacing-sm) var(--spacing-md);
+      padding-top: calc(var(--spacing-sm) + env(safe-area-inset-top));
+      padding-right: max(var(--spacing-md), env(safe-area-inset-right));
+      padding-bottom: var(--spacing-sm);
+      padding-left: max(var(--spacing-md), env(safe-area-inset-left));
+    }
+    #homepage-views-container {
+      padding-top: var(--spacing-lg);
+      padding-right: max(var(--spacing-md), env(safe-area-inset-right));
+      padding-bottom: var(--spacing-lg);
+      padding-left: max(var(--spacing-md), env(safe-area-inset-left));
     }
     .header-menu-container {
       display: none;

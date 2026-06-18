@@ -390,6 +390,42 @@ describe('MobileControls pointer lifecycle', () => {
     expect(emotes).toBe(1);
   });
 
+  it('closes the open More modal when tapping outside it', () => {
+    installMobileControlDom();
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+    new MobileControls(input, mobileCallbacks()).start();
+
+    // open the More modal, then a press outside it dismisses it
+    document.body.classList.add('mobile-more-open');
+    (document as unknown as EventTarget).dispatchEvent(
+      pointerEvent('pointerdown', { pointerId: 31, clientX: 10, clientY: 10 }),
+    );
+
+    expect(document.body.classList.contains('mobile-more-open')).toBe(false);
+  });
+
+  it('ignores an outside press while the More modal is closed', () => {
+    installMobileControlDom();
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+    new MobileControls(input, mobileCallbacks()).start();
+
+    (document as unknown as EventTarget).dispatchEvent(
+      pointerEvent('pointerdown', { pointerId: 32, clientX: 10, clientY: 10 }),
+    );
+
+    expect(document.body.classList.contains('mobile-more-open')).toBe(false);
+  });
+
   it('rotates the camera from a single-finger swipe on the game canvas', () => {
     const { canvas } = installMobileControlDom();
     const deltas: Array<{ dx: number; dy: number }> = [];

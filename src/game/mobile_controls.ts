@@ -227,6 +227,17 @@ export class MobileControls {
       this.onSwipeLookEnd(e);
     });
 
+    // Tap-outside-to-dismiss: while the More modal is open, a press anywhere
+    // outside the modal closes it. The toggle button manages its own state, so
+    // a press on it is ignored here (otherwise the open tap would re-close it).
+    document.addEventListener('pointerdown', (e) => {
+      if (!this.active || !document.body.classList.contains('mobile-more-open')) return;
+      const target = e.target as Element | null;
+      if (target && typeof target.closest === 'function'
+        && (target.closest('#mobile-extra-controls') || target.closest('#mobile-more'))) return;
+      this.closeMoreModal();
+    });
+
     this.bindButton('mobile-attack-nearest', () => this.callbacks.onAttackNearest());
     this.bindButton('mobile-jump', () => this.callbacks.onJump());
     this.bindButton('mobile-target', () => this.callbacks.onTarget());

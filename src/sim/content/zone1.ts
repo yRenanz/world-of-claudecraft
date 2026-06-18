@@ -229,7 +229,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     hpBase: 280, hpPerLevel: 56, dmgBase: 12, dmgPerLevel: 3.4, attackSpeed: 2.6,
     armorPerLevel: 32, moveSpeed: 7.4, aggroRadius: 13,
     aoePulse: { min: 13, max: 19, radius: 9, every: 9, name: 'Hollow Nova', school: 'shadow', fx: 'nova' },
-    enrage: { belowHpPct: 0.30, dmgMult: 1.5 },
+    enrage: { belowHpPct: 0.30, dmgMult: 1.5, hasteMult: 1.3 },
     loot: [
       { copper: 160, chance: 1 },
       { itemId: 'bone_fragments', chance: 1 },

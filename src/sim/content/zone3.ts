@@ -153,7 +153,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     hpBase: 360, hpPerLevel: 60, dmgBase: 16, dmgPerLevel: 3.6, attackSpeed: 2.7,
     armorPerLevel: 30, moveSpeed: 7, aggroRadius: 13,
     aoePulse: { min: 22, max: 30, radius: 10, every: 10, name: 'Skull Smash', school: 'physical', fx: 'nova' },
-    enrage: { belowHpPct: 0.30, dmgMult: 1.5 },
+    enrage: { belowHpPct: 0.30, dmgMult: 1.5, hasteMult: 1.3 },
     loot: [
       { copper: 320, chance: 1 },
       { itemId: 'cracked_ogre_tusk', chance: 1 },

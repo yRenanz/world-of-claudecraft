@@ -31,8 +31,9 @@ import {
   angleTo, armorReduction, dist2d, emptyMoveInput, isConsuming, meleeMissChance, mobXpValue, normAngle,
   rageFromDealing, rageFromTaking, spellHitChance, xpForLevel,
   MILESTONES, virtualLevel, xpToReachLevel, canPrestige,
-  ArenaFormat, ArenaStanding, ArenaCombatant,
+  ArenaFormat, ArenaStanding, ArenaCombatant, SkinRank,
 } from './types';
+import { EVENT_SKIN_TOKEN_ID, SKIN_RANKS, classHasSkin, rankAllowsSkin } from './content/skins';
 
 const LEASH_DISTANCE = 45;
 const DUNGEON_LEASH_DISTANCE = 70;
@@ -331,6 +332,10 @@ export interface PlayerMeta {
   cls: PlayerClass;
   name: string;
   skin: number; // appearance index into the render SKINS[player_<cls>]; persisted, synced
+  // Cosmetic skin-select event: the rank rolled when the event token was used,
+  // pending a lock-in. Set on use, cleared on claim. Persisted so the reward
+  // survives reconnect; re-using the token re-shows the same rank (no reroll).
+  pendingSkinRank: SkinRank | null;
   moveInput: MoveInput;
   inventory: InvSlot[];
   vendorBuyback: InvSlot[];
@@ -461,6 +466,8 @@ export interface CharacterState {
   activeLoadout?: number;
   pet?: PetState | null;
   skin?: number; // appearance index (JSONB; optional so pre-skin saves load as 0)
+  // Pending skin-select event rank (JSONB; optional so older saves load as null).
+  pendingSkinRank?: SkinRank | null;
 }
 
 export interface PetState {
@@ -741,6 +748,7 @@ export class Sim {
       cls,
       name,
       skin: opts?.state?.skin ?? 0,
+      pendingSkinRank: opts?.state?.pendingSkinRank ?? null,
       moveInput: emptyMoveInput(),
       inventory: [],
       vendorBuyback: [],
@@ -901,6 +909,7 @@ export class Sim {
       activeLoadout: meta.activeLoadout,
       pet: this.serializePet(pid),
       skin: meta.skin,
+      pendingSkinRank: meta.pendingSkinRank,
     };
   }
 
@@ -919,6 +928,37 @@ export class Sim {
 
   changeSkin(skin: number): void {
     this.setPlayerSkin(this.primaryId, skin);
+  }
+
+  /** Cosmetic skin-select event: rolls a rarity rank (once) and emits the
+   *  personal `skinEvent` cue that opens the client overlay. Re-using the token
+   *  re-shows the already-rolled rank — no reroll — so a player can't spam-roll.
+   *  The token is consumed on claim (claimEventSkin), not here. */
+  private openSkinSelect(meta: PlayerMeta): void {
+    if (meta.pendingSkinRank === null) {
+      // Equal-weight roll through the deterministic Rng (vanilla determinism:
+      // never Math.random). int() is inclusive on both ends.
+      meta.pendingSkinRank = SKIN_RANKS[this.rng.int(0, SKIN_RANKS.length - 1)];
+    }
+    this.emit({ type: 'skinEvent', rank: meta.pendingSkinRank, pid: meta.entityId });
+  }
+
+  /** Lock in a chosen skin from the skin-select event. Server-authoritative:
+   *  rejects (no-op) unless there's a pending rank, the skin's tier is within
+   *  that rank, and the player still holds the token. Consumes one token and
+   *  clears the pending rank on success. Satisfies IWorld.claimEventSkin. */
+  claimEventSkin(skin: number, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta } = r;
+    const granted = meta.pendingSkinRank;
+    if (granted === null) return; // no active event
+    if (!rankAllowsSkin(granted, skin)) return; // tier above the rolled rank
+    if (!classHasSkin(meta.cls, skin)) return; // skin doesn't exist for this class
+    if (this.countItem(EVENT_SKIN_TOKEN_ID, meta.entityId) <= 0) return; // token gone
+    this.removeItem(EVENT_SKIN_TOKEN_ID, 1, meta.entityId);
+    this.setPlayerSkin(meta.entityId, skin);
+    meta.pendingSkinRank = null;
   }
 
   // -------------------------------------------------------------------------
@@ -6065,6 +6105,10 @@ export class Sim {
     if (this.countItem(itemId, meta.entityId) <= 0) { this.error(meta.entityId, "You don't have that item."); return; }
     if (def.use?.type === 'fishing') {
       this.startFishing(p, meta);
+      return;
+    }
+    if (def.use?.type === 'skinSelect') {
+      this.openSkinSelect(meta);
       return;
     }
     if (p.castingAbility === FISHING_CAST_ID) { this.error(meta.entityId, 'You are busy.'); return; }

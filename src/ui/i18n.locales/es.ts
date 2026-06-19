@@ -2105,6 +2105,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   "entities.items.crypt_keystone.name": "Piedra clave de la cripta",
   "entities.items.crypt_ritual_circle.name": "Círculo ritual",
   "entities.items.kings_signet.name": "Anillo del rey",
+  "entities.items.event_skin_token.name": "Alijo cosmético misterioso",
   "entities.mobs.fallen_captain_aldren.name": "Capitán caído Aldren",
   "entities.mobs.corrupted_priest_malric.name": "Sacerdote corrupto Malric",
   "entities.mobs.deathstalker_voss.name": "Acechamuerte Voss",

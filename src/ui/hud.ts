@@ -12,7 +12,8 @@ import {
   zoneWelcomeText,
 } from '../sim/data';
 import type { ZoneDef } from '../sim/data';
-import type { AbilityDef, EquipSlot, InvSlot, PetMode, PlayerClass, ResourceType, Stats } from '../sim/types';
+import type { AbilityDef, EquipSlot, InvSlot, PetMode, PlayerClass, ResourceType, SkinRank, Stats } from '../sim/types';
+import { EVENT_SKIN_TIERS, SKIN_RANKS, skinRankOrder, type SkinTier } from '../sim/content/skins';
 import {
   AbilityEffect, CONSUME_DURATION, Entity, FISHING_CAST_ID, GCD, ItemDef, SimEvent,
   dist2d, xpForLevel, MAX_LEVEL, MELEE_RANGE, MILESTONES, virtualLevel, canPrestige, xpUntilNextPrestige,
@@ -379,6 +380,19 @@ export class Hud {
   private lastHudSlowAt = 0;
   private charPreview: CharacterPreview | null = null;
   private charPreviewCanvas: HTMLCanvasElement | null = null;
+  // Cosmetic skin-select event overlay (opened by the skinEvent cue). The shared
+  // CharacterPreview above is borrowed for the rotatable 3D preview.
+  private skinEventEl: HTMLElement | null = null;
+  private skinEventRank: SkinRank | null = null;
+  private skinEventTiers: readonly SkinTier[] = EVENT_SKIN_TIERS;
+  private skinEventSelected = -1;
+  private skinEventSelectedKey = '';
+  private skinEventRevealTimer: number | null = null;
+  private skinEventWheelAngle = 0;
+  // DEV-ONLY (remove with the dev button in renderOptions): when true the overlay
+  // was opened with mock data, so Lock In applies via the free changeSkin path
+  // instead of claimEventSkin (which needs a server-rolled rank + token).
+  private skinEventDev = false;
   // current typeahead state: which input, its results, and the keyboard-
   // highlighted row (-1 = none), so Enter/Arrow keys can pick a suggestion
   private socialSuggest: { field: string; items: { name: string; cls: string; level: number }[]; index: number } = { field: '', items: [], index: -1 };
@@ -3097,6 +3111,7 @@ export class Hud {
           if (this.openVendorNpcId !== null) this.renderVendor();
           break;
         }
+        case 'skinEvent': this.openSkinEvent(ev.rank); break;
         case 'error': this.showError(this.localizeErrorText(ev.text)); break;
         case 'questAccepted':
           audio.questAccept();
@@ -4551,6 +4566,13 @@ export class Hud {
   private renderCharPreview(): void {
     const container = $('#char-model-preview') as HTMLElement | null;
     if (!container) return;
+    this.mountCharPreview(container, this.sim.cfg.playerClass, this.sim.player.skin ?? 0);
+  }
+
+  /** Mount the shared character turntable into `container` showing `cls`/`skin`.
+   *  The single CharacterPreview canvas is moved between hosts (char sheet, the
+   *  skin-select overlay) via setContainer, so only one WebGL context exists. */
+  private mountCharPreview(container: HTMLElement, cls: PlayerClass, skin: number): void {
     if (!this.charPreviewCanvas) this.charPreviewCanvas = document.createElement('canvas');
     if (!this.charPreview) {
       container.appendChild(this.charPreviewCanvas);
@@ -4558,8 +4580,8 @@ export class Hud {
     } else {
       this.charPreview.setContainer(container);
     }
-    this.charPreview.setClass(this.sim.cfg.playerClass);
-    this.charPreview.setSkin(this.sim.player.skin ?? 0);
+    this.charPreview.setClass(cls);
+    this.charPreview.setSkin(skin);
   }
 
   private renderCharSkinPicker(): void {
@@ -4586,6 +4608,274 @@ export class Hud {
       });
       row.appendChild(b);
     }
+  }
+
+  // -------------------------------------------------------------------------
+  // Cosmetic skin-select event overlay (opened by the server-rolled `skinEvent`
+  // cue). Left column: rank-gated tier list of selectable skins. Right column:
+  // the shared rotatable 3D preview + a Lock In button that commits the choice
+  // through IWorld.claimEventSkin (re-validated server-side against the rank).
+  // -------------------------------------------------------------------------
+
+  private static readonly SKIN_RANK_NAME_KEY: Record<SkinRank, TranslationKey> = {
+    uncommon: 'itemUi.quality.uncommon',
+    rare: 'itemUi.quality.rare',
+    epic: 'itemUi.quality.epic',
+  };
+
+  private skinRankName(rank: SkinRank): string {
+    return t(Hud.SKIN_RANK_NAME_KEY[rank]);
+  }
+
+  /** Open the skin-select overlay for a server-rolled rank, defaulting the
+   *  selection to the best skin the rank unlocks for this character's class.
+   *  `opts.dev` opens it with mock data (no token/roll) for quick previewing. */
+  openSkinEvent(rank: SkinRank, opts?: { dev?: boolean }): void {
+    for (let i = 0; i < 20 && this.closeAll(); i++) { /* close stacked HUD overlays before the roll reveal */ }
+    this.skinEventRank = rank;
+    this.skinEventDev = opts?.dev ?? false;
+    this.skinEventTiers = this.skinEventDev ? this.randomDevSkinTiers() : EVENT_SKIN_TIERS;
+    this.skinEventWheelAngle = this.randomSkinEventLandingAngle(rank);
+    const selectedTier = this.defaultSkinSelection(rank, this.skinEventTiers);
+    this.skinEventSelected = selectedTier?.skin ?? -1;
+    this.skinEventSelectedKey = selectedTier ? this.skinTierKey(selectedTier) : '';
+    this.hideTooltip();
+    // Swatches use generated portraits; re-render once they finish preloading.
+    onPortraitsReady(() => {
+      if (this.skinEventEl?.classList.contains('open') && this.skinEventRevealTimer === null) this.renderSkinEvent();
+    });
+    this.renderSkinEventWheel();
+    const reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (this.skinEventRevealTimer !== null) window.clearTimeout(this.skinEventRevealTimer);
+    this.skinEventRevealTimer = window.setTimeout(() => {
+      this.skinEventRevealTimer = null;
+      if (this.skinEventRank !== null) this.renderSkinEvent();
+    }, reduceMotion ? 140 : 6600);
+    audio.bagOpen();
+  }
+
+  closeSkinEvent(): void {
+    if (!this.skinEventEl) return;
+    if (this.skinEventRevealTimer !== null) {
+      window.clearTimeout(this.skinEventRevealTimer);
+      this.skinEventRevealTimer = null;
+    }
+    this.skinEventEl.classList.remove('open');
+    this.skinEventRank = null;
+    this.skinEventTiers = EVENT_SKIN_TIERS;
+    this.skinEventSelectedKey = '';
+    this.skinEventWheelAngle = 0;
+    audio.bagClose();
+  }
+
+  /** Highest skin (by rank) the granted rank unlocks AND that exists for this
+   *  class; -1 when none are available (a class with too few alternate skins). */
+  private defaultSkinSelection(rank: SkinRank, tiers: readonly SkinTier[]): SkinTier | null {
+    const count = skinCount(`player_${this.sim.cfg.playerClass}`);
+    const granted = skinRankOrder(rank);
+    let best: SkinTier | null = null;
+    let bestOrder = -1;
+    for (const tier of tiers) {
+      const order = skinRankOrder(tier.rank);
+      if (order > granted || tier.skin >= count) continue;
+      if (order > bestOrder) { bestOrder = order; best = tier; }
+    }
+    return best;
+  }
+
+  private skinTierKey(tier: SkinTier): string {
+    return `${tier.rank}:${tier.skin}`;
+  }
+
+  private randomSkinEventRank(): SkinRank {
+    const roll = Math.random();
+    if (roll < 0.58) return 'uncommon';
+    if (roll < 0.88) return 'rare';
+    return 'epic';
+  }
+
+  private randomDevSkinTiers(): SkinTier[] {
+    const count = skinCount(`player_${this.sim.cfg.playerClass}`);
+    const preferred = Array.from({ length: Math.max(0, count - 1) }, (_, i) => i + 1);
+    const fallback = Array.from({ length: Math.max(1, count) }, (_, i) => i);
+    const source = preferred.length >= SKIN_RANKS.length ? preferred : fallback;
+    const pool = [...source];
+
+    return SKIN_RANKS.map((rank) => {
+      if (!pool.length) pool.push(...source);
+      const idx = Math.floor(Math.random() * pool.length);
+      const [skin] = pool.splice(idx, 1);
+      return { rank, skin: skin ?? 0 };
+    });
+  }
+
+  private randomSkinEventLandingAngle(rank: SkinRank): number {
+    // CSS wheel uses `conic-gradient(from -90deg, ...)`, so the visual centers
+    // are shifted 90deg from the raw stop midpoints. Add bounded per-roll
+    // jitter so repeat rolls of the same rarity do not stop at the same point.
+    const jitter = (span: number): number => (Math.random() - 0.5) * span;
+    switch (rank) {
+      case 'uncommon': return -15 + jitter(150);
+      case 'rare': return -172.5 + jitter(72);
+      case 'epic': return -247.5 + jitter(28);
+    }
+    return 0;
+  }
+
+  private renderSkinEventWheel(): void {
+    const rank = this.skinEventRank;
+    if (rank === null) return;
+
+    let el = this.skinEventEl;
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'skin-event';
+      el.className = 'skin-event-overlay';
+      el.addEventListener('keydown', (e) => { if (e.key === 'Escape') this.closeSkinEvent(); });
+      el.addEventListener('mousedown', (e) => { if (e.target === el) this.closeSkinEvent(); });
+      document.body.appendChild(el);
+      this.skinEventEl = el;
+    }
+
+    const title = esc(t('skinEvent.title'));
+    const landed = esc(this.skinRankName(rank));
+    el.innerHTML = `<div class="se-wheel-stage" role="dialog" aria-modal="true" aria-label="${title}">`
+      + `<div class="se-wheel-pointer" aria-hidden="true"></div>`
+      + `<div class="se-wheel" style="--land-angle:${this.skinEventWheelAngle}deg" aria-hidden="true">`
+      + `<svg class="se-wheel-labels" viewBox="0 0 200 200">`
+      + `<defs><path id="se-wheel-label-ring" d="M 100 25 A 75 75 0 1 1 99.9 25"/></defs>`
+      + `<text class="se-wheel-label-bg uncommon"><textPath href="#se-wheel-label-ring" startOffset="4%">${esc(this.skinRankName('uncommon'))}</textPath></text>`
+      + `<text class="se-wheel-label-bg rare"><textPath href="#se-wheel-label-ring" startOffset="48%">${esc(this.skinRankName('rare'))}</textPath></text>`
+      + `<text class="se-wheel-label-bg epic"><textPath href="#se-wheel-label-ring" startOffset="69%">${esc(this.skinRankName('epic'))}</textPath></text>`
+      + `<text class="se-wheel-label-fg"><textPath href="#se-wheel-label-ring" startOffset="4%">${esc(this.skinRankName('uncommon'))}</textPath></text>`
+      + `<text class="se-wheel-label-fg"><textPath href="#se-wheel-label-ring" startOffset="48%">${esc(this.skinRankName('rare'))}</textPath></text>`
+      + `<text class="se-wheel-label-fg"><textPath href="#se-wheel-label-ring" startOffset="69%">${esc(this.skinRankName('epic'))}</textPath></text>`
+      + `</svg>`
+      + `</div>`
+      + `<div class="se-wheel-result" style="--tier-color:${QUALITY_COLOR[rank] ?? '#fff'}">`
+      + `<span>${landed}</span>`
+      + `<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>`
+      + `<b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b>`
+      + `<b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div>`
+      + `</div>`;
+    el.classList.add('open');
+  }
+
+  private renderSkinEvent(): void {
+    const rank = this.skinEventRank;
+    if (rank === null) return;
+    const cls = this.sim.cfg.playerClass;
+    const count = skinCount(`player_${cls}`);
+    const granted = skinRankOrder(rank);
+
+    // Build the shell once and reuse it across opens so the single 3D canvas
+    // can be moved in/out via setContainer without being recreated.
+    let el = this.skinEventEl;
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'skin-event';
+      el.className = 'skin-event-overlay';
+      el.addEventListener('keydown', (e) => { if (e.key === 'Escape') this.closeSkinEvent(); });
+      el.addEventListener('mousedown', (e) => { if (e.target === el) this.closeSkinEvent(); });
+      document.body.appendChild(el);
+      this.skinEventEl = el;
+    }
+
+    const title = esc(t('skinEvent.title'));
+    const rankName = this.skinRankName(rank);
+    el.innerHTML = `<div class="panel skin-event-panel" role="dialog" aria-modal="true" aria-label="${title}">`
+      + `<div class="se-body"><div class="se-left">`
+      + `<div class="se-roll-banner" style="--tier-color:${QUALITY_COLOR[rank] ?? '#fff'}">${esc(t('skinEvent.rolled', { rank: rankName }))}</div>`
+      + `<div class="se-tiers" role="radiogroup" aria-label="${title}"></div>`
+      + `<button type="button" class="btn se-lockin" data-lockin>${esc(t('skinEvent.lockIn'))}</button>`
+      + `</div><div class="se-preview-col">`
+      + `<div class="se-preview"><div class="se-preview-hint">${esc(t('skinEvent.previewHint'))}</div></div>`
+      + `</div></div></div>`;
+
+    const tiersEl = el.querySelector('.se-tiers') as HTMLElement;
+    const lockInBtn = el.querySelector('[data-lockin]') as HTMLButtonElement;
+    const swatches: HTMLButtonElement[] = [];
+
+    const syncSelection = (): void => {
+      let selectedCanLock = false;
+      for (const b of swatches) {
+        const sel = b.dataset.choice === this.skinEventSelectedKey;
+        b.classList.toggle('sel', sel);
+        b.setAttribute('aria-checked', String(sel));
+        b.tabIndex = sel ? 0 : -1;
+        if (sel && b.dataset.lockable === 'true') selectedCanLock = true;
+      }
+      lockInBtn.disabled = !selectedCanLock;
+    };
+
+    const select = (tier: SkinTier): void => {
+      this.skinEventSelected = tier.skin;
+      this.skinEventSelectedKey = this.skinTierKey(tier);
+      this.charPreview?.setSkin(tier.skin);
+      syncSelection();
+      audio.click();
+    };
+
+    // Highest rank at the top (epic → uncommon), matching the design sketch.
+    for (const tier of [...this.skinEventTiers].reverse()) {
+      const order = skinRankOrder(tier.rank);
+      const unlocked = order <= granted;
+      const available = tier.skin < count;
+      const rawName = this.skinRankName(tier.rank);
+      const row = document.createElement('div');
+      row.className = 'se-tier' + (unlocked ? '' : ' locked');
+      row.style.setProperty('--tier-color', QUALITY_COLOR[tier.rank] ?? '#fff');
+      const hint = !unlocked
+        ? `<span class="se-tier-hint">${svgIcon('lock')}${esc(t('skinEvent.lockedHint', { rank: rawName }))}</span>`
+        : !available ? `<span class="se-tier-hint">${esc(t('skinEvent.unavailable'))}</span>` : '';
+      row.innerHTML = `<div class="se-tier-head"><span class="se-tier-name">${esc(rawName)}</span>${hint}</div>`
+        + `<div class="se-swatches"></div>`;
+
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'se-swatch';
+      b.dataset.skin = String(tier.skin);
+      b.dataset.choice = this.skinTierKey(tier);
+      b.dataset.lockable = String(unlocked && available);
+      b.setAttribute('role', 'radio');
+      if (available) {
+        const url = playerPortraitDataUrl(cls, tier.skin);
+        if (!unlocked) b.classList.add('locked');
+        b.innerHTML = url ? `<img src="${esc(url)}" alt="">` : String(order + 1);
+        b.setAttribute('aria-label', t('skinEvent.optionAria', { rank: rawName, index: order + 1 }));
+        b.addEventListener('click', () => select(tier));
+        if (!unlocked) {
+          this.attachTooltip(b, () => `<div class="tt-name">${esc(rawName)}</div><div class="tt-sub">${esc(t('skinEvent.lockedHint', { rank: rawName }))}</div>`);
+        }
+        swatches.push(b);
+      } else {
+        b.classList.add('unavailable');
+        b.setAttribute('aria-disabled', 'true');
+        b.innerHTML = unlocked ? '<span class="se-lock">—</span>' : `<span class="se-lock">${svgIcon('lock')}</span>`;
+        b.setAttribute('aria-label', unlocked ? t('skinEvent.unavailable') : t('skinEvent.locked'));
+        this.attachTooltip(b, () => `<div class="tt-name">${esc(rawName)}</div><div class="tt-sub">${esc(t('skinEvent.unavailable'))}</div>`);
+      }
+      (row.querySelector('.se-swatches') as HTMLElement).appendChild(b);
+      tiersEl.appendChild(row);
+    }
+
+    lockInBtn.addEventListener('click', () => {
+      if (this.skinEventSelected < 0 || lockInBtn.disabled) return;
+      // Dev preview has no server-rolled rank/token, so apply via the free skin
+      // changer; the real event commits through claimEventSkin.
+      if (this.skinEventDev) this.sim.changeSkin(this.skinEventSelected);
+      else this.sim.claimEventSkin(this.skinEventSelected);
+      this.showBanner(t('skinEvent.unlocked'));
+      audio.levelUp();
+      this.closeSkinEvent();
+      if ($('#bags').style.display !== 'none') this.renderBags();
+    });
+
+    // Show, mount the shared 3D preview into the right column, focus the choice.
+    el.classList.add('open');
+    this.mountCharPreview(el.querySelector('.se-preview') as HTMLElement, cls, this.skinEventSelected >= 0 ? this.skinEventSelected : 0);
+    syncSelection();
+    (swatches.find((b) => b.dataset.choice === this.skinEventSelectedKey) ?? swatches[0])?.focus();
   }
 
   // -------------------------------------------------------------------------
@@ -6305,6 +6595,10 @@ export class Hud {
     add(t('hud.options.interface'), () => goto('interface'));
     add(t('hud.options.audio'), () => goto('audio'));
     add(t('hud.options.interface'), () => goto('interface'));
+    // DEV-ONLY temporary trigger (remove when the event ships): opens the
+    // skin-select overlay with mock data so the UI can be previewed without the
+    // item/server flow. English literal is intentional — it's throwaway.
+    add('Skin Select (dev)', () => { this.closeOptions(); this.openSkinEvent(this.randomSkinEventRank(), { dev: true }); });
     add(t('hud.options.logout'), () => this.optionsHooks?.logout());
     add(t('hud.options.returnToGame'), () => this.closeOptions());
     el.appendChild(list);

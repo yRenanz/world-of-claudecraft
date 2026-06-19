@@ -173,6 +173,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     id: 'simple_fishing_pole', name: 'Simple Fishing Pole', kind: 'tool', quality: 'common',
     use: { type: 'fishing' }, sellValue: 4, buyValue: 20,
   },
+  // Cosmetic event reward: using it rolls a rarity rank (server-side) and opens
+  // the skin-select overlay. See src/sim/content/skins.ts. Dev-grant for now.
+  event_skin_token: {
+    id: 'event_skin_token', name: 'Mysterious Cosmetic Cache', kind: 'tool', quality: 'epic',
+    use: { type: 'skinSelect' }, sellValue: 0,
+  },
   raw_mirror_trout: {
     id: 'raw_mirror_trout', name: 'Raw Mirror Trout', kind: 'food', quality: 'common',
     foodHp: 61, sellValue: 3,

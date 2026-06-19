@@ -11742,6 +11742,20 @@ export const en = {
   meta: { builtOn: "Built {date}" },
   realmTypes: { normal: "Normal", pvp: "PvP", rp: "RP", rpPvp: "RP-PvP" },
   game: gameStrings,
+  // Cosmetic skin-select event overlay. Rarity names reuse itemUi.quality.*.
+  skinEvent: {
+    title: "Cosmetic Cache",
+    subtitle: "You unlocked a {rank} reward — choose any skin at or below it.",
+    optionAria: "{rank} skin {index}",
+    locked: "Locked",
+    lockedHint: "Requires a {rank} roll",
+    unavailable: "Coming soon",
+    rolled: "You rolled {rank}",
+    previewHint: "Drag to rotate",
+    lockIn: "Lock In",
+    close: "Close",
+    unlocked: "Cosmetic unlocked!",
+  },
   nav: {
     home: "Home",
     play: "Play",
@@ -11924,6 +11938,7 @@ export const en = {
       crypt_keystone: { name: "Crypt Keystone" },
       crypt_ritual_circle: { name: "Ritual Circle" },
       kings_signet: { name: "King's Signet" },
+      event_skin_token: { name: "Mysterious Cosmetic Cache" },
     },
     mobs: { ...worldNames.en.entities.mobs, ...mergeEntities.en.mobs, ...mergeExtra.en.mobs },
     npcs: { ...worldNames.en.entities.npcs, ...mergeExtra.en.npcs },

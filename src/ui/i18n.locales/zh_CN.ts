@@ -2107,6 +2107,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   "entities.items.crypt_keystone.name": "墓穴钥石",
   "entities.items.crypt_ritual_circle.name": "仪式法阵",
   "entities.items.kings_signet.name": "国王印戒",
+  "entities.items.event_skin_token.name": "神秘外观宝箱",
   "entities.mobs.fallen_captain_aldren.name": "堕落队长奥德伦",
   "entities.mobs.corrupted_priest_malric.name": "腐化祭司马尔里克",
   "entities.mobs.deathstalker_voss.name": "死亡潜猎者沃斯",

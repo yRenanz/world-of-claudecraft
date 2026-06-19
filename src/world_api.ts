@@ -229,6 +229,10 @@ export interface IWorld {
   sellItem(itemId: string, count?: number): void;
   buyBackItem(itemId: string): void;
   changeSkin(skin: number): void;
+  // Lock in a skin from the cosmetic skin-select event overlay. The server
+  // re-validates the choice against the rank it rolled (skinEvent) and consumes
+  // the event token; the offline Sim resolves it directly.
+  claimEventSkin(skin: number): void;
   releaseSpirit(): void;
   chat(text: string): void;
   playEmote(emoteId: OverheadEmoteId): void;

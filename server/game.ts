@@ -953,6 +953,9 @@ export class GameServer {
         break;
       case 'buyback': if (typeof msg.item === 'string') sim.buyBackItem(msg.item, pid); break;
       case 'change_skin': if (typeof msg.skin === 'number') sim.setPlayerSkin(pid, msg.skin); break;
+      // Skin-select event lock-in. The Sim re-validates the skin against the
+      // rank it rolled and consumes the event token; a forged claim no-ops.
+      case 'claim_event_skin': if (typeof msg.skin === 'number') sim.claimEventSkin(msg.skin, pid); break;
       case 'release': sim.releaseSpirit(pid); break;
       case 'chat': {
         if (typeof msg.text !== 'string') break;

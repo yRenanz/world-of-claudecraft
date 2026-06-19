@@ -2107,6 +2107,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   "entities.items.crypt_keystone.name": "Pedra-chave da cripta",
   "entities.items.crypt_ritual_circle.name": "Círculo ritual",
   "entities.items.kings_signet.name": "Anel-sinete do rei",
+  "entities.items.event_skin_token.name": "Baú cosmético misterioso",
   "entities.mobs.fallen_captain_aldren.name": "Capitão caído Aldren",
   "entities.mobs.corrupted_priest_malric.name": "Sacerdote corrompido Malric",
   "entities.mobs.deathstalker_voss.name": "Espreitador da Morte Voss",

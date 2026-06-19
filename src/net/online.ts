@@ -824,6 +824,14 @@ export class ClientWorld implements IWorld {
     if (p) p.skin = idx;
     this.cmd({ cmd: 'change_skin', skin: idx });
   }
+  claimEventSkin(skin: number): void {
+    const idx = Math.max(0, Math.min(7, Math.floor(skin)));
+    // Optimistic local nudge (mirrors changeSkin); the server re-validates the
+    // choice against the rolled rank and the snapshot confirms it.
+    const p = this.entities.get(this.playerId);
+    if (p) p.skin = idx;
+    this.cmd({ cmd: 'claim_event_skin', skin: idx });
+  }
   releaseSpirit(): void {
     this.cmd({ cmd: 'release' });
   }

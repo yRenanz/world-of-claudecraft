@@ -149,6 +149,19 @@ export const en: EnTranslations = {
       }
     }
   },
+  "skinEvent": {
+    "title": "Cosmetic Cache",
+    "subtitle": "You unlocked a {rank} reward — choose any skin at or below it.",
+    "optionAria": "{rank} skin {index}",
+    "locked": "Locked",
+    "lockedHint": "Requires a {rank} roll",
+    "unavailable": "Coming soon",
+    "rolled": "You rolled {rank}",
+    "previewHint": "Drag to rotate",
+    "lockIn": "Lock In",
+    "close": "Close",
+    "unlocked": "Cosmetic unlocked!"
+  },
   "nav": {
     "home": "Home",
     "play": "Play",
@@ -2793,6 +2806,9 @@ export const en: EnTranslations = {
       },
       "kings_signet": {
         "name": "King's Signet"
+      },
+      "event_skin_token": {
+        "name": "Mysterious Cosmetic Cache"
       }
     },
     "mobs": {
@@ -4428,6 +4444,19 @@ export const es: EnTranslations = {
         "unspent": " {count} sin gastar."
       }
     }
+  },
+  "skinEvent": {
+    "title": "Cosmetic Cache",
+    "subtitle": "You unlocked a {rank} reward — choose any skin at or below it.",
+    "optionAria": "{rank} skin {index}",
+    "locked": "Locked",
+    "lockedHint": "Requires a {rank} roll",
+    "unavailable": "Coming soon",
+    "rolled": "You rolled {rank}",
+    "previewHint": "Drag to rotate",
+    "lockIn": "Lock In",
+    "close": "Close",
+    "unlocked": "Cosmetic unlocked!"
   },
   "nav": {
     "home": "Inicio",
@@ -7073,6 +7102,9 @@ export const es: EnTranslations = {
       },
       "kings_signet": {
         "name": "Anillo del rey"
+      },
+      "event_skin_token": {
+        "name": "Alijo cosmético misterioso"
       }
     },
     "mobs": {
@@ -8708,6 +8740,19 @@ export const es_ES: EnTranslations = {
         "unspent": " {count} sin gastar."
       }
     }
+  },
+  "skinEvent": {
+    "title": "Cosmetic Cache",
+    "subtitle": "You unlocked a {rank} reward — choose any skin at or below it.",
+    "optionAria": "{rank} skin {index}",
+    "locked": "Locked",
+    "lockedHint": "Requires a {rank} roll",
+    "unavailable": "Coming soon",
+    "rolled": "You rolled {rank}",
+    "previewHint": "Drag to rotate",
+    "lockIn": "Lock In",
+    "close": "Close",
+    "unlocked": "Cosmetic unlocked!"
   },
   "nav": {
     "home": "Inicio",
@@ -11353,6 +11398,9 @@ export const es_ES: EnTranslations = {
       },
       "kings_signet": {
         "name": "Anillo del rey"
+      },
+      "event_skin_token": {
+        "name": "Alijo cosmético misterioso"
       }
     },
     "mobs": {
@@ -12988,6 +13036,19 @@ export const fr_FR: EnTranslations = {
         "unspent": " {count} non dépensés."
       }
     }
+  },
+  "skinEvent": {
+    "title": "Cosmetic Cache",
+    "subtitle": "You unlocked a {rank} reward — choose any skin at or below it.",
+    "optionAria": "{rank} skin {index}",
+    "locked": "Locked",
+    "lockedHint": "Requires a {rank} roll",
+    "unavailable": "Coming soon",
+    "rolled": "You rolled {rank}",
+    "previewHint": "Drag to rotate",
+    "lockIn": "Lock In",
+    "close": "Close",
+    "unlocked": "Cosmetic unlocked!"
   },
   "nav": {
     "home": "Accueil",
@@ -15633,6 +15694,9 @@ export const fr_FR: EnTranslations = {
       },
       "kings_signet": {
         "name": "Chevalière du roi"
+      },
+      "event_skin_token": {
+        "name": "Cache cosmétique mystérieuse"
       }
     },
     "mobs": {
@@ -17268,6 +17332,19 @@ export const fr_CA: EnTranslations = {
         "unspent": " {count} non dépensés."
       }
     }
+  },
+  "skinEvent": {
+    "title": "Cosmetic Cache",
+    "subtitle": "You unlocked a {rank} reward — choose any skin at or below it.",
+    "optionAria": "{rank} skin {index}",
+    "locked": "Locked",
+    "lockedHint": "Requires a {rank} roll",
+    "unavailable": "Coming soon",
+    "rolled": "You rolled {rank}",
+    "previewHint": "Drag to rotate",
+    "lockIn": "Lock In",
+    "close": "Close",
+    "unlocked": "Cosmetic unlocked!"
   },
   "nav": {
     "home": "Accueil",
@@ -19913,6 +19990,9 @@ export const fr_CA: EnTranslations = {
       },
       "kings_signet": {
         "name": "Chevalière du roi"
+      },
+      "event_skin_token": {
+        "name": "Cache cosmétique mystérieuse"
       }
     },
     "mobs": {
@@ -21548,6 +21628,19 @@ export const en_CA: EnTranslations = {
         "unspent": " {count} unspent."
       }
     }
+  },
+  "skinEvent": {
+    "title": "Cosmetic Cache",
+    "subtitle": "You unlocked a {rank} reward — choose any skin at or below it.",
+    "optionAria": "{rank} skin {index}",
+    "locked": "Locked",
+    "lockedHint": "Requires a {rank} roll",
+    "unavailable": "Coming soon",
+    "rolled": "You rolled {rank}",
+    "previewHint": "Drag to rotate",
+    "lockIn": "Lock In",
+    "close": "Close",
+    "unlocked": "Cosmetic unlocked!"
   },
   "nav": {
     "home": "Home",
@@ -24193,6 +24286,9 @@ export const en_CA: EnTranslations = {
       },
       "kings_signet": {
         "name": "King's Signet"
+      },
+      "event_skin_token": {
+        "name": "Mysterious Cosmetic Cache"
       }
     },
     "mobs": {
@@ -25828,6 +25924,19 @@ export const it_IT: EnTranslations = {
         "unspent": " {count} non spesi."
       }
     }
+  },
+  "skinEvent": {
+    "title": "Cosmetic Cache",
+    "subtitle": "You unlocked a {rank} reward — choose any skin at or below it.",
+    "optionAria": "{rank} skin {index}",
+    "locked": "Locked",
+    "lockedHint": "Requires a {rank} roll",
+    "unavailable": "Coming soon",
+    "rolled": "You rolled {rank}",
+    "previewHint": "Drag to rotate",
+    "lockIn": "Lock In",
+    "close": "Close",
+    "unlocked": "Cosmetic unlocked!"
   },
   "nav": {
     "home": "Pagina principale",
@@ -28473,6 +28582,9 @@ export const it_IT: EnTranslations = {
       },
       "kings_signet": {
         "name": "Anello con sigillo del re"
+      },
+      "event_skin_token": {
+        "name": "Scrigno cosmetico misterioso"
       }
     },
     "mobs": {
@@ -30108,6 +30220,19 @@ export const de_DE: EnTranslations = {
         "unspent": " {count} nicht ausgegeben."
       }
     }
+  },
+  "skinEvent": {
+    "title": "Cosmetic Cache",
+    "subtitle": "You unlocked a {rank} reward — choose any skin at or below it.",
+    "optionAria": "{rank} skin {index}",
+    "locked": "Locked",
+    "lockedHint": "Requires a {rank} roll",
+    "unavailable": "Coming soon",
+    "rolled": "You rolled {rank}",
+    "previewHint": "Drag to rotate",
+    "lockIn": "Lock In",
+    "close": "Close",
+    "unlocked": "Cosmetic unlocked!"
   },
   "nav": {
     "home": "Startseite",
@@ -32753,6 +32878,9 @@ export const de_DE: EnTranslations = {
       },
       "kings_signet": {
         "name": "Siegelring des Königs"
+      },
+      "event_skin_token": {
+        "name": "Geheimnisvolle Kosmetiktruhe"
       }
     },
     "mobs": {
@@ -34388,6 +34516,19 @@ export const zh_CN: EnTranslations = {
         "unspent": " 剩余 {count} 点未用。"
       }
     }
+  },
+  "skinEvent": {
+    "title": "Cosmetic Cache",
+    "subtitle": "You unlocked a {rank} reward — choose any skin at or below it.",
+    "optionAria": "{rank} skin {index}",
+    "locked": "Locked",
+    "lockedHint": "Requires a {rank} roll",
+    "unavailable": "Coming soon",
+    "rolled": "You rolled {rank}",
+    "previewHint": "Drag to rotate",
+    "lockIn": "Lock In",
+    "close": "Close",
+    "unlocked": "Cosmetic unlocked!"
   },
   "nav": {
     "home": "首页",
@@ -37033,6 +37174,9 @@ export const zh_CN: EnTranslations = {
       },
       "kings_signet": {
         "name": "国王印戒"
+      },
+      "event_skin_token": {
+        "name": "神秘外观宝箱"
       }
     },
     "mobs": {
@@ -38668,6 +38812,19 @@ export const zh_TW: EnTranslations = {
         "unspent": " 剩餘 {count} 點未用。"
       }
     }
+  },
+  "skinEvent": {
+    "title": "Cosmetic Cache",
+    "subtitle": "You unlocked a {rank} reward — choose any skin at or below it.",
+    "optionAria": "{rank} skin {index}",
+    "locked": "Locked",
+    "lockedHint": "Requires a {rank} roll",
+    "unavailable": "Coming soon",
+    "rolled": "You rolled {rank}",
+    "previewHint": "Drag to rotate",
+    "lockIn": "Lock In",
+    "close": "Close",
+    "unlocked": "Cosmetic unlocked!"
   },
   "nav": {
     "home": "首頁",
@@ -41313,6 +41470,9 @@ export const zh_TW: EnTranslations = {
       },
       "kings_signet": {
         "name": "國王印戒"
+      },
+      "event_skin_token": {
+        "name": "神秘外觀寶箱"
       }
     },
     "mobs": {
@@ -42948,6 +43108,19 @@ export const ko_KR: EnTranslations = {
         "unspent": " {count}점 미사용."
       }
     }
+  },
+  "skinEvent": {
+    "title": "Cosmetic Cache",
+    "subtitle": "You unlocked a {rank} reward — choose any skin at or below it.",
+    "optionAria": "{rank} skin {index}",
+    "locked": "Locked",
+    "lockedHint": "Requires a {rank} roll",
+    "unavailable": "Coming soon",
+    "rolled": "You rolled {rank}",
+    "previewHint": "Drag to rotate",
+    "lockIn": "Lock In",
+    "close": "Close",
+    "unlocked": "Cosmetic unlocked!"
   },
   "nav": {
     "home": "홈",
@@ -45593,6 +45766,9 @@ export const ko_KR: EnTranslations = {
       },
       "kings_signet": {
         "name": "왕의 인장 반지"
+      },
+      "event_skin_token": {
+        "name": "신비한 외형 상자"
       }
     },
     "mobs": {
@@ -47228,6 +47404,19 @@ export const ja_JP: EnTranslations = {
         "unspent": " 未使用 {count}。"
       }
     }
+  },
+  "skinEvent": {
+    "title": "Cosmetic Cache",
+    "subtitle": "You unlocked a {rank} reward — choose any skin at or below it.",
+    "optionAria": "{rank} skin {index}",
+    "locked": "Locked",
+    "lockedHint": "Requires a {rank} roll",
+    "unavailable": "Coming soon",
+    "rolled": "You rolled {rank}",
+    "previewHint": "Drag to rotate",
+    "lockIn": "Lock In",
+    "close": "Close",
+    "unlocked": "Cosmetic unlocked!"
   },
   "nav": {
     "home": "ホーム",
@@ -49873,6 +50062,9 @@ export const ja_JP: EnTranslations = {
       },
       "kings_signet": {
         "name": "王の印章指輪"
+      },
+      "event_skin_token": {
+        "name": "謎めいた装いの宝箱"
       }
     },
     "mobs": {
@@ -51508,6 +51700,19 @@ export const pt_BR: EnTranslations = {
         "unspent": " {count} sem gastar."
       }
     }
+  },
+  "skinEvent": {
+    "title": "Cosmetic Cache",
+    "subtitle": "You unlocked a {rank} reward — choose any skin at or below it.",
+    "optionAria": "{rank} skin {index}",
+    "locked": "Locked",
+    "lockedHint": "Requires a {rank} roll",
+    "unavailable": "Coming soon",
+    "rolled": "You rolled {rank}",
+    "previewHint": "Drag to rotate",
+    "lockIn": "Lock In",
+    "close": "Close",
+    "unlocked": "Cosmetic unlocked!"
   },
   "nav": {
     "home": "Início",
@@ -54153,6 +54358,9 @@ export const pt_BR: EnTranslations = {
       },
       "kings_signet": {
         "name": "Anel-sinete do rei"
+      },
+      "event_skin_token": {
+        "name": "Baú cosmético misterioso"
       }
     },
     "mobs": {
@@ -55788,6 +55996,19 @@ export const ru_RU: EnTranslations = {
         "unspent": " не вложено: {count}."
       }
     }
+  },
+  "skinEvent": {
+    "title": "Cosmetic Cache",
+    "subtitle": "You unlocked a {rank} reward — choose any skin at or below it.",
+    "optionAria": "{rank} skin {index}",
+    "locked": "Locked",
+    "lockedHint": "Requires a {rank} roll",
+    "unavailable": "Coming soon",
+    "rolled": "You rolled {rank}",
+    "previewHint": "Drag to rotate",
+    "lockIn": "Lock In",
+    "close": "Close",
+    "unlocked": "Cosmetic unlocked!"
   },
   "nav": {
     "home": "Главная",
@@ -58433,6 +58654,9 @@ export const ru_RU: EnTranslations = {
       },
       "kings_signet": {
         "name": "Перстень короля"
+      },
+      "event_skin_token": {
+        "name": "Загадочный косметический тайник"
       }
     },
     "mobs": {
@@ -60015,7 +60239,18 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
     "hud.options.npcVoices",
-    "hud.options.voiceVolume"
+    "hud.options.voiceVolume",
+    "skinEvent.close",
+    "skinEvent.lockIn",
+    "skinEvent.locked",
+    "skinEvent.lockedHint",
+    "skinEvent.optionAria",
+    "skinEvent.previewHint",
+    "skinEvent.rolled",
+    "skinEvent.subtitle",
+    "skinEvent.title",
+    "skinEvent.unavailable",
+    "skinEvent.unlocked"
   ],
   "es_ES": [
     "entities.mobs.bramble_lynx.name",
@@ -60085,7 +60320,18 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
     "hud.options.npcVoices",
-    "hud.options.voiceVolume"
+    "hud.options.voiceVolume",
+    "skinEvent.close",
+    "skinEvent.lockIn",
+    "skinEvent.locked",
+    "skinEvent.lockedHint",
+    "skinEvent.optionAria",
+    "skinEvent.previewHint",
+    "skinEvent.rolled",
+    "skinEvent.subtitle",
+    "skinEvent.title",
+    "skinEvent.unavailable",
+    "skinEvent.unlocked"
   ],
   "fr_FR": [
     "entities.mobs.bramble_lynx.name",
@@ -60155,7 +60401,18 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
     "hud.options.npcVoices",
-    "hud.options.voiceVolume"
+    "hud.options.voiceVolume",
+    "skinEvent.close",
+    "skinEvent.lockIn",
+    "skinEvent.locked",
+    "skinEvent.lockedHint",
+    "skinEvent.optionAria",
+    "skinEvent.previewHint",
+    "skinEvent.rolled",
+    "skinEvent.subtitle",
+    "skinEvent.title",
+    "skinEvent.unavailable",
+    "skinEvent.unlocked"
   ],
   "fr_CA": [
     "entities.mobs.bramble_lynx.name",
@@ -60225,7 +60482,18 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
     "hud.options.npcVoices",
-    "hud.options.voiceVolume"
+    "hud.options.voiceVolume",
+    "skinEvent.close",
+    "skinEvent.lockIn",
+    "skinEvent.locked",
+    "skinEvent.lockedHint",
+    "skinEvent.optionAria",
+    "skinEvent.previewHint",
+    "skinEvent.rolled",
+    "skinEvent.subtitle",
+    "skinEvent.title",
+    "skinEvent.unavailable",
+    "skinEvent.unlocked"
   ],
   "en_CA": [],
   "it_IT": [
@@ -60296,7 +60564,18 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
     "hud.options.npcVoices",
-    "hud.options.voiceVolume"
+    "hud.options.voiceVolume",
+    "skinEvent.close",
+    "skinEvent.lockIn",
+    "skinEvent.locked",
+    "skinEvent.lockedHint",
+    "skinEvent.optionAria",
+    "skinEvent.previewHint",
+    "skinEvent.rolled",
+    "skinEvent.subtitle",
+    "skinEvent.title",
+    "skinEvent.unavailable",
+    "skinEvent.unlocked"
   ],
   "de_DE": [
     "entities.mobs.bramble_lynx.name",
@@ -60366,7 +60645,18 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
     "hud.options.npcVoices",
-    "hud.options.voiceVolume"
+    "hud.options.voiceVolume",
+    "skinEvent.close",
+    "skinEvent.lockIn",
+    "skinEvent.locked",
+    "skinEvent.lockedHint",
+    "skinEvent.optionAria",
+    "skinEvent.previewHint",
+    "skinEvent.rolled",
+    "skinEvent.subtitle",
+    "skinEvent.title",
+    "skinEvent.unavailable",
+    "skinEvent.unlocked"
   ],
   "zh_CN": [
     "entities.mobs.bramble_lynx.name",
@@ -60436,7 +60726,18 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
     "hud.options.npcVoices",
-    "hud.options.voiceVolume"
+    "hud.options.voiceVolume",
+    "skinEvent.close",
+    "skinEvent.lockIn",
+    "skinEvent.locked",
+    "skinEvent.lockedHint",
+    "skinEvent.optionAria",
+    "skinEvent.previewHint",
+    "skinEvent.rolled",
+    "skinEvent.subtitle",
+    "skinEvent.title",
+    "skinEvent.unavailable",
+    "skinEvent.unlocked"
   ],
   "zh_TW": [
     "entities.mobs.bramble_lynx.name",
@@ -60506,7 +60807,18 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
     "hud.options.npcVoices",
-    "hud.options.voiceVolume"
+    "hud.options.voiceVolume",
+    "skinEvent.close",
+    "skinEvent.lockIn",
+    "skinEvent.locked",
+    "skinEvent.lockedHint",
+    "skinEvent.optionAria",
+    "skinEvent.previewHint",
+    "skinEvent.rolled",
+    "skinEvent.subtitle",
+    "skinEvent.title",
+    "skinEvent.unavailable",
+    "skinEvent.unlocked"
   ],
   "ko_KR": [
     "entities.mobs.bramble_lynx.name",
@@ -60576,7 +60888,18 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
     "hud.options.npcVoices",
-    "hud.options.voiceVolume"
+    "hud.options.voiceVolume",
+    "skinEvent.close",
+    "skinEvent.lockIn",
+    "skinEvent.locked",
+    "skinEvent.lockedHint",
+    "skinEvent.optionAria",
+    "skinEvent.previewHint",
+    "skinEvent.rolled",
+    "skinEvent.subtitle",
+    "skinEvent.title",
+    "skinEvent.unavailable",
+    "skinEvent.unlocked"
   ],
   "ja_JP": [
     "entities.mobs.bramble_lynx.name",
@@ -60646,7 +60969,18 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
     "hud.options.npcVoices",
-    "hud.options.voiceVolume"
+    "hud.options.voiceVolume",
+    "skinEvent.close",
+    "skinEvent.lockIn",
+    "skinEvent.locked",
+    "skinEvent.lockedHint",
+    "skinEvent.optionAria",
+    "skinEvent.previewHint",
+    "skinEvent.rolled",
+    "skinEvent.subtitle",
+    "skinEvent.title",
+    "skinEvent.unavailable",
+    "skinEvent.unlocked"
   ],
   "pt_BR": [
     "entities.mobs.bramble_lynx.name",
@@ -60716,7 +61050,18 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
     "hud.options.npcVoices",
-    "hud.options.voiceVolume"
+    "hud.options.voiceVolume",
+    "skinEvent.close",
+    "skinEvent.lockIn",
+    "skinEvent.locked",
+    "skinEvent.lockedHint",
+    "skinEvent.optionAria",
+    "skinEvent.previewHint",
+    "skinEvent.rolled",
+    "skinEvent.subtitle",
+    "skinEvent.title",
+    "skinEvent.unavailable",
+    "skinEvent.unlocked"
   ],
   "ru_RU": [
     "entities.mobs.bramble_lynx.name",
@@ -60786,7 +61131,18 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
     "hud.options.npcVoices",
-    "hud.options.voiceVolume"
+    "hud.options.voiceVolume",
+    "skinEvent.close",
+    "skinEvent.lockIn",
+    "skinEvent.locked",
+    "skinEvent.lockedHint",
+    "skinEvent.optionAria",
+    "skinEvent.previewHint",
+    "skinEvent.rolled",
+    "skinEvent.subtitle",
+    "skinEvent.title",
+    "skinEvent.unavailable",
+    "skinEvent.unlocked"
   ]
 };
 
@@ -60929,6 +61285,19 @@ export const en_XA: EnTranslations = {
         "unspent": "[ {count} úñšþéñţ.]"
       }
     }
+  },
+  "skinEvent": {
+    "title": "[Çóšɱéţíç Çáçĥé]",
+    "subtitle": "[Ýóú úñļóçķéð á {rank} ŕéŵáŕð — çĥóóšé áñý šķíñ áţ óŕ ƀéļóŵ íţ.]",
+    "optionAria": "[{rank} šķíñ {index}]",
+    "locked": "[Ļóçķéð]",
+    "lockedHint": "[Ŕéɋúíŕéš á {rank} ŕóļļ]",
+    "unavailable": "[Çóɱíñĝ šóóñ]",
+    "rolled": "[Ýóú ŕóļļéð {rank}]",
+    "previewHint": "[Ðŕáĝ ţó ŕóţáţé]",
+    "lockIn": "[Ļóçķ Íñ]",
+    "close": "[Çļóšé]",
+    "unlocked": "[Çóšɱéţíç úñļóçķéð!]"
   },
   "nav": {
     "home": "[Ĥóɱé]",
@@ -63574,6 +63943,9 @@ export const en_XA: EnTranslations = {
       },
       "kings_signet": {
         "name": "[Ķíñĝ'š Šíĝñéţ]"
+      },
+      "event_skin_token": {
+        "name": "[Ɱýšţéŕíóúš Çóšɱéţíç Çáçĥé]"
       }
     },
     "mobs": {

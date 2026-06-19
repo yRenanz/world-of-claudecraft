@@ -150,6 +150,77 @@ export const it_IT: EnTranslations = {
       }
     }
   },
+  "hudChrome": {
+    "emotes": {
+      "wave": "Saluta",
+      "laugh": "Ridi",
+      "question": "Ehi!",
+      "cheer": "Esulta",
+      "dance": "Balla",
+      "point": "Indica",
+      "flex": "Flettiti",
+      "salute": "Saluto",
+      "cry": "Piangi",
+      "bow": "Inchino",
+      "clap": "Applaudi",
+      "roar": "Ruggisci",
+      "kneel": "Inginocchiati"
+    },
+    "emoteWheel": {
+      "edit": "Modifica",
+      "label": "Emote"
+    },
+    "emoteEditor": {
+      "title": "Emote",
+      "done": "Fine"
+    },
+    "chatTimestamps": {
+      "show": "Mostra orari della chat",
+      "format": "Formato orario",
+      "clock12h": "12 ore",
+      "clock24h": "24 ore",
+      "note": "Antepone a ogni nuova riga di chat l'ora di arrivo, ad es. [14:32]. Influisce solo sui messaggi ricevuti mentre l'opzione è attiva."
+    },
+    "swing": {
+      "ready": "Attacco",
+      "seconds": "{seconds}s"
+    },
+    "rest": {
+      "resting": "A riposo"
+    },
+    "mobile": {
+      "autorun": "Corsa automatica",
+      "jump": "Salta",
+      "leaderboard": "Classifica",
+      "nameplates": "Nomi",
+      "haptics": "Vibrazione",
+      "hapticsOff": "Vibrazione disattivata",
+      "toggleHaptics": "Attiva/disattiva vibrazione"
+    },
+    "widgets": {
+      "clockTitle": "Ora locale - clicca per alternare 12/24 ore",
+      "worldCoordinates": "Coordinate del mondo",
+      "coordinates": "Coordinate",
+      "heading": "Direzione",
+      "minimapZoom": "Zoom minimappa"
+    },
+    "compass": {
+      "N": "N",
+      "NE": "NE",
+      "E": "E",
+      "SE": "SE",
+      "S": "S",
+      "SW": "SO",
+      "W": "O",
+      "NW": "NO"
+    },
+    "meters": {
+      "perSecond": "{value}/s",
+      "perSecondRow": "{total} ({rate})",
+      "minutesSeconds": "{m}m {s}s",
+      "seconds": "{s}s"
+    }
+  },
   "skinEvent": {
     "title": "Scrigno cosmetico",
     "subtitle": "Hai sbloccato una ricompensa {rank} — scegli un aspetto pari o inferiore.",
@@ -562,6 +633,7 @@ export const it_IT: EnTranslations = {
       "deleteConfirm": "Digita il nome del personaggio per confermare l'eliminazione.",
       "notAuthenticated": "Non autenticato.",
       "accountBanned": "Questo account è stato bannato.",
+      "webLoginOnly": "L'accesso è consentito solo dal client di gioco.",
       "accountSuspended": "Questo account è sospeso fino al {date}.",
       "alreadyInWorld": "Il personaggio è già nel mondo.",
       "renameBeforeEntering": "Questo personaggio deve essere rinominato prima di entrare nel mondo."

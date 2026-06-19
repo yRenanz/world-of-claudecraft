@@ -150,6 +150,77 @@ export const zh_TW: EnTranslations = {
       }
     }
   },
+  "hudChrome": {
+    "emotes": {
+      "wave": "揮手",
+      "laugh": "大笑",
+      "question": "喲？",
+      "cheer": "歡呼",
+      "dance": "跳舞",
+      "point": "指向",
+      "flex": "秀肌肉",
+      "salute": "敬禮",
+      "cry": "哭泣",
+      "bow": "鞠躬",
+      "clap": "鼓掌",
+      "roar": "咆哮",
+      "kneel": "跪下"
+    },
+    "emoteWheel": {
+      "edit": "編輯",
+      "label": "表情"
+    },
+    "emoteEditor": {
+      "title": "表情",
+      "done": "完成"
+    },
+    "chatTimestamps": {
+      "show": "顯示聊天時間戳記",
+      "format": "時間戳記格式",
+      "clock12h": "12 小時制",
+      "clock24h": "24 小時制",
+      "note": "在每一行新的聊天訊息前加上收到的時間，例如 [14:32]。只會影響開啟此選項後收到的訊息。"
+    },
+    "swing": {
+      "ready": "揮砍",
+      "seconds": "{seconds}秒"
+    },
+    "rest": {
+      "resting": "休息中"
+    },
+    "mobile": {
+      "autorun": "自動奔跑",
+      "jump": "跳躍",
+      "leaderboard": "排行榜",
+      "nameplates": "名條",
+      "haptics": "觸覺回饋",
+      "hapticsOff": "觸覺回饋已關閉",
+      "toggleHaptics": "切換觸覺回饋"
+    },
+    "widgets": {
+      "clockTitle": "本地時間 - 點擊切換 12／24 小時制",
+      "worldCoordinates": "世界座標",
+      "coordinates": "座標",
+      "heading": "方位",
+      "minimapZoom": "小地圖縮放"
+    },
+    "compass": {
+      "N": "北",
+      "NE": "東北",
+      "E": "東",
+      "SE": "東南",
+      "S": "南",
+      "SW": "西南",
+      "W": "西",
+      "NW": "西北"
+    },
+    "meters": {
+      "perSecond": "{value}/秒",
+      "perSecondRow": "{total}（{rate}）",
+      "minutesSeconds": "{m}分{s}秒",
+      "seconds": "{s}秒"
+    }
+  },
   "skinEvent": {
     "title": "外觀寶箱",
     "subtitle": "你解鎖了一份{rank}級獎勵 — 可任選不高於該等級的造型。",
@@ -562,6 +633,7 @@ export const zh_TW: EnTranslations = {
       "deleteConfirm": "輸入角色名稱以確認刪除。",
       "notAuthenticated": "尚未驗證。",
       "accountBanned": "此帳號已被封鎖。",
+      "webLoginOnly": "只能從遊戲客戶端登入。",
       "accountSuspended": "此帳號停權至 {date}。",
       "alreadyInWorld": "角色已在世界中。",
       "renameBeforeEntering": "此角色必須先更名才能進入世界。"

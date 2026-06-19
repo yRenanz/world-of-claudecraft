@@ -150,6 +150,77 @@ export const ja_JP: EnTranslations = {
       }
     }
   },
+  "hudChrome": {
+    "emotes": {
+      "wave": "手を振る",
+      "laugh": "大笑い",
+      "question": "やあ",
+      "cheer": "応援",
+      "dance": "踊る",
+      "point": "指さす",
+      "flex": "力こぶ",
+      "salute": "敬礼",
+      "cry": "泣く",
+      "bow": "お辞儀",
+      "clap": "拍手",
+      "roar": "雄叫び",
+      "kneel": "ひざまずく"
+    },
+    "emoteWheel": {
+      "edit": "編集",
+      "label": "エモート"
+    },
+    "emoteEditor": {
+      "title": "エモート",
+      "done": "完了"
+    },
+    "chatTimestamps": {
+      "show": "チャットに時刻を表示",
+      "format": "時刻の表記形式",
+      "clock12h": "12時間表記",
+      "clock24h": "24時間表記",
+      "note": "新しいチャット行の先頭に受信時刻を付けます（例：[14:32]）。この設定がオンの間に受信したメッセージにのみ適用されます。"
+    },
+    "swing": {
+      "ready": "攻撃",
+      "seconds": "{seconds}秒"
+    },
+    "rest": {
+      "resting": "休息中"
+    },
+    "mobile": {
+      "autorun": "オートラン",
+      "jump": "ジャンプ",
+      "leaderboard": "ランキング",
+      "nameplates": "ネームプレート",
+      "haptics": "振動",
+      "hapticsOff": "振動オフ",
+      "toggleHaptics": "振動を切り替え"
+    },
+    "widgets": {
+      "clockTitle": "現地時刻 - クリックで12/24時間表記を切り替え",
+      "worldCoordinates": "ワールド座標",
+      "coordinates": "座標",
+      "heading": "方角",
+      "minimapZoom": "ミニマップのズーム"
+    },
+    "compass": {
+      "N": "北",
+      "NE": "北東",
+      "E": "東",
+      "SE": "南東",
+      "S": "南",
+      "SW": "南西",
+      "W": "西",
+      "NW": "北西"
+    },
+    "meters": {
+      "perSecond": "{value}/秒",
+      "perSecondRow": "{total}（{rate}）",
+      "minutesSeconds": "{m}分{s}秒",
+      "seconds": "{s}秒"
+    }
+  },
   "skinEvent": {
     "title": "装いの宝箱",
     "subtitle": "{rank}の報酬を解除しました — それ以下のスキンを自由に選べます。",
@@ -562,6 +633,7 @@ export const ja_JP: EnTranslations = {
       "deleteConfirm": "削除を確認するにはキャラクター名を入力してください。",
       "notAuthenticated": "認証されていません。",
       "accountBanned": "このアカウントは利用停止されています。",
+      "webLoginOnly": "ログインはゲームクライアントからのみ可能です。",
       "accountSuspended": "このアカウントは {date} まで停止されています。",
       "alreadyInWorld": "キャラクターは既に世界にいます。",
       "renameBeforeEntering": "このキャラクターは世界に入る前に名前変更が必要です。"

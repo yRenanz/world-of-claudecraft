@@ -25,8 +25,8 @@ import { absorbBarView } from './absorb_bar';
 import { itemStatDeltas } from './item_compare';
 import { formatClockTime } from './clock';
 import { formatMinimapCoords } from './coords';
-import { compassView } from './compass';
-import { clampMinimapZoom, nextMinimapZoom, isMinMinimapZoom, isMaxMinimapZoom, formatMinimapZoom, MINIMAP_ZOOM_DEFAULT } from './minimap_zoom';
+import { compassView, type CardinalId } from './compass';
+import { clampMinimapZoom, nextMinimapZoom, isMinMinimapZoom, isMaxMinimapZoom, minimapZoomValue, MINIMAP_ZOOM_DEFAULT } from './minimap_zoom';
 import { restView } from './rest_indicator';
 import { nearestSubzone } from './subzone';
 import { lowResourceView } from './low_resource';
@@ -1081,7 +1081,7 @@ export class Hud {
   }
 
   private emoteLabel(id: OverheadEmoteId): string {
-    return OVERHEAD_EMOTES.find((e) => e.id === id)?.label ?? id;
+    return t(`hudChrome.emotes.${id}` as TranslationKey);
   }
 
   private emoteWheelKeyLabel(): string {
@@ -1139,7 +1139,7 @@ export class Hud {
       this.emoteWheelEl = el;
     }
     const slots = this.emoteWheelSlots.filter(isOverheadEmoteId).slice(0, EMOTE_WHEEL_LIMIT);
-    el.innerHTML = `<div class="emote-wheel-ring"></div><button class="emote-wheel-edit" data-edit>Edit</button>`;
+    el.innerHTML = `<div class="emote-wheel-ring"></div><button class="emote-wheel-edit" data-edit>${esc(t('hudChrome.emoteWheel.edit'))}</button>`;
     slots.forEach((id, i) => {
       const btn = document.createElement('button');
       btn.type = 'button';
@@ -1219,7 +1219,7 @@ export class Hud {
 
   private renderEmoteEditor(): void {
     const el = $('#emote-editor');
-    el.innerHTML = `<div class="panel-title"><span>Emotes</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
+    el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.emoteEditor.title'))}</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
     const count = document.createElement('div');
     count.className = 'emote-editor-count';
     const grid = document.createElement('div');
@@ -1245,7 +1245,7 @@ export class Hud {
       icon.src = emoteIconUrl(def.id);
       icon.alt = '';
       const label = document.createElement('span');
-      label.textContent = def.label;
+      label.textContent = this.emoteLabel(def.id);
       btn.append(icon, label);
       btn.addEventListener('click', () => {
         audio.click();
@@ -1264,7 +1264,7 @@ export class Hud {
     footer.className = 'emote-editor-footer';
     const done = document.createElement('button');
     done.className = 'btn';
-    done.textContent = 'Done';
+    done.textContent = t('hudChrome.emoteEditor.done');
     done.addEventListener('click', () => this.closeEmoteEditor());
     footer.append(count, done);
     el.append(grid, footer);
@@ -1458,7 +1458,8 @@ export class Hud {
       .map((d) => {
         const cls = d.delta > 0 ? 'tt-green' : 'tt-red';
         const sign = d.delta > 0 ? '+' : '−'; // proper minus sign
-        return `<div class="${cls}">${sign}${Math.abs(d.delta).toFixed(d.decimals)} ${esc(t(`itemUi.stats.${d.stat}` as TranslationKey))}</div>`;
+        const magnitude = formatNumber(Math.abs(d.delta), { minimumFractionDigits: d.decimals, maximumFractionDigits: d.decimals });
+        return `<div class="${cls}">${sign}${magnitude} ${esc(t(`itemUi.stats.${d.stat}` as TranslationKey))}</div>`;
       })
       .join('');
     let html = `<div class="tt-cmp"><div class="tt-cmp-head">${esc(t('itemUi.tooltip.currentlyEquipped'))}</div>`;
@@ -1509,6 +1510,7 @@ export class Hud {
   }
 
   private refreshLocalizedDynamicUi(): void {
+    this.refreshKeybindLabels();
     this.updateQuestTracker();
     const log = $('#quest-log-window');
     if (log.style.display === 'block') this.renderQuestLog();
@@ -1992,22 +1994,23 @@ export class Hud {
     for (let i = 0; i < this.abilityButtons.length; i++) {
       this.abilityButtons[i].keybindEl.textContent = this.keybinds.primaryLabel(`slot${i}`);
     }
-    const sideButtons: [selector: string, action: string, label: string][] = [
-      ['#mm-char', 'char', 'Character'],
-      ['#mm-spell', 'spellbook', 'Spellbook'],
-      ['#mm-talents', 'talents', 'Talents'],
-      ['#mm-quest', 'questlog', 'Quest Log'],
-      ['#mm-map', 'map', 'Map'],
-      ['#mm-bag', 'bags', 'Bags'],
-      ['#mm-arena', 'arena', 'Arena'],
-      ['#mm-leaderboard', 'leaderboard', 'Leaderboard'],
-      ['#mm-emote', 'emoteWheel', 'Emotes'],
-      ['#mm-social', 'social', 'Friends'],
+    const sideButtons: [selector: string, action: string, labelKey: TranslationKey][] = [
+      ['#mm-char', 'char', 'hud.keybinds.actions.char'],
+      ['#mm-spell', 'spellbook', 'abilityUi.spellbook.title'],
+      ['#mm-talents', 'talents', 'game.talents.title'],
+      ['#mm-quest', 'questlog', 'questUi.log.title'],
+      ['#mm-map', 'map', 'hud.core.mobileMap'],
+      ['#mm-bag', 'bags', 'itemUi.bags.title'],
+      ['#mm-arena', 'arena', 'hud.core.mobileArena'],
+      ['#mm-leaderboard', 'leaderboard', 'game.leaderboard.title'],
+      ['#mm-emote', 'emoteWheel', 'hudChrome.emoteWheel.label'],
+      ['#mm-social', 'social', 'hud.social.friendsTab'],
     ];
-    for (const [selector, action, label] of sideButtons) {
+    for (const [selector, action, labelKey] of sideButtons) {
       const btn = document.querySelector<HTMLElement>(selector);
       if (!btn) continue;
       const key = this.keybinds.primaryLabel(action);
+      const label = t(labelKey);
       const keyEl = btn.querySelector<HTMLElement>('.keybind');
       if (keyEl) keyEl.textContent = key.toLowerCase();
       btn.setAttribute('aria-label', key ? `${label} (${key})` : label);
@@ -2265,7 +2268,9 @@ export class Hud {
       (sw.querySelector('.fill') as HTMLElement).style.width = `${(frac * 100).toFixed(1)}%`;
       sw.classList.toggle('ready', p.swingTimer <= 0);
       (sw.querySelector('.label') as HTMLElement).textContent =
-        p.swingTimer <= 0 ? 'Swing' : `${p.swingTimer.toFixed(1)}s`;
+        p.swingTimer <= 0
+          ? t('hudChrome.swing.ready')
+          : t('hudChrome.swing.seconds', { seconds: formatNumber(p.swingTimer, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) });
     } else {
       sw.style.display = 'none';
       this.lastSwingTimer = 0;
@@ -2405,7 +2410,10 @@ export class Hud {
         : nearestSubzone(p.pos.x, p.pos.z, currentZone.pois, this.lastSubzone);
       if (subzone !== this.lastSubzone) {
         this.lastSubzone = subzone;
-        if (subzone) this.showSubzone(subzone);
+        if (subzone) {
+          const poiIndex = currentZone.pois.findIndex((q) => q.label === subzone);
+          this.showSubzone(poiIndex >= 0 ? zonePoiLabel(currentZone.id, poiIndex) : subzone);
+        }
       }
 
       // soundtrack: pick the zone theme and layer in combat percussion.
@@ -2434,7 +2442,7 @@ export class Hud {
         this.lastResting = rest.resting;
         const restEl = $('#pf-rest');
         restEl.classList.toggle('on', rest.resting);
-        restEl.title = rest.label;
+        restEl.title = rest.labelKey ? t(rest.labelKey) : '';
       }
 
       this.updateQuestTracker();
@@ -2634,12 +2642,13 @@ export class Hud {
   private initCompass(): void {
     const track = $('#compass-track');
     if (!track) return;
-    for (const label of ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']) {
+    const ids: CardinalId[] = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+    for (const id of ids) {
       const el = document.createElement('span');
-      el.className = 'compass-mark' + (label.length === 1 ? ' major' : '');
-      el.textContent = label;
+      el.className = 'compass-mark' + (id.length === 1 ? ' major' : '');
+      el.textContent = t(`hudChrome.compass.${id}`);
       track.appendChild(el);
-      this.compassMarks.set(label, el);
+      this.compassMarks.set(id, el);
     }
     this.compassHeadingEl = $('#compass-heading');
   }
@@ -2662,7 +2671,7 @@ export class Hud {
     }
     if (this.compassHeadingEl && view.heading !== this.lastCompassHeading) {
       this.lastCompassHeading = view.heading;
-      this.compassHeadingEl.textContent = view.heading;
+      this.compassHeadingEl.textContent = t(`hudChrome.compass.${view.heading}`);
     }
   }
 
@@ -2696,7 +2705,7 @@ export class Hud {
   // Reflect the current zoom in the readout and disable the +/- buttons at the
   // ends so the control communicates its own limits.
   private syncMinimapZoomUi(): void {
-    if (this.minimapZoomLabel) this.minimapZoomLabel.textContent = formatMinimapZoom(this.minimapZoom);
+    if (this.minimapZoomLabel) this.minimapZoomLabel.textContent = `${formatNumber(minimapZoomValue(this.minimapZoom), { maximumFractionDigits: 1 })}×`;
     const inBtn = document.querySelector('#minimap-zoom-in') as HTMLButtonElement | null;
     const outBtn = document.querySelector('#minimap-zoom-out') as HTMLButtonElement | null;
     if (inBtn) inBtn.disabled = isMaxMinimapZoom(this.minimapZoom);
@@ -7672,7 +7681,7 @@ export class Hud {
   // main.ts) plus the classic client-side "Show Timestamps" chat option. None of
   // it touches the simulation.
   private renderInterface(): void {
-    const body = this.settingsViewShell('Interface');
+    const body = this.settingsViewShell(t('hud.options.interface'));
     this.settingSlider(body, t('hud.options.hudOpacity'), 'hudOpacity');
     this.settingSlider(body, t('hud.options.tooltipScale'), 'tooltipScale');
     this.settingSlider(body, t('hud.options.fctScale'), 'fctScale');
@@ -7690,7 +7699,7 @@ export class Hud {
     tsRow.className = 'set-row';
     const tsName = document.createElement('span');
     tsName.className = 'set-name';
-    tsName.textContent = 'Show Chat Timestamps';
+    tsName.textContent = t('hudChrome.chatTimestamps.show');
     const tsToggle = document.createElement('button');
     tsToggle.className = 'btn set-toggle';
 
@@ -7699,20 +7708,20 @@ export class Hud {
     fmtRow.className = 'set-row';
     const fmtName = document.createElement('span');
     fmtName.className = 'set-name';
-    fmtName.textContent = 'Timestamp Format';
+    fmtName.textContent = t('hudChrome.chatTimestamps.format');
     const seg = document.createElement('div');
     seg.className = 'set-seg';
     const btn12 = document.createElement('button');
     btn12.className = 'btn set-seg-btn';
-    btn12.textContent = '12-hour';
+    btn12.textContent = t('hudChrome.chatTimestamps.clock12h');
     const btn24 = document.createElement('button');
     btn24.className = 'btn set-seg-btn';
-    btn24.textContent = '24-hour';
+    btn24.textContent = t('hudChrome.chatTimestamps.clock24h');
     seg.append(btn12, btn24);
     fmtRow.append(fmtName, seg);
 
     const sync = () => {
-      tsToggle.textContent = this.chatTimestamps ? 'On' : 'Off';
+      tsToggle.textContent = this.chatTimestamps ? t('hud.options.on') : t('hud.options.off');
       tsToggle.classList.toggle('off', !this.chatTimestamps);
       tsToggle.setAttribute('aria-pressed', String(this.chatTimestamps));
       btn12.classList.toggle('active', this.chatClock === '12h');
@@ -7744,12 +7753,12 @@ export class Hud {
 
     const note = document.createElement('div');
     note.className = 'set-note';
-    note.textContent = 'Prefixes each new chat line with the time it arrived, e.g. [14:32]. Only affects messages received while the option is on.';
+    note.textContent = t('hudChrome.chatTimestamps.note');
     $('#options-menu').appendChild(note);
 
     const back = document.createElement('button');
     back.className = 'btn';
-    back.textContent = 'Back';
+    back.textContent = t('hud.options.back');
     back.addEventListener('click', () => { audio.click(); this.optionsView = 'main'; this.renderOptions(); });
     $('#options-menu').appendChild(back);
     $('#options-menu').querySelector('[data-close]')?.addEventListener('click', () => this.closeOptions());
@@ -8054,7 +8063,10 @@ function entityDisplayName(entity: Entity): string {
 
 function abilityDisplayNameFromSource(name: string): string {
   const ability = Object.values(ABILITIES).find((candidate) => candidate.name === name);
-  return ability ? abilityDisplayName(ability) : name;
+  if (ability) return abilityDisplayName(ability);
+  // Boss/mob mechanic names (War Stomp, etc.) surface as a damage-log ability label but
+  // are not in ABILITIES; route them through the shared sim aura/mechanic localizer.
+  return localizeSimAuraName(name) ?? name;
 }
 
 // Localize an aura/buff name that surfaces by its raw English name (buff frame tooltip,

@@ -150,6 +150,77 @@ export const en_XA: EnTranslations = {
       }
     }
   },
+  "hudChrome": {
+    "emotes": {
+      "wave": "[Ŵáʋé]",
+      "laugh": "[ĻÓĻ]",
+      "question": "[Ɓŕó?]",
+      "cheer": "[Çĥééŕ]",
+      "dance": "[Ðáñçé]",
+      "point": "[Þóíñţ]",
+      "flex": "[Ƒļéẋ]",
+      "salute": "[Šáļúţé]",
+      "cry": "[Çŕý]",
+      "bow": "[Ɓóŵ]",
+      "clap": "[Çļáþ]",
+      "roar": "[Ŕóáŕ]",
+      "kneel": "[Ķñééļ]"
+    },
+    "emoteWheel": {
+      "edit": "[Éðíţ]",
+      "label": "[Éɱóţéš]"
+    },
+    "emoteEditor": {
+      "title": "[Éɱóţéš]",
+      "done": "[Ðóñé]"
+    },
+    "chatTimestamps": {
+      "show": "[Šĥóŵ Çĥáţ Ţíɱéšţáɱþš]",
+      "format": "[Ţíɱéšţáɱþ Ƒóŕɱáţ]",
+      "clock12h": "[12-ĥóúŕ]",
+      "clock24h": "[24-ĥóúŕ]",
+      "note": "[Þŕéƒíẋéš éáçĥ ñéŵ çĥáţ ļíñé ŵíţĥ ţĥé ţíɱé íţ áŕŕíʋéð, é.ĝ. [14:32]. Óñļý áƒƒéçţš ɱéššáĝéš ŕéçéíʋéð ŵĥíļé ţĥé óþţíóñ íš óñ.]"
+    },
+    "swing": {
+      "ready": "[Šŵíñĝ]",
+      "seconds": "[{seconds}š]"
+    },
+    "rest": {
+      "resting": "[Ŕéšţíñĝ]"
+    },
+    "mobile": {
+      "autorun": "[Áúţóŕúñ]",
+      "jump": "[Ĵúɱþ]",
+      "leaderboard": "[Ŕáñķš]",
+      "nameplates": "[Ñáɱéš]",
+      "haptics": "[Ĥáþţíçš]",
+      "hapticsOff": "[Ĥáþţíçš Óƒƒ]",
+      "toggleHaptics": "[Ţóĝĝļé ĥáþţíçš]"
+    },
+    "widgets": {
+      "clockTitle": "[Ļóçáļ ţíɱé - çļíçķ ţó ţóĝĝļé 12/24-ĥóúŕ]",
+      "worldCoordinates": "[Ŵóŕļð çóóŕðíñáţéš]",
+      "coordinates": "[Çóóŕðíñáţéš]",
+      "heading": "[Ĥéáðíñĝ]",
+      "minimapZoom": "[Ɱíñíɱáþ žóóɱ]"
+    },
+    "compass": {
+      "N": "[Ñ]",
+      "NE": "[ÑÉ]",
+      "E": "[É]",
+      "SE": "[ŠÉ]",
+      "S": "[Š]",
+      "SW": "[ŠŴ]",
+      "W": "[Ŵ]",
+      "NW": "[ÑŴ]"
+    },
+    "meters": {
+      "perSecond": "[{value}/š]",
+      "perSecondRow": "[{total} ({rate})]",
+      "minutesSeconds": "[{m}ɱ {s}š]",
+      "seconds": "[{s}š]"
+    }
+  },
   "skinEvent": {
     "title": "[Çóšɱéţíç Çáçĥé]",
     "subtitle": "[Ýóú úñļóçķéð á {rank} ŕéŵáŕð — çĥóóšé áñý šķíñ áţ óŕ ƀéļóŵ íţ.]",
@@ -562,6 +633,7 @@ export const en_XA: EnTranslations = {
       "deleteConfirm": "[Ţýþé ţĥé çĥáŕáçţéŕ ñáɱé ţó çóñƒíŕɱ ðéļéţíóñ.]",
       "notAuthenticated": "[Ñóţ áúţĥéñţíçáţéð.]",
       "accountBanned": "[Ţĥíš áççóúñţ ĥáš ƀééñ ƀáññéð.]",
+      "webLoginOnly": "[Ļóĝíñš áŕé óñļý áļļóŵéð ƒŕóɱ ţĥé ĝáɱé çļíéñţ.]",
       "accountSuspended": "[Ţĥíš áççóúñţ íš šúšþéñðéð úñţíļ {date}.]",
       "alreadyInWorld": "[Çĥáŕáçţéŕ íš áļŕéáðý íñ ŵóŕļð.]",
       "renameBeforeEntering": "[Ţĥíš çĥáŕáçţéŕ ɱúšţ ƀé ŕéñáɱéð ƀéƒóŕé éñţéŕíñĝ ţĥé ŵóŕļð.]"

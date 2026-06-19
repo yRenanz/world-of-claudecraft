@@ -1900,8 +1900,9 @@ export class Renderer {
       const emote = e.overheadEmoteId ? OVERHEAD_EMOTES.find((x) => x.id === e.overheadEmoteId) : null;
       if (emote && e.kind === 'player' && !e.dead) {
         v.emoteIconEl.src = emoteIconUrl(emote.id);
-        v.emoteLabelEl.textContent = emote.label;
-        v.emoteEl.title = emote.label;
+        const emoteLabel = t(`hudChrome.emotes.${emote.id}`);
+        v.emoteLabelEl.textContent = emoteLabel;
+        v.emoteEl.title = emoteLabel;
         v.emoteEl.style.display = '';
       } else {
         v.emoteEl.style.display = 'none';
@@ -2025,7 +2026,10 @@ export class Renderer {
     v.castBar.style.display = '';
     v.castBar.classList.toggle('channel', st.channel);
     v.castFill.style.width = `${(st.fill * 100).toFixed(1)}%`;
-    v.castLabel.textContent = st.label;
+    // cast_bar.ts keeps st.label as a stable id (DOM/i18n-free); localize here.
+    v.castLabel.textContent = st.fishing
+      ? t('abilityUi.cast.fishing')
+      : (ABILITIES[st.label] ? tEntity({ kind: 'ability', id: st.label, field: 'name' }) : st.label);
   }
 
   // Hang a speech bubble over an entity's head; it follows the entity and

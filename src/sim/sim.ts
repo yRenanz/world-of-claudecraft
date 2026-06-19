@@ -1908,7 +1908,7 @@ export class Sim {
       this.stopFollow(p, 'There is no one to follow.');
       return false;
     }
-    if (p.inCombat) { this.stopFollow(p, 'You stop following — you are in combat.'); return false; }
+    if (p.inCombat) { this.stopFollow(p, 'You stop following - you are in combat.'); return false; }
     const d = dist2d(p.pos, t.pos);
     if (d > FOLLOW_MAX_RANGE) { this.stopFollow(p, `${t.name} is too far away to follow.`); return false; }
     // always turn to face the leader, even while held in place

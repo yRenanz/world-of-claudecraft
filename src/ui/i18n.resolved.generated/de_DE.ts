@@ -150,6 +150,77 @@ export const de_DE: EnTranslations = {
       }
     }
   },
+  "hudChrome": {
+    "emotes": {
+      "wave": "Winken",
+      "laugh": "Lachen",
+      "question": "Na?",
+      "cheer": "Jubeln",
+      "dance": "Tanzen",
+      "point": "Zeigen",
+      "flex": "Muskeln",
+      "salute": "Salutieren",
+      "cry": "Weinen",
+      "bow": "Verbeugen",
+      "clap": "Klatschen",
+      "roar": "Brüllen",
+      "kneel": "Knien"
+    },
+    "emoteWheel": {
+      "edit": "Bearbeiten",
+      "label": "Emotes"
+    },
+    "emoteEditor": {
+      "title": "Emotes",
+      "done": "Fertig"
+    },
+    "chatTimestamps": {
+      "show": "Chat-Zeitstempel anzeigen",
+      "format": "Zeitstempelformat",
+      "clock12h": "12-Stunden",
+      "clock24h": "24-Stunden",
+      "note": "Stellt jeder neuen Chatzeile die Uhrzeit ihres Eintreffens voran, z. B. [14:32]. Betrifft nur Nachrichten, die bei aktivierter Option empfangen werden."
+    },
+    "swing": {
+      "ready": "Angriff",
+      "seconds": "{seconds}s"
+    },
+    "rest": {
+      "resting": "Ausgeruht"
+    },
+    "mobile": {
+      "autorun": "Auto-Laufen",
+      "jump": "Springen",
+      "leaderboard": "Rangliste",
+      "nameplates": "Namen",
+      "haptics": "Haptik",
+      "hapticsOff": "Haptik aus",
+      "toggleHaptics": "Haptik umschalten"
+    },
+    "widgets": {
+      "clockTitle": "Ortszeit - klicken, um zwischen 12-/24-Stunden zu wechseln",
+      "worldCoordinates": "Weltkoordinaten",
+      "coordinates": "Koordinaten",
+      "heading": "Blickrichtung",
+      "minimapZoom": "Minikarten-Zoom"
+    },
+    "compass": {
+      "N": "N",
+      "NE": "NO",
+      "E": "O",
+      "SE": "SO",
+      "S": "S",
+      "SW": "SW",
+      "W": "W",
+      "NW": "NW"
+    },
+    "meters": {
+      "perSecond": "{value}/s",
+      "perSecondRow": "{total} ({rate})",
+      "minutesSeconds": "{m} Min. {s} Sek.",
+      "seconds": "{s} Sek."
+    }
+  },
   "skinEvent": {
     "title": "Kosmetik-Hort",
     "subtitle": "Ihr habt eine {rank}-Belohnung freigeschaltet — wählt einen beliebigen Skin auf dieser Stufe oder darunter.",
@@ -562,6 +633,7 @@ export const de_DE: EnTranslations = {
       "deleteConfirm": "Gib den Charakternamen ein, um das Löschen zu bestätigen.",
       "notAuthenticated": "Nicht angemeldet.",
       "accountBanned": "Dieses Konto wurde gesperrt.",
+      "webLoginOnly": "Anmeldungen sind nur über den Spiel-Client erlaubt.",
       "accountSuspended": "Dieses Konto ist bis {date} suspendiert.",
       "alreadyInWorld": "Der Charakter ist bereits in der Welt.",
       "renameBeforeEntering": "Dieser Charakter muss vor dem Betreten der Welt umbenannt werden."

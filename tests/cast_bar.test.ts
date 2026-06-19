@@ -30,7 +30,10 @@ describe('overhead cast bar', () => {
     const mid = castBarState(caster({ castRemaining: 0.5, castTotal: 2.5 }));
     expect(mid.fill).toBeCloseTo(0.8);
     expect(mid.channel).toBe(false);
-    expect(mid.label).toBe('Fireball');
+    // castBarState is DOM/i18n-free: it carries the raw ability id; the renderer
+    // localizes it. So we assert the stable discriminator, not display text.
+    expect(mid.label).toBe('fireball');
+    expect(mid.fishing).toBe(false);
   });
 
   it('drains a channel downward as it ticks', () => {
@@ -39,12 +42,17 @@ describe('overhead cast bar', () => {
     }));
     expect(ch.channel).toBe(true);
     expect(ch.fill).toBeCloseTo(0.5); // half the channel left → half-full, draining
-    expect(ch.label).toBe('Arcane Missiles');
+    expect(ch.label).toBe('arcane_missiles');
+    expect(ch.fishing).toBe(false);
   });
 
-  it('labels fishing and falls back to the raw id for unknown abilities', () => {
-    expect(castBarState(caster({ castingAbility: 'fishing' })).label).toBe('Fishing');
-    expect(castBarState(caster({ castingAbility: 'made_up_spell' })).label).toBe('made_up_spell');
+  it('flags fishing and carries the raw id for known and unknown abilities', () => {
+    const fish = castBarState(caster({ castingAbility: 'fishing' }));
+    expect(fish.fishing).toBe(true);
+    expect(fish.label).toBe('fishing');
+    const unknown = castBarState(caster({ castingAbility: 'made_up_spell' }));
+    expect(unknown.fishing).toBe(false);
+    expect(unknown.label).toBe('made_up_spell');
   });
 
   it('clamps the fill fraction to 0..1 against transient overshoot', () => {

@@ -1,6 +1,6 @@
 import { apiGet, apiLogin, apiPost, clearSession, getAdminName, getToken, ApiError } from './api';
 import { barChart, chartPanel } from './charts';
-import { escapeHtml, fmtBytes, fmtDuration } from './format';
+import { escapeHtml, fmtBytes, fmtDate, fmtDuration } from './format';
 import { classLabel, t, localizeAdminError, ensureAdminLocaleLoaded, adminLanguage } from './i18n';
 import {
   renderAccountDetail, renderAccountsTable, renderCharactersTable, renderChatFilter,
@@ -340,7 +340,7 @@ function handleModerationActionClick(e: Event, source: 'account' | 'moderation')
         { label: t('dialog.account'), value: `#${accountId}` },
         { label: t('dialog.action'), value: t('dialog.actionSuspend') },
         { label: t('dialog.length'), value: t('detail.lengthHours', { count: hours }) },
-        { label: t('dialog.until'), value: new Date(expiresAt).toLocaleString() },
+        { label: t('dialog.until'), value: fmtDate(expiresAt) },
         { label: t('dialog.reason'), value: note },
       ],
       endpoint: `/admin/api/moderation/accounts/${accountId}/suspend`,
@@ -369,7 +369,7 @@ function handleModerationActionClick(e: Event, source: 'account' | 'moderation')
       rows: [
         { label: t('dialog.account'), value: `#${accountId}` },
         { label: t('dialog.action'), value: t('dialog.actionSuspend') },
-        { label: t('dialog.until'), value: expiry.toLocaleString() },
+        { label: t('dialog.until'), value: fmtDate(expiry.toISOString()) },
         { label: t('dialog.reason'), value: note },
       ],
       endpoint: `/admin/api/moderation/accounts/${accountId}/suspend`,
@@ -391,7 +391,7 @@ function handleModerationActionClick(e: Event, source: 'account' | 'moderation')
         { label: t('dialog.account'), value: `#${accountId}` },
         { label: t('dialog.action'), value: t('dialog.actionChatMute') },
         { label: t('dialog.length'), value: t('detail.lengthHours', { count: hours }) },
-        { label: t('dialog.until'), value: new Date(expiresAt).toLocaleString() },
+        { label: t('dialog.until'), value: fmtDate(expiresAt) },
         { label: t('dialog.reason'), value: note },
       ],
       endpoint: `/admin/api/moderation/accounts/${accountId}/chat-mute`,
@@ -416,7 +416,7 @@ function handleModerationActionClick(e: Event, source: 'account' | 'moderation')
       rows: [
         { label: t('dialog.account'), value: `#${accountId}` },
         { label: t('dialog.action'), value: t('dialog.actionChatMute') },
-        { label: t('dialog.until'), value: expiry.toLocaleString() },
+        { label: t('dialog.until'), value: fmtDate(expiry.toISOString()) },
         { label: t('dialog.reason'), value: note },
       ],
       endpoint: `/admin/api/moderation/accounts/${accountId}/chat-mute`,

@@ -1,4 +1,5 @@
 import type { Input, TouchMoveInput } from './input';
+import { t } from '../ui/i18n';
 
 export const PHONE_TOUCH_QUERY = '(pointer: coarse) and (max-width: 940px), (pointer: coarse) and (max-height: 760px)';
 const DEADZONE = 0.22;
@@ -385,7 +386,7 @@ export class MobileControls {
     button.classList.toggle('is-on', this.hapticsOn);
     button.setAttribute('aria-pressed', this.hapticsOn ? 'true' : 'false');
     const label = button.querySelector('.mobile-label');
-    if (label) label.textContent = this.hapticsOn ? 'Haptics' : 'Haptics Off';
+    if (label) label.textContent = this.hapticsOn ? t('hudChrome.mobile.haptics') : t('hudChrome.mobile.hapticsOff');
   }
 
   /** The Chat button taps to open the keyboard composer, but a long press toggles

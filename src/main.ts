@@ -148,6 +148,7 @@ function userFacingApiError(err: unknown): string {
   if (normalized === 'this account has been banned.') return t('errors.api.accountBanned');
   if (normalized === 'character already in world') return t('errors.api.alreadyInWorld');
   if (normalized === 'this character must be renamed before entering the world.') return t('errors.api.renameBeforeEntering');
+  if (normalized === 'logins are only allowed from the game client') return t('errors.api.webLoginOnly');
   // Cloudflare Turnstile rejection on login/register (server/main.ts passesTurnstile).
   if (normalized === 'verification failed, please try again') return t('errors.api.verificationFailed');
   // WebSocket disconnect reasons surfaced through the fatal overlay (net/online.ts).

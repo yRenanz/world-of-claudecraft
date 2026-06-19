@@ -150,6 +150,77 @@ export const ko_KR: EnTranslations = {
       }
     }
   },
+  "hudChrome": {
+    "emotes": {
+      "wave": "손인사",
+      "laugh": "ㅋㅋ",
+      "question": "안녕?",
+      "cheer": "환호",
+      "dance": "춤",
+      "point": "가리키기",
+      "flex": "근육 자랑",
+      "salute": "경례",
+      "cry": "엉엉",
+      "bow": "절",
+      "clap": "박수",
+      "roar": "포효",
+      "kneel": "무릎 꿇기"
+    },
+    "emoteWheel": {
+      "edit": "편집",
+      "label": "감정 표현"
+    },
+    "emoteEditor": {
+      "title": "감정 표현",
+      "done": "완료"
+    },
+    "chatTimestamps": {
+      "show": "채팅 시각 표시",
+      "format": "시각 표시 형식",
+      "clock12h": "12시간제",
+      "clock24h": "24시간제",
+      "note": "새 채팅 줄마다 수신된 시각을 앞에 붙입니다(예: [14:32]). 이 옵션이 켜져 있는 동안 받은 메시지에만 적용됩니다."
+    },
+    "swing": {
+      "ready": "공격",
+      "seconds": "{seconds}초"
+    },
+    "rest": {
+      "resting": "휴식 중"
+    },
+    "mobile": {
+      "autorun": "자동 달리기",
+      "jump": "점프",
+      "leaderboard": "순위",
+      "nameplates": "이름표",
+      "haptics": "진동",
+      "hapticsOff": "진동 꺼짐",
+      "toggleHaptics": "진동 전환"
+    },
+    "widgets": {
+      "clockTitle": "현지 시각 - 클릭하면 12/24시간제 전환",
+      "worldCoordinates": "세계 좌표",
+      "coordinates": "좌표",
+      "heading": "방향",
+      "minimapZoom": "미니맵 확대/축소"
+    },
+    "compass": {
+      "N": "N",
+      "NE": "NE",
+      "E": "E",
+      "SE": "SE",
+      "S": "S",
+      "SW": "SW",
+      "W": "W",
+      "NW": "NW"
+    },
+    "meters": {
+      "perSecond": "{value}/초",
+      "perSecondRow": "{total} ({rate})",
+      "minutesSeconds": "{m}분 {s}초",
+      "seconds": "{s}초"
+    }
+  },
   "skinEvent": {
     "title": "장식 상자",
     "subtitle": "{rank} 등급 보상을 잠금 해제했습니다 — 그 이하의 스킨을 자유롭게 고르세요.",
@@ -562,6 +633,7 @@ export const ko_KR: EnTranslations = {
       "deleteConfirm": "삭제를 확인하려면 캐릭터 이름을 입력하세요.",
       "notAuthenticated": "인증되지 않았습니다.",
       "accountBanned": "이 계정은 이용 정지되었습니다.",
+      "webLoginOnly": "로그인은 게임 클라이언트에서만 허용됩니다.",
       "accountSuspended": "이 계정은 {date}까지 정지되었습니다.",
       "alreadyInWorld": "캐릭터가 이미 세계에 있습니다.",
       "renameBeforeEntering": "이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다."

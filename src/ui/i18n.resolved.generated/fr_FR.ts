@@ -150,6 +150,77 @@ export const fr_FR: EnTranslations = {
       }
     }
   },
+  "hudChrome": {
+    "emotes": {
+      "wave": "Saluer de la main",
+      "laugh": "MDR",
+      "question": "Coucou ?",
+      "cheer": "Acclamer",
+      "dance": "Danser",
+      "point": "Montrer du doigt",
+      "flex": "Frimer",
+      "salute": "Saluer",
+      "cry": "Pleurer",
+      "bow": "S'incliner",
+      "clap": "Applaudir",
+      "roar": "Rugir",
+      "kneel": "S'agenouiller"
+    },
+    "emoteWheel": {
+      "edit": "Modifier",
+      "label": "Emotes"
+    },
+    "emoteEditor": {
+      "title": "Emotes",
+      "done": "Terminé"
+    },
+    "chatTimestamps": {
+      "show": "Afficher l'horodatage de la discussion",
+      "format": "Format de l'horodatage",
+      "clock12h": "12 heures",
+      "clock24h": "24 heures",
+      "note": "Préfixe chaque nouvelle ligne de discussion avec l'heure de réception, par ex. [14:32]. N'affecte que les messages reçus quand l'option est activée."
+    },
+    "swing": {
+      "ready": "Coup",
+      "seconds": "{seconds} s"
+    },
+    "rest": {
+      "resting": "Au repos"
+    },
+    "mobile": {
+      "autorun": "Course automatique",
+      "jump": "Sauter",
+      "leaderboard": "Classement",
+      "nameplates": "Noms",
+      "haptics": "Vibrations",
+      "hapticsOff": "Vibrations désactivées",
+      "toggleHaptics": "Activer/désactiver les vibrations"
+    },
+    "widgets": {
+      "clockTitle": "Heure locale - cliquez pour basculer 12/24 heures",
+      "worldCoordinates": "Coordonnées du monde",
+      "coordinates": "Coordonnées",
+      "heading": "Cap",
+      "minimapZoom": "Zoom de la minicarte"
+    },
+    "compass": {
+      "N": "N",
+      "NE": "NE",
+      "E": "E",
+      "SE": "SE",
+      "S": "S",
+      "SW": "SO",
+      "W": "O",
+      "NW": "NO"
+    },
+    "meters": {
+      "perSecond": "{value}/s",
+      "perSecondRow": "{total} ({rate})",
+      "minutesSeconds": "{m} min {s} s",
+      "seconds": "{s} s"
+    }
+  },
   "skinEvent": {
     "title": "Cache cosmétique",
     "subtitle": "Vous avez débloqué une récompense {rank} — choisissez n'importe quelle apparence de ce rang ou inférieur.",
@@ -562,6 +633,7 @@ export const fr_FR: EnTranslations = {
       "deleteConfirm": "Saisissez le nom du personnage pour confirmer la suppression.",
       "notAuthenticated": "Non authentifié.",
       "accountBanned": "Ce compte a été banni.",
+      "webLoginOnly": "Les connexions ne sont autorisées que depuis le client du jeu.",
       "accountSuspended": "Ce compte est suspendu jusqu'au {date}.",
       "alreadyInWorld": "Le personnage est déjà dans le monde.",
       "renameBeforeEntering": "Ce personnage doit être renommé avant d'entrer dans le monde."

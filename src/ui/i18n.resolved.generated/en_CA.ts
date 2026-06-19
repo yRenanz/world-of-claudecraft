@@ -150,6 +150,77 @@ export const en_CA: EnTranslations = {
       }
     }
   },
+  "hudChrome": {
+    "emotes": {
+      "wave": "Wave",
+      "laugh": "LOL",
+      "question": "Bro?",
+      "cheer": "Cheer",
+      "dance": "Dance",
+      "point": "Point",
+      "flex": "Flex",
+      "salute": "Salute",
+      "cry": "Cry",
+      "bow": "Bow",
+      "clap": "Clap",
+      "roar": "Roar",
+      "kneel": "Kneel"
+    },
+    "emoteWheel": {
+      "edit": "Edit",
+      "label": "Emotes"
+    },
+    "emoteEditor": {
+      "title": "Emotes",
+      "done": "Done"
+    },
+    "chatTimestamps": {
+      "show": "Show Chat Timestamps",
+      "format": "Timestamp Format",
+      "clock12h": "12-hour",
+      "clock24h": "24-hour",
+      "note": "Prefixes each new chat line with the time it arrived, e.g. [14:32]. Only affects messages received while the option is on."
+    },
+    "swing": {
+      "ready": "Swing",
+      "seconds": "{seconds}s"
+    },
+    "rest": {
+      "resting": "Resting"
+    },
+    "mobile": {
+      "autorun": "Autorun",
+      "jump": "Jump",
+      "leaderboard": "Ranks",
+      "nameplates": "Names",
+      "haptics": "Haptics",
+      "hapticsOff": "Haptics Off",
+      "toggleHaptics": "Toggle haptics"
+    },
+    "widgets": {
+      "clockTitle": "Local time - click to toggle 12/24-hour",
+      "worldCoordinates": "World coordinates",
+      "coordinates": "Coordinates",
+      "heading": "Heading",
+      "minimapZoom": "Minimap zoom"
+    },
+    "compass": {
+      "N": "N",
+      "NE": "NE",
+      "E": "E",
+      "SE": "SE",
+      "S": "S",
+      "SW": "SW",
+      "W": "W",
+      "NW": "NW"
+    },
+    "meters": {
+      "perSecond": "{value}/s",
+      "perSecondRow": "{total} ({rate})",
+      "minutesSeconds": "{m}m {s}s",
+      "seconds": "{s}s"
+    }
+  },
   "skinEvent": {
     "title": "Cosmetic Cache",
     "subtitle": "You unlocked a {rank} reward — choose any skin at or below it.",
@@ -359,8 +430,8 @@ export const en_CA: EnTranslations = {
       "powerup": "{player} grabbed {name}!"
     },
     "category": {
-      "offense": "Offense",
-      "defense": "Defense",
+      "offense": "Offence",
+      "defense": "Defence",
       "sustain": "Sustain",
       "mobility": "Mobility",
       "utility": "Utility"
@@ -562,6 +633,7 @@ export const en_CA: EnTranslations = {
       "deleteConfirm": "Type the character name to confirm deletion.",
       "notAuthenticated": "Not authenticated.",
       "accountBanned": "This account has been banned.",
+      "webLoginOnly": "Logins are only allowed from the game client.",
       "accountSuspended": "This account is suspended until {date}.",
       "alreadyInWorld": "Character is already in world.",
       "renameBeforeEntering": "This character must be renamed before entering the world."
@@ -1363,7 +1435,7 @@ export const en_CA: EnTranslations = {
     },
     "kind": {
       "weapon": "Weapon",
-      "armor": "Armor",
+      "armor": "Armour",
       "quest": "Quest Item",
       "junk": "Junk",
       "food": "Food",
@@ -1373,7 +1445,7 @@ export const en_CA: EnTranslations = {
       "elixir": "Elixir"
     },
     "stats": {
-      "armor": "Armor",
+      "armor": "Armour",
       "str": "Strength",
       "agi": "Agility",
       "sta": "Stamina",
@@ -1391,7 +1463,7 @@ export const en_CA: EnTranslations = {
       "damageSpeed": "{min} - {max} Damage Speed {speed}",
       "dps": "({dps} damage per second)",
       "dagger": "Dagger",
-      "armorStat": "{value} Armor",
+      "armorStat": "{value} Armour",
       "stat": "+{value} {stat}",
       "useFood": "Use: Restores {amount} health over {seconds} sec. Must remain seated while eating.",
       "useDrink": "Use: Restores {amount} mana over {seconds} sec. Must remain seated while drinking.",

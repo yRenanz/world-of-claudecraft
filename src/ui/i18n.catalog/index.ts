@@ -11,6 +11,7 @@ import { questStrings } from './quests';
 import { itemStrings, itemNames } from './items';
 import { mergeStrings, mergeEntities, mergeExtra } from './merge';
 import { gameStrings } from './game';
+import { hudChromeStrings } from './hud_chrome';
 
 // Re-export the catalog public surface (every name the old i18n.en.ts exported).
 export { shellStrings } from './shell';
@@ -19,6 +20,7 @@ export { abilityStrings, classAbilityNames } from './abilities';
 export { questStrings } from './quests';
 export { itemStrings, itemNames } from './items';
 export { mergeStrings, mergeEntities, mergeExtra } from './merge';
+export { hudChromeStrings } from './hud_chrome';
 export {
   gameStrings, gameStringsEnCA, gameStringsEs, gameStringsEsES, gameStringsFrFR,
   gameStringsFrCA, gameStringsItIT, gameStringsDeDE, gameStringsZhCN, gameStringsZhTW,
@@ -42,6 +44,7 @@ export const en = {
   meta: { builtOn: "Built {date}" },
   realmTypes: { normal: "Normal", pvp: "PvP", rp: "RP", rpPvp: "RP-PvP" },
   game: gameStrings,
+  hudChrome: hudChromeStrings,
   // Cosmetic skin-select event overlay. Rarity names reuse itemUi.quality.*.
   skinEvent: {
     title: "Cosmetic Cache",

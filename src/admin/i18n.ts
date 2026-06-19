@@ -170,6 +170,11 @@ const ADMIN_ERROR_KEYS: Record<string, string> = {
   "moderation reason is required": "error.moderationReasonRequired",
   "suspension expiry must be in the future": "error.moderationExpiryFuture",
   "character not found": "error.characterNotFound",
+  "admin accounts cannot be chat muted": "error.cannotChatMuteAdmin",
+  "tier must be \"soft\" or \"hard\"": "error.invalidWordTier",
+  "word is empty after normalization": "error.wordEmptyAfterNormalization",
+  "word not found": "error.wordNotFound",
+  "chat mute expiry must be in the future": "error.chatMuteExpiryFuture",
 };
 export function localizeAdminError(message: string): string {
   const key = ADMIN_ERROR_KEYS[message.trim().toLowerCase()];

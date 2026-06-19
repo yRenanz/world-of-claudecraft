@@ -150,6 +150,77 @@ export const ru_RU: EnTranslations = {
       }
     }
   },
+  "hudChrome": {
+    "emotes": {
+      "wave": "Помахать",
+      "laugh": "Смех",
+      "question": "Йо",
+      "cheer": "Ликование",
+      "dance": "Танец",
+      "point": "Указать",
+      "flex": "Мускулы",
+      "salute": "Честь",
+      "cry": "Плач",
+      "bow": "Поклон",
+      "clap": "Аплодисменты",
+      "roar": "Рык",
+      "kneel": "На колени"
+    },
+    "emoteWheel": {
+      "edit": "Изменить",
+      "label": "Эмоции"
+    },
+    "emoteEditor": {
+      "title": "Эмоции",
+      "done": "Готово"
+    },
+    "chatTimestamps": {
+      "show": "Показывать время в чате",
+      "format": "Формат времени",
+      "clock12h": "12-часовой",
+      "clock24h": "24-часовой",
+      "note": "Добавляет к каждой новой строке чата время её получения, например [14:32]. Влияет только на сообщения, полученные при включённой настройке."
+    },
+    "swing": {
+      "ready": "Замах",
+      "seconds": "{seconds} с"
+    },
+    "rest": {
+      "resting": "Отдых"
+    },
+    "mobile": {
+      "autorun": "Автобег",
+      "jump": "Прыжок",
+      "leaderboard": "Рейтинг",
+      "nameplates": "Имена",
+      "haptics": "Вибрация",
+      "hapticsOff": "Вибрация выкл.",
+      "toggleHaptics": "Вкл/выкл вибрацию"
+    },
+    "widgets": {
+      "clockTitle": "Местное время — нажмите для переключения 12/24-часового формата",
+      "worldCoordinates": "Координаты мира",
+      "coordinates": "Координаты",
+      "heading": "Направление",
+      "minimapZoom": "Масштаб миникарты"
+    },
+    "compass": {
+      "N": "С",
+      "NE": "СВ",
+      "E": "В",
+      "SE": "ЮВ",
+      "S": "Ю",
+      "SW": "ЮЗ",
+      "W": "З",
+      "NW": "СЗ"
+    },
+    "meters": {
+      "perSecond": "{value}/с",
+      "perSecondRow": "{total} ({rate})",
+      "minutesSeconds": "{m} мин {s} с",
+      "seconds": "{s} с"
+    }
+  },
   "skinEvent": {
     "title": "Косметический тайник",
     "subtitle": "Вы открыли награду уровня {rank} — выберите любой облик этого уровня или ниже.",
@@ -562,6 +633,7 @@ export const ru_RU: EnTranslations = {
       "deleteConfirm": "Введите имя персонажа, чтобы подтвердить удаление.",
       "notAuthenticated": "Нет авторизации.",
       "accountBanned": "Эта учетная запись заблокирована.",
+      "webLoginOnly": "Вход разрешён только из игрового клиента.",
       "accountSuspended": "Эта учетная запись заблокирована до {date}.",
       "alreadyInWorld": "Персонаж уже находится в мире.",
       "renameBeforeEntering": "Перед входом в мир этому персонажу нужно сменить имя."

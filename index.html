@@ -6764,17 +6764,17 @@
     <div id="minimap-wrap">
       <div id="zone-label" data-i18n="entities.zones.eastbrook_vale.name">Eastbrook Vale</div>
       <canvas id="minimap" width="162" height="162"></canvas>
-      <div id="minimap-clock" title="Local time — click to toggle 12/24-hour">--:--</div>
-      <div id="minimap-coords" title="Your current world coordinates" aria-label="Coordinates">0, 0</div>
-      <div id="compass" aria-label="Heading compass">
+      <div id="minimap-clock" data-i18n-title="hudChrome.widgets.clockTitle" title="Local time — click to toggle 12/24-hour">--:--</div>
+      <div id="minimap-coords" data-i18n-title="hudChrome.widgets.worldCoordinates" data-i18n-aria="hudChrome.widgets.coordinates" title="Your current world coordinates" aria-label="Coordinates">0, 0</div>
+      <div id="compass" data-i18n-aria="hudChrome.widgets.heading" aria-label="Heading">
         <div id="compass-strip"><div id="compass-track"></div></div>
         <div id="compass-center"></div>
         <div id="compass-heading">N</div>
       </div>
-      <div id="minimap-zoom" aria-label="Minimap zoom">
-        <button class="minimap-zoom-btn" id="minimap-zoom-out" title="Zoom out" aria-label="Zoom out minimap">&minus;</button>
+      <div id="minimap-zoom" data-i18n-aria="hudChrome.widgets.minimapZoom" aria-label="Minimap zoom">
+        <button class="minimap-zoom-btn" id="minimap-zoom-out" data-i18n-title="hud.core.zoomOut" data-i18n-aria="hud.core.zoomOut" title="Zoom out" aria-label="Zoom out minimap">&minus;</button>
         <span id="minimap-zoom-label" aria-live="polite">1×</span>
-        <button class="minimap-zoom-btn" id="minimap-zoom-in" title="Zoom in" aria-label="Zoom in minimap">+</button>
+        <button class="minimap-zoom-btn" id="minimap-zoom-in" data-i18n-title="hud.core.zoomIn" data-i18n-aria="hud.core.zoomIn" title="Zoom in" aria-label="Zoom in minimap">+</button>
       </div>
     </div>
 
@@ -6809,8 +6809,8 @@
             <div class="portrait-wrap">
               <div class="portrait"><canvas id="pf-portrait" width="54" height="54"></canvas></div>
               <div class="level-chip" id="pf-level">1</div>
-              <div class="combat-flash" id="pf-combat" title="In Combat">⚔</div>
-              <div class="rest-indicator" id="pf-rest" title="Resting">z</div>
+              <div class="combat-flash" id="pf-combat" data-i18n-title="hud.social.status.combat" data-i18n-aria="hud.social.status.combat" title="In Combat" aria-label="In Combat">⚔</div>
+              <div class="rest-indicator" id="pf-rest" data-i18n-title="hudChrome.rest.resting" data-i18n-aria="hudChrome.rest.resting" title="Resting" aria-label="Resting">z</div>
             </div>
             <div class="uf-bars">
               <div class="uf-name" id="pf-name"></div>
@@ -6886,7 +6886,7 @@
       <button class="micro-btn" id="mm-bag" data-i18n-title="itemUi.bags.title" data-i18n-aria="itemUi.bags.title" title="Bags" aria-label="Bags" data-icon="bags"><span class="keybind">b</span></button>
       <button class="micro-btn" id="mm-arena" data-i18n-title="hud.keybinds.actions.arena" data-i18n-aria="hud.keybinds.actions.arena" title="Arena (Ashen Coliseum)" aria-label="Arena (Ashen Coliseum)" data-icon="arena"><span class="keybind">g</span></button>
       <button class="micro-btn" id="mm-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="keybind">k</span></button>
-      <button class="micro-btn" id="mm-emote" aria-label="Emotes" data-icon="emote"><span class="keybind">x</span></button>
+      <button class="micro-btn" id="mm-emote" data-i18n-aria="hudChrome.emoteWheel.label" aria-label="Emotes" data-icon="emote"><span class="keybind">x</span></button>
       <button class="micro-btn" id="mm-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" data-icon="music"></button>
       <button class="micro-btn" id="mm-social" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social"><span class="keybind">o</span></button>
       <button class="micro-btn" id="mm-options" data-i18n-title="hud.options.gameMenu" data-i18n-aria="hud.options.gameMenu" title="Game Menu" aria-label="Game Menu" data-icon="menu"><span class="keybind">esc</span></button>
@@ -7207,7 +7207,7 @@
                   <li class="mini-class" data-class="warlock" role="button" tabindex="0" data-i18n-aria="classes.warlockAria" data-i18n="classes.warlock" aria-label="Warlock class" aria-pressed="false">Warlock</li>
                   <li class="mini-class" data-class="druid" role="button" tabindex="0" data-i18n-aria="classes.druidAria" data-i18n="classes.druid" aria-label="Druid class" aria-pressed="false">Druid</li>
                 </ul>
-                <div id="offline-skin-row" class="skin-row" role="list" aria-label="Skin"></div>
+                <div id="offline-skin-row" class="skin-row" role="list" data-i18n-aria="auth.appearance" aria-label="Skin"></div>
                 <div class="auth-actions">
                   <button type="button" class="btn btn-primary" id="btn-start-offline" data-i18n="auth.enterWorld">Enter World</button>
                   <button type="button" class="btn btn-secondary" id="btn-offline-back" data-i18n="auth.back">Back</button>
@@ -7392,8 +7392,8 @@
     </div>
     <div id="mobile-combat-controls">
       <button class="mobile-btn" id="mobile-attack-nearest" data-i18n-title="hud.keybinds.actions.attack" data-i18n-aria="hud.keybinds.actions.attack" title="Attack" aria-label="Attack" data-icon="attack"><span class="mobile-label" data-i18n="hud.core.mobileAttack">Attack</span></button>
-      <button class="mobile-btn" id="mobile-autorun" title="Toggle autorun" aria-label="Toggle autorun" data-icon="autorun"><span class="mobile-label">Autorun</span></button>
-      <button class="mobile-btn" id="mobile-jump" data-i18n-title="hud.keybinds.actions.jump" data-i18n-aria="hud.keybinds.actions.jump" title="Jump" aria-label="Jump" data-icon="jump"><span class="mobile-label">Jump</span></button>
+      <button class="mobile-btn" id="mobile-autorun" title="Toggle autorun" aria-label="Toggle autorun" data-icon="autorun"><span class="mobile-label" data-i18n="hudChrome.mobile.autorun">Autorun</span></button>
+      <button class="mobile-btn" id="mobile-jump" data-i18n-title="hud.keybinds.actions.jump" data-i18n-aria="hud.keybinds.actions.jump" title="Jump" aria-label="Jump" data-icon="jump"><span class="mobile-label" data-i18n="hudChrome.mobile.jump">Jump</span></button>
       <button class="mobile-btn" id="mobile-target" data-i18n-title="hud.keybinds.actions.target" data-i18n-aria="hud.keybinds.actions.target" title="Target Nearest Enemy" aria-label="Target Nearest Enemy" data-icon="target"><span class="mobile-label" data-i18n="hud.core.mobileTarget">Target</span></button>
       <button class="mobile-btn" id="mobile-interact" data-i18n-title="hud.keybinds.actions.interact" data-i18n-aria="hud.keybinds.actions.interact" title="Interact / Loot" aria-label="Interact / Loot" data-icon="interact"><span class="mobile-label" data-i18n="hud.core.mobileUse">Use</span></button>
       <button class="mobile-btn" id="mobile-chat" data-i18n-title="hud.keybinds.actions.chat" data-i18n-aria="hud.keybinds.actions.chat" title="Open Chat" aria-label="Open Chat" data-icon="chat"><span class="mobile-label" data-i18n="hud.core.mobileChat">Chat</span></button>
@@ -7406,19 +7406,19 @@
         </div>
         <div id="mobile-extra-grid">
           <button class="mobile-btn" id="mobile-social" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social"><span class="mobile-label" data-i18n="hud.core.mobileSocial">Social</span></button>
-          <button class="mobile-btn" id="mobile-emote" title="Emotes" aria-label="Emotes" data-icon="emote"><span class="mobile-label">Emotes</span></button>
+          <button class="mobile-btn" id="mobile-emote" data-i18n-title="hudChrome.emoteWheel.label" data-i18n-aria="hudChrome.emoteWheel.label" title="Emotes" aria-label="Emotes" data-icon="emote"><span class="mobile-label" data-i18n="hudChrome.emoteWheel.label">Emotes</span></button>
           <button class="mobile-btn" id="mobile-arena" data-i18n-title="hud.keybinds.actions.arena" data-i18n-aria="hud.keybinds.actions.arena" title="Arena (Ashen Coliseum)" aria-label="Arena (Ashen Coliseum)" data-icon="arena"><span class="mobile-label" data-i18n="hud.core.mobileArena">Arena</span></button>
           <button class="mobile-btn" id="mobile-menu" data-i18n-title="hud.options.gameMenu" data-i18n-aria="hud.options.gameMenu" title="Game Menu" aria-label="Game Menu" data-icon="menu"><span class="mobile-label" data-i18n="hud.core.mobileMenu">Menu</span></button>
           <button class="mobile-btn" id="mobile-quest" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog"><span class="mobile-label" data-i18n="questUi.log.title">Quests</span></button>
-          <button class="mobile-btn" id="mobile-char" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character"><span class="mobile-label">Character</span></button>
-          <button class="mobile-btn" id="mobile-bags" data-i18n-title="hud.keybinds.actions.bags" data-i18n-aria="hud.keybinds.actions.bags" title="Bags" aria-label="Bags" data-icon="bags"><span class="mobile-label">Bags</span></button>
+          <button class="mobile-btn" id="mobile-char" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character"><span class="mobile-label" data-i18n="hud.keybinds.actions.char">Character</span></button>
+          <button class="mobile-btn" id="mobile-bags" data-i18n-title="hud.keybinds.actions.bags" data-i18n-aria="hud.keybinds.actions.bags" title="Bags" aria-label="Bags" data-icon="bags"><span class="mobile-label" data-i18n="hud.keybinds.actions.bags">Bags</span></button>
           <button class="mobile-btn" id="mobile-spellbook" data-i18n-title="abilityUi.spellbook.title" data-i18n-aria="abilityUi.spellbook.title" title="Spellbook" aria-label="Spellbook" data-icon="spellbook"><span class="mobile-label" data-i18n="abilityUi.spellbook.title">Spellbook</span></button>
           <button class="mobile-btn" id="mobile-talents" data-i18n-title="game.talents.title" data-i18n-aria="game.talents.title" title="Talents" aria-label="Talents" data-icon="talents"><span class="mobile-label" data-i18n="game.talents.title">Talents</span></button>
           <button class="mobile-btn" id="mobile-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="mobile-label" data-i18n="hud.core.mobileMap">Map</span></button>
-          <button class="mobile-btn" id="mobile-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="mobile-label">Ranks</span></button>
-          <button class="mobile-btn active" id="mobile-nameplates" data-i18n-title="hud.keybinds.actions.nameplates" data-i18n-aria="hud.keybinds.actions.nameplates" title="Toggle nameplates" aria-label="Toggle nameplates" data-icon="nameplates"><span class="mobile-label">Names</span></button>
-          <button class="mobile-btn" id="mobile-music" title="Music" aria-label="Toggle music" data-icon="music"><span class="mobile-label">Music</span></button>
-          <button class="mobile-btn" id="mobile-haptics" title="Toggle haptic feedback" aria-label="Toggle haptic feedback" aria-pressed="true" data-icon="vibrate"><span class="mobile-label">Haptics</span></button>
+          <button class="mobile-btn" id="mobile-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="mobile-label" data-i18n="hudChrome.mobile.leaderboard">Ranks</span></button>
+          <button class="mobile-btn active" id="mobile-nameplates" data-i18n-title="hud.keybinds.actions.nameplates" data-i18n-aria="hud.keybinds.actions.nameplates" title="Toggle nameplates" aria-label="Toggle nameplates" data-icon="nameplates"><span class="mobile-label" data-i18n="hudChrome.mobile.nameplates">Names</span></button>
+          <button class="mobile-btn" id="mobile-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Toggle music" data-icon="music"><span class="mobile-label" data-i18n="hud.options.music">Music</span></button>
+          <button class="mobile-btn" id="mobile-haptics" data-i18n-title="hudChrome.mobile.toggleHaptics" data-i18n-aria="hudChrome.mobile.toggleHaptics" title="Toggle haptic feedback" aria-label="Toggle haptic feedback" aria-pressed="true" data-icon="vibrate"><span class="mobile-label" data-i18n="hudChrome.mobile.haptics">Haptics</span></button>
         </div>
       </div>
   </div>

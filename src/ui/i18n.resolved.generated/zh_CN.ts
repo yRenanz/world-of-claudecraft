@@ -150,6 +150,77 @@ export const zh_CN: EnTranslations = {
       }
     }
   },
+  "hudChrome": {
+    "emotes": {
+      "wave": "挥手",
+      "laugh": "大笑",
+      "question": "嘿？",
+      "cheer": "欢呼",
+      "dance": "跳舞",
+      "point": "指向",
+      "flex": "秀肌肉",
+      "salute": "敬礼",
+      "cry": "哭泣",
+      "bow": "鞠躬",
+      "clap": "鼓掌",
+      "roar": "咆哮",
+      "kneel": "下跪"
+    },
+    "emoteWheel": {
+      "edit": "编辑",
+      "label": "表情"
+    },
+    "emoteEditor": {
+      "title": "表情",
+      "done": "完成"
+    },
+    "chatTimestamps": {
+      "show": "显示聊天时间戳",
+      "format": "时间戳格式",
+      "clock12h": "12小时制",
+      "clock24h": "24小时制",
+      "note": "在每条新聊天消息前加上其到达时间，例如 [14:32]。仅对开启此选项后收到的消息生效。"
+    },
+    "swing": {
+      "ready": "挥击",
+      "seconds": "{seconds}秒"
+    },
+    "rest": {
+      "resting": "休息中"
+    },
+    "mobile": {
+      "autorun": "自动奔跑",
+      "jump": "跳跃",
+      "leaderboard": "排行榜",
+      "nameplates": "姓名板",
+      "haptics": "震动反馈",
+      "hapticsOff": "震动反馈：关",
+      "toggleHaptics": "切换震动反馈"
+    },
+    "widgets": {
+      "clockTitle": "本地时间 - 点击切换 12/24 小时制",
+      "worldCoordinates": "世界坐标",
+      "coordinates": "坐标",
+      "heading": "朝向",
+      "minimapZoom": "小地图缩放"
+    },
+    "compass": {
+      "N": "北",
+      "NE": "东北",
+      "E": "东",
+      "SE": "东南",
+      "S": "南",
+      "SW": "西南",
+      "W": "西",
+      "NW": "西北"
+    },
+    "meters": {
+      "perSecond": "{value}/秒",
+      "perSecondRow": "{total}（{rate}）",
+      "minutesSeconds": "{m}分{s}秒",
+      "seconds": "{s}秒"
+    }
+  },
   "skinEvent": {
     "title": "外观宝箱",
     "subtitle": "你解锁了一份{rank}级奖励——可选择不高于该等级的任意皮肤。",
@@ -562,6 +633,7 @@ export const zh_CN: EnTranslations = {
       "deleteConfirm": "输入角色名称以确认删除。",
       "notAuthenticated": "尚未认证。",
       "accountBanned": "此账号已被封禁。",
+      "webLoginOnly": "只能从游戏客户端登录。",
       "accountSuspended": "此账号被停用至 {date}。",
       "alreadyInWorld": "角色已在世界中。",
       "renameBeforeEntering": "此角色必须先改名才能进入世界。"

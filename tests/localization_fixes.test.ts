@@ -504,6 +504,13 @@ describe("A1: admin classLabel localizes the raw class id", () => {
 describe("S3: every sim.ts emit is recognized (drift guard)", () => {
   const hudSrc = fs.readFileSync(path.resolve(process.cwd(), "src/ui/hud.ts"), "utf8");
   const simSrc = fs.readFileSync(path.resolve(process.cwd(), "src/sim/sim.ts"), "utf8");
+  // Hardened S3: also scan the authoritative server's player-facing emits. The
+  // server (server/game.ts) is language-agnostic like the sim and re-localized
+  // client-side by localizeServerText; previously the guard read only sim.ts, so
+  // a new server emit (chat-filter notices, pet-name, etc.) could ship English to
+  // every locale while the gate stayed green. Recognized via the localizeServerText
+  // fallback in recognized() below.
+  const serverSrc = fs.readFileSync(path.resolve(process.cwd(), "server/game.ts"), "utf8");
 
   const armBody = (name: string): string => {
     const start = hudSrc.indexOf(`private ${name}(text: string): string {`);
@@ -537,7 +544,11 @@ describe("S3: every sim.ts emit is recognized (drift guard)", () => {
 
   // `${verb}` holds a whole clause (leaves/has left/has been removed from the party),
   // each concrete form covered by a sim_i18n RULE — not representable by one substitution.
-  const TMPL_SKIP = [/\$\{verb\}/];
+  // The /who header + "...and N more" server templates count off `${total}` (a var the
+  // probe substituter leaves as "Aki" because forcing it to a digit would desync the
+  // fishing/overpower V07 backstop forms that share `total`/`remaining`); they are
+  // exhaustively covered by the B1 and M1b describe blocks above, so skip them here.
+  const TMPL_SKIP = [/\$\{verb\}/, /^Who: \$\{/, /^\.\.\.and \$\{.*\} more\.$/];
   // Intentional-English backstops: deterministic-sim talent-build VALIDATION diagnostics
   // (reasons originate in content/talents.ts and behave like code diagnostics). The
   // normal talent-panel flow uses the localized buildInvalid message instead.
@@ -559,16 +570,40 @@ describe("S3: every sim.ts emit is recognized (drift guard)", () => {
   const extract = (): Cand[] => {
     const cands: Cand[] = [];
     const lit = "(`[^`]*`|'(?:[^'\\\\]|\\\\.)*'|\"(?:[^\"\\\\]|\\\\.)*\")";
+    // A ternary condition up to the `?` (no quotes/braces/commas of its own beyond
+    // the matched literals): catches `text: cond ? 'A' : 'B'` emits the literal-only
+    // patterns below miss.
+    const cond = "[^?,{}\\n]*?";
     const unq = (s: string) => s.slice(1, -1);
     let m: RegExpExecArray | null;
+    // --- src/sim/sim.ts emits ---
     const e1 = new RegExp(`emit\\(\\{[^}]*?type:\\s*'(log|loot)'[^}]*?text:\\s*${lit}`, "gs");
     while ((m = e1.exec(simSrc))) cands.push({ type: m[1] as Cand["type"], tmpl: unq(m[2]) });
     const e2 = new RegExp(`emit\\(\\{[^}]*?text:\\s*${lit}[^}]*?type:\\s*'(log|loot)'`, "gs");
     while ((m = e2.exec(simSrc))) cands.push({ type: m[2] as Cand["type"], tmpl: unq(m[1]) });
+    // Ternary `text:` emits (both branches) — previously a blind spot.
+    const e3 = new RegExp(`emit\\(\\{[^}]*?type:\\s*'(log|loot)'[^}]*?text:\\s*${cond}\\?\\s*${lit}\\s*:\\s*${lit}`, "gs");
+    while ((m = e3.exec(simSrc))) { cands.push({ type: m[1] as Cand["type"], tmpl: unq(m[2]) }); cands.push({ type: m[1] as Cand["type"], tmpl: unq(m[3]) }); }
     const er = new RegExp(`this\\.error\\([^,]+,\\s*${lit}\\s*\\)`, "g");
     while ((m = er.exec(simSrc))) cands.push({ type: "error", tmpl: unq(m[1]) });
+    // Variable-routed sim emits: this.notice(pid, '<lit>') (emits 'log') and
+    // this.stopFollow(p, '<lit>') (arg2 routes through this.error) — blind spots.
+    // The first-arg class excludes ),(,newline so a single-arg call (e.g.
+    // `this.stopFollow(p);`) cannot span into the NEXT call's literal.
+    const nr = new RegExp(`this\\.(?:notice|stopFollow)\\([^,()\\n]+,\\s*${lit}`, "g");
+    while ((m = nr.exec(simSrc))) cands.push({ type: "log", tmpl: unq(m[1]) });
+    // Ternary args to error/notice/stopFollow (both branches).
+    const ert = new RegExp(`this\\.(?:error|notice|stopFollow)\\([^,()\\n]+,\\s*${cond}\\?\\s*${lit}\\s*:\\s*${lit}`, "g");
+    while ((m = ert.exec(simSrc))) { cands.push({ type: "error", tmpl: unq(m[1]) }); cands.push({ type: "error", tmpl: unq(m[2]) }); }
     const rr = new RegExp(`return\\s+${lit};`, "g");
     while ((m = rr.exec(simSrc))) { const t = unq(m[1]); if (/^[A-Z].* .*[.!?]$/.test(t) || /^[A-Z].*\$\{/.test(t)) cands.push({ type: "error", tmpl: t }); }
+    // --- server/game.ts player-facing emits (recognized via localizeServerText) ---
+    const s1 = new RegExp(`type:\\s*'(log|error|loot)',\\s*text:\\s*${lit}`, "g");
+    while ((m = s1.exec(serverSrc))) cands.push({ type: m[1] as Cand["type"], tmpl: unq(m[2]) });
+    const s1t = new RegExp(`type:\\s*'(log|error|loot)',\\s*text:\\s*${cond}\\?\\s*${lit}\\s*:\\s*${lit}`, "g");
+    while ((m = s1t.exec(serverSrc))) { cands.push({ type: m[1] as Cand["type"], tmpl: unq(m[2]) }); cands.push({ type: m[1] as Cand["type"], tmpl: unq(m[3]) }); }
+    const s2 = new RegExp(`sendChatNotice\\([^,]+,\\s*${lit}`, "g");
+    while ((m = s2.exec(serverSrc))) cands.push({ type: "error", tmpl: unq(m[1]) });
     const seen = new Set<string>();
     return cands.filter((c) => { const k = c.type + " " + c.tmpl; if (seen.has(k)) return false; seen.add(k); return true; });
   };

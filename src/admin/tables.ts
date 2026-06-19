@@ -124,9 +124,9 @@ export function renderAccountDetail(d: AccountDetail, includeAdminControls = fal
   const activeChatMute = d.chatMutedUntil !== null && new Date(d.chatMutedUntil).getTime() > Date.now();
   const chatModControls = includeAdminControls ? `
     <div class="account-admin-controls chat-mod-controls" data-action-account-id="${d.id}">
-      <div class="account-status"><b>Chat:</b> ${activeChatMute ? `<span class="badge warn">muted until ${fmtDate(d.chatMutedUntil)}</span>` : '<span class="badge">not muted</span>'} &middot; strikes: <b>${d.chatStrikes}</b></div>
-      ${activeChatMute ? '<button data-lift-mute="1">Lift chat mute</button>' : ''}
-      ${d.chatStrikes > 0 ? '<button data-reset-strikes="1">Reset chat strikes</button>' : ''}
+      <div class="account-status"><b>${t('chatMod.chatLabel')}</b> ${activeChatMute ? `<span class="badge warn">${t('chatMod.mutedUntil', { value: fmtDate(d.chatMutedUntil) })}</span>` : `<span class="badge">${t('chatMod.notMuted')}</span>`} &middot; ${t('chatMod.strikesInline')} <b>${d.chatStrikes}</b></div>
+      ${activeChatMute ? `<button data-lift-mute="1">${t('chatMod.liftChatMute')}</button>` : ''}
+      ${d.chatStrikes > 0 ? `<button data-reset-strikes="1">${t('chatMod.resetChatStrikes')}</button>` : ''}
     </div>` : '';
   return `<div class="account-detail" data-action-account-id="${d.id}">${adminControls}${chatModControls}<div class="detail-grid">
     <div><h4>${t('detail.charactersHeader')}</h4>${chars}</div>
@@ -314,27 +314,27 @@ export function renderChatFilter(data: ChatFilterData): string {
       ${renderWordChips(data.hard)}
     </div>
     <div class="panel">
-      <div class="panel-title">Chat-moderated accounts <span class="hint">currently muted or carrying strikes — lift or reset here</span></div>
+      <div class="panel-title">${t('chatFilter.accountsTitle')} <span class="hint">${t('chatFilter.accountsHint')}</span></div>
       ${renderChatModeratedAccounts(data.accounts)}
     </div>`;
 }
 
 function renderChatModeratedAccounts(accounts: ChatModeratedAccount[]): string {
-  if (accounts.length === 0) return '<div class="empty">no muted or striked accounts</div>';
+  if (accounts.length === 0) return `<div class="empty">${t('chatFilter.noModeratedAccounts')}</div>`;
   const rows = accounts.map((a) => {
     const muted = a.chatMutedUntil !== null && new Date(a.chatMutedUntil).getTime() > Date.now();
     const muteCell = muted
-      ? `<span class="badge warn">muted until ${fmtDate(a.chatMutedUntil)}</span>`
-      : '<span class="badge">not muted</span>';
-    const actions = `${muted ? '<button data-lift-mute="1">Lift mute</button>' : ''}${a.chatStrikes > 0 ? ' <button data-reset-strikes="1">Reset strikes</button>' : ''}`;
+      ? `<span class="badge warn">${t('chatMod.mutedUntil', { value: fmtDate(a.chatMutedUntil) })}</span>`
+      : `<span class="badge">${t('chatMod.notMuted')}</span>`;
+    const actions = `${muted ? `<button data-lift-mute="1">${t('chatMod.liftMute')}</button>` : ''}${a.chatStrikes > 0 ? ` <button data-reset-strikes="1">${t('chatMod.resetStrikes')}</button>` : ''}`;
     return `<tr data-action-account-id="${a.id}">
-      <td>${escapeHtml(a.username)}${a.isAdmin ? ' <span class="badge">admin</span>' : ''}</td>
+      <td>${escapeHtml(a.username)}${a.isAdmin ? ` <span class="badge">${t('accounts.badgeAdmin')}</span>` : ''}</td>
       <td class="num">${a.chatStrikes}</td>
       <td>${muteCell}</td>
       <td>${actions}</td>
     </tr>`;
   }).join('');
-  return `<table><thead><tr><th>Account</th><th class="num">Strikes</th><th>Mute</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table>`;
+  return `<table><thead><tr><th>${t('moderation.colAccount')}</th><th class="num">${t('chatMod.colStrikes')}</th><th>${t('chatMod.colMute')}</th><th>${t('detail.colActions')}</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function reasonLabel(reason: string): string {

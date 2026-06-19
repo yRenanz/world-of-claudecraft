@@ -1,6 +1,6 @@
-// Phase 4 (i18n Lazy Locales) mobile first-paint check for the stored-locale path.
+// Stored-locale modulepreload mobile first-paint check for the stored-locale path.
 // Loads the PRODUCTION build (vite preview) on a mobile viewport with a stored non-en
-// locale, measures Cumulative Layout Shift across first paint (the Phase 3 visibility:hidden
+// locale, measures Cumulative Layout Shift across first paint (the lazy locale flip's visibility:hidden
 // gate should hold layout so the localized reveal causes ~0 shift), and writes a screenshot.
 //
 //   BASE_URL=http://localhost:4173 node scripts/i18n_modulepreload_mobile.mjs
@@ -95,7 +95,7 @@ try {
 
   // NOTE on `localeAttributableClsDelta`: any non-zero delta is the homepage's static-English
   // -> localized TEXT SWAP reflow (the marketing landing copy outside the #start-screen
-  // visibility gate), a PRE-EXISTING Phase 3 behavior - NOT a Phase 4 effect. Phase 4 injects
+  // visibility gate), a PRE-EXISTING lazy-locale-flip behavior - NOT a stored-locale modulepreload effect. The stored-locale modulepreload injects
   // only a <link rel=modulepreload> in <head> (no rendered DOM, cannot shift layout) and a
   // network prefetch; it adds zero layout-affecting DOM and shrinks the English-visible window
   // (~23s -> ~2.5s under Slow-4G). So the acceptance asserts the stored-locale first paint is
@@ -105,7 +105,7 @@ try {
   if (es.cls != null && es.cls >= 0.1) fails.push(`stored-es CLS ${es.cls} >= 0.1 (worse than CLS-good)`);
   if (es.lang !== "es") fails.push(`stored-es documentElement.lang is "${es.lang}", expected "es" (locale not applied)`);
   if (fails.length) { console.error("FAIL:\n - " + fails.join("\n - ")); process.exit(1); }
-  console.log(`PASS: stored-es CLS=${es.cls.toFixed(4)} (<0.1 good), lang=es applied; english CLS=${(english.cls ?? 0).toFixed(4)}; homepage translate-swap delta=${delta.toFixed(4)} (pre-existing, not Phase 4).`);
+  console.log(`PASS: stored-es CLS=${es.cls.toFixed(4)} (<0.1 good), lang=es applied; english CLS=${(english.cls ?? 0).toFixed(4)}; homepage translate-swap delta=${delta.toFixed(4)} (pre-existing, not the stored-locale modulepreload).`);
 } finally {
   await browser.close();
 }

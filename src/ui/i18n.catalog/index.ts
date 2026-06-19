@@ -1,7 +1,7 @@
 // i18n source catalog barrel. Assembles the authoritative English `en` object from
 // the per-domain modules and exports the catalog public surface + the key-shape types
 // (Leaves, EnTranslations, TranslationKey, ...). This file was src/ui/i18n.en.ts before
-// the Phase 6 domain split; importers resolve './i18n.catalog' to this index.
+// the i18n.catalog domain split; importers resolve './i18n.catalog' to this index.
 
 import { worldEntityText as worldNames } from '../world_entity_i18n';
 import { shellStrings } from './shell';

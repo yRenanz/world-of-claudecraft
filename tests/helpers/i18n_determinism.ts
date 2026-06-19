@@ -1,4 +1,4 @@
-// Shared determinism gate for the i18n generators (lazy-locales Phase 5).
+// Shared determinism gate for the i18n generators (lazy-locales artifact/CI/determinism hygiene).
 //
 // `assertDeterministic` runs an i18n generator script TWICE, each time into its
 // own throwaway temp directory via the script's `I18N_OUT_DIR` override (honored

@@ -1,4 +1,4 @@
-// Phase 4 (i18n Lazy Locales) - resolve each lazy locale chunk's content-hashed
+// The stored-locale modulepreload (i18n Lazy Locales) - resolve each lazy locale chunk's content-hashed
 // URL from Vite's post-build manifest and template a { locale: hashedChunkUrl }
 // lookup into the emitted dist/index.html, where the inline boot <script> reads it
 // to inject a high-priority <link rel="modulepreload"> for a stored non-en visitor's
@@ -50,7 +50,7 @@ export function parseSupportedLocales(loadersSource) {
 
 // Build the { locale: hashedChunkUrl } lookup from a parsed Vite manifest. Every expected
 // non-en locale MUST resolve to a real chunk file; a miss is a hard error (a stored visitor
-// for that locale would otherwise get no preload), satisfying the Phase 4 STOP rule "the
+// for that locale would otherwise get no preload), satisfying the stored-locale modulepreload STOP rule "the
 // build hook cannot reliably resolve the hashed filename".
 export function localeChunkMap(manifest, locales, base = '/', dir = GENERATED_DIR) {
   const map = {};

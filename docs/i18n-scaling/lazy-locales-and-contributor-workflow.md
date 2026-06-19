@@ -1,4 +1,4 @@
-# i18n Phase 3: Per-locale Lazy Loading, Build/Artifact Hygiene, and the English-only Contributor Workflow
+# i18n: Per-locale Lazy Loading, Build/Artifact Hygiene, and the English-only Contributor Workflow
 
 | | |
 |---|---|
@@ -9,7 +9,7 @@
 | **Implementation** | A later pass (Opus 4.8 + ultracode), sequenced per the migration plan (Section 6). |
 | **Owner doc home** | `docs/i18n-scaling/` |
 
-This is the canonical Phase 3 design. It integrates the build-emit, runtime-bootstrap, bundling-cache, test-ci-gates, docs-and-CLAUDE.md, and migration findings into one plan. Where individual investigations disagreed, the resolved recommendation is stated once and the rejected alternative is noted in the trade-off ledgers.
+This is the canonical lazy-locales design. It integrates the build-emit, runtime-bootstrap, bundling-cache, test-ci-gates, docs-and-CLAUDE.md, and migration findings into one plan. Where individual investigations disagreed, the resolved recommendation is stated once and the rejected alternative is noted in the trade-off ledgers.
 
 ---
 

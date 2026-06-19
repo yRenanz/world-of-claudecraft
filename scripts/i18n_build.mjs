@@ -4,8 +4,8 @@
 // + en_XA.ts), a back-compat barrel (index.ts) that re-exports every slice and
 // assembles the runtime `translations` map, a loaders.ts (per-locale dynamic-import
 // thunks + SUPPORTED_LANGUAGES, scaffolding for the later lazy flip), and pending.ts.
-// The single-file resolved table was split into this directory in the lazy-locales
-// Phase 1 refactor; the resolved-table SHA is invariant under the split (it hashes
+// The single-file resolved table was split into this directory in the per-locale
+// emit split; the resolved-table SHA is invariant under the split (it hashes
 // src/ui/i18n.ts EXPORTS via scripts/i18n_resolved_hash.mjs, not file bytes).
 //
 // This is the load-bearing tsc safety net for the i18n scaling refactor. `en`
@@ -201,7 +201,7 @@ function emitPendingModule(pending) {
 // the dev-only pseudo-locale, so neither gets a loader. SUPPORTED_LANGUAGES mirrors
 // the runtime `translations` key set (en + the 13 non-en locales, NOT en_XA). Nothing
 // imports this module yet - the runtime still static-imports every slice via the
-// barrel this phase, so the bundle is unchanged; the async loader wires these in later.
+// barrel for now, so the bundle is unchanged; the async loader wires these in later.
 function emitLoadersModule(locales) {
   const lines = [fileBanner(), '', 'export const LOCALE_LOADERS = {'];
   for (const lang of locales) {

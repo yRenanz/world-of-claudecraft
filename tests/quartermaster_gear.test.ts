@@ -52,7 +52,7 @@ describe("Quartermaster's Consignment gear pack", () => {
   });
 
   it('localizes every new item name in a non-English locale', async () => {
-    // Phase 3 lazy flip: await the de_DE chunk so tEntity's synchronous read resolves the
+    // Lazy locale flip: await the de_DE chunk so tEntity's synchronous read resolves the
     // German item names instead of the English fallback.
     await ensureLocaleLoaded('de_DE');
     setLanguage('de_DE');

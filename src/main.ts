@@ -538,7 +538,7 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
   // Paint the loading screen before anything can block — assetsReady may resolve
   // immediately when assets are already cached, and the scene build is synchronous.
   await nextPaint();
-  // Phase 3 lazy flip: fetch the active locale's chunk and make it resident before the HUD
+  // Lazy locale flip: fetch the active locale's chunk and make it resident before the HUD
   // renders (mountGameUi -> translatePage fans out hundreds of t() calls). It sits behind the
   // loading screen (already painted above), so a stored non-en visitor never sees an English
   // flash. This is now a REAL per-locale network request, so guard it: startGame is
@@ -2716,14 +2716,14 @@ function wireHomepageMusicToggle(): void {
 }
 
 function wireStartScreens(): void {
-  // Initial page translation and stats load. Phase 3 lazy flip: a stored non-en locale is now
+  // Initial page translation and stats load. Lazy locale flip: a stored non-en locale is now
   // a real chunk fetch, and the homepage IS the first paint (there is no loading screen to sit
   // behind), so we localize-then-reveal to prevent an English flash + text swap. The start
   // screen is held with visibility:hidden - which PRESERVES layout, so there is no layout
   // shift - ONLY when the boot locale is not already resident; English and any already-loaded
   // locale skip the gate entirely (no blank, no delay). The gate lifts on BOTH resolve and
   // reject (the English fallback still renders), so a failed locale fetch can never strand the
-  // homepage hidden. Phase 4's modulepreload will shrink the non-en hold toward zero.
+  // homepage hidden. The stored-locale modulepreload will shrink the non-en hold toward zero.
   const bootLang = getLanguage();
   const startScreen = document.getElementById('start-screen');
   const gated = !!startScreen && !isLocaleResident(bootLang);
@@ -3468,16 +3468,16 @@ function wireStartScreens(): void {
         langSelect.value = getLanguage();
         return;
       }
-      // Phase 2 lazy-locales: load the locale chunk BEFORE switching. This phase the
+      // Async locale loader: load the locale chunk BEFORE switching. At this point the
       // module is still static-imported through the barrel, so the await resolves on a
       // microtask with no network and the transient "loading" status never paints; the
-      // failure path is wired now so Phase 3's real lazy flip needs no call-site change.
+      // failure path is wired now so the lazy locale flip's real fetch needs no call-site change.
       void (async () => {
         if (langStatus) langStatus.textContent = t('settings.languageLoading');
         try {
           await ensureLocaleLoaded(selected);
         } catch {
-          // The locale chunk failed to load (a real risk once Phase 3 makes this a
+          // The locale chunk failed to load (a real risk once the lazy locale flip makes this a
           // network fetch). Keep the already-resident locale and tell the user.
           if (langStatus) langStatus.textContent = t('settings.languageLoadFailed');
           langSelect.value = getLanguage();

@@ -75,7 +75,7 @@ The locale data is split across files. Touch the right one:
   It is a directory of English-valued domain modules (`shell.ts`, `hud.ts`,
   `abilities.ts`, `quests.ts`, `items.ts`, `game.ts`, `merge.ts`) plus `index.ts`,
   the barrel that assembles + exports `en`. Add a new English string in the matching
-  domain module (was the single `i18n.en.ts` before the Phase 6 split).
+  domain module (was the single `i18n.en.ts` before the i18n.catalog domain split).
 - `i18n.locales/<lang>.ts` are the 13 non-English **flat sparse overlays**
   (`Partial<Record<TranslationKey,string>>`), the ONLY files a translator edits. An
   omitted key is filled from English by the build and marked `pending` in the registry.

@@ -639,7 +639,7 @@ function localizeStatic(): void {
   });
 }
 
-// Phase 2 lazy-locales (parity seam): await the active locale before painting the static
+// Async locale loader (parity seam): await the active locale before painting the static
 // admin UI. Admin keeps every locale static, so this resolves instantly; the await mirrors
 // the game client's bootstrap shape without flipping admin to lazy.
 void (async () => {

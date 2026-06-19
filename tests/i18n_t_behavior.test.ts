@@ -51,7 +51,7 @@ describe("t(): untracked key (absent from the table and from en)", () => {
 });
 
 describe("t(): pending key (untranslated; the dense table English-fills it)", () => {
-  // After the Phase 3 lazy flip the runtime no longer reads the barrel's `translations`
+  // After the lazy locale flip the runtime no longer reads the barrel's `translations`
   // map; it reads the eager `en` slice plus a `resident.es` that ensureLocaleLoaded("es")
   // populates from LOCALE_LOADERS.es() (a dynamic import of ./es), plus the static
   // `pending` set. So inject the synthetic pending key at THOSE seams: add it to the es

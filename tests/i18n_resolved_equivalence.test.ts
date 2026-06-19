@@ -20,7 +20,7 @@ const scriptPath = path.join(root, "scripts/i18n_resolved_hash.mjs");
 const baselinePath = path.join(root, "src/ui/i18n.resolved.sha256");
 const buildScript = path.join(root, "scripts/i18n_build.mjs");
 // The resolved table is a generated DIRECTORY of per-locale modules + a barrel
-// (lazy-locales Phase 1), not a single file. A directory pathspec makes both
+// (the per-locale emit split), not a single file. A directory pathspec makes both
 // `git ls-files --error-unmatch` and `git diff --exit-code` cover every slice.
 const generatedPath = "src/ui/i18n.resolved.generated";
 

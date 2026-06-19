@@ -69,7 +69,7 @@ const locales: Record<string, typeof en> = {
 const RELEASE_TIER = process.env.I18N_RELEASE_TIER === "1";
 
 describe("i18n Localization Key Coverage", () => {
-  // Phase 3 lazy flip: non-en locales are no longer statically resident. This suite
+  // Lazy locale flip: non-en locales are no longer statically resident. This suite
   // setLanguage(non-en)s and reads synchronously via t()/tEntity/formatMoney/talent helpers,
   // so make every supported locale resident up front - the test-harness mirror of the
   // bootstrap's await-before-paint. Each setLanguage(lang) read then resolves the localized

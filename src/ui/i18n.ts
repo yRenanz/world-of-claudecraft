@@ -1,4 +1,4 @@
-// THE LAZY FLIP (Phase 3). The runtime statically imports ONLY English eagerly:
+// THE LAZY LOCALE FLIP. The runtime statically imports ONLY English eagerly:
 //   - `en`     the eager default + universal synchronous fallback (always resident),
 //   - `en_XA`  the dev-only pseudo-locale (referenced solely inside the
 //              !import.meta.env.PROD branch in tableFor, so a prod build tree-shakes it),
@@ -23,7 +23,7 @@ import type { Leaves, TranslationKey, InterpolationValue, InterpolationValues, D
 // through './i18n' - every read-path below (t, translationValue, hasTranslation, tOptional)
 // reads the lazy `resident` table instead - so Rollup drops the unused re-export and
 // tree-shakes the 13 non-en slices (and the barrel that assembles them) out of the app
-// chunk. THAT drop is the payload win of this phase. `en` stays in the chunk via the eager
+// chunk. THAT drop is the payload win of the lazy locale flip. `en` stays in the chunk via the eager
 // local import above (the universal English default), not via this line.
 export { en, es, es_ES, fr_FR, fr_CA, en_CA, it_IT, de_DE, zh_CN, zh_TW, ko_KR, ja_JP, pt_BR, ru_RU } from './i18n.resolved.generated';
 // gameStrings is the post-cap/XP/leaderboard layer, which the table carries under the
@@ -128,7 +128,7 @@ export function setLanguage(lang: SupportedLanguage): void {
   setStoredLanguage(lang);
 }
 
-// --- lazy-locale async loader surface (Phase 2) ----------------------------------
+// --- lazy-locale async loader surface (the async locale loader) ----------------------------------
 //
 // ensureLocaleLoaded is the ONLY async surface in this module. t() and setLanguage stay
 // synchronous forever (locked decision: making t() async would force `await` through 600+
@@ -151,7 +151,7 @@ export function isLocaleResident(lang: SupportedLanguage): boolean {
   return lang === "en" || resident[lang] !== undefined;
 }
 
-// Soft failure hook for a locale chunk that failed to load (a real risk once Phase 3
+// Soft failure hook for a locale chunk that failed to load (a real risk once the lazy locale flip
 // makes this a network fetch). Dev-channel only - an English console.warn, never player
 // text (the caller renders settings.languageLoadFailed via t()). A production telemetry
 // sink can be wired here later; it is intentionally silent on a release build today.
@@ -186,7 +186,7 @@ export async function ensureLocaleLoaded(lang: SupportedLanguage): Promise<void>
   return task;
 }
 
-// --- runtime prefetch (Phase 4, mechanism 1) -------------------------------------
+// --- runtime prefetch (the stored-locale modulepreload, mechanism 1) -------------------------------------
 //
 // Start the current (stored / ?lang) locale's chunk fetch as EARLY as possible - the
 // moment this module evaluates - so the network request is already in flight before the

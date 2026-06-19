@@ -122,7 +122,7 @@ describe("admin bundle stays separate from the game client", () => {
         // Bare specifiers (node/npm) are fine. A relative import is an offender only
         // if it RESOLVES outside src/admin/ - resolve against the importing file's
         // own directory so a within-tree `../i18n.en` from the per-locale split dir
-        // (i18n.resolved.generated/, lazy-locales Phase 1) is allowed, but a
+        // (i18n.resolved.generated/, the per-locale emit split) is allowed, but a
         // `../ui/...` escape into the game locale table is still caught.
         if (!spec.startsWith(".")) continue;
         const resolved = path.resolve(fileDir, spec);
@@ -168,7 +168,7 @@ describe("admin.html data-i18n keys are all real admin en keys", () => {
 // --- The generated dense admin table is committed + reproducible -----------------
 describe("admin resolved table reproducibility", () => {
   // The admin resolved table is a generated DIRECTORY of per-locale modules + a
-  // barrel (lazy-locales Phase 1), not a single file. A directory pathspec makes
+  // barrel (the per-locale emit split), not a single file. A directory pathspec makes
   // both git checks cover every slice.
   const generatedRel = "src/admin/i18n.resolved.generated";
 

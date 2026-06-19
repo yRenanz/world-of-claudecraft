@@ -37,7 +37,7 @@ describe("i18n Translation Foundation", () => {
   });
 
   it("updates language and retrieves Spanish translations", async () => {
-    // Phase 3 lazy flip: await the es chunk so the synchronous t() reads below resolve the
+    // Lazy locale flip: await the es chunk so the synchronous t() reads below resolve the
     // Spanish table (the bootstrap/picker await the same way before rendering).
     await ensureLocaleLoaded("es");
     setLanguage("es");
@@ -74,7 +74,7 @@ describe("i18n Translation Foundation", () => {
     ] as const;
 
     for (const lang of additionalLanguages) {
-      // Phase 3 lazy flip: await each locale chunk before the synchronous t() read so it
+      // Lazy locale flip: await each locale chunk before the synchronous t() read so it
       // resolves the now-resident locale table instead of the English fallback.
       await ensureLocaleLoaded(lang.code);
       setLanguage(lang.code as any);

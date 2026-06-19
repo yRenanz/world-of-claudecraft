@@ -46,7 +46,7 @@ describe('chat player context menu', () => {
   });
 
   it('localizes chat context action labels', async () => {
-    // Phase 3 lazy flip: await the locale chunk so the synchronous t() label reads resolve
+    // Lazy locale flip: await the locale chunk so the synchronous t() label reads resolve
     // German rather than the English fallback (the bootstrap awaits the same way before paint).
     await ensureLocaleLoaded('de_DE');
     setLanguage('de_DE');

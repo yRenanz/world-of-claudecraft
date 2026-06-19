@@ -1,4 +1,4 @@
-// Phase 4 (i18n Lazy Locales) network + TTI trace for the stored-locale modulepreload.
+// Stored-locale modulepreload network + TTI trace for i18n lazy locales.
 //
 // Drives the PRODUCTION build (serve with `vite preview`) through Chrome via CDP under
 // Slow-4G + 4x CPU throttling and reports, per scenario, the locale-chunk request set:
@@ -7,7 +7,7 @@
 // gates first localized paint). Median of RUNS per scenario.
 //
 //   BASE_URL=http://localhost:4173 RUNS=5 node scripts/i18n_modulepreload_trace.mjs
-//   LABEL=phase4  (optional tag in the output)
+//   LABEL=modulepreload  (optional tag in the output)
 //
 // Needs a running preview server (see BASE_URL) and a local Chrome/Edge (browser_path.mjs).
 
@@ -16,7 +16,7 @@ import { BROWSER_PATH } from "./browser_path.mjs";
 
 const BASE = (process.env.BASE_URL || "http://localhost:4173").replace(/\/$/, "");
 const RUNS = Number(process.env.RUNS || 5);
-const LABEL = process.env.LABEL || "phase4";
+const LABEL = process.env.LABEL || "modulepreload";
 const SLOW_4G = PredefinedNetworkConditions["Slow 4G"];
 
 const LOCALE_RE = /\/assets\/(es|es_ES|fr_FR|fr_CA|en_CA|it_IT|de_DE|zh_CN|zh_TW|ko_KR|ja_JP|pt_BR|ru_RU)-[^/]+\.js(\?|$)/;

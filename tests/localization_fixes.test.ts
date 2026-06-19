@@ -12,7 +12,7 @@ import {
 import { talentTranslationManifest, renderTalentManifestEntry, hasTalentTitleOverride } from "../src/ui/talent_i18n";
 import { ABILITIES } from "../src/sim/data";
 
-// Phase 3 lazy flip: the non-en game locales are no longer statically resident. Every
+// Lazy locale flip: the non-en game locales are no longer statically resident. Every
 // describe below setLanguage(non-en)s and reads synchronously through t() / localizeSimText /
 // renderTalentManifestEntry. Make every supported game locale resident once for the whole
 // file - the test-harness mirror of the bootstrap await-before-paint - so those reads resolve

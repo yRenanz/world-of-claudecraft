@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-// Phase 1 (lazy-locales) emit-split surface contract. The build scripts now emit a
+// Per-locale emit split surface contract. The build scripts now emit a
 // DIRECTORY of per-locale modules + a barrel (index.ts) + loaders.ts + pending.ts.
 // loaders.ts (LOCALE_LOADERS / SUPPORTED_LANGUAGES) is scaffolding for the later lazy
 // flip and is imported by NOTHING in the runtime yet, so neither tsc nor any other
@@ -93,7 +93,7 @@ describe("i18n emit-split surface (game table)", () => {
       uiSupported,
     );
     // The runtime derives supportedLanguages from the barrel; the loaders constant
-    // must agree with it (they will diverge silently otherwise once Phase 4 consumes it).
+    // must agree with it (they will diverge silently otherwise once the stored-locale modulepreload consumes it).
     expect([...uiSupported]).toEqual(uiRuntimeSupported);
   });
 
@@ -126,7 +126,7 @@ describe("i18n emit-split surface (admin table)", () => {
 // The build scripts emit ATOMICALLY (per-file temp + renameSync) and prune orphan
 // *.ts, with an I18N_OUT_DIR override so a determinism/orphan test can emit into a
 // throwaway dir without racing the committed artifact. Exercise that override branch
-// (untested otherwise) plus the determinism + orphan-sweep guarantees Phase 6 must keep.
+// (untested otherwise) plus the determinism + orphan-sweep guarantees the i18n.catalog domain split must keep.
 describe("i18n emit determinism + orphan-sweep (I18N_OUT_DIR override)", () => {
   const EXPECTED_FILES = [
     ...ALL_LOCALES.map((l) => `${l}.ts`),

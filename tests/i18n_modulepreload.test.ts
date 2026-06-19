@@ -1,4 +1,4 @@
-// Phase 4 (i18n Lazy Locales): the build hook that templates each lazy locale chunk's
+// The stored-locale modulepreload: the build hook that templates each lazy locale chunk's
 // content-hashed URL into dist/index.html for the stored-locale modulepreload. Exercises
 // the pure helpers (parse loaders -> resolve manifest -> inject) and pins the contract
 // between the committed index.html sentinel and the hook.

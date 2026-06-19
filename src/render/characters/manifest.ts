@@ -310,12 +310,14 @@ export const VISUALS: Record<string, VisualDef> = {
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
   },
 
-  // -- cosmetic-only bodies (never a live entity; rendered in the skin preview) -
+  // -- cosmetic body skin (class-agnostic; both the skin preview and a live
+  //    player whose skinCatalog === 'mech', see visualKeyFor) ----------------
   player_mech: {
     url: `${PLAYERS}/Mech/characters/CombatMech.glb`, height: HUMANOID_H,
-    // The mech GLB ships no animation clips and one shared material, so these
-    // clip names simply don't resolve (graceful no-op) — it previews as a static
-    // hero pose on the turntable. Lazy-loaded; see preloadMechAssets().
+    // The mech is rigged to the same KayKit Rig_Medium skeleton as every other
+    // player class; its GLB shipped with no clips, so the full KayKit set is
+    // baked in from knight.glb (scripts/bake_mech_anims.mjs) — these names now
+    // resolve like any other class. Lazy-loaded; see preloadMechAssets().
     clips: kaykit(['1H_Melee_Attack_Chop']),
     lazyPreload: true,
   },

@@ -23,7 +23,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/chars/enemies/skeleton_rogue.glb": "/media/models/chars/enemies/skeleton_rogue.7ec02d186c26.glb",
   "models/chars/enemies/skeleton_warrior.glb": "/media/models/chars/enemies/skeleton_warrior.a17fbcc134a8.glb",
   "models/chars/players/Mech/characters/CombatMech.fbx": "/media/models/chars/players/Mech/characters/CombatMech.51bb345b166f.fbx",
-  "models/chars/players/Mech/characters/CombatMech.glb": "/media/models/chars/players/Mech/characters/CombatMech.2a62c2c2b493.glb",
+  "models/chars/players/Mech/characters/CombatMech.glb": "/media/models/chars/players/Mech/characters/CombatMech.a96ef2a9ff5d.glb",
   "models/chars/players/Mech/textures/epics/combatmech_epic_imperial_crimson.png": "/media/models/chars/players/Mech/textures/epics/combatmech_epic_imperial_crimson.6550ae2f73f6.png",
   "models/chars/players/Mech/textures/epics/combatmech_epic_imperial_crimson_emis.png": "/media/models/chars/players/Mech/textures/epics/combatmech_epic_imperial_crimson_emis.6aa11ff2b952.png",
   "models/chars/players/Mech/textures/epics/combatmech_epic_imperial_gold.png": "/media/models/chars/players/Mech/textures/epics/combatmech_epic_imperial_gold.1d4874de50ea.png",

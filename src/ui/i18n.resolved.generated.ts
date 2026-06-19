@@ -334,6 +334,173 @@ export const en: EnTranslations = {
     "friends": "Friends & Guild",
     "chat": "Open Chat"
   },
+  "fiesta": {
+    "bracket": "Fiesta",
+    "enterQueue": "Join the Fiesta!",
+    "practice": "🎉 Practice vs Bots",
+    "practiceNote": "Offline practice: spawns 3 AI bots and queues you for a 2v2 Fiesta. Click again to stop.",
+    "banner": {
+      "wave": "WAVE {wave}/{total} — CHOOSE AN AUGMENT!",
+      "augmentGained": "Augment gained: {name}!",
+      "powerup": "{name}!"
+    },
+    "log": {
+      "augmentGained": "You gain the {name} augment!",
+      "allyAugment": "{player} chose the {name} augment.",
+      "welcome": "Welcome to the 2v2 FIESTA! Score takedowns, grab augments, survive the ring!",
+      "go": "FIESTA — GO!",
+      "over": "FIESTA OVER! What a party. Returning to the world…",
+      "powerup": "{player} grabbed {name}!"
+    },
+    "category": {
+      "offense": "Offense",
+      "defense": "Defense",
+      "sustain": "Sustain",
+      "mobility": "Mobility",
+      "utility": "Utility"
+    },
+    "pending": {
+      "label": "Augment ready — pick it on your next death!"
+    },
+    "powerup": {
+      "pow_speed_demon": {
+        "name": "Speed Demon"
+      },
+      "pow_colossus": {
+        "name": "Colossus"
+      },
+      "pow_moon_boots": {
+        "name": "Moon Boots"
+      },
+      "pow_berserker": {
+        "name": "Berserker"
+      }
+    },
+    "queue": {
+      "join": "You join the 2v2 Fiesta queue. Get ready to PARTY…",
+      "leave": "You leave the 2v2 Fiesta queue.",
+      "teamLeave": "Your team leaves the 2v2 Fiesta queue."
+    },
+    "error": {
+      "leaderOnly": "Only the party leader may queue your team for {label}.",
+      "premadeTwo": "A {label} premade requires a party of exactly two.",
+      "noAugment": "You have no augment to choose right now.",
+      "notOnOffer": "That augment is not on offer."
+    },
+    "score": {
+      "title": "FIESTA",
+      "toWin": "First to {n}",
+      "aria": "Fiesta score: your team {mine}, enemy team {theirs}, first to {limit} wins."
+    },
+    "respawn": {
+      "title": "DOWNED!",
+      "sub": "Back in the fight in…"
+    },
+    "end": {
+      "win": "FIESTA WON! 🎉 What a party!",
+      "loss": "FIESTA LOST! Run it back!",
+      "draw": "FIESTA DRAW! Too close to call!"
+    },
+    "augment": {
+      "choose": "Choose an Augment",
+      "aug_brutality": {
+        "name": "Brutality",
+        "desc": "Your physical strikes hit 15% harder."
+      },
+      "aug_spellfire": {
+        "name": "Spellfire",
+        "desc": "Your spells deal 15% more damage."
+      },
+      "aug_toughness": {
+        "name": "Toughness",
+        "desc": "Gain 12% maximum health."
+      },
+      "aug_keen_eye": {
+        "name": "Keen Eye",
+        "desc": "Gain 8% critical strike chance."
+      },
+      "aug_fleetfoot": {
+        "name": "Fleetfoot",
+        "desc": "Move 15% faster. Run them down — or run away."
+      },
+      "aug_ironhide": {
+        "name": "Ironhide",
+        "desc": "Gain 250 armor and 5% dodge."
+      },
+      "aug_mending": {
+        "name": "Mending",
+        "desc": "Your healing is 20% more potent."
+      },
+      "aug_warlords_might": {
+        "name": "Warlord's Might",
+        "desc": "+25% physical damage and +10% crit. Become the threat."
+      },
+      "aug_arcane_surge": {
+        "name": "Arcane Surge",
+        "desc": "+25% spell damage and +10% crit. Light them up."
+      },
+      "aug_vampirism": {
+        "name": "Vampirism",
+        "desc": "Heal for 15% of all damage you deal. Sustain through chaos."
+      },
+      "aug_juggernaut": {
+        "name": "Juggernaut",
+        "desc": "+20% maximum health and +400 armor. Immovable."
+      },
+      "aug_bloodhunter": {
+        "name": "Bloodhunter",
+        "desc": "+18% damage of all kinds and +12% move speed."
+      },
+      "aug_lightwell": {
+        "name": "Lightwell",
+        "desc": "+30% healing and +15% maximum health. Anchor your team."
+      },
+      "aug_bounty_hunter": {
+        "name": "Bounty Hunter",
+        "desc": "Your kills are worth +1 bonus team point. Close the gap fast."
+      },
+      "aug_apex_predator": {
+        "name": "Apex Predator",
+        "desc": "+40% physical damage, +15% crit, heal for 12% of damage dealt."
+      },
+      "aug_archmage": {
+        "name": "Archmage",
+        "desc": "+45% spell damage, +15% crit, +15% maximum health."
+      },
+      "aug_unkillable": {
+        "name": "Unkillable",
+        "desc": "+40% maximum health, +600 armor, heal for 10% of damage dealt."
+      },
+      "aug_overdrive": {
+        "name": "Overdrive",
+        "desc": "+30% all damage, +20% crit, +20% move speed. FIESTA!"
+      },
+      "aug_avatar": {
+        "name": "Avatar of War",
+        "desc": "+25% all damage, +25% maximum health, +300 armor. Walk it down."
+      },
+      "aug_ascendant": {
+        "name": "Ascendant",
+        "desc": "+45% healing, +25% spell damage, +20% maximum health."
+      }
+    },
+    "tier": {
+      "silver": "Silver",
+      "gold": "Gold",
+      "prismatic": "Prismatic"
+    },
+    "word": {
+      "kill": "TAKEDOWN!",
+      "firstblood": "FIRST BLOOD!",
+      "doublekill": "DOUBLE KILL!",
+      "shutdown": "SHUTDOWN!",
+      "spree": "{n}× SPREE!",
+      "revived": "BACK IN!",
+      "ringclose": "RING CLOSING!",
+      "wave": "AUGMENTS!",
+      "dodge": "DODGE!"
+    }
+  },
   "seo": {
     "title": "World of ClaudeCraft: Classic-Style Web MMO",
     "description": "Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared realm, level up classes, and defeat enemies!",
@@ -544,7 +711,23 @@ export const en: EnTranslations = {
       "releaseSpirit": "Release Spirit",
       "chatTab": "Chat",
       "combatLogTab": "Combat Log",
-      "chatPlaceholder": "Say something... (/w name whisper, /r reply, /p party, /gu guild, /o officer, /g general)",
+      "chatPlaceholder": "Say something... (/s say, /w name whisper, /r reply, /p party, /gu guild, /o officer, /general general, /help)",
+      "chatChannels": {
+        "add": "Add chat channel",
+        "addTitle": "Add channel",
+        "close": "Close {channel} tab",
+        "sendingTo": "Message {channel}",
+        "names": {
+          "say": "Say",
+          "yell": "Yell",
+          "party": "Party",
+          "general": "General",
+          "world": "World",
+          "lfg": "LFG",
+          "guild": "Guild",
+          "officer": "Officer"
+        }
+      },
       "communityLinks": "Community links",
       "mobileControls": "Mobile controls",
       "mobileMove": "Move",
@@ -4665,6 +4848,173 @@ export const es: EnTranslations = {
     "friends": "Amigos y Hermandad",
     "chat": "Abrir Chat"
   },
+  "fiesta": {
+    "bracket": "Fiesta",
+    "enterQueue": "Join the Fiesta!",
+    "practice": "🎉 Practice vs Bots",
+    "practiceNote": "Offline practice: spawns 3 AI bots and queues you for a 2v2 Fiesta. Click again to stop.",
+    "banner": {
+      "wave": "WAVE {wave}/{total} — CHOOSE AN AUGMENT!",
+      "augmentGained": "Augment gained: {name}!",
+      "powerup": "{name}!"
+    },
+    "log": {
+      "augmentGained": "You gain the {name} augment!",
+      "allyAugment": "{player} chose the {name} augment.",
+      "welcome": "Welcome to the 2v2 FIESTA! Score takedowns, grab augments, survive the ring!",
+      "go": "FIESTA — GO!",
+      "over": "FIESTA OVER! What a party. Returning to the world…",
+      "powerup": "{player} grabbed {name}!"
+    },
+    "category": {
+      "offense": "Offense",
+      "defense": "Defense",
+      "sustain": "Sustain",
+      "mobility": "Mobility",
+      "utility": "Utility"
+    },
+    "pending": {
+      "label": "Augment ready — pick it on your next death!"
+    },
+    "powerup": {
+      "pow_speed_demon": {
+        "name": "Speed Demon"
+      },
+      "pow_colossus": {
+        "name": "Colossus"
+      },
+      "pow_moon_boots": {
+        "name": "Moon Boots"
+      },
+      "pow_berserker": {
+        "name": "Berserker"
+      }
+    },
+    "queue": {
+      "join": "You join the 2v2 Fiesta queue. Get ready to PARTY…",
+      "leave": "You leave the 2v2 Fiesta queue.",
+      "teamLeave": "Your team leaves the 2v2 Fiesta queue."
+    },
+    "error": {
+      "leaderOnly": "Only the party leader may queue your team for {label}.",
+      "premadeTwo": "A {label} premade requires a party of exactly two.",
+      "noAugment": "You have no augment to choose right now.",
+      "notOnOffer": "That augment is not on offer."
+    },
+    "score": {
+      "title": "FIESTA",
+      "toWin": "First to {n}",
+      "aria": "Fiesta score: your team {mine}, enemy team {theirs}, first to {limit} wins."
+    },
+    "respawn": {
+      "title": "DOWNED!",
+      "sub": "Back in the fight in…"
+    },
+    "end": {
+      "win": "FIESTA WON! 🎉 What a party!",
+      "loss": "FIESTA LOST! Run it back!",
+      "draw": "FIESTA DRAW! Too close to call!"
+    },
+    "augment": {
+      "choose": "Choose an Augment",
+      "aug_brutality": {
+        "name": "Brutality",
+        "desc": "Your physical strikes hit 15% harder."
+      },
+      "aug_spellfire": {
+        "name": "Spellfire",
+        "desc": "Your spells deal 15% more damage."
+      },
+      "aug_toughness": {
+        "name": "Toughness",
+        "desc": "Gain 12% maximum health."
+      },
+      "aug_keen_eye": {
+        "name": "Keen Eye",
+        "desc": "Gain 8% critical strike chance."
+      },
+      "aug_fleetfoot": {
+        "name": "Fleetfoot",
+        "desc": "Move 15% faster. Run them down — or run away."
+      },
+      "aug_ironhide": {
+        "name": "Ironhide",
+        "desc": "Gain 250 armor and 5% dodge."
+      },
+      "aug_mending": {
+        "name": "Mending",
+        "desc": "Your healing is 20% more potent."
+      },
+      "aug_warlords_might": {
+        "name": "Warlord's Might",
+        "desc": "+25% physical damage and +10% crit. Become the threat."
+      },
+      "aug_arcane_surge": {
+        "name": "Arcane Surge",
+        "desc": "+25% spell damage and +10% crit. Light them up."
+      },
+      "aug_vampirism": {
+        "name": "Vampirism",
+        "desc": "Heal for 15% of all damage you deal. Sustain through chaos."
+      },
+      "aug_juggernaut": {
+        "name": "Juggernaut",
+        "desc": "+20% maximum health and +400 armor. Immovable."
+      },
+      "aug_bloodhunter": {
+        "name": "Bloodhunter",
+        "desc": "+18% damage of all kinds and +12% move speed."
+      },
+      "aug_lightwell": {
+        "name": "Lightwell",
+        "desc": "+30% healing and +15% maximum health. Anchor your team."
+      },
+      "aug_bounty_hunter": {
+        "name": "Bounty Hunter",
+        "desc": "Your kills are worth +1 bonus team point. Close the gap fast."
+      },
+      "aug_apex_predator": {
+        "name": "Apex Predator",
+        "desc": "+40% physical damage, +15% crit, heal for 12% of damage dealt."
+      },
+      "aug_archmage": {
+        "name": "Archmage",
+        "desc": "+45% spell damage, +15% crit, +15% maximum health."
+      },
+      "aug_unkillable": {
+        "name": "Unkillable",
+        "desc": "+40% maximum health, +600 armor, heal for 10% of damage dealt."
+      },
+      "aug_overdrive": {
+        "name": "Overdrive",
+        "desc": "+30% all damage, +20% crit, +20% move speed. FIESTA!"
+      },
+      "aug_avatar": {
+        "name": "Avatar of War",
+        "desc": "+25% all damage, +25% maximum health, +300 armor. Walk it down."
+      },
+      "aug_ascendant": {
+        "name": "Ascendant",
+        "desc": "+45% healing, +25% spell damage, +20% maximum health."
+      }
+    },
+    "tier": {
+      "silver": "Silver",
+      "gold": "Gold",
+      "prismatic": "Prismatic"
+    },
+    "word": {
+      "kill": "TAKEDOWN!",
+      "firstblood": "FIRST BLOOD!",
+      "doublekill": "DOUBLE KILL!",
+      "shutdown": "SHUTDOWN!",
+      "spree": "{n}× SPREE!",
+      "revived": "BACK IN!",
+      "ringclose": "RING CLOSING!",
+      "wave": "AUGMENTS!",
+      "dodge": "DODGE!"
+    }
+  },
   "seo": {
     "title": "World of ClaudeCraft: MMO web de estilo clásico",
     "description": "Emprende una aventura épica en World of ClaudeCraft, un micro-MMO de estilo clásico que se juega directamente en el navegador. Entra a un reino compartido, sube de nivel y derrota enemigos.",
@@ -4875,7 +5225,23 @@ export const es: EnTranslations = {
       "releaseSpirit": "Liberar espíritu",
       "chatTab": "Chat",
       "combatLogTab": "Registro de combate",
-      "chatPlaceholder": "Di algo... (/w nombre susurro, /r responder, /p grupo, /gu hermandad, /o oficiales, /g general)",
+      "chatPlaceholder": "Di algo... (/w nombre susurro, /r responder, /p grupo, /gu hermandad, /o oficiales, /general general)",
+      "chatChannels": {
+        "add": "Add chat channel",
+        "addTitle": "Add channel",
+        "close": "Close {channel} tab",
+        "sendingTo": "Message {channel}",
+        "names": {
+          "say": "Say",
+          "yell": "Yell",
+          "party": "Party",
+          "general": "General",
+          "world": "World",
+          "lfg": "LFG",
+          "guild": "Guild",
+          "officer": "Officer"
+        }
+      },
       "communityLinks": "Enlaces de comunidad",
       "mobileControls": "Controles móviles",
       "mobileMove": "Mover",
@@ -8996,6 +9362,173 @@ export const es_ES: EnTranslations = {
     "friends": "Amigos y hermandad",
     "chat": "Abrir chat"
   },
+  "fiesta": {
+    "bracket": "Fiesta",
+    "enterQueue": "Join the Fiesta!",
+    "practice": "🎉 Practice vs Bots",
+    "practiceNote": "Offline practice: spawns 3 AI bots and queues you for a 2v2 Fiesta. Click again to stop.",
+    "banner": {
+      "wave": "WAVE {wave}/{total} — CHOOSE AN AUGMENT!",
+      "augmentGained": "Augment gained: {name}!",
+      "powerup": "{name}!"
+    },
+    "log": {
+      "augmentGained": "You gain the {name} augment!",
+      "allyAugment": "{player} chose the {name} augment.",
+      "welcome": "Welcome to the 2v2 FIESTA! Score takedowns, grab augments, survive the ring!",
+      "go": "FIESTA — GO!",
+      "over": "FIESTA OVER! What a party. Returning to the world…",
+      "powerup": "{player} grabbed {name}!"
+    },
+    "category": {
+      "offense": "Offense",
+      "defense": "Defense",
+      "sustain": "Sustain",
+      "mobility": "Mobility",
+      "utility": "Utility"
+    },
+    "pending": {
+      "label": "Augment ready — pick it on your next death!"
+    },
+    "powerup": {
+      "pow_speed_demon": {
+        "name": "Speed Demon"
+      },
+      "pow_colossus": {
+        "name": "Colossus"
+      },
+      "pow_moon_boots": {
+        "name": "Moon Boots"
+      },
+      "pow_berserker": {
+        "name": "Berserker"
+      }
+    },
+    "queue": {
+      "join": "You join the 2v2 Fiesta queue. Get ready to PARTY…",
+      "leave": "You leave the 2v2 Fiesta queue.",
+      "teamLeave": "Your team leaves the 2v2 Fiesta queue."
+    },
+    "error": {
+      "leaderOnly": "Only the party leader may queue your team for {label}.",
+      "premadeTwo": "A {label} premade requires a party of exactly two.",
+      "noAugment": "You have no augment to choose right now.",
+      "notOnOffer": "That augment is not on offer."
+    },
+    "score": {
+      "title": "FIESTA",
+      "toWin": "First to {n}",
+      "aria": "Fiesta score: your team {mine}, enemy team {theirs}, first to {limit} wins."
+    },
+    "respawn": {
+      "title": "DOWNED!",
+      "sub": "Back in the fight in…"
+    },
+    "end": {
+      "win": "FIESTA WON! 🎉 What a party!",
+      "loss": "FIESTA LOST! Run it back!",
+      "draw": "FIESTA DRAW! Too close to call!"
+    },
+    "augment": {
+      "choose": "Choose an Augment",
+      "aug_brutality": {
+        "name": "Brutality",
+        "desc": "Your physical strikes hit 15% harder."
+      },
+      "aug_spellfire": {
+        "name": "Spellfire",
+        "desc": "Your spells deal 15% more damage."
+      },
+      "aug_toughness": {
+        "name": "Toughness",
+        "desc": "Gain 12% maximum health."
+      },
+      "aug_keen_eye": {
+        "name": "Keen Eye",
+        "desc": "Gain 8% critical strike chance."
+      },
+      "aug_fleetfoot": {
+        "name": "Fleetfoot",
+        "desc": "Move 15% faster. Run them down — or run away."
+      },
+      "aug_ironhide": {
+        "name": "Ironhide",
+        "desc": "Gain 250 armor and 5% dodge."
+      },
+      "aug_mending": {
+        "name": "Mending",
+        "desc": "Your healing is 20% more potent."
+      },
+      "aug_warlords_might": {
+        "name": "Warlord's Might",
+        "desc": "+25% physical damage and +10% crit. Become the threat."
+      },
+      "aug_arcane_surge": {
+        "name": "Arcane Surge",
+        "desc": "+25% spell damage and +10% crit. Light them up."
+      },
+      "aug_vampirism": {
+        "name": "Vampirism",
+        "desc": "Heal for 15% of all damage you deal. Sustain through chaos."
+      },
+      "aug_juggernaut": {
+        "name": "Juggernaut",
+        "desc": "+20% maximum health and +400 armor. Immovable."
+      },
+      "aug_bloodhunter": {
+        "name": "Bloodhunter",
+        "desc": "+18% damage of all kinds and +12% move speed."
+      },
+      "aug_lightwell": {
+        "name": "Lightwell",
+        "desc": "+30% healing and +15% maximum health. Anchor your team."
+      },
+      "aug_bounty_hunter": {
+        "name": "Bounty Hunter",
+        "desc": "Your kills are worth +1 bonus team point. Close the gap fast."
+      },
+      "aug_apex_predator": {
+        "name": "Apex Predator",
+        "desc": "+40% physical damage, +15% crit, heal for 12% of damage dealt."
+      },
+      "aug_archmage": {
+        "name": "Archmage",
+        "desc": "+45% spell damage, +15% crit, +15% maximum health."
+      },
+      "aug_unkillable": {
+        "name": "Unkillable",
+        "desc": "+40% maximum health, +600 armor, heal for 10% of damage dealt."
+      },
+      "aug_overdrive": {
+        "name": "Overdrive",
+        "desc": "+30% all damage, +20% crit, +20% move speed. FIESTA!"
+      },
+      "aug_avatar": {
+        "name": "Avatar of War",
+        "desc": "+25% all damage, +25% maximum health, +300 armor. Walk it down."
+      },
+      "aug_ascendant": {
+        "name": "Ascendant",
+        "desc": "+45% healing, +25% spell damage, +20% maximum health."
+      }
+    },
+    "tier": {
+      "silver": "Silver",
+      "gold": "Gold",
+      "prismatic": "Prismatic"
+    },
+    "word": {
+      "kill": "TAKEDOWN!",
+      "firstblood": "FIRST BLOOD!",
+      "doublekill": "DOUBLE KILL!",
+      "shutdown": "SHUTDOWN!",
+      "spree": "{n}× SPREE!",
+      "revived": "BACK IN!",
+      "ringclose": "RING CLOSING!",
+      "wave": "AUGMENTS!",
+      "dodge": "DODGE!"
+    }
+  },
   "seo": {
     "title": "World of ClaudeCraft: MMO web de estilo clásico",
     "description": "Emprende una aventura épica en World of ClaudeCraft, un micro-MMO de estilo clásico jugable directamente en el navegador. Únete a un reino compartido, sube clases de nivel y derrota enemigos.",
@@ -9206,7 +9739,23 @@ export const es_ES: EnTranslations = {
       "releaseSpirit": "Liberar espíritu",
       "chatTab": "Chat",
       "combatLogTab": "Registro de combate",
-      "chatPlaceholder": "Di algo... (/w nombre susurro, /r responder, /p grupo, /gu hermandad, /o oficiales, /g general)",
+      "chatPlaceholder": "Di algo... (/w nombre susurro, /r responder, /p grupo, /gu hermandad, /o oficiales, /general general)",
+      "chatChannels": {
+        "add": "Add chat channel",
+        "addTitle": "Add channel",
+        "close": "Close {channel} tab",
+        "sendingTo": "Message {channel}",
+        "names": {
+          "say": "Say",
+          "yell": "Yell",
+          "party": "Party",
+          "general": "General",
+          "world": "World",
+          "lfg": "LFG",
+          "guild": "Guild",
+          "officer": "Officer"
+        }
+      },
       "communityLinks": "Enlaces de comunidad",
       "mobileControls": "Controles móviles",
       "mobileMove": "Mover",
@@ -13327,6 +13876,173 @@ export const fr_FR: EnTranslations = {
     "friends": "Amis et guilde",
     "chat": "Ouvrir le chat"
   },
+  "fiesta": {
+    "bracket": "Fiesta",
+    "enterQueue": "Join the Fiesta!",
+    "practice": "🎉 Practice vs Bots",
+    "practiceNote": "Offline practice: spawns 3 AI bots and queues you for a 2v2 Fiesta. Click again to stop.",
+    "banner": {
+      "wave": "WAVE {wave}/{total} — CHOOSE AN AUGMENT!",
+      "augmentGained": "Augment gained: {name}!",
+      "powerup": "{name}!"
+    },
+    "log": {
+      "augmentGained": "You gain the {name} augment!",
+      "allyAugment": "{player} chose the {name} augment.",
+      "welcome": "Welcome to the 2v2 FIESTA! Score takedowns, grab augments, survive the ring!",
+      "go": "FIESTA — GO!",
+      "over": "FIESTA OVER! What a party. Returning to the world…",
+      "powerup": "{player} grabbed {name}!"
+    },
+    "category": {
+      "offense": "Offense",
+      "defense": "Defense",
+      "sustain": "Sustain",
+      "mobility": "Mobility",
+      "utility": "Utility"
+    },
+    "pending": {
+      "label": "Augment ready — pick it on your next death!"
+    },
+    "powerup": {
+      "pow_speed_demon": {
+        "name": "Speed Demon"
+      },
+      "pow_colossus": {
+        "name": "Colossus"
+      },
+      "pow_moon_boots": {
+        "name": "Moon Boots"
+      },
+      "pow_berserker": {
+        "name": "Berserker"
+      }
+    },
+    "queue": {
+      "join": "You join the 2v2 Fiesta queue. Get ready to PARTY…",
+      "leave": "You leave the 2v2 Fiesta queue.",
+      "teamLeave": "Your team leaves the 2v2 Fiesta queue."
+    },
+    "error": {
+      "leaderOnly": "Only the party leader may queue your team for {label}.",
+      "premadeTwo": "A {label} premade requires a party of exactly two.",
+      "noAugment": "You have no augment to choose right now.",
+      "notOnOffer": "That augment is not on offer."
+    },
+    "score": {
+      "title": "FIESTA",
+      "toWin": "First to {n}",
+      "aria": "Fiesta score: your team {mine}, enemy team {theirs}, first to {limit} wins."
+    },
+    "respawn": {
+      "title": "DOWNED!",
+      "sub": "Back in the fight in…"
+    },
+    "end": {
+      "win": "FIESTA WON! 🎉 What a party!",
+      "loss": "FIESTA LOST! Run it back!",
+      "draw": "FIESTA DRAW! Too close to call!"
+    },
+    "augment": {
+      "choose": "Choose an Augment",
+      "aug_brutality": {
+        "name": "Brutality",
+        "desc": "Your physical strikes hit 15% harder."
+      },
+      "aug_spellfire": {
+        "name": "Spellfire",
+        "desc": "Your spells deal 15% more damage."
+      },
+      "aug_toughness": {
+        "name": "Toughness",
+        "desc": "Gain 12% maximum health."
+      },
+      "aug_keen_eye": {
+        "name": "Keen Eye",
+        "desc": "Gain 8% critical strike chance."
+      },
+      "aug_fleetfoot": {
+        "name": "Fleetfoot",
+        "desc": "Move 15% faster. Run them down — or run away."
+      },
+      "aug_ironhide": {
+        "name": "Ironhide",
+        "desc": "Gain 250 armor and 5% dodge."
+      },
+      "aug_mending": {
+        "name": "Mending",
+        "desc": "Your healing is 20% more potent."
+      },
+      "aug_warlords_might": {
+        "name": "Warlord's Might",
+        "desc": "+25% physical damage and +10% crit. Become the threat."
+      },
+      "aug_arcane_surge": {
+        "name": "Arcane Surge",
+        "desc": "+25% spell damage and +10% crit. Light them up."
+      },
+      "aug_vampirism": {
+        "name": "Vampirism",
+        "desc": "Heal for 15% of all damage you deal. Sustain through chaos."
+      },
+      "aug_juggernaut": {
+        "name": "Juggernaut",
+        "desc": "+20% maximum health and +400 armor. Immovable."
+      },
+      "aug_bloodhunter": {
+        "name": "Bloodhunter",
+        "desc": "+18% damage of all kinds and +12% move speed."
+      },
+      "aug_lightwell": {
+        "name": "Lightwell",
+        "desc": "+30% healing and +15% maximum health. Anchor your team."
+      },
+      "aug_bounty_hunter": {
+        "name": "Bounty Hunter",
+        "desc": "Your kills are worth +1 bonus team point. Close the gap fast."
+      },
+      "aug_apex_predator": {
+        "name": "Apex Predator",
+        "desc": "+40% physical damage, +15% crit, heal for 12% of damage dealt."
+      },
+      "aug_archmage": {
+        "name": "Archmage",
+        "desc": "+45% spell damage, +15% crit, +15% maximum health."
+      },
+      "aug_unkillable": {
+        "name": "Unkillable",
+        "desc": "+40% maximum health, +600 armor, heal for 10% of damage dealt."
+      },
+      "aug_overdrive": {
+        "name": "Overdrive",
+        "desc": "+30% all damage, +20% crit, +20% move speed. FIESTA!"
+      },
+      "aug_avatar": {
+        "name": "Avatar of War",
+        "desc": "+25% all damage, +25% maximum health, +300 armor. Walk it down."
+      },
+      "aug_ascendant": {
+        "name": "Ascendant",
+        "desc": "+45% healing, +25% spell damage, +20% maximum health."
+      }
+    },
+    "tier": {
+      "silver": "Silver",
+      "gold": "Gold",
+      "prismatic": "Prismatic"
+    },
+    "word": {
+      "kill": "TAKEDOWN!",
+      "firstblood": "FIRST BLOOD!",
+      "doublekill": "DOUBLE KILL!",
+      "shutdown": "SHUTDOWN!",
+      "spree": "{n}× SPREE!",
+      "revived": "BACK IN!",
+      "ringclose": "RING CLOSING!",
+      "wave": "AUGMENTS!",
+      "dodge": "DODGE!"
+    }
+  },
   "seo": {
     "title": "World of ClaudeCraft: MMO web de style classique",
     "description": "Partez pour une aventure épique dans World of ClaudeCraft, un micro-MMO au style classique jouable directement dans votre navigateur. Rejoignez un royaume persistant, progressez en classe et terrassez vos ennemis.",
@@ -13537,7 +14253,23 @@ export const fr_FR: EnTranslations = {
       "releaseSpirit": "Libérer l'esprit",
       "chatTab": "Discussion",
       "combatLogTab": "Journal de combat",
-      "chatPlaceholder": "Dites quelque chose... (/w nom chuchoter, /r répondre, /p groupe, /gu guilde, /o officiers, /g général)",
+      "chatPlaceholder": "Dites quelque chose... (/w nom chuchoter, /r répondre, /p groupe, /gu guilde, /o officiers, /general général)",
+      "chatChannels": {
+        "add": "Add chat channel",
+        "addTitle": "Add channel",
+        "close": "Close {channel} tab",
+        "sendingTo": "Message {channel}",
+        "names": {
+          "say": "Say",
+          "yell": "Yell",
+          "party": "Party",
+          "general": "General",
+          "world": "World",
+          "lfg": "LFG",
+          "guild": "Guild",
+          "officer": "Officer"
+        }
+      },
       "communityLinks": "Liens communautaires",
       "mobileControls": "Commandes mobiles",
       "mobileMove": "Déplacer",
@@ -17658,6 +18390,173 @@ export const fr_CA: EnTranslations = {
     "friends": "Amis et guilde",
     "chat": "Ouvrir le chat"
   },
+  "fiesta": {
+    "bracket": "Fiesta",
+    "enterQueue": "Join the Fiesta!",
+    "practice": "🎉 Practice vs Bots",
+    "practiceNote": "Offline practice: spawns 3 AI bots and queues you for a 2v2 Fiesta. Click again to stop.",
+    "banner": {
+      "wave": "WAVE {wave}/{total} — CHOOSE AN AUGMENT!",
+      "augmentGained": "Augment gained: {name}!",
+      "powerup": "{name}!"
+    },
+    "log": {
+      "augmentGained": "You gain the {name} augment!",
+      "allyAugment": "{player} chose the {name} augment.",
+      "welcome": "Welcome to the 2v2 FIESTA! Score takedowns, grab augments, survive the ring!",
+      "go": "FIESTA — GO!",
+      "over": "FIESTA OVER! What a party. Returning to the world…",
+      "powerup": "{player} grabbed {name}!"
+    },
+    "category": {
+      "offense": "Offense",
+      "defense": "Defense",
+      "sustain": "Sustain",
+      "mobility": "Mobility",
+      "utility": "Utility"
+    },
+    "pending": {
+      "label": "Augment ready — pick it on your next death!"
+    },
+    "powerup": {
+      "pow_speed_demon": {
+        "name": "Speed Demon"
+      },
+      "pow_colossus": {
+        "name": "Colossus"
+      },
+      "pow_moon_boots": {
+        "name": "Moon Boots"
+      },
+      "pow_berserker": {
+        "name": "Berserker"
+      }
+    },
+    "queue": {
+      "join": "You join the 2v2 Fiesta queue. Get ready to PARTY…",
+      "leave": "You leave the 2v2 Fiesta queue.",
+      "teamLeave": "Your team leaves the 2v2 Fiesta queue."
+    },
+    "error": {
+      "leaderOnly": "Only the party leader may queue your team for {label}.",
+      "premadeTwo": "A {label} premade requires a party of exactly two.",
+      "noAugment": "You have no augment to choose right now.",
+      "notOnOffer": "That augment is not on offer."
+    },
+    "score": {
+      "title": "FIESTA",
+      "toWin": "First to {n}",
+      "aria": "Fiesta score: your team {mine}, enemy team {theirs}, first to {limit} wins."
+    },
+    "respawn": {
+      "title": "DOWNED!",
+      "sub": "Back in the fight in…"
+    },
+    "end": {
+      "win": "FIESTA WON! 🎉 What a party!",
+      "loss": "FIESTA LOST! Run it back!",
+      "draw": "FIESTA DRAW! Too close to call!"
+    },
+    "augment": {
+      "choose": "Choose an Augment",
+      "aug_brutality": {
+        "name": "Brutality",
+        "desc": "Your physical strikes hit 15% harder."
+      },
+      "aug_spellfire": {
+        "name": "Spellfire",
+        "desc": "Your spells deal 15% more damage."
+      },
+      "aug_toughness": {
+        "name": "Toughness",
+        "desc": "Gain 12% maximum health."
+      },
+      "aug_keen_eye": {
+        "name": "Keen Eye",
+        "desc": "Gain 8% critical strike chance."
+      },
+      "aug_fleetfoot": {
+        "name": "Fleetfoot",
+        "desc": "Move 15% faster. Run them down — or run away."
+      },
+      "aug_ironhide": {
+        "name": "Ironhide",
+        "desc": "Gain 250 armor and 5% dodge."
+      },
+      "aug_mending": {
+        "name": "Mending",
+        "desc": "Your healing is 20% more potent."
+      },
+      "aug_warlords_might": {
+        "name": "Warlord's Might",
+        "desc": "+25% physical damage and +10% crit. Become the threat."
+      },
+      "aug_arcane_surge": {
+        "name": "Arcane Surge",
+        "desc": "+25% spell damage and +10% crit. Light them up."
+      },
+      "aug_vampirism": {
+        "name": "Vampirism",
+        "desc": "Heal for 15% of all damage you deal. Sustain through chaos."
+      },
+      "aug_juggernaut": {
+        "name": "Juggernaut",
+        "desc": "+20% maximum health and +400 armor. Immovable."
+      },
+      "aug_bloodhunter": {
+        "name": "Bloodhunter",
+        "desc": "+18% damage of all kinds and +12% move speed."
+      },
+      "aug_lightwell": {
+        "name": "Lightwell",
+        "desc": "+30% healing and +15% maximum health. Anchor your team."
+      },
+      "aug_bounty_hunter": {
+        "name": "Bounty Hunter",
+        "desc": "Your kills are worth +1 bonus team point. Close the gap fast."
+      },
+      "aug_apex_predator": {
+        "name": "Apex Predator",
+        "desc": "+40% physical damage, +15% crit, heal for 12% of damage dealt."
+      },
+      "aug_archmage": {
+        "name": "Archmage",
+        "desc": "+45% spell damage, +15% crit, +15% maximum health."
+      },
+      "aug_unkillable": {
+        "name": "Unkillable",
+        "desc": "+40% maximum health, +600 armor, heal for 10% of damage dealt."
+      },
+      "aug_overdrive": {
+        "name": "Overdrive",
+        "desc": "+30% all damage, +20% crit, +20% move speed. FIESTA!"
+      },
+      "aug_avatar": {
+        "name": "Avatar of War",
+        "desc": "+25% all damage, +25% maximum health, +300 armor. Walk it down."
+      },
+      "aug_ascendant": {
+        "name": "Ascendant",
+        "desc": "+45% healing, +25% spell damage, +20% maximum health."
+      }
+    },
+    "tier": {
+      "silver": "Silver",
+      "gold": "Gold",
+      "prismatic": "Prismatic"
+    },
+    "word": {
+      "kill": "TAKEDOWN!",
+      "firstblood": "FIRST BLOOD!",
+      "doublekill": "DOUBLE KILL!",
+      "shutdown": "SHUTDOWN!",
+      "spree": "{n}× SPREE!",
+      "revived": "BACK IN!",
+      "ringclose": "RING CLOSING!",
+      "wave": "AUGMENTS!",
+      "dodge": "DODGE!"
+    }
+  },
   "seo": {
     "title": "World of ClaudeCraft: MMO Web de style classique",
     "description": "Partez à l'aventure dans World of ClaudeCraft, un micro-MMO de style classique jouable directement dans votre navigateur. Rejoignez un royaume partagé, faites progresser vos classes et terrassez des ennemis.",
@@ -17868,7 +18767,23 @@ export const fr_CA: EnTranslations = {
       "releaseSpirit": "Libérer l'esprit",
       "chatTab": "Discussion",
       "combatLogTab": "Journal de combat",
-      "chatPlaceholder": "Dites quelque chose... (/w nom chuchoter, /r répondre, /p groupe, /gu guilde, /o officiers, /g général)",
+      "chatPlaceholder": "Dites quelque chose... (/w nom chuchoter, /r répondre, /p groupe, /gu guilde, /o officiers, /general général)",
+      "chatChannels": {
+        "add": "Add chat channel",
+        "addTitle": "Add channel",
+        "close": "Close {channel} tab",
+        "sendingTo": "Message {channel}",
+        "names": {
+          "say": "Say",
+          "yell": "Yell",
+          "party": "Party",
+          "general": "General",
+          "world": "World",
+          "lfg": "LFG",
+          "guild": "Guild",
+          "officer": "Officer"
+        }
+      },
       "communityLinks": "Liens communautaires",
       "mobileControls": "Commandes mobiles",
       "mobileMove": "Déplacer",
@@ -21989,6 +22904,173 @@ export const en_CA: EnTranslations = {
     "friends": "Friends & Guild",
     "chat": "Open Chat"
   },
+  "fiesta": {
+    "bracket": "Fiesta",
+    "enterQueue": "Join the Fiesta!",
+    "practice": "🎉 Practice vs Bots",
+    "practiceNote": "Offline practice: spawns 3 AI bots and queues you for a 2v2 Fiesta. Click again to stop.",
+    "banner": {
+      "wave": "WAVE {wave}/{total} — CHOOSE AN AUGMENT!",
+      "augmentGained": "Augment gained: {name}!",
+      "powerup": "{name}!"
+    },
+    "log": {
+      "augmentGained": "You gain the {name} augment!",
+      "allyAugment": "{player} chose the {name} augment.",
+      "welcome": "Welcome to the 2v2 FIESTA! Score takedowns, grab augments, survive the ring!",
+      "go": "FIESTA — GO!",
+      "over": "FIESTA OVER! What a party. Returning to the world…",
+      "powerup": "{player} grabbed {name}!"
+    },
+    "category": {
+      "offense": "Offense",
+      "defense": "Defense",
+      "sustain": "Sustain",
+      "mobility": "Mobility",
+      "utility": "Utility"
+    },
+    "pending": {
+      "label": "Augment ready — pick it on your next death!"
+    },
+    "powerup": {
+      "pow_speed_demon": {
+        "name": "Speed Demon"
+      },
+      "pow_colossus": {
+        "name": "Colossus"
+      },
+      "pow_moon_boots": {
+        "name": "Moon Boots"
+      },
+      "pow_berserker": {
+        "name": "Berserker"
+      }
+    },
+    "queue": {
+      "join": "You join the 2v2 Fiesta queue. Get ready to PARTY…",
+      "leave": "You leave the 2v2 Fiesta queue.",
+      "teamLeave": "Your team leaves the 2v2 Fiesta queue."
+    },
+    "error": {
+      "leaderOnly": "Only the party leader may queue your team for {label}.",
+      "premadeTwo": "A {label} premade requires a party of exactly two.",
+      "noAugment": "You have no augment to choose right now.",
+      "notOnOffer": "That augment is not on offer."
+    },
+    "score": {
+      "title": "FIESTA",
+      "toWin": "First to {n}",
+      "aria": "Fiesta score: your team {mine}, enemy team {theirs}, first to {limit} wins."
+    },
+    "respawn": {
+      "title": "DOWNED!",
+      "sub": "Back in the fight in…"
+    },
+    "end": {
+      "win": "FIESTA WON! 🎉 What a party!",
+      "loss": "FIESTA LOST! Run it back!",
+      "draw": "FIESTA DRAW! Too close to call!"
+    },
+    "augment": {
+      "choose": "Choose an Augment",
+      "aug_brutality": {
+        "name": "Brutality",
+        "desc": "Your physical strikes hit 15% harder."
+      },
+      "aug_spellfire": {
+        "name": "Spellfire",
+        "desc": "Your spells deal 15% more damage."
+      },
+      "aug_toughness": {
+        "name": "Toughness",
+        "desc": "Gain 12% maximum health."
+      },
+      "aug_keen_eye": {
+        "name": "Keen Eye",
+        "desc": "Gain 8% critical strike chance."
+      },
+      "aug_fleetfoot": {
+        "name": "Fleetfoot",
+        "desc": "Move 15% faster. Run them down — or run away."
+      },
+      "aug_ironhide": {
+        "name": "Ironhide",
+        "desc": "Gain 250 armor and 5% dodge."
+      },
+      "aug_mending": {
+        "name": "Mending",
+        "desc": "Your healing is 20% more potent."
+      },
+      "aug_warlords_might": {
+        "name": "Warlord's Might",
+        "desc": "+25% physical damage and +10% crit. Become the threat."
+      },
+      "aug_arcane_surge": {
+        "name": "Arcane Surge",
+        "desc": "+25% spell damage and +10% crit. Light them up."
+      },
+      "aug_vampirism": {
+        "name": "Vampirism",
+        "desc": "Heal for 15% of all damage you deal. Sustain through chaos."
+      },
+      "aug_juggernaut": {
+        "name": "Juggernaut",
+        "desc": "+20% maximum health and +400 armor. Immovable."
+      },
+      "aug_bloodhunter": {
+        "name": "Bloodhunter",
+        "desc": "+18% damage of all kinds and +12% move speed."
+      },
+      "aug_lightwell": {
+        "name": "Lightwell",
+        "desc": "+30% healing and +15% maximum health. Anchor your team."
+      },
+      "aug_bounty_hunter": {
+        "name": "Bounty Hunter",
+        "desc": "Your kills are worth +1 bonus team point. Close the gap fast."
+      },
+      "aug_apex_predator": {
+        "name": "Apex Predator",
+        "desc": "+40% physical damage, +15% crit, heal for 12% of damage dealt."
+      },
+      "aug_archmage": {
+        "name": "Archmage",
+        "desc": "+45% spell damage, +15% crit, +15% maximum health."
+      },
+      "aug_unkillable": {
+        "name": "Unkillable",
+        "desc": "+40% maximum health, +600 armor, heal for 10% of damage dealt."
+      },
+      "aug_overdrive": {
+        "name": "Overdrive",
+        "desc": "+30% all damage, +20% crit, +20% move speed. FIESTA!"
+      },
+      "aug_avatar": {
+        "name": "Avatar of War",
+        "desc": "+25% all damage, +25% maximum health, +300 armor. Walk it down."
+      },
+      "aug_ascendant": {
+        "name": "Ascendant",
+        "desc": "+45% healing, +25% spell damage, +20% maximum health."
+      }
+    },
+    "tier": {
+      "silver": "Silver",
+      "gold": "Gold",
+      "prismatic": "Prismatic"
+    },
+    "word": {
+      "kill": "TAKEDOWN!",
+      "firstblood": "FIRST BLOOD!",
+      "doublekill": "DOUBLE KILL!",
+      "shutdown": "SHUTDOWN!",
+      "spree": "{n}× SPREE!",
+      "revived": "BACK IN!",
+      "ringclose": "RING CLOSING!",
+      "wave": "AUGMENTS!",
+      "dodge": "DODGE!"
+    }
+  },
   "seo": {
     "title": "World of ClaudeCraft: Classic-Style Web MMO",
     "description": "Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared realm, level up classes, and defeat enemies!",
@@ -22199,7 +23281,23 @@ export const en_CA: EnTranslations = {
       "releaseSpirit": "Release Spirit",
       "chatTab": "Chat",
       "combatLogTab": "Combat Log",
-      "chatPlaceholder": "Say something... (/w name whisper, /r reply, /p party, /gu guild, /o officer, /g general)",
+      "chatPlaceholder": "Say something... (/s say, /w name whisper, /r reply, /p party, /gu guild, /o officer, /general general, /help)",
+      "chatChannels": {
+        "add": "Add chat channel",
+        "addTitle": "Add channel",
+        "close": "Close {channel} tab",
+        "sendingTo": "Message {channel}",
+        "names": {
+          "say": "Say",
+          "yell": "Yell",
+          "party": "Party",
+          "general": "General",
+          "world": "World",
+          "lfg": "LFG",
+          "guild": "Guild",
+          "officer": "Officer"
+        }
+      },
       "communityLinks": "Community links",
       "mobileControls": "Mobile controls",
       "mobileMove": "Move",
@@ -26320,6 +27418,173 @@ export const it_IT: EnTranslations = {
     "friends": "Amici e gilda",
     "chat": "Apri chat"
   },
+  "fiesta": {
+    "bracket": "Fiesta",
+    "enterQueue": "Join the Fiesta!",
+    "practice": "🎉 Practice vs Bots",
+    "practiceNote": "Offline practice: spawns 3 AI bots and queues you for a 2v2 Fiesta. Click again to stop.",
+    "banner": {
+      "wave": "WAVE {wave}/{total} — CHOOSE AN AUGMENT!",
+      "augmentGained": "Augment gained: {name}!",
+      "powerup": "{name}!"
+    },
+    "log": {
+      "augmentGained": "You gain the {name} augment!",
+      "allyAugment": "{player} chose the {name} augment.",
+      "welcome": "Welcome to the 2v2 FIESTA! Score takedowns, grab augments, survive the ring!",
+      "go": "FIESTA — GO!",
+      "over": "FIESTA OVER! What a party. Returning to the world…",
+      "powerup": "{player} grabbed {name}!"
+    },
+    "category": {
+      "offense": "Offense",
+      "defense": "Defense",
+      "sustain": "Sustain",
+      "mobility": "Mobility",
+      "utility": "Utility"
+    },
+    "pending": {
+      "label": "Augment ready — pick it on your next death!"
+    },
+    "powerup": {
+      "pow_speed_demon": {
+        "name": "Speed Demon"
+      },
+      "pow_colossus": {
+        "name": "Colossus"
+      },
+      "pow_moon_boots": {
+        "name": "Moon Boots"
+      },
+      "pow_berserker": {
+        "name": "Berserker"
+      }
+    },
+    "queue": {
+      "join": "You join the 2v2 Fiesta queue. Get ready to PARTY…",
+      "leave": "You leave the 2v2 Fiesta queue.",
+      "teamLeave": "Your team leaves the 2v2 Fiesta queue."
+    },
+    "error": {
+      "leaderOnly": "Only the party leader may queue your team for {label}.",
+      "premadeTwo": "A {label} premade requires a party of exactly two.",
+      "noAugment": "You have no augment to choose right now.",
+      "notOnOffer": "That augment is not on offer."
+    },
+    "score": {
+      "title": "FIESTA",
+      "toWin": "First to {n}",
+      "aria": "Fiesta score: your team {mine}, enemy team {theirs}, first to {limit} wins."
+    },
+    "respawn": {
+      "title": "DOWNED!",
+      "sub": "Back in the fight in…"
+    },
+    "end": {
+      "win": "FIESTA WON! 🎉 What a party!",
+      "loss": "FIESTA LOST! Run it back!",
+      "draw": "FIESTA DRAW! Too close to call!"
+    },
+    "augment": {
+      "choose": "Choose an Augment",
+      "aug_brutality": {
+        "name": "Brutality",
+        "desc": "Your physical strikes hit 15% harder."
+      },
+      "aug_spellfire": {
+        "name": "Spellfire",
+        "desc": "Your spells deal 15% more damage."
+      },
+      "aug_toughness": {
+        "name": "Toughness",
+        "desc": "Gain 12% maximum health."
+      },
+      "aug_keen_eye": {
+        "name": "Keen Eye",
+        "desc": "Gain 8% critical strike chance."
+      },
+      "aug_fleetfoot": {
+        "name": "Fleetfoot",
+        "desc": "Move 15% faster. Run them down — or run away."
+      },
+      "aug_ironhide": {
+        "name": "Ironhide",
+        "desc": "Gain 250 armor and 5% dodge."
+      },
+      "aug_mending": {
+        "name": "Mending",
+        "desc": "Your healing is 20% more potent."
+      },
+      "aug_warlords_might": {
+        "name": "Warlord's Might",
+        "desc": "+25% physical damage and +10% crit. Become the threat."
+      },
+      "aug_arcane_surge": {
+        "name": "Arcane Surge",
+        "desc": "+25% spell damage and +10% crit. Light them up."
+      },
+      "aug_vampirism": {
+        "name": "Vampirism",
+        "desc": "Heal for 15% of all damage you deal. Sustain through chaos."
+      },
+      "aug_juggernaut": {
+        "name": "Juggernaut",
+        "desc": "+20% maximum health and +400 armor. Immovable."
+      },
+      "aug_bloodhunter": {
+        "name": "Bloodhunter",
+        "desc": "+18% damage of all kinds and +12% move speed."
+      },
+      "aug_lightwell": {
+        "name": "Lightwell",
+        "desc": "+30% healing and +15% maximum health. Anchor your team."
+      },
+      "aug_bounty_hunter": {
+        "name": "Bounty Hunter",
+        "desc": "Your kills are worth +1 bonus team point. Close the gap fast."
+      },
+      "aug_apex_predator": {
+        "name": "Apex Predator",
+        "desc": "+40% physical damage, +15% crit, heal for 12% of damage dealt."
+      },
+      "aug_archmage": {
+        "name": "Archmage",
+        "desc": "+45% spell damage, +15% crit, +15% maximum health."
+      },
+      "aug_unkillable": {
+        "name": "Unkillable",
+        "desc": "+40% maximum health, +600 armor, heal for 10% of damage dealt."
+      },
+      "aug_overdrive": {
+        "name": "Overdrive",
+        "desc": "+30% all damage, +20% crit, +20% move speed. FIESTA!"
+      },
+      "aug_avatar": {
+        "name": "Avatar of War",
+        "desc": "+25% all damage, +25% maximum health, +300 armor. Walk it down."
+      },
+      "aug_ascendant": {
+        "name": "Ascendant",
+        "desc": "+45% healing, +25% spell damage, +20% maximum health."
+      }
+    },
+    "tier": {
+      "silver": "Silver",
+      "gold": "Gold",
+      "prismatic": "Prismatic"
+    },
+    "word": {
+      "kill": "TAKEDOWN!",
+      "firstblood": "FIRST BLOOD!",
+      "doublekill": "DOUBLE KILL!",
+      "shutdown": "SHUTDOWN!",
+      "spree": "{n}× SPREE!",
+      "revived": "BACK IN!",
+      "ringclose": "RING CLOSING!",
+      "wave": "AUGMENTS!",
+      "dodge": "DODGE!"
+    }
+  },
   "seo": {
     "title": "World of ClaudeCraft: MMO web in stile classico",
     "description": "Parti per un'avventura epica in World of ClaudeCraft, un micro-MMO in stile classico giocabile direttamente dal browser. Entra in un reame condiviso, fai crescere le classi e sconfiggi i nemici.",
@@ -26530,7 +27795,23 @@ export const it_IT: EnTranslations = {
       "releaseSpirit": "Libera spirito",
       "chatTab": "Chat",
       "combatLogTab": "Registro di combattimento",
-      "chatPlaceholder": "Di' qualcosa... (/w nome sussurro, /r risposta, /p gruppo, /gu gilda, /o ufficiali, /g generale)",
+      "chatPlaceholder": "Di' qualcosa... (/w nome sussurro, /r risposta, /p gruppo, /gu gilda, /o ufficiali, /general generale)",
+      "chatChannels": {
+        "add": "Add chat channel",
+        "addTitle": "Add channel",
+        "close": "Close {channel} tab",
+        "sendingTo": "Message {channel}",
+        "names": {
+          "say": "Say",
+          "yell": "Yell",
+          "party": "Party",
+          "general": "General",
+          "world": "World",
+          "lfg": "LFG",
+          "guild": "Guild",
+          "officer": "Officer"
+        }
+      },
       "communityLinks": "Link comunità",
       "mobileControls": "Comandi mobili",
       "mobileMove": "Muovi",
@@ -30651,6 +31932,173 @@ export const de_DE: EnTranslations = {
     "friends": "Freunde und Gilde",
     "chat": "Chat öffnen"
   },
+  "fiesta": {
+    "bracket": "Fiesta",
+    "enterQueue": "Join the Fiesta!",
+    "practice": "🎉 Practice vs Bots",
+    "practiceNote": "Offline practice: spawns 3 AI bots and queues you for a 2v2 Fiesta. Click again to stop.",
+    "banner": {
+      "wave": "WAVE {wave}/{total} — CHOOSE AN AUGMENT!",
+      "augmentGained": "Augment gained: {name}!",
+      "powerup": "{name}!"
+    },
+    "log": {
+      "augmentGained": "You gain the {name} augment!",
+      "allyAugment": "{player} chose the {name} augment.",
+      "welcome": "Welcome to the 2v2 FIESTA! Score takedowns, grab augments, survive the ring!",
+      "go": "FIESTA — GO!",
+      "over": "FIESTA OVER! What a party. Returning to the world…",
+      "powerup": "{player} grabbed {name}!"
+    },
+    "category": {
+      "offense": "Offense",
+      "defense": "Defense",
+      "sustain": "Sustain",
+      "mobility": "Mobility",
+      "utility": "Utility"
+    },
+    "pending": {
+      "label": "Augment ready — pick it on your next death!"
+    },
+    "powerup": {
+      "pow_speed_demon": {
+        "name": "Speed Demon"
+      },
+      "pow_colossus": {
+        "name": "Colossus"
+      },
+      "pow_moon_boots": {
+        "name": "Moon Boots"
+      },
+      "pow_berserker": {
+        "name": "Berserker"
+      }
+    },
+    "queue": {
+      "join": "You join the 2v2 Fiesta queue. Get ready to PARTY…",
+      "leave": "You leave the 2v2 Fiesta queue.",
+      "teamLeave": "Your team leaves the 2v2 Fiesta queue."
+    },
+    "error": {
+      "leaderOnly": "Only the party leader may queue your team for {label}.",
+      "premadeTwo": "A {label} premade requires a party of exactly two.",
+      "noAugment": "You have no augment to choose right now.",
+      "notOnOffer": "That augment is not on offer."
+    },
+    "score": {
+      "title": "FIESTA",
+      "toWin": "First to {n}",
+      "aria": "Fiesta score: your team {mine}, enemy team {theirs}, first to {limit} wins."
+    },
+    "respawn": {
+      "title": "DOWNED!",
+      "sub": "Back in the fight in…"
+    },
+    "end": {
+      "win": "FIESTA WON! 🎉 What a party!",
+      "loss": "FIESTA LOST! Run it back!",
+      "draw": "FIESTA DRAW! Too close to call!"
+    },
+    "augment": {
+      "choose": "Choose an Augment",
+      "aug_brutality": {
+        "name": "Brutality",
+        "desc": "Your physical strikes hit 15% harder."
+      },
+      "aug_spellfire": {
+        "name": "Spellfire",
+        "desc": "Your spells deal 15% more damage."
+      },
+      "aug_toughness": {
+        "name": "Toughness",
+        "desc": "Gain 12% maximum health."
+      },
+      "aug_keen_eye": {
+        "name": "Keen Eye",
+        "desc": "Gain 8% critical strike chance."
+      },
+      "aug_fleetfoot": {
+        "name": "Fleetfoot",
+        "desc": "Move 15% faster. Run them down — or run away."
+      },
+      "aug_ironhide": {
+        "name": "Ironhide",
+        "desc": "Gain 250 armor and 5% dodge."
+      },
+      "aug_mending": {
+        "name": "Mending",
+        "desc": "Your healing is 20% more potent."
+      },
+      "aug_warlords_might": {
+        "name": "Warlord's Might",
+        "desc": "+25% physical damage and +10% crit. Become the threat."
+      },
+      "aug_arcane_surge": {
+        "name": "Arcane Surge",
+        "desc": "+25% spell damage and +10% crit. Light them up."
+      },
+      "aug_vampirism": {
+        "name": "Vampirism",
+        "desc": "Heal for 15% of all damage you deal. Sustain through chaos."
+      },
+      "aug_juggernaut": {
+        "name": "Juggernaut",
+        "desc": "+20% maximum health and +400 armor. Immovable."
+      },
+      "aug_bloodhunter": {
+        "name": "Bloodhunter",
+        "desc": "+18% damage of all kinds and +12% move speed."
+      },
+      "aug_lightwell": {
+        "name": "Lightwell",
+        "desc": "+30% healing and +15% maximum health. Anchor your team."
+      },
+      "aug_bounty_hunter": {
+        "name": "Bounty Hunter",
+        "desc": "Your kills are worth +1 bonus team point. Close the gap fast."
+      },
+      "aug_apex_predator": {
+        "name": "Apex Predator",
+        "desc": "+40% physical damage, +15% crit, heal for 12% of damage dealt."
+      },
+      "aug_archmage": {
+        "name": "Archmage",
+        "desc": "+45% spell damage, +15% crit, +15% maximum health."
+      },
+      "aug_unkillable": {
+        "name": "Unkillable",
+        "desc": "+40% maximum health, +600 armor, heal for 10% of damage dealt."
+      },
+      "aug_overdrive": {
+        "name": "Overdrive",
+        "desc": "+30% all damage, +20% crit, +20% move speed. FIESTA!"
+      },
+      "aug_avatar": {
+        "name": "Avatar of War",
+        "desc": "+25% all damage, +25% maximum health, +300 armor. Walk it down."
+      },
+      "aug_ascendant": {
+        "name": "Ascendant",
+        "desc": "+45% healing, +25% spell damage, +20% maximum health."
+      }
+    },
+    "tier": {
+      "silver": "Silver",
+      "gold": "Gold",
+      "prismatic": "Prismatic"
+    },
+    "word": {
+      "kill": "TAKEDOWN!",
+      "firstblood": "FIRST BLOOD!",
+      "doublekill": "DOUBLE KILL!",
+      "shutdown": "SHUTDOWN!",
+      "spree": "{n}× SPREE!",
+      "revived": "BACK IN!",
+      "ringclose": "RING CLOSING!",
+      "wave": "AUGMENTS!",
+      "dodge": "DODGE!"
+    }
+  },
   "seo": {
     "title": "World of ClaudeCraft: Klassisches Web-MMO",
     "description": "Begib dich in World of ClaudeCraft auf ein episches Abenteuer, ein Micro-MMO im klassischen Stil direkt im Browser. Betritt einen gemeinsamen Realm, steigere Klassen und besiege Gegner.",
@@ -30861,7 +32309,23 @@ export const de_DE: EnTranslations = {
       "releaseSpirit": "Geist freigeben",
       "chatTab": "Chat",
       "combatLogTab": "Kampflog",
-      "chatPlaceholder": "Etwas sagen... (/w Name flüstern, /r antworten, /p Gruppe, /gu Gilde, /o Offiziere, /g Allgemein)",
+      "chatPlaceholder": "Etwas sagen... (/w Name flüstern, /r antworten, /p Gruppe, /gu Gilde, /o Offiziere, /general Allgemein)",
+      "chatChannels": {
+        "add": "Add chat channel",
+        "addTitle": "Add channel",
+        "close": "Close {channel} tab",
+        "sendingTo": "Message {channel}",
+        "names": {
+          "say": "Say",
+          "yell": "Yell",
+          "party": "Party",
+          "general": "General",
+          "world": "World",
+          "lfg": "LFG",
+          "guild": "Guild",
+          "officer": "Officer"
+        }
+      },
       "communityLinks": "Community-Links",
       "mobileControls": "Mobile Steuerung",
       "mobileMove": "Bewegen",
@@ -34982,6 +36446,173 @@ export const zh_CN: EnTranslations = {
     "friends": "好友与公会",
     "chat": "打开聊天框"
   },
+  "fiesta": {
+    "bracket": "Fiesta",
+    "enterQueue": "Join the Fiesta!",
+    "practice": "🎉 Practice vs Bots",
+    "practiceNote": "Offline practice: spawns 3 AI bots and queues you for a 2v2 Fiesta. Click again to stop.",
+    "banner": {
+      "wave": "WAVE {wave}/{total} — CHOOSE AN AUGMENT!",
+      "augmentGained": "Augment gained: {name}!",
+      "powerup": "{name}!"
+    },
+    "log": {
+      "augmentGained": "You gain the {name} augment!",
+      "allyAugment": "{player} chose the {name} augment.",
+      "welcome": "Welcome to the 2v2 FIESTA! Score takedowns, grab augments, survive the ring!",
+      "go": "FIESTA — GO!",
+      "over": "FIESTA OVER! What a party. Returning to the world…",
+      "powerup": "{player} grabbed {name}!"
+    },
+    "category": {
+      "offense": "Offense",
+      "defense": "Defense",
+      "sustain": "Sustain",
+      "mobility": "Mobility",
+      "utility": "Utility"
+    },
+    "pending": {
+      "label": "Augment ready — pick it on your next death!"
+    },
+    "powerup": {
+      "pow_speed_demon": {
+        "name": "Speed Demon"
+      },
+      "pow_colossus": {
+        "name": "Colossus"
+      },
+      "pow_moon_boots": {
+        "name": "Moon Boots"
+      },
+      "pow_berserker": {
+        "name": "Berserker"
+      }
+    },
+    "queue": {
+      "join": "You join the 2v2 Fiesta queue. Get ready to PARTY…",
+      "leave": "You leave the 2v2 Fiesta queue.",
+      "teamLeave": "Your team leaves the 2v2 Fiesta queue."
+    },
+    "error": {
+      "leaderOnly": "Only the party leader may queue your team for {label}.",
+      "premadeTwo": "A {label} premade requires a party of exactly two.",
+      "noAugment": "You have no augment to choose right now.",
+      "notOnOffer": "That augment is not on offer."
+    },
+    "score": {
+      "title": "FIESTA",
+      "toWin": "First to {n}",
+      "aria": "Fiesta score: your team {mine}, enemy team {theirs}, first to {limit} wins."
+    },
+    "respawn": {
+      "title": "DOWNED!",
+      "sub": "Back in the fight in…"
+    },
+    "end": {
+      "win": "FIESTA WON! 🎉 What a party!",
+      "loss": "FIESTA LOST! Run it back!",
+      "draw": "FIESTA DRAW! Too close to call!"
+    },
+    "augment": {
+      "choose": "Choose an Augment",
+      "aug_brutality": {
+        "name": "Brutality",
+        "desc": "Your physical strikes hit 15% harder."
+      },
+      "aug_spellfire": {
+        "name": "Spellfire",
+        "desc": "Your spells deal 15% more damage."
+      },
+      "aug_toughness": {
+        "name": "Toughness",
+        "desc": "Gain 12% maximum health."
+      },
+      "aug_keen_eye": {
+        "name": "Keen Eye",
+        "desc": "Gain 8% critical strike chance."
+      },
+      "aug_fleetfoot": {
+        "name": "Fleetfoot",
+        "desc": "Move 15% faster. Run them down — or run away."
+      },
+      "aug_ironhide": {
+        "name": "Ironhide",
+        "desc": "Gain 250 armor and 5% dodge."
+      },
+      "aug_mending": {
+        "name": "Mending",
+        "desc": "Your healing is 20% more potent."
+      },
+      "aug_warlords_might": {
+        "name": "Warlord's Might",
+        "desc": "+25% physical damage and +10% crit. Become the threat."
+      },
+      "aug_arcane_surge": {
+        "name": "Arcane Surge",
+        "desc": "+25% spell damage and +10% crit. Light them up."
+      },
+      "aug_vampirism": {
+        "name": "Vampirism",
+        "desc": "Heal for 15% of all damage you deal. Sustain through chaos."
+      },
+      "aug_juggernaut": {
+        "name": "Juggernaut",
+        "desc": "+20% maximum health and +400 armor. Immovable."
+      },
+      "aug_bloodhunter": {
+        "name": "Bloodhunter",
+        "desc": "+18% damage of all kinds and +12% move speed."
+      },
+      "aug_lightwell": {
+        "name": "Lightwell",
+        "desc": "+30% healing and +15% maximum health. Anchor your team."
+      },
+      "aug_bounty_hunter": {
+        "name": "Bounty Hunter",
+        "desc": "Your kills are worth +1 bonus team point. Close the gap fast."
+      },
+      "aug_apex_predator": {
+        "name": "Apex Predator",
+        "desc": "+40% physical damage, +15% crit, heal for 12% of damage dealt."
+      },
+      "aug_archmage": {
+        "name": "Archmage",
+        "desc": "+45% spell damage, +15% crit, +15% maximum health."
+      },
+      "aug_unkillable": {
+        "name": "Unkillable",
+        "desc": "+40% maximum health, +600 armor, heal for 10% of damage dealt."
+      },
+      "aug_overdrive": {
+        "name": "Overdrive",
+        "desc": "+30% all damage, +20% crit, +20% move speed. FIESTA!"
+      },
+      "aug_avatar": {
+        "name": "Avatar of War",
+        "desc": "+25% all damage, +25% maximum health, +300 armor. Walk it down."
+      },
+      "aug_ascendant": {
+        "name": "Ascendant",
+        "desc": "+45% healing, +25% spell damage, +20% maximum health."
+      }
+    },
+    "tier": {
+      "silver": "Silver",
+      "gold": "Gold",
+      "prismatic": "Prismatic"
+    },
+    "word": {
+      "kill": "TAKEDOWN!",
+      "firstblood": "FIRST BLOOD!",
+      "doublekill": "DOUBLE KILL!",
+      "shutdown": "SHUTDOWN!",
+      "spree": "{n}× SPREE!",
+      "revived": "BACK IN!",
+      "ringclose": "RING CLOSING!",
+      "wave": "AUGMENTS!",
+      "dodge": "DODGE!"
+    }
+  },
   "seo": {
     "title": "World of ClaudeCraft：经典风格网页 MMO",
     "description": "在 World of ClaudeCraft 展开史诗冒险。这是一款可直接在浏览器中游玩的经典风格微型 MMO。加入持续共享的服务器，提升职业等级，击败敌人。",
@@ -35192,7 +36823,23 @@ export const zh_CN: EnTranslations = {
       "releaseSpirit": "释放灵魂",
       "chatTab": "聊天",
       "combatLogTab": "战斗记录",
-      "chatPlaceholder": "说点什么...（/w 名字 密语，/r 回复，/p 队伍，/gu 公会，/o 官员，/g 综合）",
+      "chatPlaceholder": "说点什么...（/w 名字 密语，/r 回复，/p 队伍，/gu 公会，/o 官员，/general 综合）",
+      "chatChannels": {
+        "add": "Add chat channel",
+        "addTitle": "Add channel",
+        "close": "Close {channel} tab",
+        "sendingTo": "Message {channel}",
+        "names": {
+          "say": "Say",
+          "yell": "Yell",
+          "party": "Party",
+          "general": "General",
+          "world": "World",
+          "lfg": "LFG",
+          "guild": "Guild",
+          "officer": "Officer"
+        }
+      },
       "communityLinks": "社区链接",
       "mobileControls": "移动端控制",
       "mobileMove": "移动",
@@ -39313,6 +40960,173 @@ export const zh_TW: EnTranslations = {
     "friends": "好友與公會",
     "chat": "開啟對話框"
   },
+  "fiesta": {
+    "bracket": "Fiesta",
+    "enterQueue": "Join the Fiesta!",
+    "practice": "🎉 Practice vs Bots",
+    "practiceNote": "Offline practice: spawns 3 AI bots and queues you for a 2v2 Fiesta. Click again to stop.",
+    "banner": {
+      "wave": "WAVE {wave}/{total} — CHOOSE AN AUGMENT!",
+      "augmentGained": "Augment gained: {name}!",
+      "powerup": "{name}!"
+    },
+    "log": {
+      "augmentGained": "You gain the {name} augment!",
+      "allyAugment": "{player} chose the {name} augment.",
+      "welcome": "Welcome to the 2v2 FIESTA! Score takedowns, grab augments, survive the ring!",
+      "go": "FIESTA — GO!",
+      "over": "FIESTA OVER! What a party. Returning to the world…",
+      "powerup": "{player} grabbed {name}!"
+    },
+    "category": {
+      "offense": "Offense",
+      "defense": "Defense",
+      "sustain": "Sustain",
+      "mobility": "Mobility",
+      "utility": "Utility"
+    },
+    "pending": {
+      "label": "Augment ready — pick it on your next death!"
+    },
+    "powerup": {
+      "pow_speed_demon": {
+        "name": "Speed Demon"
+      },
+      "pow_colossus": {
+        "name": "Colossus"
+      },
+      "pow_moon_boots": {
+        "name": "Moon Boots"
+      },
+      "pow_berserker": {
+        "name": "Berserker"
+      }
+    },
+    "queue": {
+      "join": "You join the 2v2 Fiesta queue. Get ready to PARTY…",
+      "leave": "You leave the 2v2 Fiesta queue.",
+      "teamLeave": "Your team leaves the 2v2 Fiesta queue."
+    },
+    "error": {
+      "leaderOnly": "Only the party leader may queue your team for {label}.",
+      "premadeTwo": "A {label} premade requires a party of exactly two.",
+      "noAugment": "You have no augment to choose right now.",
+      "notOnOffer": "That augment is not on offer."
+    },
+    "score": {
+      "title": "FIESTA",
+      "toWin": "First to {n}",
+      "aria": "Fiesta score: your team {mine}, enemy team {theirs}, first to {limit} wins."
+    },
+    "respawn": {
+      "title": "DOWNED!",
+      "sub": "Back in the fight in…"
+    },
+    "end": {
+      "win": "FIESTA WON! 🎉 What a party!",
+      "loss": "FIESTA LOST! Run it back!",
+      "draw": "FIESTA DRAW! Too close to call!"
+    },
+    "augment": {
+      "choose": "Choose an Augment",
+      "aug_brutality": {
+        "name": "Brutality",
+        "desc": "Your physical strikes hit 15% harder."
+      },
+      "aug_spellfire": {
+        "name": "Spellfire",
+        "desc": "Your spells deal 15% more damage."
+      },
+      "aug_toughness": {
+        "name": "Toughness",
+        "desc": "Gain 12% maximum health."
+      },
+      "aug_keen_eye": {
+        "name": "Keen Eye",
+        "desc": "Gain 8% critical strike chance."
+      },
+      "aug_fleetfoot": {
+        "name": "Fleetfoot",
+        "desc": "Move 15% faster. Run them down — or run away."
+      },
+      "aug_ironhide": {
+        "name": "Ironhide",
+        "desc": "Gain 250 armor and 5% dodge."
+      },
+      "aug_mending": {
+        "name": "Mending",
+        "desc": "Your healing is 20% more potent."
+      },
+      "aug_warlords_might": {
+        "name": "Warlord's Might",
+        "desc": "+25% physical damage and +10% crit. Become the threat."
+      },
+      "aug_arcane_surge": {
+        "name": "Arcane Surge",
+        "desc": "+25% spell damage and +10% crit. Light them up."
+      },
+      "aug_vampirism": {
+        "name": "Vampirism",
+        "desc": "Heal for 15% of all damage you deal. Sustain through chaos."
+      },
+      "aug_juggernaut": {
+        "name": "Juggernaut",
+        "desc": "+20% maximum health and +400 armor. Immovable."
+      },
+      "aug_bloodhunter": {
+        "name": "Bloodhunter",
+        "desc": "+18% damage of all kinds and +12% move speed."
+      },
+      "aug_lightwell": {
+        "name": "Lightwell",
+        "desc": "+30% healing and +15% maximum health. Anchor your team."
+      },
+      "aug_bounty_hunter": {
+        "name": "Bounty Hunter",
+        "desc": "Your kills are worth +1 bonus team point. Close the gap fast."
+      },
+      "aug_apex_predator": {
+        "name": "Apex Predator",
+        "desc": "+40% physical damage, +15% crit, heal for 12% of damage dealt."
+      },
+      "aug_archmage": {
+        "name": "Archmage",
+        "desc": "+45% spell damage, +15% crit, +15% maximum health."
+      },
+      "aug_unkillable": {
+        "name": "Unkillable",
+        "desc": "+40% maximum health, +600 armor, heal for 10% of damage dealt."
+      },
+      "aug_overdrive": {
+        "name": "Overdrive",
+        "desc": "+30% all damage, +20% crit, +20% move speed. FIESTA!"
+      },
+      "aug_avatar": {
+        "name": "Avatar of War",
+        "desc": "+25% all damage, +25% maximum health, +300 armor. Walk it down."
+      },
+      "aug_ascendant": {
+        "name": "Ascendant",
+        "desc": "+45% healing, +25% spell damage, +20% maximum health."
+      }
+    },
+    "tier": {
+      "silver": "Silver",
+      "gold": "Gold",
+      "prismatic": "Prismatic"
+    },
+    "word": {
+      "kill": "TAKEDOWN!",
+      "firstblood": "FIRST BLOOD!",
+      "doublekill": "DOUBLE KILL!",
+      "shutdown": "SHUTDOWN!",
+      "spree": "{n}× SPREE!",
+      "revived": "BACK IN!",
+      "ringclose": "RING CLOSING!",
+      "wave": "AUGMENTS!",
+      "dodge": "DODGE!"
+    }
+  },
   "seo": {
     "title": "World of ClaudeCraft：經典風格網頁 MMO",
     "description": "在 World of ClaudeCraft 展開史詩冒險。這是一款可直接在瀏覽器中遊玩的經典風格微型 MMO。加入持續共享的伺服器，提升職業等級並擊敗敵人。",
@@ -39523,7 +41337,23 @@ export const zh_TW: EnTranslations = {
       "releaseSpirit": "釋放靈魂",
       "chatTab": "聊天",
       "combatLogTab": "戰鬥紀錄",
-      "chatPlaceholder": "說點什麼...（/w 名字 密語，/r 回覆，/p 隊伍，/gu 公會，/o 幹部，/g 綜合）",
+      "chatPlaceholder": "說點什麼...（/w 名字 密語，/r 回覆，/p 隊伍，/gu 公會，/o 幹部，/general 綜合）",
+      "chatChannels": {
+        "add": "Add chat channel",
+        "addTitle": "Add channel",
+        "close": "Close {channel} tab",
+        "sendingTo": "Message {channel}",
+        "names": {
+          "say": "Say",
+          "yell": "Yell",
+          "party": "Party",
+          "general": "General",
+          "world": "World",
+          "lfg": "LFG",
+          "guild": "Guild",
+          "officer": "Officer"
+        }
+      },
       "communityLinks": "社群連結",
       "mobileControls": "行動控制",
       "mobileMove": "移動",
@@ -43644,6 +45474,173 @@ export const ko_KR: EnTranslations = {
     "friends": "친구 및 길드",
     "chat": "채팅창 열기"
   },
+  "fiesta": {
+    "bracket": "Fiesta",
+    "enterQueue": "Join the Fiesta!",
+    "practice": "🎉 Practice vs Bots",
+    "practiceNote": "Offline practice: spawns 3 AI bots and queues you for a 2v2 Fiesta. Click again to stop.",
+    "banner": {
+      "wave": "WAVE {wave}/{total} — CHOOSE AN AUGMENT!",
+      "augmentGained": "Augment gained: {name}!",
+      "powerup": "{name}!"
+    },
+    "log": {
+      "augmentGained": "You gain the {name} augment!",
+      "allyAugment": "{player} chose the {name} augment.",
+      "welcome": "Welcome to the 2v2 FIESTA! Score takedowns, grab augments, survive the ring!",
+      "go": "FIESTA — GO!",
+      "over": "FIESTA OVER! What a party. Returning to the world…",
+      "powerup": "{player} grabbed {name}!"
+    },
+    "category": {
+      "offense": "Offense",
+      "defense": "Defense",
+      "sustain": "Sustain",
+      "mobility": "Mobility",
+      "utility": "Utility"
+    },
+    "pending": {
+      "label": "Augment ready — pick it on your next death!"
+    },
+    "powerup": {
+      "pow_speed_demon": {
+        "name": "Speed Demon"
+      },
+      "pow_colossus": {
+        "name": "Colossus"
+      },
+      "pow_moon_boots": {
+        "name": "Moon Boots"
+      },
+      "pow_berserker": {
+        "name": "Berserker"
+      }
+    },
+    "queue": {
+      "join": "You join the 2v2 Fiesta queue. Get ready to PARTY…",
+      "leave": "You leave the 2v2 Fiesta queue.",
+      "teamLeave": "Your team leaves the 2v2 Fiesta queue."
+    },
+    "error": {
+      "leaderOnly": "Only the party leader may queue your team for {label}.",
+      "premadeTwo": "A {label} premade requires a party of exactly two.",
+      "noAugment": "You have no augment to choose right now.",
+      "notOnOffer": "That augment is not on offer."
+    },
+    "score": {
+      "title": "FIESTA",
+      "toWin": "First to {n}",
+      "aria": "Fiesta score: your team {mine}, enemy team {theirs}, first to {limit} wins."
+    },
+    "respawn": {
+      "title": "DOWNED!",
+      "sub": "Back in the fight in…"
+    },
+    "end": {
+      "win": "FIESTA WON! 🎉 What a party!",
+      "loss": "FIESTA LOST! Run it back!",
+      "draw": "FIESTA DRAW! Too close to call!"
+    },
+    "augment": {
+      "choose": "Choose an Augment",
+      "aug_brutality": {
+        "name": "Brutality",
+        "desc": "Your physical strikes hit 15% harder."
+      },
+      "aug_spellfire": {
+        "name": "Spellfire",
+        "desc": "Your spells deal 15% more damage."
+      },
+      "aug_toughness": {
+        "name": "Toughness",
+        "desc": "Gain 12% maximum health."
+      },
+      "aug_keen_eye": {
+        "name": "Keen Eye",
+        "desc": "Gain 8% critical strike chance."
+      },
+      "aug_fleetfoot": {
+        "name": "Fleetfoot",
+        "desc": "Move 15% faster. Run them down — or run away."
+      },
+      "aug_ironhide": {
+        "name": "Ironhide",
+        "desc": "Gain 250 armor and 5% dodge."
+      },
+      "aug_mending": {
+        "name": "Mending",
+        "desc": "Your healing is 20% more potent."
+      },
+      "aug_warlords_might": {
+        "name": "Warlord's Might",
+        "desc": "+25% physical damage and +10% crit. Become the threat."
+      },
+      "aug_arcane_surge": {
+        "name": "Arcane Surge",
+        "desc": "+25% spell damage and +10% crit. Light them up."
+      },
+      "aug_vampirism": {
+        "name": "Vampirism",
+        "desc": "Heal for 15% of all damage you deal. Sustain through chaos."
+      },
+      "aug_juggernaut": {
+        "name": "Juggernaut",
+        "desc": "+20% maximum health and +400 armor. Immovable."
+      },
+      "aug_bloodhunter": {
+        "name": "Bloodhunter",
+        "desc": "+18% damage of all kinds and +12% move speed."
+      },
+      "aug_lightwell": {
+        "name": "Lightwell",
+        "desc": "+30% healing and +15% maximum health. Anchor your team."
+      },
+      "aug_bounty_hunter": {
+        "name": "Bounty Hunter",
+        "desc": "Your kills are worth +1 bonus team point. Close the gap fast."
+      },
+      "aug_apex_predator": {
+        "name": "Apex Predator",
+        "desc": "+40% physical damage, +15% crit, heal for 12% of damage dealt."
+      },
+      "aug_archmage": {
+        "name": "Archmage",
+        "desc": "+45% spell damage, +15% crit, +15% maximum health."
+      },
+      "aug_unkillable": {
+        "name": "Unkillable",
+        "desc": "+40% maximum health, +600 armor, heal for 10% of damage dealt."
+      },
+      "aug_overdrive": {
+        "name": "Overdrive",
+        "desc": "+30% all damage, +20% crit, +20% move speed. FIESTA!"
+      },
+      "aug_avatar": {
+        "name": "Avatar of War",
+        "desc": "+25% all damage, +25% maximum health, +300 armor. Walk it down."
+      },
+      "aug_ascendant": {
+        "name": "Ascendant",
+        "desc": "+45% healing, +25% spell damage, +20% maximum health."
+      }
+    },
+    "tier": {
+      "silver": "Silver",
+      "gold": "Gold",
+      "prismatic": "Prismatic"
+    },
+    "word": {
+      "kill": "TAKEDOWN!",
+      "firstblood": "FIRST BLOOD!",
+      "doublekill": "DOUBLE KILL!",
+      "shutdown": "SHUTDOWN!",
+      "spree": "{n}× SPREE!",
+      "revived": "BACK IN!",
+      "ringclose": "RING CLOSING!",
+      "wave": "AUGMENTS!",
+      "dodge": "DODGE!"
+    }
+  },
   "seo": {
     "title": "World of ClaudeCraft: 클래식 스타일 웹 MMO",
     "description": "브라우저에서 바로 즐기는 클래식 스타일 마이크로 MMO, World of ClaudeCraft에서 장대한 모험을 시작하세요. 지속되는 공유 렐름에 접속해 직업을 성장시키고 적을 물리치세요.",
@@ -43854,7 +45851,23 @@ export const ko_KR: EnTranslations = {
       "releaseSpirit": "영혼 풀어주기",
       "chatTab": "채팅",
       "combatLogTab": "전투 기록",
-      "chatPlaceholder": "메시지 입력... (/w 이름 귓속말, /r 답장, /p 파티, /gu 길드, /o 장교, /g 일반)",
+      "chatPlaceholder": "메시지 입력... (/w 이름 귓속말, /r 답장, /p 파티, /gu 길드, /o 장교, /general 일반)",
+      "chatChannels": {
+        "add": "Add chat channel",
+        "addTitle": "Add channel",
+        "close": "Close {channel} tab",
+        "sendingTo": "Message {channel}",
+        "names": {
+          "say": "Say",
+          "yell": "Yell",
+          "party": "Party",
+          "general": "General",
+          "world": "World",
+          "lfg": "LFG",
+          "guild": "Guild",
+          "officer": "Officer"
+        }
+      },
       "communityLinks": "커뮤니티 링크",
       "mobileControls": "모바일 조작",
       "mobileMove": "이동",
@@ -47975,6 +49988,173 @@ export const ja_JP: EnTranslations = {
     "friends": "フレンド & ギルド",
     "chat": "チャットを開く"
   },
+  "fiesta": {
+    "bracket": "Fiesta",
+    "enterQueue": "Join the Fiesta!",
+    "practice": "🎉 Practice vs Bots",
+    "practiceNote": "Offline practice: spawns 3 AI bots and queues you for a 2v2 Fiesta. Click again to stop.",
+    "banner": {
+      "wave": "WAVE {wave}/{total} — CHOOSE AN AUGMENT!",
+      "augmentGained": "Augment gained: {name}!",
+      "powerup": "{name}!"
+    },
+    "log": {
+      "augmentGained": "You gain the {name} augment!",
+      "allyAugment": "{player} chose the {name} augment.",
+      "welcome": "Welcome to the 2v2 FIESTA! Score takedowns, grab augments, survive the ring!",
+      "go": "FIESTA — GO!",
+      "over": "FIESTA OVER! What a party. Returning to the world…",
+      "powerup": "{player} grabbed {name}!"
+    },
+    "category": {
+      "offense": "Offense",
+      "defense": "Defense",
+      "sustain": "Sustain",
+      "mobility": "Mobility",
+      "utility": "Utility"
+    },
+    "pending": {
+      "label": "Augment ready — pick it on your next death!"
+    },
+    "powerup": {
+      "pow_speed_demon": {
+        "name": "Speed Demon"
+      },
+      "pow_colossus": {
+        "name": "Colossus"
+      },
+      "pow_moon_boots": {
+        "name": "Moon Boots"
+      },
+      "pow_berserker": {
+        "name": "Berserker"
+      }
+    },
+    "queue": {
+      "join": "You join the 2v2 Fiesta queue. Get ready to PARTY…",
+      "leave": "You leave the 2v2 Fiesta queue.",
+      "teamLeave": "Your team leaves the 2v2 Fiesta queue."
+    },
+    "error": {
+      "leaderOnly": "Only the party leader may queue your team for {label}.",
+      "premadeTwo": "A {label} premade requires a party of exactly two.",
+      "noAugment": "You have no augment to choose right now.",
+      "notOnOffer": "That augment is not on offer."
+    },
+    "score": {
+      "title": "FIESTA",
+      "toWin": "First to {n}",
+      "aria": "Fiesta score: your team {mine}, enemy team {theirs}, first to {limit} wins."
+    },
+    "respawn": {
+      "title": "DOWNED!",
+      "sub": "Back in the fight in…"
+    },
+    "end": {
+      "win": "FIESTA WON! 🎉 What a party!",
+      "loss": "FIESTA LOST! Run it back!",
+      "draw": "FIESTA DRAW! Too close to call!"
+    },
+    "augment": {
+      "choose": "Choose an Augment",
+      "aug_brutality": {
+        "name": "Brutality",
+        "desc": "Your physical strikes hit 15% harder."
+      },
+      "aug_spellfire": {
+        "name": "Spellfire",
+        "desc": "Your spells deal 15% more damage."
+      },
+      "aug_toughness": {
+        "name": "Toughness",
+        "desc": "Gain 12% maximum health."
+      },
+      "aug_keen_eye": {
+        "name": "Keen Eye",
+        "desc": "Gain 8% critical strike chance."
+      },
+      "aug_fleetfoot": {
+        "name": "Fleetfoot",
+        "desc": "Move 15% faster. Run them down — or run away."
+      },
+      "aug_ironhide": {
+        "name": "Ironhide",
+        "desc": "Gain 250 armor and 5% dodge."
+      },
+      "aug_mending": {
+        "name": "Mending",
+        "desc": "Your healing is 20% more potent."
+      },
+      "aug_warlords_might": {
+        "name": "Warlord's Might",
+        "desc": "+25% physical damage and +10% crit. Become the threat."
+      },
+      "aug_arcane_surge": {
+        "name": "Arcane Surge",
+        "desc": "+25% spell damage and +10% crit. Light them up."
+      },
+      "aug_vampirism": {
+        "name": "Vampirism",
+        "desc": "Heal for 15% of all damage you deal. Sustain through chaos."
+      },
+      "aug_juggernaut": {
+        "name": "Juggernaut",
+        "desc": "+20% maximum health and +400 armor. Immovable."
+      },
+      "aug_bloodhunter": {
+        "name": "Bloodhunter",
+        "desc": "+18% damage of all kinds and +12% move speed."
+      },
+      "aug_lightwell": {
+        "name": "Lightwell",
+        "desc": "+30% healing and +15% maximum health. Anchor your team."
+      },
+      "aug_bounty_hunter": {
+        "name": "Bounty Hunter",
+        "desc": "Your kills are worth +1 bonus team point. Close the gap fast."
+      },
+      "aug_apex_predator": {
+        "name": "Apex Predator",
+        "desc": "+40% physical damage, +15% crit, heal for 12% of damage dealt."
+      },
+      "aug_archmage": {
+        "name": "Archmage",
+        "desc": "+45% spell damage, +15% crit, +15% maximum health."
+      },
+      "aug_unkillable": {
+        "name": "Unkillable",
+        "desc": "+40% maximum health, +600 armor, heal for 10% of damage dealt."
+      },
+      "aug_overdrive": {
+        "name": "Overdrive",
+        "desc": "+30% all damage, +20% crit, +20% move speed. FIESTA!"
+      },
+      "aug_avatar": {
+        "name": "Avatar of War",
+        "desc": "+25% all damage, +25% maximum health, +300 armor. Walk it down."
+      },
+      "aug_ascendant": {
+        "name": "Ascendant",
+        "desc": "+45% healing, +25% spell damage, +20% maximum health."
+      }
+    },
+    "tier": {
+      "silver": "Silver",
+      "gold": "Gold",
+      "prismatic": "Prismatic"
+    },
+    "word": {
+      "kill": "TAKEDOWN!",
+      "firstblood": "FIRST BLOOD!",
+      "doublekill": "DOUBLE KILL!",
+      "shutdown": "SHUTDOWN!",
+      "spree": "{n}× SPREE!",
+      "revived": "BACK IN!",
+      "ringclose": "RING CLOSING!",
+      "wave": "AUGMENTS!",
+      "dodge": "DODGE!"
+    }
+  },
   "seo": {
     "title": "World of ClaudeCraft: クラシック風Web MMO",
     "description": "ブラウザで直接遊べるクラシック風マイクロMMO、World of ClaudeCraft で壮大な冒険に出ましょう。永続的な共有レルムに参加し、クラスを育て、敵を倒してください。",
@@ -48185,7 +50365,23 @@ export const ja_JP: EnTranslations = {
       "releaseSpirit": "霊魂を解放",
       "chatTab": "チャット",
       "combatLogTab": "戦闘ログ",
-      "chatPlaceholder": "発言する... (/w 名前 ささやき、/r 返信、/p パーティ、/gu ギルド、/o オフィサー、/g 一般)",
+      "chatPlaceholder": "発言する... (/w 名前 ささやき、/r 返信、/p パーティ、/gu ギルド、/o オフィサー、/general 一般)",
+      "chatChannels": {
+        "add": "Add chat channel",
+        "addTitle": "Add channel",
+        "close": "Close {channel} tab",
+        "sendingTo": "Message {channel}",
+        "names": {
+          "say": "Say",
+          "yell": "Yell",
+          "party": "Party",
+          "general": "General",
+          "world": "World",
+          "lfg": "LFG",
+          "guild": "Guild",
+          "officer": "Officer"
+        }
+      },
       "communityLinks": "コミュニティリンク",
       "mobileControls": "モバイル操作",
       "mobileMove": "移動",
@@ -52306,6 +54502,173 @@ export const pt_BR: EnTranslations = {
     "friends": "Amigos e guilda",
     "chat": "Abrir chat"
   },
+  "fiesta": {
+    "bracket": "Fiesta",
+    "enterQueue": "Join the Fiesta!",
+    "practice": "🎉 Practice vs Bots",
+    "practiceNote": "Offline practice: spawns 3 AI bots and queues you for a 2v2 Fiesta. Click again to stop.",
+    "banner": {
+      "wave": "WAVE {wave}/{total} — CHOOSE AN AUGMENT!",
+      "augmentGained": "Augment gained: {name}!",
+      "powerup": "{name}!"
+    },
+    "log": {
+      "augmentGained": "You gain the {name} augment!",
+      "allyAugment": "{player} chose the {name} augment.",
+      "welcome": "Welcome to the 2v2 FIESTA! Score takedowns, grab augments, survive the ring!",
+      "go": "FIESTA — GO!",
+      "over": "FIESTA OVER! What a party. Returning to the world…",
+      "powerup": "{player} grabbed {name}!"
+    },
+    "category": {
+      "offense": "Offense",
+      "defense": "Defense",
+      "sustain": "Sustain",
+      "mobility": "Mobility",
+      "utility": "Utility"
+    },
+    "pending": {
+      "label": "Augment ready — pick it on your next death!"
+    },
+    "powerup": {
+      "pow_speed_demon": {
+        "name": "Speed Demon"
+      },
+      "pow_colossus": {
+        "name": "Colossus"
+      },
+      "pow_moon_boots": {
+        "name": "Moon Boots"
+      },
+      "pow_berserker": {
+        "name": "Berserker"
+      }
+    },
+    "queue": {
+      "join": "You join the 2v2 Fiesta queue. Get ready to PARTY…",
+      "leave": "You leave the 2v2 Fiesta queue.",
+      "teamLeave": "Your team leaves the 2v2 Fiesta queue."
+    },
+    "error": {
+      "leaderOnly": "Only the party leader may queue your team for {label}.",
+      "premadeTwo": "A {label} premade requires a party of exactly two.",
+      "noAugment": "You have no augment to choose right now.",
+      "notOnOffer": "That augment is not on offer."
+    },
+    "score": {
+      "title": "FIESTA",
+      "toWin": "First to {n}",
+      "aria": "Fiesta score: your team {mine}, enemy team {theirs}, first to {limit} wins."
+    },
+    "respawn": {
+      "title": "DOWNED!",
+      "sub": "Back in the fight in…"
+    },
+    "end": {
+      "win": "FIESTA WON! 🎉 What a party!",
+      "loss": "FIESTA LOST! Run it back!",
+      "draw": "FIESTA DRAW! Too close to call!"
+    },
+    "augment": {
+      "choose": "Choose an Augment",
+      "aug_brutality": {
+        "name": "Brutality",
+        "desc": "Your physical strikes hit 15% harder."
+      },
+      "aug_spellfire": {
+        "name": "Spellfire",
+        "desc": "Your spells deal 15% more damage."
+      },
+      "aug_toughness": {
+        "name": "Toughness",
+        "desc": "Gain 12% maximum health."
+      },
+      "aug_keen_eye": {
+        "name": "Keen Eye",
+        "desc": "Gain 8% critical strike chance."
+      },
+      "aug_fleetfoot": {
+        "name": "Fleetfoot",
+        "desc": "Move 15% faster. Run them down — or run away."
+      },
+      "aug_ironhide": {
+        "name": "Ironhide",
+        "desc": "Gain 250 armor and 5% dodge."
+      },
+      "aug_mending": {
+        "name": "Mending",
+        "desc": "Your healing is 20% more potent."
+      },
+      "aug_warlords_might": {
+        "name": "Warlord's Might",
+        "desc": "+25% physical damage and +10% crit. Become the threat."
+      },
+      "aug_arcane_surge": {
+        "name": "Arcane Surge",
+        "desc": "+25% spell damage and +10% crit. Light them up."
+      },
+      "aug_vampirism": {
+        "name": "Vampirism",
+        "desc": "Heal for 15% of all damage you deal. Sustain through chaos."
+      },
+      "aug_juggernaut": {
+        "name": "Juggernaut",
+        "desc": "+20% maximum health and +400 armor. Immovable."
+      },
+      "aug_bloodhunter": {
+        "name": "Bloodhunter",
+        "desc": "+18% damage of all kinds and +12% move speed."
+      },
+      "aug_lightwell": {
+        "name": "Lightwell",
+        "desc": "+30% healing and +15% maximum health. Anchor your team."
+      },
+      "aug_bounty_hunter": {
+        "name": "Bounty Hunter",
+        "desc": "Your kills are worth +1 bonus team point. Close the gap fast."
+      },
+      "aug_apex_predator": {
+        "name": "Apex Predator",
+        "desc": "+40% physical damage, +15% crit, heal for 12% of damage dealt."
+      },
+      "aug_archmage": {
+        "name": "Archmage",
+        "desc": "+45% spell damage, +15% crit, +15% maximum health."
+      },
+      "aug_unkillable": {
+        "name": "Unkillable",
+        "desc": "+40% maximum health, +600 armor, heal for 10% of damage dealt."
+      },
+      "aug_overdrive": {
+        "name": "Overdrive",
+        "desc": "+30% all damage, +20% crit, +20% move speed. FIESTA!"
+      },
+      "aug_avatar": {
+        "name": "Avatar of War",
+        "desc": "+25% all damage, +25% maximum health, +300 armor. Walk it down."
+      },
+      "aug_ascendant": {
+        "name": "Ascendant",
+        "desc": "+45% healing, +25% spell damage, +20% maximum health."
+      }
+    },
+    "tier": {
+      "silver": "Silver",
+      "gold": "Gold",
+      "prismatic": "Prismatic"
+    },
+    "word": {
+      "kill": "TAKEDOWN!",
+      "firstblood": "FIRST BLOOD!",
+      "doublekill": "DOUBLE KILL!",
+      "shutdown": "SHUTDOWN!",
+      "spree": "{n}× SPREE!",
+      "revived": "BACK IN!",
+      "ringclose": "RING CLOSING!",
+      "wave": "AUGMENTS!",
+      "dodge": "DODGE!"
+    }
+  },
   "seo": {
     "title": "World of ClaudeCraft: MMO web em estilo clássico",
     "description": "Embarque em uma aventura épica em World of ClaudeCraft, um micro-MMO de estilo clássico jogável diretamente no navegador. Entre em um reino compartilhado, evolua classes e derrote inimigos.",
@@ -52516,7 +54879,23 @@ export const pt_BR: EnTranslations = {
       "releaseSpirit": "Liberar espírito",
       "chatTab": "Chat",
       "combatLogTab": "Registro de combate",
-      "chatPlaceholder": "Diga algo... (/w nome sussurrar, /r responder, /p grupo, /gu guilda, /o oficiais, /g geral)",
+      "chatPlaceholder": "Diga algo... (/w nome sussurrar, /r responder, /p grupo, /gu guilda, /o oficiais, /general geral)",
+      "chatChannels": {
+        "add": "Add chat channel",
+        "addTitle": "Add channel",
+        "close": "Close {channel} tab",
+        "sendingTo": "Message {channel}",
+        "names": {
+          "say": "Say",
+          "yell": "Yell",
+          "party": "Party",
+          "general": "General",
+          "world": "World",
+          "lfg": "LFG",
+          "guild": "Guild",
+          "officer": "Officer"
+        }
+      },
       "communityLinks": "Links da comunidade",
       "mobileControls": "Controles móveis",
       "mobileMove": "Mover",
@@ -56637,6 +59016,173 @@ export const ru_RU: EnTranslations = {
     "friends": "Друзья и гильдия",
     "chat": "Открыть чат"
   },
+  "fiesta": {
+    "bracket": "Fiesta",
+    "enterQueue": "Join the Fiesta!",
+    "practice": "🎉 Practice vs Bots",
+    "practiceNote": "Offline practice: spawns 3 AI bots and queues you for a 2v2 Fiesta. Click again to stop.",
+    "banner": {
+      "wave": "WAVE {wave}/{total} — CHOOSE AN AUGMENT!",
+      "augmentGained": "Augment gained: {name}!",
+      "powerup": "{name}!"
+    },
+    "log": {
+      "augmentGained": "You gain the {name} augment!",
+      "allyAugment": "{player} chose the {name} augment.",
+      "welcome": "Welcome to the 2v2 FIESTA! Score takedowns, grab augments, survive the ring!",
+      "go": "FIESTA — GO!",
+      "over": "FIESTA OVER! What a party. Returning to the world…",
+      "powerup": "{player} grabbed {name}!"
+    },
+    "category": {
+      "offense": "Offense",
+      "defense": "Defense",
+      "sustain": "Sustain",
+      "mobility": "Mobility",
+      "utility": "Utility"
+    },
+    "pending": {
+      "label": "Augment ready — pick it on your next death!"
+    },
+    "powerup": {
+      "pow_speed_demon": {
+        "name": "Speed Demon"
+      },
+      "pow_colossus": {
+        "name": "Colossus"
+      },
+      "pow_moon_boots": {
+        "name": "Moon Boots"
+      },
+      "pow_berserker": {
+        "name": "Berserker"
+      }
+    },
+    "queue": {
+      "join": "You join the 2v2 Fiesta queue. Get ready to PARTY…",
+      "leave": "You leave the 2v2 Fiesta queue.",
+      "teamLeave": "Your team leaves the 2v2 Fiesta queue."
+    },
+    "error": {
+      "leaderOnly": "Only the party leader may queue your team for {label}.",
+      "premadeTwo": "A {label} premade requires a party of exactly two.",
+      "noAugment": "You have no augment to choose right now.",
+      "notOnOffer": "That augment is not on offer."
+    },
+    "score": {
+      "title": "FIESTA",
+      "toWin": "First to {n}",
+      "aria": "Fiesta score: your team {mine}, enemy team {theirs}, first to {limit} wins."
+    },
+    "respawn": {
+      "title": "DOWNED!",
+      "sub": "Back in the fight in…"
+    },
+    "end": {
+      "win": "FIESTA WON! 🎉 What a party!",
+      "loss": "FIESTA LOST! Run it back!",
+      "draw": "FIESTA DRAW! Too close to call!"
+    },
+    "augment": {
+      "choose": "Choose an Augment",
+      "aug_brutality": {
+        "name": "Brutality",
+        "desc": "Your physical strikes hit 15% harder."
+      },
+      "aug_spellfire": {
+        "name": "Spellfire",
+        "desc": "Your spells deal 15% more damage."
+      },
+      "aug_toughness": {
+        "name": "Toughness",
+        "desc": "Gain 12% maximum health."
+      },
+      "aug_keen_eye": {
+        "name": "Keen Eye",
+        "desc": "Gain 8% critical strike chance."
+      },
+      "aug_fleetfoot": {
+        "name": "Fleetfoot",
+        "desc": "Move 15% faster. Run them down — or run away."
+      },
+      "aug_ironhide": {
+        "name": "Ironhide",
+        "desc": "Gain 250 armor and 5% dodge."
+      },
+      "aug_mending": {
+        "name": "Mending",
+        "desc": "Your healing is 20% more potent."
+      },
+      "aug_warlords_might": {
+        "name": "Warlord's Might",
+        "desc": "+25% physical damage and +10% crit. Become the threat."
+      },
+      "aug_arcane_surge": {
+        "name": "Arcane Surge",
+        "desc": "+25% spell damage and +10% crit. Light them up."
+      },
+      "aug_vampirism": {
+        "name": "Vampirism",
+        "desc": "Heal for 15% of all damage you deal. Sustain through chaos."
+      },
+      "aug_juggernaut": {
+        "name": "Juggernaut",
+        "desc": "+20% maximum health and +400 armor. Immovable."
+      },
+      "aug_bloodhunter": {
+        "name": "Bloodhunter",
+        "desc": "+18% damage of all kinds and +12% move speed."
+      },
+      "aug_lightwell": {
+        "name": "Lightwell",
+        "desc": "+30% healing and +15% maximum health. Anchor your team."
+      },
+      "aug_bounty_hunter": {
+        "name": "Bounty Hunter",
+        "desc": "Your kills are worth +1 bonus team point. Close the gap fast."
+      },
+      "aug_apex_predator": {
+        "name": "Apex Predator",
+        "desc": "+40% physical damage, +15% crit, heal for 12% of damage dealt."
+      },
+      "aug_archmage": {
+        "name": "Archmage",
+        "desc": "+45% spell damage, +15% crit, +15% maximum health."
+      },
+      "aug_unkillable": {
+        "name": "Unkillable",
+        "desc": "+40% maximum health, +600 armor, heal for 10% of damage dealt."
+      },
+      "aug_overdrive": {
+        "name": "Overdrive",
+        "desc": "+30% all damage, +20% crit, +20% move speed. FIESTA!"
+      },
+      "aug_avatar": {
+        "name": "Avatar of War",
+        "desc": "+25% all damage, +25% maximum health, +300 armor. Walk it down."
+      },
+      "aug_ascendant": {
+        "name": "Ascendant",
+        "desc": "+45% healing, +25% spell damage, +20% maximum health."
+      }
+    },
+    "tier": {
+      "silver": "Silver",
+      "gold": "Gold",
+      "prismatic": "Prismatic"
+    },
+    "word": {
+      "kill": "TAKEDOWN!",
+      "firstblood": "FIRST BLOOD!",
+      "doublekill": "DOUBLE KILL!",
+      "shutdown": "SHUTDOWN!",
+      "spree": "{n}× SPREE!",
+      "revived": "BACK IN!",
+      "ringclose": "RING CLOSING!",
+      "wave": "AUGMENTS!",
+      "dodge": "DODGE!"
+    }
+  },
   "seo": {
     "title": "World of ClaudeCraft: веб-MMO в классическом стиле",
     "description": "Отправьтесь в эпическое приключение в World of ClaudeCraft, микро-MMO в классическом стиле прямо в браузере. Присоединяйтесь к общему миру, развивайте классы и побеждайте врагов.",
@@ -56847,7 +59393,23 @@ export const ru_RU: EnTranslations = {
       "releaseSpirit": "Освободить дух",
       "chatTab": "Чат",
       "combatLogTab": "Журнал боя",
-      "chatPlaceholder": "Напишите сообщение... (/w имя шепот, /r ответ, /p группа, /gu гильдия, /o офицеры, /g общий)",
+      "chatPlaceholder": "Напишите сообщение... (/w имя шепот, /r ответ, /p группа, /gu гильдия, /o офицеры, /general общий)",
+      "chatChannels": {
+        "add": "Add chat channel",
+        "addTitle": "Add channel",
+        "close": "Close {channel} tab",
+        "sendingTo": "Message {channel}",
+        "names": {
+          "say": "Say",
+          "yell": "Yell",
+          "party": "Party",
+          "general": "General",
+          "world": "World",
+          "lfg": "LFG",
+          "guild": "Guild",
+          "officer": "Officer"
+        }
+      },
       "communityLinks": "Ссылки сообщества",
       "mobileControls": "Мобильное управление",
       "mobileMove": "Движение",
@@ -60728,6 +63290,109 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.text",
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
+    "fiesta.augment.aug_apex_predator.desc",
+    "fiesta.augment.aug_apex_predator.name",
+    "fiesta.augment.aug_arcane_surge.desc",
+    "fiesta.augment.aug_arcane_surge.name",
+    "fiesta.augment.aug_archmage.desc",
+    "fiesta.augment.aug_archmage.name",
+    "fiesta.augment.aug_ascendant.desc",
+    "fiesta.augment.aug_ascendant.name",
+    "fiesta.augment.aug_avatar.desc",
+    "fiesta.augment.aug_avatar.name",
+    "fiesta.augment.aug_bloodhunter.desc",
+    "fiesta.augment.aug_bloodhunter.name",
+    "fiesta.augment.aug_bounty_hunter.desc",
+    "fiesta.augment.aug_bounty_hunter.name",
+    "fiesta.augment.aug_brutality.desc",
+    "fiesta.augment.aug_brutality.name",
+    "fiesta.augment.aug_fleetfoot.desc",
+    "fiesta.augment.aug_fleetfoot.name",
+    "fiesta.augment.aug_ironhide.desc",
+    "fiesta.augment.aug_ironhide.name",
+    "fiesta.augment.aug_juggernaut.desc",
+    "fiesta.augment.aug_juggernaut.name",
+    "fiesta.augment.aug_keen_eye.desc",
+    "fiesta.augment.aug_keen_eye.name",
+    "fiesta.augment.aug_lightwell.desc",
+    "fiesta.augment.aug_lightwell.name",
+    "fiesta.augment.aug_mending.desc",
+    "fiesta.augment.aug_mending.name",
+    "fiesta.augment.aug_overdrive.desc",
+    "fiesta.augment.aug_overdrive.name",
+    "fiesta.augment.aug_spellfire.desc",
+    "fiesta.augment.aug_spellfire.name",
+    "fiesta.augment.aug_toughness.desc",
+    "fiesta.augment.aug_toughness.name",
+    "fiesta.augment.aug_unkillable.desc",
+    "fiesta.augment.aug_unkillable.name",
+    "fiesta.augment.aug_vampirism.desc",
+    "fiesta.augment.aug_vampirism.name",
+    "fiesta.augment.aug_warlords_might.desc",
+    "fiesta.augment.aug_warlords_might.name",
+    "fiesta.augment.choose",
+    "fiesta.banner.augmentGained",
+    "fiesta.banner.powerup",
+    "fiesta.banner.wave",
+    "fiesta.bracket",
+    "fiesta.category.defense",
+    "fiesta.category.mobility",
+    "fiesta.category.offense",
+    "fiesta.category.sustain",
+    "fiesta.category.utility",
+    "fiesta.end.draw",
+    "fiesta.end.loss",
+    "fiesta.end.win",
+    "fiesta.enterQueue",
+    "fiesta.error.leaderOnly",
+    "fiesta.error.noAugment",
+    "fiesta.error.notOnOffer",
+    "fiesta.error.premadeTwo",
+    "fiesta.log.allyAugment",
+    "fiesta.log.augmentGained",
+    "fiesta.log.go",
+    "fiesta.log.over",
+    "fiesta.log.powerup",
+    "fiesta.log.welcome",
+    "fiesta.pending.label",
+    "fiesta.powerup.pow_berserker.name",
+    "fiesta.powerup.pow_colossus.name",
+    "fiesta.powerup.pow_moon_boots.name",
+    "fiesta.powerup.pow_speed_demon.name",
+    "fiesta.practice",
+    "fiesta.practiceNote",
+    "fiesta.queue.join",
+    "fiesta.queue.leave",
+    "fiesta.queue.teamLeave",
+    "fiesta.respawn.sub",
+    "fiesta.respawn.title",
+    "fiesta.score.aria",
+    "fiesta.score.title",
+    "fiesta.score.toWin",
+    "fiesta.tier.gold",
+    "fiesta.tier.prismatic",
+    "fiesta.tier.silver",
+    "fiesta.word.dodge",
+    "fiesta.word.doublekill",
+    "fiesta.word.firstblood",
+    "fiesta.word.kill",
+    "fiesta.word.revived",
+    "fiesta.word.ringclose",
+    "fiesta.word.shutdown",
+    "fiesta.word.spree",
+    "fiesta.word.wave",
+    "hud.core.chatChannels.add",
+    "hud.core.chatChannels.addTitle",
+    "hud.core.chatChannels.close",
+    "hud.core.chatChannels.names.general",
+    "hud.core.chatChannels.names.guild",
+    "hud.core.chatChannels.names.lfg",
+    "hud.core.chatChannels.names.officer",
+    "hud.core.chatChannels.names.party",
+    "hud.core.chatChannels.names.say",
+    "hud.core.chatChannels.names.world",
+    "hud.core.chatChannels.names.yell",
+    "hud.core.chatChannels.sendingTo",
     "hud.options.npcVoices",
     "hud.options.voiceVolume",
     "skinEvent.close",
@@ -60826,6 +63491,109 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.text",
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
+    "fiesta.augment.aug_apex_predator.desc",
+    "fiesta.augment.aug_apex_predator.name",
+    "fiesta.augment.aug_arcane_surge.desc",
+    "fiesta.augment.aug_arcane_surge.name",
+    "fiesta.augment.aug_archmage.desc",
+    "fiesta.augment.aug_archmage.name",
+    "fiesta.augment.aug_ascendant.desc",
+    "fiesta.augment.aug_ascendant.name",
+    "fiesta.augment.aug_avatar.desc",
+    "fiesta.augment.aug_avatar.name",
+    "fiesta.augment.aug_bloodhunter.desc",
+    "fiesta.augment.aug_bloodhunter.name",
+    "fiesta.augment.aug_bounty_hunter.desc",
+    "fiesta.augment.aug_bounty_hunter.name",
+    "fiesta.augment.aug_brutality.desc",
+    "fiesta.augment.aug_brutality.name",
+    "fiesta.augment.aug_fleetfoot.desc",
+    "fiesta.augment.aug_fleetfoot.name",
+    "fiesta.augment.aug_ironhide.desc",
+    "fiesta.augment.aug_ironhide.name",
+    "fiesta.augment.aug_juggernaut.desc",
+    "fiesta.augment.aug_juggernaut.name",
+    "fiesta.augment.aug_keen_eye.desc",
+    "fiesta.augment.aug_keen_eye.name",
+    "fiesta.augment.aug_lightwell.desc",
+    "fiesta.augment.aug_lightwell.name",
+    "fiesta.augment.aug_mending.desc",
+    "fiesta.augment.aug_mending.name",
+    "fiesta.augment.aug_overdrive.desc",
+    "fiesta.augment.aug_overdrive.name",
+    "fiesta.augment.aug_spellfire.desc",
+    "fiesta.augment.aug_spellfire.name",
+    "fiesta.augment.aug_toughness.desc",
+    "fiesta.augment.aug_toughness.name",
+    "fiesta.augment.aug_unkillable.desc",
+    "fiesta.augment.aug_unkillable.name",
+    "fiesta.augment.aug_vampirism.desc",
+    "fiesta.augment.aug_vampirism.name",
+    "fiesta.augment.aug_warlords_might.desc",
+    "fiesta.augment.aug_warlords_might.name",
+    "fiesta.augment.choose",
+    "fiesta.banner.augmentGained",
+    "fiesta.banner.powerup",
+    "fiesta.banner.wave",
+    "fiesta.bracket",
+    "fiesta.category.defense",
+    "fiesta.category.mobility",
+    "fiesta.category.offense",
+    "fiesta.category.sustain",
+    "fiesta.category.utility",
+    "fiesta.end.draw",
+    "fiesta.end.loss",
+    "fiesta.end.win",
+    "fiesta.enterQueue",
+    "fiesta.error.leaderOnly",
+    "fiesta.error.noAugment",
+    "fiesta.error.notOnOffer",
+    "fiesta.error.premadeTwo",
+    "fiesta.log.allyAugment",
+    "fiesta.log.augmentGained",
+    "fiesta.log.go",
+    "fiesta.log.over",
+    "fiesta.log.powerup",
+    "fiesta.log.welcome",
+    "fiesta.pending.label",
+    "fiesta.powerup.pow_berserker.name",
+    "fiesta.powerup.pow_colossus.name",
+    "fiesta.powerup.pow_moon_boots.name",
+    "fiesta.powerup.pow_speed_demon.name",
+    "fiesta.practice",
+    "fiesta.practiceNote",
+    "fiesta.queue.join",
+    "fiesta.queue.leave",
+    "fiesta.queue.teamLeave",
+    "fiesta.respawn.sub",
+    "fiesta.respawn.title",
+    "fiesta.score.aria",
+    "fiesta.score.title",
+    "fiesta.score.toWin",
+    "fiesta.tier.gold",
+    "fiesta.tier.prismatic",
+    "fiesta.tier.silver",
+    "fiesta.word.dodge",
+    "fiesta.word.doublekill",
+    "fiesta.word.firstblood",
+    "fiesta.word.kill",
+    "fiesta.word.revived",
+    "fiesta.word.ringclose",
+    "fiesta.word.shutdown",
+    "fiesta.word.spree",
+    "fiesta.word.wave",
+    "hud.core.chatChannels.add",
+    "hud.core.chatChannels.addTitle",
+    "hud.core.chatChannels.close",
+    "hud.core.chatChannels.names.general",
+    "hud.core.chatChannels.names.guild",
+    "hud.core.chatChannels.names.lfg",
+    "hud.core.chatChannels.names.officer",
+    "hud.core.chatChannels.names.party",
+    "hud.core.chatChannels.names.say",
+    "hud.core.chatChannels.names.world",
+    "hud.core.chatChannels.names.yell",
+    "hud.core.chatChannels.sendingTo",
     "hud.options.npcVoices",
     "hud.options.voiceVolume",
     "skinEvent.close",
@@ -60924,6 +63692,109 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.text",
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
+    "fiesta.augment.aug_apex_predator.desc",
+    "fiesta.augment.aug_apex_predator.name",
+    "fiesta.augment.aug_arcane_surge.desc",
+    "fiesta.augment.aug_arcane_surge.name",
+    "fiesta.augment.aug_archmage.desc",
+    "fiesta.augment.aug_archmage.name",
+    "fiesta.augment.aug_ascendant.desc",
+    "fiesta.augment.aug_ascendant.name",
+    "fiesta.augment.aug_avatar.desc",
+    "fiesta.augment.aug_avatar.name",
+    "fiesta.augment.aug_bloodhunter.desc",
+    "fiesta.augment.aug_bloodhunter.name",
+    "fiesta.augment.aug_bounty_hunter.desc",
+    "fiesta.augment.aug_bounty_hunter.name",
+    "fiesta.augment.aug_brutality.desc",
+    "fiesta.augment.aug_brutality.name",
+    "fiesta.augment.aug_fleetfoot.desc",
+    "fiesta.augment.aug_fleetfoot.name",
+    "fiesta.augment.aug_ironhide.desc",
+    "fiesta.augment.aug_ironhide.name",
+    "fiesta.augment.aug_juggernaut.desc",
+    "fiesta.augment.aug_juggernaut.name",
+    "fiesta.augment.aug_keen_eye.desc",
+    "fiesta.augment.aug_keen_eye.name",
+    "fiesta.augment.aug_lightwell.desc",
+    "fiesta.augment.aug_lightwell.name",
+    "fiesta.augment.aug_mending.desc",
+    "fiesta.augment.aug_mending.name",
+    "fiesta.augment.aug_overdrive.desc",
+    "fiesta.augment.aug_overdrive.name",
+    "fiesta.augment.aug_spellfire.desc",
+    "fiesta.augment.aug_spellfire.name",
+    "fiesta.augment.aug_toughness.desc",
+    "fiesta.augment.aug_toughness.name",
+    "fiesta.augment.aug_unkillable.desc",
+    "fiesta.augment.aug_unkillable.name",
+    "fiesta.augment.aug_vampirism.desc",
+    "fiesta.augment.aug_vampirism.name",
+    "fiesta.augment.aug_warlords_might.desc",
+    "fiesta.augment.aug_warlords_might.name",
+    "fiesta.augment.choose",
+    "fiesta.banner.augmentGained",
+    "fiesta.banner.powerup",
+    "fiesta.banner.wave",
+    "fiesta.bracket",
+    "fiesta.category.defense",
+    "fiesta.category.mobility",
+    "fiesta.category.offense",
+    "fiesta.category.sustain",
+    "fiesta.category.utility",
+    "fiesta.end.draw",
+    "fiesta.end.loss",
+    "fiesta.end.win",
+    "fiesta.enterQueue",
+    "fiesta.error.leaderOnly",
+    "fiesta.error.noAugment",
+    "fiesta.error.notOnOffer",
+    "fiesta.error.premadeTwo",
+    "fiesta.log.allyAugment",
+    "fiesta.log.augmentGained",
+    "fiesta.log.go",
+    "fiesta.log.over",
+    "fiesta.log.powerup",
+    "fiesta.log.welcome",
+    "fiesta.pending.label",
+    "fiesta.powerup.pow_berserker.name",
+    "fiesta.powerup.pow_colossus.name",
+    "fiesta.powerup.pow_moon_boots.name",
+    "fiesta.powerup.pow_speed_demon.name",
+    "fiesta.practice",
+    "fiesta.practiceNote",
+    "fiesta.queue.join",
+    "fiesta.queue.leave",
+    "fiesta.queue.teamLeave",
+    "fiesta.respawn.sub",
+    "fiesta.respawn.title",
+    "fiesta.score.aria",
+    "fiesta.score.title",
+    "fiesta.score.toWin",
+    "fiesta.tier.gold",
+    "fiesta.tier.prismatic",
+    "fiesta.tier.silver",
+    "fiesta.word.dodge",
+    "fiesta.word.doublekill",
+    "fiesta.word.firstblood",
+    "fiesta.word.kill",
+    "fiesta.word.revived",
+    "fiesta.word.ringclose",
+    "fiesta.word.shutdown",
+    "fiesta.word.spree",
+    "fiesta.word.wave",
+    "hud.core.chatChannels.add",
+    "hud.core.chatChannels.addTitle",
+    "hud.core.chatChannels.close",
+    "hud.core.chatChannels.names.general",
+    "hud.core.chatChannels.names.guild",
+    "hud.core.chatChannels.names.lfg",
+    "hud.core.chatChannels.names.officer",
+    "hud.core.chatChannels.names.party",
+    "hud.core.chatChannels.names.say",
+    "hud.core.chatChannels.names.world",
+    "hud.core.chatChannels.names.yell",
+    "hud.core.chatChannels.sendingTo",
     "hud.options.npcVoices",
     "hud.options.voiceVolume",
     "skinEvent.close",
@@ -61022,6 +63893,109 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.text",
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
+    "fiesta.augment.aug_apex_predator.desc",
+    "fiesta.augment.aug_apex_predator.name",
+    "fiesta.augment.aug_arcane_surge.desc",
+    "fiesta.augment.aug_arcane_surge.name",
+    "fiesta.augment.aug_archmage.desc",
+    "fiesta.augment.aug_archmage.name",
+    "fiesta.augment.aug_ascendant.desc",
+    "fiesta.augment.aug_ascendant.name",
+    "fiesta.augment.aug_avatar.desc",
+    "fiesta.augment.aug_avatar.name",
+    "fiesta.augment.aug_bloodhunter.desc",
+    "fiesta.augment.aug_bloodhunter.name",
+    "fiesta.augment.aug_bounty_hunter.desc",
+    "fiesta.augment.aug_bounty_hunter.name",
+    "fiesta.augment.aug_brutality.desc",
+    "fiesta.augment.aug_brutality.name",
+    "fiesta.augment.aug_fleetfoot.desc",
+    "fiesta.augment.aug_fleetfoot.name",
+    "fiesta.augment.aug_ironhide.desc",
+    "fiesta.augment.aug_ironhide.name",
+    "fiesta.augment.aug_juggernaut.desc",
+    "fiesta.augment.aug_juggernaut.name",
+    "fiesta.augment.aug_keen_eye.desc",
+    "fiesta.augment.aug_keen_eye.name",
+    "fiesta.augment.aug_lightwell.desc",
+    "fiesta.augment.aug_lightwell.name",
+    "fiesta.augment.aug_mending.desc",
+    "fiesta.augment.aug_mending.name",
+    "fiesta.augment.aug_overdrive.desc",
+    "fiesta.augment.aug_overdrive.name",
+    "fiesta.augment.aug_spellfire.desc",
+    "fiesta.augment.aug_spellfire.name",
+    "fiesta.augment.aug_toughness.desc",
+    "fiesta.augment.aug_toughness.name",
+    "fiesta.augment.aug_unkillable.desc",
+    "fiesta.augment.aug_unkillable.name",
+    "fiesta.augment.aug_vampirism.desc",
+    "fiesta.augment.aug_vampirism.name",
+    "fiesta.augment.aug_warlords_might.desc",
+    "fiesta.augment.aug_warlords_might.name",
+    "fiesta.augment.choose",
+    "fiesta.banner.augmentGained",
+    "fiesta.banner.powerup",
+    "fiesta.banner.wave",
+    "fiesta.bracket",
+    "fiesta.category.defense",
+    "fiesta.category.mobility",
+    "fiesta.category.offense",
+    "fiesta.category.sustain",
+    "fiesta.category.utility",
+    "fiesta.end.draw",
+    "fiesta.end.loss",
+    "fiesta.end.win",
+    "fiesta.enterQueue",
+    "fiesta.error.leaderOnly",
+    "fiesta.error.noAugment",
+    "fiesta.error.notOnOffer",
+    "fiesta.error.premadeTwo",
+    "fiesta.log.allyAugment",
+    "fiesta.log.augmentGained",
+    "fiesta.log.go",
+    "fiesta.log.over",
+    "fiesta.log.powerup",
+    "fiesta.log.welcome",
+    "fiesta.pending.label",
+    "fiesta.powerup.pow_berserker.name",
+    "fiesta.powerup.pow_colossus.name",
+    "fiesta.powerup.pow_moon_boots.name",
+    "fiesta.powerup.pow_speed_demon.name",
+    "fiesta.practice",
+    "fiesta.practiceNote",
+    "fiesta.queue.join",
+    "fiesta.queue.leave",
+    "fiesta.queue.teamLeave",
+    "fiesta.respawn.sub",
+    "fiesta.respawn.title",
+    "fiesta.score.aria",
+    "fiesta.score.title",
+    "fiesta.score.toWin",
+    "fiesta.tier.gold",
+    "fiesta.tier.prismatic",
+    "fiesta.tier.silver",
+    "fiesta.word.dodge",
+    "fiesta.word.doublekill",
+    "fiesta.word.firstblood",
+    "fiesta.word.kill",
+    "fiesta.word.revived",
+    "fiesta.word.ringclose",
+    "fiesta.word.shutdown",
+    "fiesta.word.spree",
+    "fiesta.word.wave",
+    "hud.core.chatChannels.add",
+    "hud.core.chatChannels.addTitle",
+    "hud.core.chatChannels.close",
+    "hud.core.chatChannels.names.general",
+    "hud.core.chatChannels.names.guild",
+    "hud.core.chatChannels.names.lfg",
+    "hud.core.chatChannels.names.officer",
+    "hud.core.chatChannels.names.party",
+    "hud.core.chatChannels.names.say",
+    "hud.core.chatChannels.names.world",
+    "hud.core.chatChannels.names.yell",
+    "hud.core.chatChannels.sendingTo",
     "hud.options.npcVoices",
     "hud.options.voiceVolume",
     "skinEvent.close",
@@ -61121,6 +64095,109 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.text",
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
+    "fiesta.augment.aug_apex_predator.desc",
+    "fiesta.augment.aug_apex_predator.name",
+    "fiesta.augment.aug_arcane_surge.desc",
+    "fiesta.augment.aug_arcane_surge.name",
+    "fiesta.augment.aug_archmage.desc",
+    "fiesta.augment.aug_archmage.name",
+    "fiesta.augment.aug_ascendant.desc",
+    "fiesta.augment.aug_ascendant.name",
+    "fiesta.augment.aug_avatar.desc",
+    "fiesta.augment.aug_avatar.name",
+    "fiesta.augment.aug_bloodhunter.desc",
+    "fiesta.augment.aug_bloodhunter.name",
+    "fiesta.augment.aug_bounty_hunter.desc",
+    "fiesta.augment.aug_bounty_hunter.name",
+    "fiesta.augment.aug_brutality.desc",
+    "fiesta.augment.aug_brutality.name",
+    "fiesta.augment.aug_fleetfoot.desc",
+    "fiesta.augment.aug_fleetfoot.name",
+    "fiesta.augment.aug_ironhide.desc",
+    "fiesta.augment.aug_ironhide.name",
+    "fiesta.augment.aug_juggernaut.desc",
+    "fiesta.augment.aug_juggernaut.name",
+    "fiesta.augment.aug_keen_eye.desc",
+    "fiesta.augment.aug_keen_eye.name",
+    "fiesta.augment.aug_lightwell.desc",
+    "fiesta.augment.aug_lightwell.name",
+    "fiesta.augment.aug_mending.desc",
+    "fiesta.augment.aug_mending.name",
+    "fiesta.augment.aug_overdrive.desc",
+    "fiesta.augment.aug_overdrive.name",
+    "fiesta.augment.aug_spellfire.desc",
+    "fiesta.augment.aug_spellfire.name",
+    "fiesta.augment.aug_toughness.desc",
+    "fiesta.augment.aug_toughness.name",
+    "fiesta.augment.aug_unkillable.desc",
+    "fiesta.augment.aug_unkillable.name",
+    "fiesta.augment.aug_vampirism.desc",
+    "fiesta.augment.aug_vampirism.name",
+    "fiesta.augment.aug_warlords_might.desc",
+    "fiesta.augment.aug_warlords_might.name",
+    "fiesta.augment.choose",
+    "fiesta.banner.augmentGained",
+    "fiesta.banner.powerup",
+    "fiesta.banner.wave",
+    "fiesta.bracket",
+    "fiesta.category.defense",
+    "fiesta.category.mobility",
+    "fiesta.category.offense",
+    "fiesta.category.sustain",
+    "fiesta.category.utility",
+    "fiesta.end.draw",
+    "fiesta.end.loss",
+    "fiesta.end.win",
+    "fiesta.enterQueue",
+    "fiesta.error.leaderOnly",
+    "fiesta.error.noAugment",
+    "fiesta.error.notOnOffer",
+    "fiesta.error.premadeTwo",
+    "fiesta.log.allyAugment",
+    "fiesta.log.augmentGained",
+    "fiesta.log.go",
+    "fiesta.log.over",
+    "fiesta.log.powerup",
+    "fiesta.log.welcome",
+    "fiesta.pending.label",
+    "fiesta.powerup.pow_berserker.name",
+    "fiesta.powerup.pow_colossus.name",
+    "fiesta.powerup.pow_moon_boots.name",
+    "fiesta.powerup.pow_speed_demon.name",
+    "fiesta.practice",
+    "fiesta.practiceNote",
+    "fiesta.queue.join",
+    "fiesta.queue.leave",
+    "fiesta.queue.teamLeave",
+    "fiesta.respawn.sub",
+    "fiesta.respawn.title",
+    "fiesta.score.aria",
+    "fiesta.score.title",
+    "fiesta.score.toWin",
+    "fiesta.tier.gold",
+    "fiesta.tier.prismatic",
+    "fiesta.tier.silver",
+    "fiesta.word.dodge",
+    "fiesta.word.doublekill",
+    "fiesta.word.firstblood",
+    "fiesta.word.kill",
+    "fiesta.word.revived",
+    "fiesta.word.ringclose",
+    "fiesta.word.shutdown",
+    "fiesta.word.spree",
+    "fiesta.word.wave",
+    "hud.core.chatChannels.add",
+    "hud.core.chatChannels.addTitle",
+    "hud.core.chatChannels.close",
+    "hud.core.chatChannels.names.general",
+    "hud.core.chatChannels.names.guild",
+    "hud.core.chatChannels.names.lfg",
+    "hud.core.chatChannels.names.officer",
+    "hud.core.chatChannels.names.party",
+    "hud.core.chatChannels.names.say",
+    "hud.core.chatChannels.names.world",
+    "hud.core.chatChannels.names.yell",
+    "hud.core.chatChannels.sendingTo",
     "hud.options.npcVoices",
     "hud.options.voiceVolume",
     "skinEvent.close",
@@ -61219,6 +64296,109 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.text",
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
+    "fiesta.augment.aug_apex_predator.desc",
+    "fiesta.augment.aug_apex_predator.name",
+    "fiesta.augment.aug_arcane_surge.desc",
+    "fiesta.augment.aug_arcane_surge.name",
+    "fiesta.augment.aug_archmage.desc",
+    "fiesta.augment.aug_archmage.name",
+    "fiesta.augment.aug_ascendant.desc",
+    "fiesta.augment.aug_ascendant.name",
+    "fiesta.augment.aug_avatar.desc",
+    "fiesta.augment.aug_avatar.name",
+    "fiesta.augment.aug_bloodhunter.desc",
+    "fiesta.augment.aug_bloodhunter.name",
+    "fiesta.augment.aug_bounty_hunter.desc",
+    "fiesta.augment.aug_bounty_hunter.name",
+    "fiesta.augment.aug_brutality.desc",
+    "fiesta.augment.aug_brutality.name",
+    "fiesta.augment.aug_fleetfoot.desc",
+    "fiesta.augment.aug_fleetfoot.name",
+    "fiesta.augment.aug_ironhide.desc",
+    "fiesta.augment.aug_ironhide.name",
+    "fiesta.augment.aug_juggernaut.desc",
+    "fiesta.augment.aug_juggernaut.name",
+    "fiesta.augment.aug_keen_eye.desc",
+    "fiesta.augment.aug_keen_eye.name",
+    "fiesta.augment.aug_lightwell.desc",
+    "fiesta.augment.aug_lightwell.name",
+    "fiesta.augment.aug_mending.desc",
+    "fiesta.augment.aug_mending.name",
+    "fiesta.augment.aug_overdrive.desc",
+    "fiesta.augment.aug_overdrive.name",
+    "fiesta.augment.aug_spellfire.desc",
+    "fiesta.augment.aug_spellfire.name",
+    "fiesta.augment.aug_toughness.desc",
+    "fiesta.augment.aug_toughness.name",
+    "fiesta.augment.aug_unkillable.desc",
+    "fiesta.augment.aug_unkillable.name",
+    "fiesta.augment.aug_vampirism.desc",
+    "fiesta.augment.aug_vampirism.name",
+    "fiesta.augment.aug_warlords_might.desc",
+    "fiesta.augment.aug_warlords_might.name",
+    "fiesta.augment.choose",
+    "fiesta.banner.augmentGained",
+    "fiesta.banner.powerup",
+    "fiesta.banner.wave",
+    "fiesta.bracket",
+    "fiesta.category.defense",
+    "fiesta.category.mobility",
+    "fiesta.category.offense",
+    "fiesta.category.sustain",
+    "fiesta.category.utility",
+    "fiesta.end.draw",
+    "fiesta.end.loss",
+    "fiesta.end.win",
+    "fiesta.enterQueue",
+    "fiesta.error.leaderOnly",
+    "fiesta.error.noAugment",
+    "fiesta.error.notOnOffer",
+    "fiesta.error.premadeTwo",
+    "fiesta.log.allyAugment",
+    "fiesta.log.augmentGained",
+    "fiesta.log.go",
+    "fiesta.log.over",
+    "fiesta.log.powerup",
+    "fiesta.log.welcome",
+    "fiesta.pending.label",
+    "fiesta.powerup.pow_berserker.name",
+    "fiesta.powerup.pow_colossus.name",
+    "fiesta.powerup.pow_moon_boots.name",
+    "fiesta.powerup.pow_speed_demon.name",
+    "fiesta.practice",
+    "fiesta.practiceNote",
+    "fiesta.queue.join",
+    "fiesta.queue.leave",
+    "fiesta.queue.teamLeave",
+    "fiesta.respawn.sub",
+    "fiesta.respawn.title",
+    "fiesta.score.aria",
+    "fiesta.score.title",
+    "fiesta.score.toWin",
+    "fiesta.tier.gold",
+    "fiesta.tier.prismatic",
+    "fiesta.tier.silver",
+    "fiesta.word.dodge",
+    "fiesta.word.doublekill",
+    "fiesta.word.firstblood",
+    "fiesta.word.kill",
+    "fiesta.word.revived",
+    "fiesta.word.ringclose",
+    "fiesta.word.shutdown",
+    "fiesta.word.spree",
+    "fiesta.word.wave",
+    "hud.core.chatChannels.add",
+    "hud.core.chatChannels.addTitle",
+    "hud.core.chatChannels.close",
+    "hud.core.chatChannels.names.general",
+    "hud.core.chatChannels.names.guild",
+    "hud.core.chatChannels.names.lfg",
+    "hud.core.chatChannels.names.officer",
+    "hud.core.chatChannels.names.party",
+    "hud.core.chatChannels.names.say",
+    "hud.core.chatChannels.names.world",
+    "hud.core.chatChannels.names.yell",
+    "hud.core.chatChannels.sendingTo",
     "hud.options.npcVoices",
     "hud.options.voiceVolume",
     "skinEvent.close",
@@ -61317,6 +64497,109 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.text",
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
+    "fiesta.augment.aug_apex_predator.desc",
+    "fiesta.augment.aug_apex_predator.name",
+    "fiesta.augment.aug_arcane_surge.desc",
+    "fiesta.augment.aug_arcane_surge.name",
+    "fiesta.augment.aug_archmage.desc",
+    "fiesta.augment.aug_archmage.name",
+    "fiesta.augment.aug_ascendant.desc",
+    "fiesta.augment.aug_ascendant.name",
+    "fiesta.augment.aug_avatar.desc",
+    "fiesta.augment.aug_avatar.name",
+    "fiesta.augment.aug_bloodhunter.desc",
+    "fiesta.augment.aug_bloodhunter.name",
+    "fiesta.augment.aug_bounty_hunter.desc",
+    "fiesta.augment.aug_bounty_hunter.name",
+    "fiesta.augment.aug_brutality.desc",
+    "fiesta.augment.aug_brutality.name",
+    "fiesta.augment.aug_fleetfoot.desc",
+    "fiesta.augment.aug_fleetfoot.name",
+    "fiesta.augment.aug_ironhide.desc",
+    "fiesta.augment.aug_ironhide.name",
+    "fiesta.augment.aug_juggernaut.desc",
+    "fiesta.augment.aug_juggernaut.name",
+    "fiesta.augment.aug_keen_eye.desc",
+    "fiesta.augment.aug_keen_eye.name",
+    "fiesta.augment.aug_lightwell.desc",
+    "fiesta.augment.aug_lightwell.name",
+    "fiesta.augment.aug_mending.desc",
+    "fiesta.augment.aug_mending.name",
+    "fiesta.augment.aug_overdrive.desc",
+    "fiesta.augment.aug_overdrive.name",
+    "fiesta.augment.aug_spellfire.desc",
+    "fiesta.augment.aug_spellfire.name",
+    "fiesta.augment.aug_toughness.desc",
+    "fiesta.augment.aug_toughness.name",
+    "fiesta.augment.aug_unkillable.desc",
+    "fiesta.augment.aug_unkillable.name",
+    "fiesta.augment.aug_vampirism.desc",
+    "fiesta.augment.aug_vampirism.name",
+    "fiesta.augment.aug_warlords_might.desc",
+    "fiesta.augment.aug_warlords_might.name",
+    "fiesta.augment.choose",
+    "fiesta.banner.augmentGained",
+    "fiesta.banner.powerup",
+    "fiesta.banner.wave",
+    "fiesta.bracket",
+    "fiesta.category.defense",
+    "fiesta.category.mobility",
+    "fiesta.category.offense",
+    "fiesta.category.sustain",
+    "fiesta.category.utility",
+    "fiesta.end.draw",
+    "fiesta.end.loss",
+    "fiesta.end.win",
+    "fiesta.enterQueue",
+    "fiesta.error.leaderOnly",
+    "fiesta.error.noAugment",
+    "fiesta.error.notOnOffer",
+    "fiesta.error.premadeTwo",
+    "fiesta.log.allyAugment",
+    "fiesta.log.augmentGained",
+    "fiesta.log.go",
+    "fiesta.log.over",
+    "fiesta.log.powerup",
+    "fiesta.log.welcome",
+    "fiesta.pending.label",
+    "fiesta.powerup.pow_berserker.name",
+    "fiesta.powerup.pow_colossus.name",
+    "fiesta.powerup.pow_moon_boots.name",
+    "fiesta.powerup.pow_speed_demon.name",
+    "fiesta.practice",
+    "fiesta.practiceNote",
+    "fiesta.queue.join",
+    "fiesta.queue.leave",
+    "fiesta.queue.teamLeave",
+    "fiesta.respawn.sub",
+    "fiesta.respawn.title",
+    "fiesta.score.aria",
+    "fiesta.score.title",
+    "fiesta.score.toWin",
+    "fiesta.tier.gold",
+    "fiesta.tier.prismatic",
+    "fiesta.tier.silver",
+    "fiesta.word.dodge",
+    "fiesta.word.doublekill",
+    "fiesta.word.firstblood",
+    "fiesta.word.kill",
+    "fiesta.word.revived",
+    "fiesta.word.ringclose",
+    "fiesta.word.shutdown",
+    "fiesta.word.spree",
+    "fiesta.word.wave",
+    "hud.core.chatChannels.add",
+    "hud.core.chatChannels.addTitle",
+    "hud.core.chatChannels.close",
+    "hud.core.chatChannels.names.general",
+    "hud.core.chatChannels.names.guild",
+    "hud.core.chatChannels.names.lfg",
+    "hud.core.chatChannels.names.officer",
+    "hud.core.chatChannels.names.party",
+    "hud.core.chatChannels.names.say",
+    "hud.core.chatChannels.names.world",
+    "hud.core.chatChannels.names.yell",
+    "hud.core.chatChannels.sendingTo",
     "hud.options.npcVoices",
     "hud.options.voiceVolume",
     "skinEvent.close",
@@ -61415,6 +64698,109 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.text",
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
+    "fiesta.augment.aug_apex_predator.desc",
+    "fiesta.augment.aug_apex_predator.name",
+    "fiesta.augment.aug_arcane_surge.desc",
+    "fiesta.augment.aug_arcane_surge.name",
+    "fiesta.augment.aug_archmage.desc",
+    "fiesta.augment.aug_archmage.name",
+    "fiesta.augment.aug_ascendant.desc",
+    "fiesta.augment.aug_ascendant.name",
+    "fiesta.augment.aug_avatar.desc",
+    "fiesta.augment.aug_avatar.name",
+    "fiesta.augment.aug_bloodhunter.desc",
+    "fiesta.augment.aug_bloodhunter.name",
+    "fiesta.augment.aug_bounty_hunter.desc",
+    "fiesta.augment.aug_bounty_hunter.name",
+    "fiesta.augment.aug_brutality.desc",
+    "fiesta.augment.aug_brutality.name",
+    "fiesta.augment.aug_fleetfoot.desc",
+    "fiesta.augment.aug_fleetfoot.name",
+    "fiesta.augment.aug_ironhide.desc",
+    "fiesta.augment.aug_ironhide.name",
+    "fiesta.augment.aug_juggernaut.desc",
+    "fiesta.augment.aug_juggernaut.name",
+    "fiesta.augment.aug_keen_eye.desc",
+    "fiesta.augment.aug_keen_eye.name",
+    "fiesta.augment.aug_lightwell.desc",
+    "fiesta.augment.aug_lightwell.name",
+    "fiesta.augment.aug_mending.desc",
+    "fiesta.augment.aug_mending.name",
+    "fiesta.augment.aug_overdrive.desc",
+    "fiesta.augment.aug_overdrive.name",
+    "fiesta.augment.aug_spellfire.desc",
+    "fiesta.augment.aug_spellfire.name",
+    "fiesta.augment.aug_toughness.desc",
+    "fiesta.augment.aug_toughness.name",
+    "fiesta.augment.aug_unkillable.desc",
+    "fiesta.augment.aug_unkillable.name",
+    "fiesta.augment.aug_vampirism.desc",
+    "fiesta.augment.aug_vampirism.name",
+    "fiesta.augment.aug_warlords_might.desc",
+    "fiesta.augment.aug_warlords_might.name",
+    "fiesta.augment.choose",
+    "fiesta.banner.augmentGained",
+    "fiesta.banner.powerup",
+    "fiesta.banner.wave",
+    "fiesta.bracket",
+    "fiesta.category.defense",
+    "fiesta.category.mobility",
+    "fiesta.category.offense",
+    "fiesta.category.sustain",
+    "fiesta.category.utility",
+    "fiesta.end.draw",
+    "fiesta.end.loss",
+    "fiesta.end.win",
+    "fiesta.enterQueue",
+    "fiesta.error.leaderOnly",
+    "fiesta.error.noAugment",
+    "fiesta.error.notOnOffer",
+    "fiesta.error.premadeTwo",
+    "fiesta.log.allyAugment",
+    "fiesta.log.augmentGained",
+    "fiesta.log.go",
+    "fiesta.log.over",
+    "fiesta.log.powerup",
+    "fiesta.log.welcome",
+    "fiesta.pending.label",
+    "fiesta.powerup.pow_berserker.name",
+    "fiesta.powerup.pow_colossus.name",
+    "fiesta.powerup.pow_moon_boots.name",
+    "fiesta.powerup.pow_speed_demon.name",
+    "fiesta.practice",
+    "fiesta.practiceNote",
+    "fiesta.queue.join",
+    "fiesta.queue.leave",
+    "fiesta.queue.teamLeave",
+    "fiesta.respawn.sub",
+    "fiesta.respawn.title",
+    "fiesta.score.aria",
+    "fiesta.score.title",
+    "fiesta.score.toWin",
+    "fiesta.tier.gold",
+    "fiesta.tier.prismatic",
+    "fiesta.tier.silver",
+    "fiesta.word.dodge",
+    "fiesta.word.doublekill",
+    "fiesta.word.firstblood",
+    "fiesta.word.kill",
+    "fiesta.word.revived",
+    "fiesta.word.ringclose",
+    "fiesta.word.shutdown",
+    "fiesta.word.spree",
+    "fiesta.word.wave",
+    "hud.core.chatChannels.add",
+    "hud.core.chatChannels.addTitle",
+    "hud.core.chatChannels.close",
+    "hud.core.chatChannels.names.general",
+    "hud.core.chatChannels.names.guild",
+    "hud.core.chatChannels.names.lfg",
+    "hud.core.chatChannels.names.officer",
+    "hud.core.chatChannels.names.party",
+    "hud.core.chatChannels.names.say",
+    "hud.core.chatChannels.names.world",
+    "hud.core.chatChannels.names.yell",
+    "hud.core.chatChannels.sendingTo",
     "hud.options.npcVoices",
     "hud.options.voiceVolume",
     "skinEvent.close",
@@ -61513,6 +64899,109 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.text",
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
+    "fiesta.augment.aug_apex_predator.desc",
+    "fiesta.augment.aug_apex_predator.name",
+    "fiesta.augment.aug_arcane_surge.desc",
+    "fiesta.augment.aug_arcane_surge.name",
+    "fiesta.augment.aug_archmage.desc",
+    "fiesta.augment.aug_archmage.name",
+    "fiesta.augment.aug_ascendant.desc",
+    "fiesta.augment.aug_ascendant.name",
+    "fiesta.augment.aug_avatar.desc",
+    "fiesta.augment.aug_avatar.name",
+    "fiesta.augment.aug_bloodhunter.desc",
+    "fiesta.augment.aug_bloodhunter.name",
+    "fiesta.augment.aug_bounty_hunter.desc",
+    "fiesta.augment.aug_bounty_hunter.name",
+    "fiesta.augment.aug_brutality.desc",
+    "fiesta.augment.aug_brutality.name",
+    "fiesta.augment.aug_fleetfoot.desc",
+    "fiesta.augment.aug_fleetfoot.name",
+    "fiesta.augment.aug_ironhide.desc",
+    "fiesta.augment.aug_ironhide.name",
+    "fiesta.augment.aug_juggernaut.desc",
+    "fiesta.augment.aug_juggernaut.name",
+    "fiesta.augment.aug_keen_eye.desc",
+    "fiesta.augment.aug_keen_eye.name",
+    "fiesta.augment.aug_lightwell.desc",
+    "fiesta.augment.aug_lightwell.name",
+    "fiesta.augment.aug_mending.desc",
+    "fiesta.augment.aug_mending.name",
+    "fiesta.augment.aug_overdrive.desc",
+    "fiesta.augment.aug_overdrive.name",
+    "fiesta.augment.aug_spellfire.desc",
+    "fiesta.augment.aug_spellfire.name",
+    "fiesta.augment.aug_toughness.desc",
+    "fiesta.augment.aug_toughness.name",
+    "fiesta.augment.aug_unkillable.desc",
+    "fiesta.augment.aug_unkillable.name",
+    "fiesta.augment.aug_vampirism.desc",
+    "fiesta.augment.aug_vampirism.name",
+    "fiesta.augment.aug_warlords_might.desc",
+    "fiesta.augment.aug_warlords_might.name",
+    "fiesta.augment.choose",
+    "fiesta.banner.augmentGained",
+    "fiesta.banner.powerup",
+    "fiesta.banner.wave",
+    "fiesta.bracket",
+    "fiesta.category.defense",
+    "fiesta.category.mobility",
+    "fiesta.category.offense",
+    "fiesta.category.sustain",
+    "fiesta.category.utility",
+    "fiesta.end.draw",
+    "fiesta.end.loss",
+    "fiesta.end.win",
+    "fiesta.enterQueue",
+    "fiesta.error.leaderOnly",
+    "fiesta.error.noAugment",
+    "fiesta.error.notOnOffer",
+    "fiesta.error.premadeTwo",
+    "fiesta.log.allyAugment",
+    "fiesta.log.augmentGained",
+    "fiesta.log.go",
+    "fiesta.log.over",
+    "fiesta.log.powerup",
+    "fiesta.log.welcome",
+    "fiesta.pending.label",
+    "fiesta.powerup.pow_berserker.name",
+    "fiesta.powerup.pow_colossus.name",
+    "fiesta.powerup.pow_moon_boots.name",
+    "fiesta.powerup.pow_speed_demon.name",
+    "fiesta.practice",
+    "fiesta.practiceNote",
+    "fiesta.queue.join",
+    "fiesta.queue.leave",
+    "fiesta.queue.teamLeave",
+    "fiesta.respawn.sub",
+    "fiesta.respawn.title",
+    "fiesta.score.aria",
+    "fiesta.score.title",
+    "fiesta.score.toWin",
+    "fiesta.tier.gold",
+    "fiesta.tier.prismatic",
+    "fiesta.tier.silver",
+    "fiesta.word.dodge",
+    "fiesta.word.doublekill",
+    "fiesta.word.firstblood",
+    "fiesta.word.kill",
+    "fiesta.word.revived",
+    "fiesta.word.ringclose",
+    "fiesta.word.shutdown",
+    "fiesta.word.spree",
+    "fiesta.word.wave",
+    "hud.core.chatChannels.add",
+    "hud.core.chatChannels.addTitle",
+    "hud.core.chatChannels.close",
+    "hud.core.chatChannels.names.general",
+    "hud.core.chatChannels.names.guild",
+    "hud.core.chatChannels.names.lfg",
+    "hud.core.chatChannels.names.officer",
+    "hud.core.chatChannels.names.party",
+    "hud.core.chatChannels.names.say",
+    "hud.core.chatChannels.names.world",
+    "hud.core.chatChannels.names.yell",
+    "hud.core.chatChannels.sendingTo",
     "hud.options.npcVoices",
     "hud.options.voiceVolume",
     "skinEvent.close",
@@ -61611,6 +65100,109 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.text",
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
+    "fiesta.augment.aug_apex_predator.desc",
+    "fiesta.augment.aug_apex_predator.name",
+    "fiesta.augment.aug_arcane_surge.desc",
+    "fiesta.augment.aug_arcane_surge.name",
+    "fiesta.augment.aug_archmage.desc",
+    "fiesta.augment.aug_archmage.name",
+    "fiesta.augment.aug_ascendant.desc",
+    "fiesta.augment.aug_ascendant.name",
+    "fiesta.augment.aug_avatar.desc",
+    "fiesta.augment.aug_avatar.name",
+    "fiesta.augment.aug_bloodhunter.desc",
+    "fiesta.augment.aug_bloodhunter.name",
+    "fiesta.augment.aug_bounty_hunter.desc",
+    "fiesta.augment.aug_bounty_hunter.name",
+    "fiesta.augment.aug_brutality.desc",
+    "fiesta.augment.aug_brutality.name",
+    "fiesta.augment.aug_fleetfoot.desc",
+    "fiesta.augment.aug_fleetfoot.name",
+    "fiesta.augment.aug_ironhide.desc",
+    "fiesta.augment.aug_ironhide.name",
+    "fiesta.augment.aug_juggernaut.desc",
+    "fiesta.augment.aug_juggernaut.name",
+    "fiesta.augment.aug_keen_eye.desc",
+    "fiesta.augment.aug_keen_eye.name",
+    "fiesta.augment.aug_lightwell.desc",
+    "fiesta.augment.aug_lightwell.name",
+    "fiesta.augment.aug_mending.desc",
+    "fiesta.augment.aug_mending.name",
+    "fiesta.augment.aug_overdrive.desc",
+    "fiesta.augment.aug_overdrive.name",
+    "fiesta.augment.aug_spellfire.desc",
+    "fiesta.augment.aug_spellfire.name",
+    "fiesta.augment.aug_toughness.desc",
+    "fiesta.augment.aug_toughness.name",
+    "fiesta.augment.aug_unkillable.desc",
+    "fiesta.augment.aug_unkillable.name",
+    "fiesta.augment.aug_vampirism.desc",
+    "fiesta.augment.aug_vampirism.name",
+    "fiesta.augment.aug_warlords_might.desc",
+    "fiesta.augment.aug_warlords_might.name",
+    "fiesta.augment.choose",
+    "fiesta.banner.augmentGained",
+    "fiesta.banner.powerup",
+    "fiesta.banner.wave",
+    "fiesta.bracket",
+    "fiesta.category.defense",
+    "fiesta.category.mobility",
+    "fiesta.category.offense",
+    "fiesta.category.sustain",
+    "fiesta.category.utility",
+    "fiesta.end.draw",
+    "fiesta.end.loss",
+    "fiesta.end.win",
+    "fiesta.enterQueue",
+    "fiesta.error.leaderOnly",
+    "fiesta.error.noAugment",
+    "fiesta.error.notOnOffer",
+    "fiesta.error.premadeTwo",
+    "fiesta.log.allyAugment",
+    "fiesta.log.augmentGained",
+    "fiesta.log.go",
+    "fiesta.log.over",
+    "fiesta.log.powerup",
+    "fiesta.log.welcome",
+    "fiesta.pending.label",
+    "fiesta.powerup.pow_berserker.name",
+    "fiesta.powerup.pow_colossus.name",
+    "fiesta.powerup.pow_moon_boots.name",
+    "fiesta.powerup.pow_speed_demon.name",
+    "fiesta.practice",
+    "fiesta.practiceNote",
+    "fiesta.queue.join",
+    "fiesta.queue.leave",
+    "fiesta.queue.teamLeave",
+    "fiesta.respawn.sub",
+    "fiesta.respawn.title",
+    "fiesta.score.aria",
+    "fiesta.score.title",
+    "fiesta.score.toWin",
+    "fiesta.tier.gold",
+    "fiesta.tier.prismatic",
+    "fiesta.tier.silver",
+    "fiesta.word.dodge",
+    "fiesta.word.doublekill",
+    "fiesta.word.firstblood",
+    "fiesta.word.kill",
+    "fiesta.word.revived",
+    "fiesta.word.ringclose",
+    "fiesta.word.shutdown",
+    "fiesta.word.spree",
+    "fiesta.word.wave",
+    "hud.core.chatChannels.add",
+    "hud.core.chatChannels.addTitle",
+    "hud.core.chatChannels.close",
+    "hud.core.chatChannels.names.general",
+    "hud.core.chatChannels.names.guild",
+    "hud.core.chatChannels.names.lfg",
+    "hud.core.chatChannels.names.officer",
+    "hud.core.chatChannels.names.party",
+    "hud.core.chatChannels.names.say",
+    "hud.core.chatChannels.names.world",
+    "hud.core.chatChannels.names.yell",
+    "hud.core.chatChannels.sendingTo",
     "hud.options.npcVoices",
     "hud.options.voiceVolume",
     "skinEvent.close",
@@ -61709,6 +65301,109 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.text",
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
+    "fiesta.augment.aug_apex_predator.desc",
+    "fiesta.augment.aug_apex_predator.name",
+    "fiesta.augment.aug_arcane_surge.desc",
+    "fiesta.augment.aug_arcane_surge.name",
+    "fiesta.augment.aug_archmage.desc",
+    "fiesta.augment.aug_archmage.name",
+    "fiesta.augment.aug_ascendant.desc",
+    "fiesta.augment.aug_ascendant.name",
+    "fiesta.augment.aug_avatar.desc",
+    "fiesta.augment.aug_avatar.name",
+    "fiesta.augment.aug_bloodhunter.desc",
+    "fiesta.augment.aug_bloodhunter.name",
+    "fiesta.augment.aug_bounty_hunter.desc",
+    "fiesta.augment.aug_bounty_hunter.name",
+    "fiesta.augment.aug_brutality.desc",
+    "fiesta.augment.aug_brutality.name",
+    "fiesta.augment.aug_fleetfoot.desc",
+    "fiesta.augment.aug_fleetfoot.name",
+    "fiesta.augment.aug_ironhide.desc",
+    "fiesta.augment.aug_ironhide.name",
+    "fiesta.augment.aug_juggernaut.desc",
+    "fiesta.augment.aug_juggernaut.name",
+    "fiesta.augment.aug_keen_eye.desc",
+    "fiesta.augment.aug_keen_eye.name",
+    "fiesta.augment.aug_lightwell.desc",
+    "fiesta.augment.aug_lightwell.name",
+    "fiesta.augment.aug_mending.desc",
+    "fiesta.augment.aug_mending.name",
+    "fiesta.augment.aug_overdrive.desc",
+    "fiesta.augment.aug_overdrive.name",
+    "fiesta.augment.aug_spellfire.desc",
+    "fiesta.augment.aug_spellfire.name",
+    "fiesta.augment.aug_toughness.desc",
+    "fiesta.augment.aug_toughness.name",
+    "fiesta.augment.aug_unkillable.desc",
+    "fiesta.augment.aug_unkillable.name",
+    "fiesta.augment.aug_vampirism.desc",
+    "fiesta.augment.aug_vampirism.name",
+    "fiesta.augment.aug_warlords_might.desc",
+    "fiesta.augment.aug_warlords_might.name",
+    "fiesta.augment.choose",
+    "fiesta.banner.augmentGained",
+    "fiesta.banner.powerup",
+    "fiesta.banner.wave",
+    "fiesta.bracket",
+    "fiesta.category.defense",
+    "fiesta.category.mobility",
+    "fiesta.category.offense",
+    "fiesta.category.sustain",
+    "fiesta.category.utility",
+    "fiesta.end.draw",
+    "fiesta.end.loss",
+    "fiesta.end.win",
+    "fiesta.enterQueue",
+    "fiesta.error.leaderOnly",
+    "fiesta.error.noAugment",
+    "fiesta.error.notOnOffer",
+    "fiesta.error.premadeTwo",
+    "fiesta.log.allyAugment",
+    "fiesta.log.augmentGained",
+    "fiesta.log.go",
+    "fiesta.log.over",
+    "fiesta.log.powerup",
+    "fiesta.log.welcome",
+    "fiesta.pending.label",
+    "fiesta.powerup.pow_berserker.name",
+    "fiesta.powerup.pow_colossus.name",
+    "fiesta.powerup.pow_moon_boots.name",
+    "fiesta.powerup.pow_speed_demon.name",
+    "fiesta.practice",
+    "fiesta.practiceNote",
+    "fiesta.queue.join",
+    "fiesta.queue.leave",
+    "fiesta.queue.teamLeave",
+    "fiesta.respawn.sub",
+    "fiesta.respawn.title",
+    "fiesta.score.aria",
+    "fiesta.score.title",
+    "fiesta.score.toWin",
+    "fiesta.tier.gold",
+    "fiesta.tier.prismatic",
+    "fiesta.tier.silver",
+    "fiesta.word.dodge",
+    "fiesta.word.doublekill",
+    "fiesta.word.firstblood",
+    "fiesta.word.kill",
+    "fiesta.word.revived",
+    "fiesta.word.ringclose",
+    "fiesta.word.shutdown",
+    "fiesta.word.spree",
+    "fiesta.word.wave",
+    "hud.core.chatChannels.add",
+    "hud.core.chatChannels.addTitle",
+    "hud.core.chatChannels.close",
+    "hud.core.chatChannels.names.general",
+    "hud.core.chatChannels.names.guild",
+    "hud.core.chatChannels.names.lfg",
+    "hud.core.chatChannels.names.officer",
+    "hud.core.chatChannels.names.party",
+    "hud.core.chatChannels.names.say",
+    "hud.core.chatChannels.names.world",
+    "hud.core.chatChannels.names.yell",
+    "hud.core.chatChannels.sendingTo",
     "hud.options.npcVoices",
     "hud.options.voiceVolume",
     "skinEvent.close",
@@ -61807,6 +65502,109 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_ledger_vigil.text",
     "entities.quests.q_ledger_vigil.title",
     "entities.zones.eastbrook_vale.pois.8.label",
+    "fiesta.augment.aug_apex_predator.desc",
+    "fiesta.augment.aug_apex_predator.name",
+    "fiesta.augment.aug_arcane_surge.desc",
+    "fiesta.augment.aug_arcane_surge.name",
+    "fiesta.augment.aug_archmage.desc",
+    "fiesta.augment.aug_archmage.name",
+    "fiesta.augment.aug_ascendant.desc",
+    "fiesta.augment.aug_ascendant.name",
+    "fiesta.augment.aug_avatar.desc",
+    "fiesta.augment.aug_avatar.name",
+    "fiesta.augment.aug_bloodhunter.desc",
+    "fiesta.augment.aug_bloodhunter.name",
+    "fiesta.augment.aug_bounty_hunter.desc",
+    "fiesta.augment.aug_bounty_hunter.name",
+    "fiesta.augment.aug_brutality.desc",
+    "fiesta.augment.aug_brutality.name",
+    "fiesta.augment.aug_fleetfoot.desc",
+    "fiesta.augment.aug_fleetfoot.name",
+    "fiesta.augment.aug_ironhide.desc",
+    "fiesta.augment.aug_ironhide.name",
+    "fiesta.augment.aug_juggernaut.desc",
+    "fiesta.augment.aug_juggernaut.name",
+    "fiesta.augment.aug_keen_eye.desc",
+    "fiesta.augment.aug_keen_eye.name",
+    "fiesta.augment.aug_lightwell.desc",
+    "fiesta.augment.aug_lightwell.name",
+    "fiesta.augment.aug_mending.desc",
+    "fiesta.augment.aug_mending.name",
+    "fiesta.augment.aug_overdrive.desc",
+    "fiesta.augment.aug_overdrive.name",
+    "fiesta.augment.aug_spellfire.desc",
+    "fiesta.augment.aug_spellfire.name",
+    "fiesta.augment.aug_toughness.desc",
+    "fiesta.augment.aug_toughness.name",
+    "fiesta.augment.aug_unkillable.desc",
+    "fiesta.augment.aug_unkillable.name",
+    "fiesta.augment.aug_vampirism.desc",
+    "fiesta.augment.aug_vampirism.name",
+    "fiesta.augment.aug_warlords_might.desc",
+    "fiesta.augment.aug_warlords_might.name",
+    "fiesta.augment.choose",
+    "fiesta.banner.augmentGained",
+    "fiesta.banner.powerup",
+    "fiesta.banner.wave",
+    "fiesta.bracket",
+    "fiesta.category.defense",
+    "fiesta.category.mobility",
+    "fiesta.category.offense",
+    "fiesta.category.sustain",
+    "fiesta.category.utility",
+    "fiesta.end.draw",
+    "fiesta.end.loss",
+    "fiesta.end.win",
+    "fiesta.enterQueue",
+    "fiesta.error.leaderOnly",
+    "fiesta.error.noAugment",
+    "fiesta.error.notOnOffer",
+    "fiesta.error.premadeTwo",
+    "fiesta.log.allyAugment",
+    "fiesta.log.augmentGained",
+    "fiesta.log.go",
+    "fiesta.log.over",
+    "fiesta.log.powerup",
+    "fiesta.log.welcome",
+    "fiesta.pending.label",
+    "fiesta.powerup.pow_berserker.name",
+    "fiesta.powerup.pow_colossus.name",
+    "fiesta.powerup.pow_moon_boots.name",
+    "fiesta.powerup.pow_speed_demon.name",
+    "fiesta.practice",
+    "fiesta.practiceNote",
+    "fiesta.queue.join",
+    "fiesta.queue.leave",
+    "fiesta.queue.teamLeave",
+    "fiesta.respawn.sub",
+    "fiesta.respawn.title",
+    "fiesta.score.aria",
+    "fiesta.score.title",
+    "fiesta.score.toWin",
+    "fiesta.tier.gold",
+    "fiesta.tier.prismatic",
+    "fiesta.tier.silver",
+    "fiesta.word.dodge",
+    "fiesta.word.doublekill",
+    "fiesta.word.firstblood",
+    "fiesta.word.kill",
+    "fiesta.word.revived",
+    "fiesta.word.ringclose",
+    "fiesta.word.shutdown",
+    "fiesta.word.spree",
+    "fiesta.word.wave",
+    "hud.core.chatChannels.add",
+    "hud.core.chatChannels.addTitle",
+    "hud.core.chatChannels.close",
+    "hud.core.chatChannels.names.general",
+    "hud.core.chatChannels.names.guild",
+    "hud.core.chatChannels.names.lfg",
+    "hud.core.chatChannels.names.officer",
+    "hud.core.chatChannels.names.party",
+    "hud.core.chatChannels.names.say",
+    "hud.core.chatChannels.names.world",
+    "hud.core.chatChannels.names.yell",
+    "hud.core.chatChannels.sendingTo",
     "hud.options.npcVoices",
     "hud.options.voiceVolume",
     "skinEvent.close",
@@ -62165,6 +65963,173 @@ export const en_XA: EnTranslations = {
     "friends": "[Ƒŕíéñðš & Ĝúíļð]",
     "chat": "[Óþéñ Çĥáţ]"
   },
+  "fiesta": {
+    "bracket": "[Ƒíéšţá]",
+    "enterQueue": "[Ĵóíñ ţĥé Ƒíéšţá!]",
+    "practice": "[🎉 Þŕáçţíçé ʋš Ɓóţš]",
+    "practiceNote": "[Óƒƒļíñé þŕáçţíçé: šþáŵñš 3 ÁÍ ƀóţš áñð ɋúéúéš ýóú ƒóŕ á 2ʋ2 Ƒíéšţá. Çļíçķ áĝáíñ ţó šţóþ.]",
+    "banner": {
+      "wave": "[ŴÁƲÉ {wave}/{total} — ÇĤÓÓŠÉ ÁÑ ÁÚĜⱮÉÑŢ!]",
+      "augmentGained": "[Áúĝɱéñţ ĝáíñéð: {name}!]",
+      "powerup": "[{name}!]"
+    },
+    "log": {
+      "augmentGained": "[Ýóú ĝáíñ ţĥé {name} áúĝɱéñţ!]",
+      "allyAugment": "[{player} çĥóšé ţĥé {name} áúĝɱéñţ.]",
+      "welcome": "[Ŵéļçóɱé ţó ţĥé 2ʋ2 ƑÍÉŠŢÁ! Šçóŕé ţáķéðóŵñš, ĝŕáƀ áúĝɱéñţš, šúŕʋíʋé ţĥé ŕíñĝ!]",
+      "go": "[ƑÍÉŠŢÁ — ĜÓ!]",
+      "over": "[ƑÍÉŠŢÁ ÓƲÉŔ! Ŵĥáţ á þáŕţý. Ŕéţúŕñíñĝ ţó ţĥé ŵóŕļð…]",
+      "powerup": "[{player} ĝŕáƀƀéð {name}!]"
+    },
+    "category": {
+      "offense": "[Óƒƒéñšé]",
+      "defense": "[Ðéƒéñšé]",
+      "sustain": "[Šúšţáíñ]",
+      "mobility": "[Ɱóƀíļíţý]",
+      "utility": "[Úţíļíţý]"
+    },
+    "pending": {
+      "label": "[Áúĝɱéñţ ŕéáðý — þíçķ íţ óñ ýóúŕ ñéẋţ ðéáţĥ!]"
+    },
+    "powerup": {
+      "pow_speed_demon": {
+        "name": "[Šþééð Ðéɱóñ]"
+      },
+      "pow_colossus": {
+        "name": "[Çóļóššúš]"
+      },
+      "pow_moon_boots": {
+        "name": "[Ɱóóñ Ɓóóţš]"
+      },
+      "pow_berserker": {
+        "name": "[Ɓéŕšéŕķéŕ]"
+      }
+    },
+    "queue": {
+      "join": "[Ýóú ĵóíñ ţĥé 2ʋ2 Ƒíéšţá ɋúéúé. Ĝéţ ŕéáðý ţó ÞÁŔŢÝ…]",
+      "leave": "[Ýóú ļéáʋé ţĥé 2ʋ2 Ƒíéšţá ɋúéúé.]",
+      "teamLeave": "[Ýóúŕ ţéáɱ ļéáʋéš ţĥé 2ʋ2 Ƒíéšţá ɋúéúé.]"
+    },
+    "error": {
+      "leaderOnly": "[Óñļý ţĥé þáŕţý ļéáðéŕ ɱáý ɋúéúé ýóúŕ ţéáɱ ƒóŕ {label}.]",
+      "premadeTwo": "[Á {label} þŕéɱáðé ŕéɋúíŕéš á þáŕţý óƒ éẋáçţļý ţŵó.]",
+      "noAugment": "[Ýóú ĥáʋé ñó áúĝɱéñţ ţó çĥóóšé ŕíĝĥţ ñóŵ.]",
+      "notOnOffer": "[Ţĥáţ áúĝɱéñţ íš ñóţ óñ óƒƒéŕ.]"
+    },
+    "score": {
+      "title": "[ƑÍÉŠŢÁ]",
+      "toWin": "[Ƒíŕšţ ţó {n}]",
+      "aria": "[Ƒíéšţá šçóŕé: ýóúŕ ţéáɱ {mine}, éñéɱý ţéáɱ {theirs}, ƒíŕšţ ţó {limit} ŵíñš.]"
+    },
+    "respawn": {
+      "title": "[ÐÓŴÑÉÐ!]",
+      "sub": "[Ɓáçķ íñ ţĥé ƒíĝĥţ íñ…]"
+    },
+    "end": {
+      "win": "[ƑÍÉŠŢÁ ŴÓÑ! 🎉 Ŵĥáţ á þáŕţý!]",
+      "loss": "[ƑÍÉŠŢÁ ĻÓŠŢ! Ŕúñ íţ ƀáçķ!]",
+      "draw": "[ƑÍÉŠŢÁ ÐŔÁŴ! Ţóó çļóšé ţó çáļļ!]"
+    },
+    "augment": {
+      "choose": "[Çĥóóšé áñ Áúĝɱéñţ]",
+      "aug_brutality": {
+        "name": "[Ɓŕúţáļíţý]",
+        "desc": "[Ýóúŕ þĥýšíçáļ šţŕíķéš ĥíţ 15% ĥáŕðéŕ.]"
+      },
+      "aug_spellfire": {
+        "name": "[Šþéļļƒíŕé]",
+        "desc": "[Ýóúŕ šþéļļš ðéáļ 15% ɱóŕé ðáɱáĝé.]"
+      },
+      "aug_toughness": {
+        "name": "[Ţóúĝĥñéšš]",
+        "desc": "[Ĝáíñ 12% ɱáẋíɱúɱ ĥéáļţĥ.]"
+      },
+      "aug_keen_eye": {
+        "name": "[Ķééñ Éýé]",
+        "desc": "[Ĝáíñ 8% çŕíţíçáļ šţŕíķé çĥáñçé.]"
+      },
+      "aug_fleetfoot": {
+        "name": "[Ƒļééţƒóóţ]",
+        "desc": "[Ɱóʋé 15% ƒášţéŕ. Ŕúñ ţĥéɱ ðóŵñ — óŕ ŕúñ áŵáý.]"
+      },
+      "aug_ironhide": {
+        "name": "[Íŕóñĥíðé]",
+        "desc": "[Ĝáíñ 250 áŕɱóŕ áñð 5% ðóðĝé.]"
+      },
+      "aug_mending": {
+        "name": "[Ɱéñðíñĝ]",
+        "desc": "[Ýóúŕ ĥéáļíñĝ íš 20% ɱóŕé þóţéñţ.]"
+      },
+      "aug_warlords_might": {
+        "name": "[Ŵáŕļóŕð'š Ɱíĝĥţ]",
+        "desc": "[+25% þĥýšíçáļ ðáɱáĝé áñð +10% çŕíţ. Ɓéçóɱé ţĥé ţĥŕéáţ.]"
+      },
+      "aug_arcane_surge": {
+        "name": "[Áŕçáñé Šúŕĝé]",
+        "desc": "[+25% šþéļļ ðáɱáĝé áñð +10% çŕíţ. Ļíĝĥţ ţĥéɱ úþ.]"
+      },
+      "aug_vampirism": {
+        "name": "[Ʋáɱþíŕíšɱ]",
+        "desc": "[Ĥéáļ ƒóŕ 15% óƒ áļļ ðáɱáĝé ýóú ðéáļ. Šúšţáíñ ţĥŕóúĝĥ çĥáóš.]"
+      },
+      "aug_juggernaut": {
+        "name": "[Ĵúĝĝéŕñáúţ]",
+        "desc": "[+20% ɱáẋíɱúɱ ĥéáļţĥ áñð +400 áŕɱóŕ. Íɱɱóʋáƀļé.]"
+      },
+      "aug_bloodhunter": {
+        "name": "[Ɓļóóðĥúñţéŕ]",
+        "desc": "[+18% ðáɱáĝé óƒ áļļ ķíñðš áñð +12% ɱóʋé šþééð.]"
+      },
+      "aug_lightwell": {
+        "name": "[Ļíĝĥţŵéļļ]",
+        "desc": "[+30% ĥéáļíñĝ áñð +15% ɱáẋíɱúɱ ĥéáļţĥ. Áñçĥóŕ ýóúŕ ţéáɱ.]"
+      },
+      "aug_bounty_hunter": {
+        "name": "[Ɓóúñţý Ĥúñţéŕ]",
+        "desc": "[Ýóúŕ ķíļļš áŕé ŵóŕţĥ +1 ƀóñúš ţéáɱ þóíñţ. Çļóšé ţĥé ĝáþ ƒášţ.]"
+      },
+      "aug_apex_predator": {
+        "name": "[Áþéẋ Þŕéðáţóŕ]",
+        "desc": "[+40% þĥýšíçáļ ðáɱáĝé, +15% çŕíţ, ĥéáļ ƒóŕ 12% óƒ ðáɱáĝé ðéáļţ.]"
+      },
+      "aug_archmage": {
+        "name": "[Áŕçĥɱáĝé]",
+        "desc": "[+45% šþéļļ ðáɱáĝé, +15% çŕíţ, +15% ɱáẋíɱúɱ ĥéáļţĥ.]"
+      },
+      "aug_unkillable": {
+        "name": "[Úñķíļļáƀļé]",
+        "desc": "[+40% ɱáẋíɱúɱ ĥéáļţĥ, +600 áŕɱóŕ, ĥéáļ ƒóŕ 10% óƒ ðáɱáĝé ðéáļţ.]"
+      },
+      "aug_overdrive": {
+        "name": "[Óʋéŕðŕíʋé]",
+        "desc": "[+30% áļļ ðáɱáĝé, +20% çŕíţ, +20% ɱóʋé šþééð. ƑÍÉŠŢÁ!]"
+      },
+      "aug_avatar": {
+        "name": "[Áʋáţáŕ óƒ Ŵáŕ]",
+        "desc": "[+25% áļļ ðáɱáĝé, +25% ɱáẋíɱúɱ ĥéáļţĥ, +300 áŕɱóŕ. Ŵáļķ íţ ðóŵñ.]"
+      },
+      "aug_ascendant": {
+        "name": "[Ášçéñðáñţ]",
+        "desc": "[+45% ĥéáļíñĝ, +25% šþéļļ ðáɱáĝé, +20% ɱáẋíɱúɱ ĥéáļţĥ.]"
+      }
+    },
+    "tier": {
+      "silver": "[Šíļʋéŕ]",
+      "gold": "[Ĝóļð]",
+      "prismatic": "[Þŕíšɱáţíç]"
+    },
+    "word": {
+      "kill": "[ŢÁĶÉÐÓŴÑ!]",
+      "firstblood": "[ƑÍŔŠŢ ƁĻÓÓÐ!]",
+      "doublekill": "[ÐÓÚƁĻÉ ĶÍĻĻ!]",
+      "shutdown": "[ŠĤÚŢÐÓŴÑ!]",
+      "spree": "[{n}× ŠÞŔÉÉ!]",
+      "revived": "[ƁÁÇĶ ÍÑ!]",
+      "ringclose": "[ŔÍÑĜ ÇĻÓŠÍÑĜ!]",
+      "wave": "[ÁÚĜⱮÉÑŢŠ!]",
+      "dodge": "[ÐÓÐĜÉ!]"
+    }
+  },
   "seo": {
     "title": "[Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ: Çļáššíç-Šţýļé Ŵéƀ ⱮⱮÓ]",
     "description": "[Éɱƀáŕķ óñ áñ éþíç áðʋéñţúŕé íñ Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ, á çļáššíç-šţýļé ɱíçŕó-ⱮⱮÓ þļáýáƀļé ðíŕéçţļý íñ ýóúŕ ƀŕóŵšéŕ. Ĵóíñ á þéŕšíšţéñţ šĥáŕéð ŕéáļɱ, ļéʋéļ úþ çļáššéš, áñð ðéƒéáţ éñéɱíéš!]",
@@ -62375,7 +66340,23 @@ export const en_XA: EnTranslations = {
       "releaseSpirit": "[Ŕéļéášé Šþíŕíţ]",
       "chatTab": "[Çĥáţ]",
       "combatLogTab": "[Çóɱƀáţ Ļóĝ]",
-      "chatPlaceholder": "[Šáý šóɱéţĥíñĝ... (/ŵ ñáɱé ŵĥíšþéŕ, /ŕ ŕéþļý, /þ þáŕţý, /ĝú ĝúíļð, /ó óƒƒíçéŕ, /ĝ ĝéñéŕáļ)]",
+      "chatPlaceholder": "[Šáý šóɱéţĥíñĝ... (/š šáý, /ŵ ñáɱé ŵĥíšþéŕ, /ŕ ŕéþļý, /þ þáŕţý, /ĝú ĝúíļð, /ó óƒƒíçéŕ, /ĝéñéŕáļ ĝéñéŕáļ, /ĥéļþ)]",
+      "chatChannels": {
+        "add": "[Áðð çĥáţ çĥáññéļ]",
+        "addTitle": "[Áðð çĥáññéļ]",
+        "close": "[Çļóšé {channel} ţáƀ]",
+        "sendingTo": "[Ɱéššáĝé {channel}]",
+        "names": {
+          "say": "[Šáý]",
+          "yell": "[Ýéļļ]",
+          "party": "[Þáŕţý]",
+          "general": "[Ĝéñéŕáļ]",
+          "world": "[Ŵóŕļð]",
+          "lfg": "[ĻƑĜ]",
+          "guild": "[Ĝúíļð]",
+          "officer": "[Óƒƒíçéŕ]"
+        }
+      },
       "communityLinks": "[Çóɱɱúñíţý ļíñķš]",
       "mobileControls": "[Ɱóƀíļé çóñţŕóļš]",
       "mobileMove": "[Ɱóʋé]",

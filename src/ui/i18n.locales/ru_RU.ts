@@ -402,7 +402,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   "hud.core.releaseSpirit": "Освободить дух",
   "hud.core.chatTab": "Чат",
   "hud.core.combatLogTab": "Журнал боя",
-  "hud.core.chatPlaceholder": "Напишите сообщение... (/w имя шепот, /r ответ, /p группа, /gu гильдия, /o офицеры, /g общий)",
+  "hud.core.chatPlaceholder": "Напишите сообщение... (/w имя шепот, /r ответ, /p группа, /gu гильдия, /o офицеры, /general общий)",
   "hud.core.communityLinks": "Ссылки сообщества",
   "hud.core.mobileControls": "Мобильное управление",
   "hud.core.mobileMove": "Движение",

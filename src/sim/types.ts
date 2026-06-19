@@ -16,7 +16,10 @@ export const FISHING_CAST_TIME = 5;
 export type PlayerClass =
   | 'warrior' | 'paladin' | 'hunter' | 'rogue' | 'priest'
   | 'shaman' | 'mage' | 'warlock' | 'druid';
-export type ArenaFormat = '1v1' | '2v2';
+// '1v1'/'2v2' are the ranked Ashen Coliseum ladders; 'fiesta' is the
+// dopamine-maxxed 2v2 party mode (score-based, respawns, augments, a shrinking
+// ring) — see docs/design and the Fiesta region of sim.ts.
+export type ArenaFormat = '1v1' | '2v2' | 'fiesta';
 
 export interface ArenaStanding {
   rating: number;
@@ -54,7 +57,10 @@ export type AuraKind =
   | 'attackspeed' | 'debuff_ap' | 'buff_ap' | 'buff_armor' | 'buff_int' | 'buff_agi' | 'buff_dodge' | 'buff_speed' | 'buff_haste'
   | 'hot' | 'absorb' | 'imbue' | 'buff_sta' | 'buff_allstats' | 'thorns' | 'form_bear'
   | 'form_cat' | 'stealth' | 'defensive_stance' | 'righteous_fury' | 'sunder' | 'mortal_wound' | 'silence' | 'blind' | 'disarm' | 'expose' | 'spellvuln' | 'lockout'
-  | 'vulnerability' | 'hex' | 'tongues' | 'cost_tax' | 'heal_absorb' | 'critvuln' | 'buff_spi';
+  | 'vulnerability' | 'hex' | 'tongues' | 'cost_tax' | 'heal_absorb' | 'critvuln' | 'buff_spi'
+  // 2v2 Fiesta power-up buffs: `buff_scale` value = body-size multiplier (also
+  // boosts max-hp when >1); `buff_jump` value = jump-height multiplier.
+  | 'buff_scale' | 'buff_jump';
 
 export interface Aura {
   id: string; // ability id that applied it
@@ -950,6 +956,21 @@ export type SimEvent = { pid?: number } & (
   | { type: 'arenaCountdown'; seconds: number }
   | { type: 'arenaStart' }
   | { type: 'arenaEnd'; format: ArenaFormat; won: boolean; draw: boolean; oppName: string; ratingBefore: number; ratingAfter: number; allies: ArenaCombatant[]; enemies: ArenaCombatant[] }
+  // 2v2 Fiesta party mode. All carry pid (personal — delivered to each combatant).
+  // `fiestaScore`: the running team tally changed. `fiestaWave`: a new augment
+  // wave just opened. `fiestaWord`: an exaggerated word-pop cue (the client maps
+  // `flavor` to a localized exclamation). `fiestaDown`: you were dropped and will
+  // respawn in `seconds`. `augmentOffer`: pick one of these augment ids.
+  // `augmentChosen`: a fighter locked in an augment (own or ally, for flavor).
+  | { type: 'fiestaScore'; a: number; b: number; limit: number; team: 'A' | 'B' }
+  | { type: 'fiestaWave'; wave: number; totalWaves: number }
+  | { type: 'fiestaWord'; flavor: 'firstblood' | 'kill' | 'doublekill' | 'spree' | 'shutdown' | 'revived' | 'ringclose'; n?: number }
+  | { type: 'fiestaDown'; seconds: number }
+  | { type: 'augmentOffer'; tier: 'silver' | 'gold' | 'prismatic'; wave: number; choices: string[] }
+  | { type: 'augmentChosen'; augmentId: string; byPid: number; byName: string; mine: boolean }
+  // A fighter grabbed a ring power-up (world event so everyone sees the glow).
+  // Whether it's "mine" is decided client-side (entityId === local player).
+  | { type: 'fiestaPowerup'; entityId: number; defId: string; glow: number; duration: number }
   | { type: 'heal2'; sourceId: number; targetId: number; amount: number; crit: boolean; ability: string }
   // visual-only cue for the renderer: spell projectiles, dot ticks, aoe novas
   | { type: 'spellfx'; sourceId: number; targetId: number; school: string; fx: 'projectile' | 'tick' | 'nova' }

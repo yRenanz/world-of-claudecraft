@@ -402,7 +402,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   "hud.core.releaseSpirit": "Liberar espíritu",
   "hud.core.chatTab": "Chat",
   "hud.core.combatLogTab": "Registro de combate",
-  "hud.core.chatPlaceholder": "Di algo... (/w nombre susurro, /r responder, /p grupo, /gu hermandad, /o oficiales, /g general)",
+  "hud.core.chatPlaceholder": "Di algo... (/w nombre susurro, /r responder, /p grupo, /gu hermandad, /o oficiales, /general general)",
   "hud.core.communityLinks": "Enlaces de comunidad",
   "hud.core.mobileControls": "Controles móviles",
   "hud.core.mobileMove": "Mover",

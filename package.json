@@ -30,6 +30,7 @@
     "admin:grant": "node scripts/grant_admin.mjs",
     "voices:gen": "node scripts/gen_npc_voices.mjs",
     "voices:lines": "node scripts/gen_npc_lines.mjs",
+    "sfx:gen": "node scripts/gen_sfx.mjs",
     "wiki:seed": "node scripts/mediawiki/build_seed.mjs"
   },
   "dependencies": {

@@ -402,7 +402,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   "hud.core.releaseSpirit": "釋放靈魂",
   "hud.core.chatTab": "聊天",
   "hud.core.combatLogTab": "戰鬥紀錄",
-  "hud.core.chatPlaceholder": "說點什麼...（/w 名字 密語，/r 回覆，/p 隊伍，/gu 公會，/o 幹部，/g 綜合）",
+  "hud.core.chatPlaceholder": "說點什麼...（/w 名字 密語，/r 回覆，/p 隊伍，/gu 公會，/o 幹部，/general 綜合）",
   "hud.core.communityLinks": "社群連結",
   "hud.core.mobileControls": "行動控制",
   "hud.core.mobileMove": "移動",

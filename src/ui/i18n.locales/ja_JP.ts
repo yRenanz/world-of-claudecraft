@@ -402,7 +402,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   "hud.core.releaseSpirit": "霊魂を解放",
   "hud.core.chatTab": "チャット",
   "hud.core.combatLogTab": "戦闘ログ",
-  "hud.core.chatPlaceholder": "発言する... (/w 名前 ささやき、/r 返信、/p パーティ、/gu ギルド、/o オフィサー、/g 一般)",
+  "hud.core.chatPlaceholder": "発言する... (/w 名前 ささやき、/r 返信、/p パーティ、/gu ギルド、/o オフィサー、/general 一般)",
   "hud.core.communityLinks": "コミュニティリンク",
   "hud.core.mobileControls": "モバイル操作",
   "hud.core.mobileMove": "移動",

@@ -769,7 +769,10 @@ export class GameServer {
     const state = this.sim.serializeCharacter(session.pid);
     const e = this.sim.entities.get(session.pid);
     if (state && e) {
-      await saveCharacterState(session.characterId, e.level, state);
+      // Use the SERIALIZED level (not e.level): during a 2v2 Fiesta bout e.level
+      // is temporarily 20, but serializeCharacter reports the real level — so the
+      // character-list/leaderboard `level` column never reflects the temp state.
+      await saveCharacterState(session.characterId, state.level, state);
       session.lastSave = Date.now();
     }
   }
@@ -1206,11 +1209,15 @@ export class GameServer {
       case 'guild_disband': void this.social.guildDisband(this.actorFor(session)).catch(logSocialErr); break;
       // arena (Ashen Coliseum queue)
       case 'arena_queue': {
-        const fmt = msg.format === '2v2' ? '2v2' : '1v1';
+        const fmt = msg.format === '2v2' ? '2v2' : msg.format === 'fiesta' ? 'fiesta' : '1v1';
         sim.arenaQueueJoin(pid, fmt);
         break;
       }
       case 'arena_leave': sim.arenaQueueLeave(pid); break;
+      case 'arena_augment': {
+        if (typeof msg.augment === 'string' && msg.augment.length <= 64) sim.arenaAugmentPick(msg.augment, pid);
+        break;
+      }
 
       // post-cap cosmetic prestige (Max-Level XP Overflow)
       case 'prestige': sim.prestige(pid); break;

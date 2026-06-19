@@ -402,7 +402,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   "hud.core.releaseSpirit": "영혼 풀어주기",
   "hud.core.chatTab": "채팅",
   "hud.core.combatLogTab": "전투 기록",
-  "hud.core.chatPlaceholder": "메시지 입력... (/w 이름 귓속말, /r 답장, /p 파티, /gu 길드, /o 장교, /g 일반)",
+  "hud.core.chatPlaceholder": "메시지 입력... (/w 이름 귓속말, /r 답장, /p 파티, /gu 길드, /o 장교, /general 일반)",
   "hud.core.communityLinks": "커뮤니티 링크",
   "hud.core.mobileControls": "모바일 조작",
   "hud.core.mobileMove": "이동",

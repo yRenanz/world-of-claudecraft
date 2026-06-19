@@ -23,7 +23,7 @@ import { DT, INTERACT_RANGE, MELEE_RANGE, PlayerClass, RUN_SPEED, dist2d } from 
 import { togglePasswordVisibility, syncInputAriaState, validateForm, handleKeyboardActivation, validateCharacterName } from './ui/auth_utils';
 import { CLASSES, ABILITIES } from './sim/content/classes';
 import { iconDataUrl } from './ui/icons';
-import { formatDateTime, formatNumber, getLanguage, isSupportedLanguage, languageTag, setLanguage, t, type SupportedLanguage, type TranslationKey } from './ui/i18n';
+import { ensureLocaleLoaded, formatDateTime, formatNumber, getLanguage, isLocaleResident, isSupportedLanguage, languageTag, setLanguage, t, type SupportedLanguage, type TranslationKey } from './ui/i18n';
 import { tServer } from './ui/server_i18n';
 import { tEntity } from './ui/entity_i18n';
 import { hydrateIcons } from './ui/ui_icons';
@@ -540,6 +540,17 @@ async function startGame(world: IWorld, offlineSim: Sim | null, online: ClientWo
   // Paint the loading screen before anything can block — assetsReady may resolve
   // immediately when assets are already cached, and the scene build is synchronous.
   await nextPaint();
+  // Lazy locale flip: fetch the active locale's chunk and make it resident before the HUD
+  // renders (mountGameUi -> translatePage fans out hundreds of t() calls). It sits behind the
+  // loading screen (already painted above), so a stored non-en visitor never sees an English
+  // flash. This is now a REAL per-locale network request, so guard it: startGame is
+  // void-invoked (see the call sites) with no .catch, and English is always resident, so a
+  // failed fetch must fall back to English and keep booting rather than reject unhandled.
+  try {
+    await ensureLocaleLoaded(getLanguage());
+  } catch {
+    // Soft fallback: English is statically resident; boot in English (the picker can retry).
+  }
   try {
     await assetsReady((done, total) => setLoadingProgress(done, total));
   } catch (err) {
@@ -2727,8 +2738,29 @@ function wireHomepageMusicToggle(): void {
 }
 
 function wireStartScreens(): void {
-  // Initial page translation and stats load
-  translatePage();
+  // Initial page translation and stats load. Lazy locale flip: a stored non-en locale is now
+  // a real chunk fetch, and the homepage IS the first paint (there is no loading screen to sit
+  // behind), so we localize-then-reveal to prevent an English flash + text swap. The start
+  // screen is held with visibility:hidden - which PRESERVES layout, so there is no layout
+  // shift - ONLY when the boot locale is not already resident; English and any already-loaded
+  // locale skip the gate entirely (no blank, no delay). The gate lifts on BOTH resolve and
+  // reject (the English fallback still renders), so a failed locale fetch can never strand the
+  // homepage hidden. The stored-locale modulepreload will shrink the non-en hold toward zero.
+  const bootLang = getLanguage();
+  const startScreen = document.getElementById('start-screen');
+  const gated = !!startScreen && !isLocaleResident(bootLang);
+  if (gated) startScreen!.style.visibility = 'hidden';
+  const revealLocalized = () => {
+    // Restore visibility even if translatePage() throws (e.g. a dev-build untracked-key
+    // throw or any mid-translate DOM error), so a translation failure can never strand the
+    // homepage permanently hidden - a worse failure than the English flash this gate prevents.
+    try {
+      translatePage();
+    } finally {
+      if (gated) startScreen!.style.visibility = '';
+    }
+  };
+  void ensureLocaleLoaded(bootLang).then(revealLocalized, revealLocalized);
   hydrateIcons();
   void loadProjectStats();
   wireContractAddressCopy();
@@ -3447,23 +3479,47 @@ function wireStartScreens(): void {
 
   // Language selection dropdown setup
   const langSelect = $('#lang-select') as HTMLSelectElement | null;
+  const langStatus = $('#lang-select-status') as HTMLElement | null;
   if (langSelect) {
     langSelect.value = getLanguage();
     langSelect.addEventListener('change', () => {
       const selected = langSelect.value;
-      if (!isSupportedLanguage(selected)) return;
-      setLanguage(selected);
-      
-      // Dynamically update the browser URL query parameter without page reload
-      if (typeof window !== 'undefined' && window.history) {
-        const url = new URL(window.location.href);
-        url.searchParams.set('lang', selected);
-        window.history.pushState({}, '', url.toString());
+      if (!isSupportedLanguage(selected)) {
+        // The static <option> set should never produce this, but the picker is the
+        // user-facing seam: surface it via t() and revert to the active locale.
+        if (langStatus) langStatus.textContent = t('settings.languageLoadUnavailable');
+        langSelect.value = getLanguage();
+        return;
       }
-      
-      translatePage();
-      refreshLocalizedDynamicShell();
-      document.dispatchEvent(new CustomEvent('woc:languagechange', { detail: { language: selected } }));
+      // Async locale loader: load the locale chunk BEFORE switching. At this point the
+      // module is still static-imported through the barrel, so the await resolves on a
+      // microtask with no network and the transient "loading" status never paints; the
+      // failure path is wired now so the lazy locale flip's real fetch needs no call-site change.
+      void (async () => {
+        if (langStatus) langStatus.textContent = t('settings.languageLoading');
+        try {
+          await ensureLocaleLoaded(selected);
+        } catch {
+          // The locale chunk failed to load (a real risk once the lazy locale flip makes this a
+          // network fetch). Keep the already-resident locale and tell the user.
+          if (langStatus) langStatus.textContent = t('settings.languageLoadFailed');
+          langSelect.value = getLanguage();
+          return;
+        }
+        if (langStatus) langStatus.textContent = '';
+        setLanguage(selected);
+
+        // Dynamically update the browser URL query parameter without page reload
+        if (typeof window !== 'undefined' && window.history) {
+          const url = new URL(window.location.href);
+          url.searchParams.set('lang', selected);
+          window.history.pushState({}, '', url.toString());
+        }
+
+        translatePage();
+        refreshLocalizedDynamicShell();
+        document.dispatchEvent(new CustomEvent('woc:languagechange', { detail: { language: selected } }));
+      })();
     });
   }
 

@@ -176,7 +176,7 @@ export const zh_TW: Record<string, string> = {
   "class.warrior": "戰士",
   "class.paladin": "聖騎士",
   "class.hunter": "獵人",
-  "class.rogue": "潛行者",
+  "class.rogue": "盜賊",
   "class.priest": "牧師",
   "class.shaman": "薩滿",
   "class.mage": "法師",

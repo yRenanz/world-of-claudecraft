@@ -1934,7 +1934,7 @@ export const es: EnTranslations = {
       },
       "power_word_fortitude": {
         "name": "Palabra de poder: entereza",
-        "description": "Aumenta la Aguante del objetivo en 3 durante 30 min."
+        "description": "Aumenta el Aguante del objetivo en 3 durante 30 min."
       },
       "shadow_word_pain": {
         "name": "Palabra de las Sombras: dolor",
@@ -4373,31 +4373,31 @@ export const es: EnTranslations = {
       },
       "q_ledger_teeth": {
         "title": "Colmillos en la oscuridad",
-        "text": "Las manadas de lobos han aprendido las rutas de patrulla: atacan al anochecer, cuando la luz es escasa y un viajero solitario es presa fácil. Quiébralas, {playerName}. Abate a 10 Lobos del bosque y haz que las manadas aprendan una nueva lección.",
-        "completion": "Diez lobos, y el camino del crepúsculo vuelve a ser nuestro. El libro mayor se vuelve más amable contigo.",
+        "text": "Los zorros de la cañada se han vuelto tan audaces como lobos: se cuelan en los gallineros al anochecer y desaparecen antes de que se encienda un farol, y una zorra hambrienta se llevará un cordero con la misma facilidad que una gallina. Diézmalos, {playerName}. Abate a 10 Zorros de la cañada y haz que el resto vuelva a temer a la luz.",
+        "completion": "Diez zorros, y los gallineros vuelven a estar tranquilos al anochecer. El libro mayor se vuelve más amable contigo.",
         "objectives": {
           "0": {
-            "label": "Lobos del bosque abatidos"
+            "label": "Zorros de la cañada abatidos"
           }
         }
       },
       "q_ledger_reedwater": {
         "title": "Patrulla del juncal",
-        "text": "¿Te envía Redbrook? Bien, estos viejos huesos ya no pueden vadear los bajíos. Los Aletabarro se han colado de nuevo en el juncal y están más atrevidos que nunca. Diézmalos: 8 Acechadores Aletabarro, y cuidado con el agua profunda.",
-        "completion": "Eso mantendrá a esos demonios borboteantes lejos de mis redes una estación. Dile al Mariscal que el lago vuelve a estar tranquilo.",
+        "text": "¿Te envía Redbrook? Bien, estos viejos huesos ya no pueden vadear los bajíos. Las grullas de la pradera han dado con mis redes, y arponean más de mi captura de lo que jamás hizo el Aletabarro. Diézmalas: 8 Grullas de la pradera, y cuidado con el agua profunda.",
+        "completion": "Eso mantendrá a esas ladronas zancudas lejos de mis redes una estación. Dile al Mariscal que los bajíos vuelven a ser míos.",
         "objectives": {
           "0": {
-            "label": "Acechadores Aletabarro abatidos"
+            "label": "Grullas de la pradera ahuyentadas"
           }
         }
       },
       "q_ledger_silk": {
-        "title": "Seda y veneno",
-        "text": "El libro mayor marca también los bosques del este como tierra de guardianes. Los acechadores de Webwood tejen más espeso cada semana: una niña se acercó demasiado el último día de mercado y la cortamos libre apenas respirando. Mata 8 Acechadores de Webwood antes de que se adueñen del bosque por completo.",
-        "completion": "Ocho tejedoras menos en la oscuridad. El bosque respira más tranquilo, y yo también.",
+        "title": "Ramoneo y zarza",
+        "text": "El libro mayor marca también los bosques del este como tierra de guardianes, y mis huertos de hierbas medicinales forman parte de ellos. Los cervatos moteados han arrasado mi hoja de plata y mi cardosangre hasta la raíz, y sin esos remedios la mitad de Eastbrook se queda sin medicina. No me complace, pero sacrifica a 8 Cervatos moteados antes de que se pierdan por completo las hierbas de otoño.",
+        "completion": "Los huertos aún podrían recuperarse, gracias a ti. Una piedad dura, pero un niño ardiendo de fiebre necesita los remedios más de lo que el bosque necesita a los ciervos. El libro mayor queda saldado.",
         "objectives": {
           "0": {
-            "label": "Acechadores de Webwood abatidos"
+            "label": "Cervatos moteados sacrificados"
           }
         }
       },
@@ -4422,12 +4422,12 @@ export const es: EnTranslations = {
         }
       },
       "q_ledger_toll": {
-        "title": "El peaje de los salteadores",
-        "text": "Las colinas del sureste se han vuelto el camino de peaje de un bandido: roban a cualquiera lo bastante necio para viajar ligero. El libro mayor pone precio a cada uno de ellos. Lleva la justicia de Eastbrook a 8 Bandidos del Valle.",
-        "completion": "Ocho bandidos que rinden cuentas. Ya corre la voz de que el camino de peaje tiene un nuevo guardián, y no cobra monedas, cobra cabezas.",
+        "title": "El camino de los colmillos",
+        "text": "Los jabalíes colmillobosque han bajado de Brightwood al camino comercial del sureste: grandes bestias colmilludas que cornean a los bueyes de tiro y vuelcan los carros por el grano derramado. El libro mayor pone precio a cada uno de ellos. Reabre el camino: abate a 8 Jabalíes colmillobosque.",
+        "completion": "Ocho bestias menos en el camino, y los carros vuelven a rodar. Ya corre la voz de que el camino comercial tiene un nuevo guardián. El libro mayor sube a tu favor.",
         "objectives": {
           "0": {
-            "label": "Bandidos del Valle llevados ante la justicia"
+            "label": "Jabalíes colmillobosque abatidos"
           }
         }
       },

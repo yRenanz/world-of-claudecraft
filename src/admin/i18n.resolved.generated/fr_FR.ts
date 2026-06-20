@@ -223,7 +223,7 @@ export const fr_FR: AdminTranslations = {
   "chatFilter.noWords": "aucun mot pour l'instant",
   "chatFilter.removeWord": "Retirer",
   "chatFilter.escalationTitle": "Escalade",
-  "chatFilter.escalationHint": "Saisir un mot grave bloque le message et avertit le joueur, puis applique des coupures de chat progressives à l'échelle du compte (persistent après reconnexion / changement de personnage).",
+  "chatFilter.escalationHint": "Saisir un mot grave bloque le message et avertit le joueur, puis applique des coupures de chat progressives à l'échelle du compte (persistantes après reconnexion / changement de personnage).",
   "chatFilter.warningsLabel": "Avertissements avant la première coupure",
   "chatFilter.ladderLabel": "Échelle des coupures (secondes, séparées par des virgules)",
   "chatFilter.currentLadder": "Échelle actuelle :",

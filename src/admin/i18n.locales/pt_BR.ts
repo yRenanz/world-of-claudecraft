@@ -220,7 +220,7 @@ export const pt_BR: Record<string, string> = {
   "chatMod.recentIncidents": "Incidentes recentes do filtro de chat",
   "chatMod.resetStrikes": "Zerar penalidades",
   "chatMod.status": "Status:",
-  "chatMod.strikes": "Penalidades:",
+  "chatMod.strikes": "Advertências:",
   "chatMod.title": "Moderação de chat",
   "detail.chatMute1h": "Silenciar Chat 1h",
   "detail.chatMuteCustom": "Silenciar Chat Personalizado",

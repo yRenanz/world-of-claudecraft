@@ -3547,7 +3547,7 @@ export const it_IT: EnTranslations = {
       "brother_aldric_fen": {
         "name": "Fratello Aldric",
         "title": "Sacerdote della Valle",
-        "greeting": "Che la Luce ti mantenga fuori dall acqua, {playerName}. I morti di questa palude non dormono: guadano."
+        "greeting": "Che la Luce ti mantenga fuori dall'acqua, {playerName}. I morti di questa palude non dormono: guadano."
       },
       "provisioner_hale": {
         "name": "Provveditore Hale",
@@ -3675,7 +3675,7 @@ export const it_IT: EnTranslations = {
         "completion": "Che riposino, e che la Luce perdoni chi li ha svegliati.",
         "objectives": {
           "0": {
-            "label": "Ossa irrequiete restituito al riposo"
+            "label": "Ossa irrequiete restituite al riposo"
           }
         }
       },
@@ -3715,7 +3715,7 @@ export const it_IT: EnTranslations = {
         "completion": "Il cimitero è più quieto, ma il richiamo ora sale dalla cripta, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Ossa irrequiete messo a tacere"
+            "label": "Ossa irrequiete messe a tacere"
           }
         }
       },
@@ -3868,7 +3868,7 @@ export const it_IT: EnTranslations = {
         "completion": "Sacche tutte integre. Hai mani più ferme di metà dei chirurghi del sud, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Vedova di Mirefen ucciso"
+            "label": "Vedova di Mirefen uccisa"
           },
           "1": {
             "label": "Sacca velenifera di vedova"
@@ -3881,10 +3881,10 @@ export const it_IT: EnTranslations = {
         "completion": "Davvero morta? Allora il folto torna a essere solo alberi. Che la Luce benedica la tua lama, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Vedova di Mirefen ucciso"
+            "label": "Vedova di Mirefen uccisa"
           },
           "1": {
-            "label": "Madre della covata ucciso"
+            "label": "Madre della covata uccisa"
           }
         }
       },
@@ -4373,31 +4373,31 @@ export const it_IT: EnTranslations = {
       },
       "q_ledger_teeth": {
         "title": "Zanne nel buio",
-        "text": "I branchi di lupi hanno imparato le rotte di pattuglia: colpiscono al crepuscolo, quando la luce è scarsa e un viandante solitario è preda facile. Spezzali, {playerName}. Uccidi 10 Lupi della foresta e fa' che i branchi imparino una nuova lezione.",
-        "completion": "Dieci lupi, e la strada del crepuscolo è di nuovo nostra. Il registro diventa più gentile con te.",
+        "text": "Le volpi della radura sono diventate audaci come lupi: si intrufolano nei pollai al crepuscolo e spariscono prima che si accenda una lanterna, e una volpe affamata prenderà un agnello tanto quanto una gallina. Diradale, {playerName}. Uccidi 10 Volpi della radura e fa' che le altre tornino a temere la luce.",
+        "completion": "Dieci volpi, e al crepuscolo i pollai sono di nuovo tranquilli. Il registro diventa più gentile con te.",
         "objectives": {
           "0": {
-            "label": "Lupo della foresta ucciso"
+            "label": "Volpe della radura uccisa"
           }
         }
       },
       "q_ledger_reedwater": {
         "title": "Pattuglia tra le canne",
-        "text": "Ti manda Redbrook? Bene: queste vecchie ossa non riescono più a guadare le secche. I Pinnalimo sono tornati strisciando tra le canne e sono più audaci che mai. Diradali: 8 Acquattati Pinnalimo, e attento all'acqua profonda.",
-        "completion": "Questo terrà quei demoni gorgoglianti lontani dalle mie reti per una stagione. Di' al Maresciallo che il lago è di nuovo tranquillo.",
+        "text": "Ti manda Redbrook? Bene: queste vecchie ossa non riescono più a guadare le secche. Le gru della prateria hanno scoperto le mie reti e mi infilzano più pesci di quanti ne abbiano mai presi i Pinnalimo. Diradale: 8 Gru della prateria, e attento all'acqua profonda.",
+        "completion": "Questo terrà quelle ladre dalle lunghe zampe lontane dalle mie reti per una stagione. Di' al Maresciallo che le secche sono di nuovo mie.",
         "objectives": {
           "0": {
-            "label": "Acquattato Pinnalimo ucciso"
+            "label": "Gru della prateria scacciata"
           }
         }
       },
       "q_ledger_silk": {
-        "title": "Seta e veleno",
-        "text": "Il registro segna anche i boschi orientali come terra di guardiani. Gli acquattati di Webwood tessono più fitto ogni settimana: l'ultimo giorno di mercato una bambina si è spinta troppo vicino e l'abbiamo liberata che respirava a malapena. Uccidi 8 Acquattati di Webwood prima che si prendano del tutto il bosco.",
-        "completion": "Otto filatori in meno nel buio. Il bosco respira più leggero, e così faccio io.",
+        "title": "Pascolo e rovi",
+        "text": "Il registro segna anche i boschi orientali come terra di guardiani, e i miei orti officinali ne fanno parte. I cerbiatti maculati hanno spogliato fino alla radice la mia foglia d'argento e il cardo sanguigno, e senza quei semplici metà di Eastbrook resta senza medicine. Non ci trovo alcun piacere, ma abbatti 8 Cerbiatti maculati prima che le erbe d'autunno vadano perdute del tutto.",
+        "completion": "Gli orti potrebbero ancora riprendersi, grazie a te. Una dura misericordia, ma un bambino divorato dalla febbre ha più bisogno dei semplici di quanto il bosco abbia bisogno dei cervi. Il registro è in pari.",
         "objectives": {
           "0": {
-            "label": "Acquattato di Webwood ucciso"
+            "label": "Cerbiatto maculato abbattuto"
           }
         }
       },
@@ -4422,12 +4422,12 @@ export const it_IT: EnTranslations = {
         }
       },
       "q_ledger_toll": {
-        "title": "Il pedaggio dei briganti",
-        "text": "Le colline a sud-est sono diventate la strada del pedaggio di un bandito: rapinano chiunque sia tanto folle da viaggiare leggero. Il registro ha una taglia su ognuno di loro. Porta la giustizia di Eastbrook a 8 Banditi della Valle.",
-        "completion": "Otto banditi che hanno reso conto. Si sparge già la voce che la strada del pedaggio ha un nuovo guardiano, e non prende monete: prende teste.",
+        "title": "La strada delle zanne",
+        "text": "I cinghiali zannaboschiva sono scesi dal Boscochiaro fino alla strada commerciale di sud-est: bestioni dalle grandi zanne che incornano i buoi da tiro e rovesciano i carri per il grano sparso. Il registro ha una taglia su ognuno di loro. Riapri la strada: abbatti 8 Cinghiali zannaboschiva.",
+        "completion": "Otto bestioni in meno sulla strada, e i carri tornano a viaggiare. Si sparge già la voce che la strada commerciale ha un nuovo guardiano. Il registro sale a tuo favore.",
         "objectives": {
           "0": {
-            "label": "Bandito della Valle assicurato alla giustizia"
+            "label": "Cinghiale zannaboschiva ucciso"
           }
         }
       },
@@ -4661,11 +4661,11 @@ export const it_IT: EnTranslations = {
       "sunken_bastion": {
         "name": "Il Bastione Sommerso",
         "enterText": "Guadi nelle profondità del Bastione Sommerso...",
-        "leaveText": "Esci dall oscurità annegata."
+        "leaveText": "Esci dall'oscurità annegata."
       },
       "gravewyrm_sanctum": {
         "name": "Santuario del Gravewyrm",
-        "enterText": "L aria si fa fredda. Qualcosa di immenso respira sotto...",
+        "enterText": "L'aria si fa fredda. Qualcosa di immenso respira sotto...",
         "leaveText": "Barcolli di nuovo nel vento di montagna."
       },
       "nythraxis_crypt": {

@@ -198,7 +198,7 @@ export const fr_FR: Record<string, string> = {
   "alert.saveConfigFailed": "échec de l'enregistrement des paramètres d'escalade",
   "chatFilter.add": "Ajouter",
   "chatFilter.currentLadder": "Échelle actuelle :",
-  "chatFilter.escalationHint": "Saisir un mot grave bloque le message et avertit le joueur, puis applique des coupures de chat progressives à l'échelle du compte (persistent après reconnexion / changement de personnage).",
+  "chatFilter.escalationHint": "Saisir un mot grave bloque le message et avertit le joueur, puis applique des coupures de chat progressives à l'échelle du compte (persistantes après reconnexion / changement de personnage).",
   "chatFilter.escalationTitle": "Escalade",
   "chatFilter.hardHint": "insultes — message bloqué + coupures progressives ; jamais affichées à personne, non désactivable",
   "chatFilter.hardPlaceholder": "ajouter un mot grave",

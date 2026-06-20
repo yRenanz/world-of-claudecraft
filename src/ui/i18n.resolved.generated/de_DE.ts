@@ -2206,7 +2206,7 @@ export const de_DE: EnTranslations = {
       },
       "bear_charge": {
         "name": "Bärensturm",
-        "description": "Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn für 1 Sek. Reichweite 7-23 Meter. Nur in Bärengestalt."
+        "description": "Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn für 1 Sek. Reichweite 8-25 m. Nur in Bärengestalt."
       },
       "demoralizing_roar": {
         "name": "Demoralisierendes Gebrüll",
@@ -2473,7 +2473,7 @@ export const de_DE: EnTranslations = {
         "name": "Silbernebel-Kordial"
       },
       "bogiron_mace": {
-        "name": "Moor Eisenstreitkolben"
+        "name": "Mooreisen-Streitkolben"
       },
       "fenreed_staff": {
         "name": "Fenreed-Stab"
@@ -2482,7 +2482,7 @@ export const de_DE: EnTranslations = {
         "name": "Mirefen-Häuter"
       },
       "bogiron_hauberk": {
-        "name": "Moor Eisenhalsberge"
+        "name": "Mooreisen-Halsberge"
       },
       "marshcloth_robe": {
         "name": "Sumpftuchrobe"
@@ -2497,7 +2497,7 @@ export const de_DE: EnTranslations = {
         "name": "Schilfgewobene Hose"
       },
       "bogiron_nugget": {
-        "name": "Moor Eisennugget"
+        "name": "Mooreisen-Nugget"
       },
       "soggy_moccasin": {
         "name": "Durchnässter Mokassin"
@@ -3112,10 +3112,10 @@ export const de_DE: EnTranslations = {
         "name": "Alte Kryptentür"
       },
       "captains_crest": {
-        "name": "Oberteil des Kryptenschlussels"
+        "name": "Oberteil des Kryptenschlüssels"
       },
       "priests_sigil": {
-        "name": "Unterteil des Kryptenschlussels"
+        "name": "Unterteil des Kryptenschlüssels"
       },
       "royal_seal": {
         "name": "Altes Tagebuch"
@@ -4373,31 +4373,31 @@ export const de_DE: EnTranslations = {
       },
       "q_ledger_teeth": {
         "title": "Zähne in der Dunkelheit",
-        "text": "Die Wolfsrudel haben die Patrouillenwege gelernt - sie schlagen in der Dämmerung zu, wenn das Licht dünn ist und ein einsamer Reisender leichte Beute. Brecht sie, {playerName}. Erlegt 10 Waldwölfe und lasst die Rudel eine neue Lektion lernen.",
-        "completion": "Zehn Wölfe, und die Dämmerstraße gehört wieder uns. Das Verzeichnis wird Euch gnädiger.",
+        "text": "Die Lichtungsfüchse sind kühn geworden wie Wölfe - sie schleichen sich in der Dämmerung in die Hühnerställe und sind verschwunden, ehe eine Laterne brennt, und eine hungrige Füchsin reißt ein Lamm so bereitwillig wie ein Huhn. Lichtet ihre Reihen, {playerName}. Erlegt 10 Lichtungsfüchse und lehrt den Rest, das Licht wieder zu fürchten.",
+        "completion": "Zehn Füchse, und die Hühnerställe sind in der Dämmerung wieder still. Das Verzeichnis wird Euch gnädiger.",
         "objectives": {
           "0": {
-            "label": "Waldwölfe erlegt"
+            "label": "Lichtungsfüchse erlegt"
           }
         }
       },
       "q_ledger_reedwater": {
         "title": "Schilfwasser-Patrouille",
-        "text": "Redbrook hat Euch geschickt? Gut - diese alten Knochen können nicht mehr durch die Untiefen waten. Die Schlammflossen haben sich ins Schilfwasser zurückgeschlichen und sind dreister denn je. Dünnt sie aus: 8 Schlammflossen-Schleicher, und hütet Euch vor dem tiefen Wasser.",
-        "completion": "Das hält die gurgelnden Teufel eine Jahreszeit lang von meinen Netzen fern. Sagt dem Marschall, der See sei wieder still.",
+        "text": "Redbrook hat Euch geschickt? Gut - diese alten Knochen können nicht mehr durch die Untiefen waten. Die Wiesenkraniche haben meine Netze entdeckt, und sie spießen mehr von meinem Fang auf, als es die Schlammflossen je taten. Lichtet ihre Reihen: 8 Wiesenkraniche, und hütet Euch vor dem tiefen Wasser.",
+        "completion": "Das hält die langbeinigen Diebe eine Jahreszeit lang von meinen Netzen fern. Sagt dem Marschall, die Untiefen gehören wieder mir.",
         "objectives": {
           "0": {
-            "label": "Schlammflossen-Schleicher erlegt"
+            "label": "Wiesenkraniche vertrieben"
           }
         }
       },
       "q_ledger_silk": {
-        "title": "Seide und Gift",
-        "text": "Das Verzeichnis weist auch die östlichen Wälder als Hüterland aus. Die Netzwald-Lauerer spinnen Woche um Woche dichter - vergangenen Markttag verirrte sich ein Kind zu nah, und wir schnitten es kaum noch atmend frei. Tötet 8 Netzwald-Lauerer, ehe sie den Wald ganz für sich nehmen.",
-        "completion": "Acht Spinnen weniger in der Dunkelheit. Der Wald atmet leichter, und ich auch.",
+        "title": "Äsung und Gestrüpp",
+        "text": "Das Verzeichnis weist auch die östlichen Wälder als Hüterland aus - und meine Heilkräuterbeete gehören dazu. Die gefleckten Kitze haben mein Silberblatt und meine Blutdistel bis zur Wurzel abgefressen, und ohne diese Heilkräuter bleibt halb Eastbrook ohne Medizin. Es bereitet mir keine Freude, doch erlegt 8 Gefleckte Kitze, ehe die Herbstkräuter gänzlich verloren sind.",
+        "completion": "Die Beete mögen sich noch erholen, dank Euch. Eine harte Gnade - doch ein Kind, das im Fieber brennt, braucht die Heilkräuter dringender, als der Wald die Rehe braucht. Das Verzeichnis ist beglichen.",
         "objectives": {
           "0": {
-            "label": "Netzwald-Lauerer erlegt"
+            "label": "Gefleckte Kitze erlegt"
           }
         }
       },
@@ -4422,12 +4422,12 @@ export const de_DE: EnTranslations = {
         }
       },
       "q_ledger_toll": {
-        "title": "Die Maut der Wegelagerer",
-        "text": "Die südöstlichen Hügel sind zur Mautstraße eines Banditen geworden - sie berauben jeden, der närrisch genug ist, mit leichtem Gepäck zu reisen. Das Verzeichnis hat auf jeden von ihnen einen Preis gesetzt. Bringt 8 Talbanditen die Gerechtigkeit von Eastbrook.",
-        "completion": "Acht Banditen, zur Rechenschaft gezogen. Es spricht sich schon herum, dass die Mautstraße einen neuen Hüter hat - und der nimmt keine Münze, der nimmt Köpfe.",
+        "title": "Die Straße der Hauer",
+        "text": "Die Hainhauer-Keiler sind aus dem Lichtwald herabgekommen und auf die südöstliche Handelsstraße - mächtige, hauerbewehrte Bestien, die die Zugochsen aufspießen und die Karren umstürzen, um das verschüttete Korn zu fressen. Das Verzeichnis hat auf jeden von ihnen einen Preis gesetzt. Macht die Straße wieder frei: streckt 8 Hainhauer-Keiler nieder.",
+        "completion": "Acht Bestien fort von der Straße, und die Karren rollen wieder. Es spricht sich bereits herum, dass die Handelsstraße einen neuen Hüter hat. Das Verzeichnis steigt zu Euren Gunsten.",
         "objectives": {
           "0": {
-            "label": "Talbanditen vor Gericht gebracht"
+            "label": "Hainhauer-Keiler erlegt"
           }
         }
       },

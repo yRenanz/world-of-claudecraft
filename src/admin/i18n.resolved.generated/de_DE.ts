@@ -156,7 +156,7 @@ export const de_DE: AdminTranslations = {
   "auth.loginFailed": "Anmeldung fehlgeschlagen — läuft der Server?",
   "common.unknown": "unbekannt",
   "detail.since": "seit {value}",
-  "detail.suspendedUntil": "gesperrt bis {value}",
+  "detail.suspendedUntil": "ausgesetzt bis {value}",
   "detail.accountNum": "Konto #{id}",
   "detail.started": "Gestartet",
   "detail.lengthHours": "{count} h",

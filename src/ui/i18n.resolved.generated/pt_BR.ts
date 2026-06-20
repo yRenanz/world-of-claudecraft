@@ -2206,11 +2206,11 @@ export const pt_BR: EnTranslations = {
       },
       "bear_charge": {
         "name": "Investida do Urso",
-        "description": "Investe contra um inimigo, gerando 9 de fúria e o atordoando por 1 seg. Alcance de 7-23 metros. Apenas na Forma de Urso."
+        "description": "Investe contra um inimigo, gera 9 de raiva e o atordoa por 1 s. Alcance de 8-25 m. Apenas Forma de Urso."
       },
       "demoralizing_roar": {
         "name": "Rugido Desmoralizante",
-        "description": "Desmoraliza os inimigos próximos, reduzindo seu poder de ataque em 20 por 20 seg. Apenas na Forma de Urso."
+        "description": "Desmoraliza os inimigos próximos, reduzindo seu poder de ataque em 20 por 20 s. Apenas Forma de Urso."
       },
       "prowl": {
         "name": "Espreitar",
@@ -2218,7 +2218,7 @@ export const pt_BR: EnTranslations = {
       },
       "rake": {
         "name": "Dilacerar",
-        "description": "Um golpe de abertura furtivo que dilacera o inimigo causando dano de arma mais {damage} e provoca sangramento ao longo de 9 seg. Concede 1 ponto de combo. Apenas na Forma de Lobo."
+        "description": "Um golpe de abertura furtivo que dilacera o inimigo causando dano de arma mais {damage} e provoca sangramento ao longo de 9 s. Concede 1 ponto de combo. Apenas Forma de Lobo."
       },
       "revive_pet": {
         "name": "Reviver Mascote",
@@ -3118,7 +3118,7 @@ export const pt_BR: EnTranslations = {
         "name": "Parte inferior da pedra-chave"
       },
       "royal_seal": {
-        "name": "Diario antigo"
+        "name": "Diário antigo"
       },
       "crypt_keystone": {
         "name": "Pedra-chave da cripta"
@@ -4373,31 +4373,31 @@ export const pt_BR: EnTranslations = {
       },
       "q_ledger_teeth": {
         "title": "Dentes na Escuridão",
-        "text": "As alcateias de lobos aprenderam as rotas de patrulha - elas atacam ao anoitecer, quando a luz é fraca e um viajante solitário é presa fácil. Quebre-as, {playerName}. Abata 10 Lobos da floresta e que as alcateias aprendam uma nova lição.",
-        "completion": "Dez lobos, e a estrada do crepúsculo é nossa de novo. O livro-razão fica mais brando com você.",
+        "text": "As raposas do bosque ficaram ousadas como lobos - elas se esgueiram nos galinheiros ao anoitecer e somem antes que uma lanterna se acenda, e uma raposa faminta leva um cordeiro com a mesma facilidade que uma galinha. Reduza-as, {playerName}. Abata 10 Raposas do Bosque e que as demais voltem a temer a luz.",
+        "completion": "Dez raposas, e os galinheiros voltaram a ficar tranquilos ao anoitecer. O livro-razão fica mais brando com você.",
         "objectives": {
           "0": {
-            "label": "Lobo da floresta abatido"
+            "label": "Raposa do Bosque abatida"
           }
         }
       },
       "q_ledger_reedwater": {
         "title": "Patrulha das Águas dos Juncos",
-        "text": "Redbrook mandou você? Bom - estes ossos velhos não conseguem mais vadear os baixios. Os Barbatana-de-lodo voltaram a se esgueirar pelas águas dos juncos e estão mais ousados do que nunca. Reduza-os: 8 Espreitadores Barbatana-de-lodo, e cuidado com as águas fundas.",
-        "completion": "Isso manterá aqueles demônios borbulhantes longe das minhas redes por uma estação. Diga ao Marechal que o lago está quieto de novo.",
+        "text": "Redbrook mandou você? Bom - estes ossos velhos não conseguem mais vadear os baixios. As garças do prado descobriram minhas redes e fisgam mais da minha pesca do que os Barbatana-de-lodo jamais fizeram. Reduza-as: 8 Garças do Prado, e cuidado com as águas fundas.",
+        "completion": "Isso manterá aquelas ladras pernaltas longe das minhas redes por uma estação. Diga ao Marechal que os baixios voltaram a ser meus.",
         "objectives": {
           "0": {
-            "label": "Espreitador Barbatana-de-lodo abatido"
+            "label": "Garça do Prado expulsa"
           }
         }
       },
       "q_ledger_silk": {
-        "title": "Seda e Veneno",
-        "text": "O livro-razão marca os bosques orientais como terra de guardião também. Os espreitadores de Webwood tecem teias mais densas a cada semana - uma criança se aproximou demais no último dia de feira e a cortamos da teia mal respirando. Mate 8 Espreitadores de Webwood antes que tomem o bosque por completo.",
-        "completion": "Oito tecedoras a menos na escuridão. O bosque respira aliviado, e eu também.",
+        "title": "Pasto e Espinheiro",
+        "text": "O livro-razão marca os bosques orientais como terra de guardião também - e meus canteiros de ervas medicinais fazem parte deles. Os cervos malhados devoraram minha folha-de-prata e meu sangue-de-cardo até a raiz, e sem esses simples metade de Eastbrook fica sem remédios. Não me alegra fazê-lo, mas abata 8 Cervos Malhados antes que as ervas do outono se percam por completo.",
+        "completion": "Os canteiros ainda podem se recuperar, graças a você. Uma misericórdia dura - mas uma criança ardendo em febre precisa mais dos simples do que o bosque precisa dos cervos. O livro-razão está acertado.",
         "objectives": {
           "0": {
-            "label": "Espreitador de Webwood abatido"
+            "label": "Cervo Malhado abatido"
           }
         }
       },
@@ -4422,12 +4422,12 @@ export const pt_BR: EnTranslations = {
         }
       },
       "q_ledger_toll": {
-        "title": "O Pedágio dos Salteadores",
-        "text": "As colinas a sudeste viraram estrada de pedágio de bandidos - eles roubam qualquer um tolo o bastante para viajar despreocupado. O livro-razão tem um preço sobre a cabeça de cada um deles. Leve a justiça de Eastbrook a 8 Bandidos do Vale.",
-        "completion": "Oito bandidos prestaram contas. Já corre a voz de que a estrada do pedágio tem um novo guardião - e ele não aceita moedas, ele toma cabeças.",
+        "title": "A Estrada das Presas",
+        "text": "Os javalis presa-do-bosque desceram da Mata Clara para a estrada de comércio do sudeste - feras enormes e presadas que escornam os bois de carga e viram as carroças atrás do grão derramado. O livro-razão tem um preço pela cabeça de cada um. Reabra a estrada: abata 8 Javalis Presa-do-Bosque.",
+        "completion": "Oito feras a menos na estrada, e as carroças voltaram a rodar. Já corre a voz de que a estrada de comércio tem um novo guardião. O livro-razão sobe a seu favor.",
         "objectives": {
           "0": {
-            "label": "Bandido do Vale levado à justiça"
+            "label": "Javali Presa-do-Bosque abatido"
           }
         }
       },

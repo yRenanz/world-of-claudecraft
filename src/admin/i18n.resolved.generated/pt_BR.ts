@@ -211,7 +211,7 @@ export const pt_BR: AdminTranslations = {
   "detail.chatMuteLabel": "Silenciamento de chat:",
   "chatMod.title": "Moderação de chat",
   "chatMod.status": "Status:",
-  "chatMod.strikes": "Penalidades:",
+  "chatMod.strikes": "Advertências:",
   "chatMod.liftMute": "Remover silenciamento",
   "chatMod.resetStrikes": "Zerar penalidades",
   "chatMod.recentIncidents": "Incidentes recentes do filtro de chat",

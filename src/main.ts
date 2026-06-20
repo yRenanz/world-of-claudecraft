@@ -2102,7 +2102,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   // composited PNG to this realm and returns an absolute public page URL, and
   // the referral provider feeds the card footer. Both are cleared on disconnect.
   setCardUploader(async (png) => {
-    const r = await api.uploadCard(c.id, png);
+    const r = await api.uploadCard(c.id, png, getLanguage());
     return { url: absolutePublishedCardUrl(r.url, api.base, location.origin) };
   });
   setReferralProvider(() => api.referralStats());

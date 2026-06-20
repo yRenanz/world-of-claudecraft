@@ -9,6 +9,8 @@ import type http from 'node:http';
 import { randomBytes } from 'node:crypto';
 import { json, readBody } from './http_util';
 import { isSolanaAddress, verifySolanaSignature, buildLinkMessage } from './wallet_link';
+import { walletLinkRateLimited } from './ratelimit';
+import { recordUsageMetric } from './provider_usage';
 import {
   createWalletChallenge,
   consumeWalletChallenge,
@@ -31,6 +33,11 @@ export async function handleWalletChallenge(
   res: http.ServerResponse,
   accountId: number,
 ): Promise<void> {
+  recordUsageMetric('wallet.challenge.request');
+  if (walletLinkRateLimited(req, accountId)) {
+    recordUsageMetric('wallet.challenge.rate_limited');
+    return json(res, 429, { error: 'rate limited' });
+  }
   const body = await readBody(req);
   const address = typeof body.address === 'string' ? body.address.trim() : '';
   if (!isSolanaAddress(address)) return json(res, 400, { error: 'invalid Solana wallet address' });
@@ -49,23 +56,39 @@ export async function handleWalletLink(
   res: http.ServerResponse,
   accountId: number,
 ): Promise<void> {
+  recordUsageMetric('wallet.link.request');
+  if (walletLinkRateLimited(req, accountId)) {
+    recordUsageMetric('wallet.link.rate_limited');
+    return json(res, 429, { error: 'rate limited' });
+  }
   const body = await readBody(req);
   const address = typeof body.address === 'string' ? body.address.trim() : '';
   const signature = typeof body.signature === 'string' ? body.signature.trim() : '';
   const nonce = typeof body.nonce === 'string' ? body.nonce.trim() : '';
   if (!isSolanaAddress(address) || !signature || !nonce) {
+    recordUsageMetric('wallet.link.failure');
     return json(res, 400, { error: 'address, signature, and nonce are required' });
   }
 
   const challenge = await consumeWalletChallenge(nonce, accountId);
-  if (!challenge) return json(res, 400, { error: 'challenge expired or already used — request a new one' });
-  if (challenge.address !== address) return json(res, 400, { error: 'wallet address does not match the challenge' });
+  if (!challenge) {
+    recordUsageMetric('wallet.link.failure');
+    return json(res, 400, { error: 'challenge expired or already used - request a new one' });
+  }
+  if (challenge.address !== address) {
+    recordUsageMetric('wallet.link.failure');
+    return json(res, 400, { error: 'wallet address does not match the challenge' });
+  }
   if (!verifySolanaSignature(challenge.message, signature, address)) {
+    recordUsageMetric('wallet.link.failure');
     return json(res, 401, { error: 'signature verification failed' });
   }
 
   const linked = await linkWalletToAccount(accountId, address);
-  if (!linked) return json(res, 409, { error: 'this wallet is already linked to another account' });
+  if (!linked) {
+    recordUsageMetric('wallet.link.failure');
+    return json(res, 409, { error: 'this wallet is already linked to another account' });
+  }
   return json(res, 200, { pubkey: address, linked: true });
 }
 

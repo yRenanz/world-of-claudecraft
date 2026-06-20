@@ -143,9 +143,12 @@ export function resetRateLimits(): void {
 }
 
 export const CARD_UPLOAD_MAX_PER_MINUTE = 10;
+export const WALLET_LINK_MAX_PER_MINUTE = 10;
 
 const cardUploadIpAttempts = new Map<string, number[]>();
 const cardUploadAccountAttempts = new Map<number, number[]>();
+const walletLinkIpAttempts = new Map<string, number[]>();
+const walletLinkAccountAttempts = new Map<number, number[]>();
 
 function recordSlidingWindowAttempt<K>(
   attemptsByKey: Map<K, number[]>,
@@ -194,6 +197,18 @@ export function cardUploadRateLimited(req: http.IncomingMessage, accountId: numb
 export function resetCardUploadRateLimits(): void {
   cardUploadIpAttempts.clear();
   cardUploadAccountAttempts.clear();
+}
+
+export function walletLinkRateLimited(req: http.IncomingMessage, accountId: number): boolean {
+  const ipLimited = recordSlidingWindowAttempt(walletLinkIpAttempts, requestIp(req), WALLET_LINK_MAX_PER_MINUTE);
+  const accountLimited = recordSlidingWindowAttempt(walletLinkAccountAttempts, accountId, WALLET_LINK_MAX_PER_MINUTE);
+  return ipLimited || accountLimited;
+}
+
+/** Reset wallet-link verification throttles. Test-only: keeps scoped buckets isolated. */
+export function resetWalletLinkRateLimits(): void {
+  walletLinkIpAttempts.clear();
+  walletLinkAccountAttempts.clear();
 }
 
 // ---------------------------------------------------------------------------

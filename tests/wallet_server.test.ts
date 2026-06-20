@@ -15,12 +15,26 @@ vi.mock('pg', () => ({
 }));
 
 import { handleWalletChallenge, handleWalletLink, handleWalletGet, handleWalletUnlink } from '../server/wallet';
+import { resetWalletLinkRateLimits, walletLinkRateLimited, WALLET_LINK_MAX_PER_MINUTE } from '../server/ratelimit';
 
 // ── fakes for http.IncomingMessage / ServerResponse ─────────────────────────
 function makeReq(body: unknown): any {
   const req: any = Readable.from([Buffer.from(JSON.stringify(body))]);
   req.headers = { host: 'localhost:8787' };
+  req.socket = { remoteAddress: '127.0.0.1' };
   return req;
+}
+function makeUnreadableReq(): { req: any; wasRead: () => boolean } {
+  let read = false;
+  const req: any = new Readable({
+    read() {
+      read = true;
+      this.destroy(new Error('body should not be read'));
+    },
+  });
+  req.headers = { host: 'localhost:8787' };
+  req.socket = { remoteAddress: '127.0.0.1' };
+  return { req, wasRead: () => read };
 }
 function makeRes(): any {
   return {
@@ -51,6 +65,7 @@ let walletRows: any[] = [];
 
 beforeEach(() => {
   challengeRows = []; ownerRows = []; walletRows = [];
+  resetWalletLinkRateLimits();
   dbMock.query.mockReset();
   dbMock.query.mockImplementation((sql: string) => {
     // The real queries are multi-line; collapse whitespace so routing is robust.
@@ -82,6 +97,20 @@ describe('POST /api/wallet/link/challenge', () => {
   it('rejects a non-Solana address', async () => {
     const { status } = await call(handleWalletChallenge, { address: 'not-a-real-address' });
     expect(status).toBe(400);
+  });
+
+  it('rate-limits before reading the body or writing challenge rows', async () => {
+    for (let i = 0; i < WALLET_LINK_MAX_PER_MINUTE; i++) {
+      expect(walletLinkRateLimited(makeReq({}), 1)).toBe(false);
+    }
+    dbMock.query.mockClear();
+    const { req, wasRead } = makeUnreadableReq();
+    const res = makeRes();
+    await handleWalletChallenge(req, res, 1);
+    expect(res.statusCode).toBe(429);
+    expect(JSON.parse(String(res.body)).error).toBe('rate limited');
+    expect(wasRead()).toBe(false);
+    expect(dbMock.query).not.toHaveBeenCalled();
   });
 });
 
@@ -136,7 +165,7 @@ describe('POST /api/wallet/link', () => {
   });
 
   it('returns 409 (not 500) on the TOCTOU race: pre-check passes but the INSERT hits a unique violation', async () => {
-    // The ownership pre-check (SELECT ... WHERE pubkey) passes — no row — but
+    // The ownership pre-check (SELECT ... WHERE pubkey) passes with no row, but
     // between that read and the INSERT another account claims the pubkey, so the
     // UNIQUE index races to a Postgres 23505. linkWalletToAccount must swallow
     // that into `false`, and the handler must surface 409, never a 500.
@@ -175,7 +204,7 @@ describe('POST /api/wallet/link', () => {
     );
     expect(status).toBe(200);
     expect(data).toEqual({ pubkey: w.address, linked: true });
-    // the trimmed address — not the padded input — is what gets persisted
+    // the trimmed address, not the padded input, is what gets persisted
     const insert = dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO wallet_links'));
     expect(insert?.[1]).toEqual([1, w.address]);
   });
@@ -183,7 +212,7 @@ describe('POST /api/wallet/link', () => {
   it('rejects a valid signature scoped to another account (consume returns null) with 400', async () => {
     // The signature is valid, but the nonce belongs to a different account, so
     // consumeWalletChallenge (DELETE ... WHERE nonce = $1 AND account_id = $2)
-    // matches no row → null → the handler must 400, never reach the link step.
+    // matches no row, returns null, and the handler must 400 without linking.
     const w = makeWallet();
     const message = 'm';
     challengeRows = []; // account-scoped consume finds nothing for this caller
@@ -200,6 +229,20 @@ describe('POST /api/wallet/link', () => {
   it('rejects missing fields with 400', async () => {
     const { status } = await call(handleWalletLink, { address: '', signature: '', nonce: '' });
     expect(status).toBe(400);
+  });
+
+  it('rate-limits before reading the body or consuming challenge rows', async () => {
+    for (let i = 0; i < WALLET_LINK_MAX_PER_MINUTE; i++) {
+      expect(walletLinkRateLimited(makeReq({}), 1)).toBe(false);
+    }
+    dbMock.query.mockClear();
+    const { req, wasRead } = makeUnreadableReq();
+    const res = makeRes();
+    await handleWalletLink(req, res, 1);
+    expect(res.statusCode).toBe(429);
+    expect(JSON.parse(String(res.body)).error).toBe('rate limited');
+    expect(wasRead()).toBe(false);
+    expect(dbMock.query).not.toHaveBeenCalled();
   });
 });
 

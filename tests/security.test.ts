@@ -19,6 +19,9 @@ import {
   cardUploadRateLimited,
   CARD_UPLOAD_MAX_PER_MINUTE,
   resetCardUploadRateLimits,
+  walletLinkRateLimited,
+  WALLET_LINK_MAX_PER_MINUTE,
+  resetWalletLinkRateLimits,
 } from '../server/ratelimit';
 
 function fakeReq(headers: Record<string, string>, remoteAddress: string) {
@@ -68,6 +71,7 @@ describe('rate-limit client IP selection', () => {
   beforeEach(() => {
     resetRateLimits();
     resetCardUploadRateLimits();
+    resetWalletLinkRateLimits();
   });
 
   it('ignores spoofed x-forwarded-for from untrusted direct clients', () => {
@@ -145,6 +149,22 @@ describe('rate-limit client IP selection', () => {
       expect(cardUploadRateLimited(fakeReq({ 'x-forwarded-for': ip }, '172.18.0.1'), 1000 + i)).toBe(false);
     }
     expect(cardUploadRateLimited(fakeReq({ 'x-forwarded-for': ip }, '172.18.0.1'), 2000)).toBe(true);
+  });
+
+  it('rate-limits wallet link/challenge attempts by account across client IPs', () => {
+    const accountId = 77;
+    for (let i = 0; i < WALLET_LINK_MAX_PER_MINUTE; i++) {
+      expect(walletLinkRateLimited(fakeReq({ 'x-forwarded-for': `203.0.114.${i + 1}` }, '172.18.0.1'), accountId)).toBe(false);
+    }
+    expect(walletLinkRateLimited(fakeReq({ 'x-forwarded-for': '203.0.114.250' }, '172.18.0.1'), accountId)).toBe(true);
+  });
+
+  it('rate-limits wallet link/challenge attempts by client IP across accounts', () => {
+    const ip = '203.0.114.220';
+    for (let i = 0; i < WALLET_LINK_MAX_PER_MINUTE; i++) {
+      expect(walletLinkRateLimited(fakeReq({ 'x-forwarded-for': ip }, '172.18.0.1'), 1000 + i)).toBe(false);
+    }
+    expect(walletLinkRateLimited(fakeReq({ 'x-forwarded-for': ip }, '172.18.0.1'), 2000)).toBe(true);
   });
 
   it('keeps limiting a persistent attacker after the memory backstop evicts', () => {

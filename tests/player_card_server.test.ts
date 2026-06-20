@@ -18,6 +18,7 @@ vi.mock('pg', () => ({
 
 import {
   handleCardUpload, handleCardRoutes, captureReferral, slugify, isValidSlug, MAX_CARD_BYTES,
+  PUBLIC_CARD_COPY, PUBLIC_CARD_LOCALES, normalizePublicCardLocale,
 } from '../server/player_card';
 import { lifetimeXpStanding } from '../server/db';
 import { publicOriginForRealm, resolvePublicOrigin } from '../server/realm';
@@ -139,8 +140,8 @@ beforeEach(() => {
       if (upsertThrows) return Promise.reject(upsertThrows);
       return Promise.resolve({ rows: [] });
     }
-    if (s.includes('SELECT character_id, account_id, png, title, description FROM player_cards')) return Promise.resolve({ rows: cardRows });
-    if (s.includes('SELECT title, description FROM player_cards')) return Promise.resolve({ rows: cardRows }); // metadata-only OG page read
+    if (s.includes('SELECT character_id, account_id, png, title, description')) return Promise.resolve({ rows: cardRows });
+    if (s.includes('SELECT title, description, locale')) return Promise.resolve({ rows: cardRows }); // metadata-only OG page read
     if (s.includes('SELECT account_id FROM player_cards WHERE slug')) return Promise.resolve({ rows: accountForSlugRows });
     if (s.includes('INSERT INTO referrals')) return Promise.resolve({ rows: [] });
     return Promise.resolve({ rows: [] });
@@ -153,13 +154,13 @@ async function callUpload(url: string, body: Buffer, accountId = 1) {
   return { status: res.statusCode, data: res.body ? JSON.parse(String(res.body)) : {} };
 }
 
-type CardOriginEnvKey = 'PUBLIC_ORIGIN' | 'REALM_NAME' | 'REALMS';
+type CardOriginEnvKey = 'PUBLIC_ORIGIN' | 'REALM_NAME' | 'REALMS' | 'NODE_ENV';
 
 async function withReloadedCardRoutes(
   env: Partial<Record<CardOriginEnvKey, string | undefined>>,
   run: (routes: typeof handleCardRoutes) => Promise<void>,
 ): Promise<void> {
-  const keys: readonly CardOriginEnvKey[] = ['PUBLIC_ORIGIN', 'REALM_NAME', 'REALMS'];
+  const keys: readonly CardOriginEnvKey[] = ['PUBLIC_ORIGIN', 'REALM_NAME', 'REALMS', 'NODE_ENV'];
   const previous = new Map<CardOriginEnvKey, string | undefined>();
   for (const key of keys) {
     previous.set(key, process.env[key]);
@@ -235,7 +236,19 @@ describe('POST /api/card', () => {
     const storedPng = insert?.[1][3];
     expect(Buffer.isBuffer(storedPng)).toBe(true); // png bytes
     expect(Buffer.isBuffer(storedPng) && storedPng.equals(validCardPng)).toBe(true);
-    expect(insert?.[1][4]).toBe('Sir Test — Level 12 Paladin'); // title
+    expect(insert?.[1][4]).toBe('Sir Test - Level 12 Paladin'); // title
+    expect(insert?.[1][6]).toBe('en'); // locale
+  });
+
+  it('stores localized public-page metadata using the upload locale', async () => {
+    characterRows = [{ id: 5, account_id: 1, name: 'Sir Test', class: 'paladin', level: 12 }];
+    slugRows = [];
+    const { status } = await callUpload('/api/card?character=5&lang=es-ES', validCardPng);
+    expect(status).toBe(200);
+    const insert = dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO player_cards'));
+    expect(insert?.[1][4]).toBe('Sir Test - Nivel 12 Paladín');
+    expect(insert?.[1][5]).toContain('Sir Test está forjando una leyenda');
+    expect(insert?.[1][6]).toBe('es_ES');
   });
 
   it('falls back to a character-id-suffixed slug when the name slug is taken', async () => {
@@ -390,6 +403,7 @@ describe('GET /p/<slug>', () => {
     expect(res.statusCode).toBe(200);
     expect(String(res.headers['Content-Type'])).toContain('text/html');
     const html = String(res.body);
+    expect(html).toContain('<link rel="canonical" href="http://realm.example/p/sir-test">');
     expect(html).toContain('property="og:image" content="http://realm.example/p/sir-test/card.png"');
     expect(html).toContain('name="twitter:card" content="summary_large_image"');
     expect(html).toContain('href="http://realm.example/?ref=sir-test"');
@@ -398,6 +412,61 @@ describe('GET /p/<slug>', () => {
     expect(html).toContain('desc &amp; more');
     expect(html).not.toContain('<b>A "Quote"');
     expect(res.headers['Cache-Control']).toBe('public, max-age=120');
+  });
+
+  it('renders localized server-side public card copy from the stored card locale', async () => {
+    cardRows = [{ character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd', locale: 'es_ES' }];
+    const res = makeRes();
+    await handleCardRoutes(makeGetReq('/p/sir-test'), res);
+    const html = String(res.body);
+    expect(html).toContain('<html lang="es-ES">');
+    expect(html).toContain(`>${PUBLIC_CARD_COPY.es_ES.cta}</a>`);
+    expect(html).toContain(`<footer>${PUBLIC_CARD_COPY.es_ES.gameName}</footer>`);
+    expect(html).not.toContain('\u2192');
+    expect(html).not.toContain('\u2014');
+
+    cardRows = [];
+    const missing = makeRes();
+    await handleCardRoutes(makeGetReq('/p/nope?lang=fr-CA'), missing);
+    const missingHtml = String(missing.body);
+    expect(missing.statusCode).toBe(404);
+    expect(missingHtml).toContain('<html lang="fr-CA">');
+    expect(missingHtml).toContain('Cette carte n&#39;est plus disponible.');
+    expect(missingHtml).toContain('Elle a peut-être été retirée ou n&#39;a jamais existé.');
+    expect(missingHtml).toContain(`>${PUBLIC_CARD_COPY.fr_CA.missingCta}</a>`);
+    expect(missingHtml).not.toContain('\u2192');
+    expect(missingHtml).not.toContain('\u2014');
+  });
+
+  it('has public card wrapper copy for every supported card locale', async () => {
+    for (const locale of PUBLIC_CARD_LOCALES) {
+      cardRows = [{ character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd', locale }];
+      const res = makeRes();
+      await handleCardRoutes(makeGetReq('/p/sir-test'), res);
+      const html = String(res.body);
+      expect(html).toContain(`<html lang="${locale.replace('_', '-')}">`);
+      expect(html).toContain(`>${PUBLIC_CARD_COPY[locale].cta}</a>`);
+      expect(html).toContain(`<footer>${PUBLIC_CARD_COPY[locale].gameName}</footer>`);
+    }
+  });
+
+  it('normalizes card locale inputs and falls back to English', () => {
+    expect(normalizePublicCardLocale('fr-CA')).toBe('fr_CA');
+    expect(normalizePublicCardLocale('zh-Hant')).toBe('zh_TW');
+    expect(normalizePublicCardLocale('pt')).toBe('pt_BR');
+    expect(normalizePublicCardLocale('unknown')).toBe('en');
+  });
+
+  it('uses Accept-Language for missing public card pages when no lang query is present', async () => {
+    cardRows = [];
+    const res = makeRes();
+    await handleCardRoutes(makeGetReq('/p/nope', {
+      headers: { 'accept-language': 'de-DE;q=0.9,fr-CA;q=0.8,en;q=0.1' },
+    }), res);
+    const html = String(res.body);
+    expect(res.statusCode).toBe(404);
+    expect(html).toContain('<html lang="de-DE">');
+    expect(html).toContain(PUBLIC_CARD_COPY.de_DE.missingCta);
   });
 
   it('HTML-escapes an apostrophe in the title', async () => {
@@ -434,9 +503,28 @@ describe('GET /p/<slug>', () => {
       }), res);
       const html = String(res.body);
       expect(res.statusCode).toBe(200);
+      expect(html).toContain('<link rel="canonical" href="https://cards.example.com/p/sir-test">');
       expect(html).toContain('property="og:url" content="https://cards.example.com/p/sir-test"');
       expect(html).toContain('property="og:image" content="https://cards.example.com/p/sir-test/card.png"');
       expect(html).toContain('href="https://cards.example.com/?ref=sir-test"');
+      expect(html).not.toContain('evil.example');
+      expect(html).not.toContain('javascript://');
+    });
+  });
+
+  it('uses a stable production origin instead of hostile headers when no public origin is configured', async () => {
+    await withReloadedCardRoutes({ NODE_ENV: 'production' }, async (routes) => {
+      cardRows = [{ character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd' }];
+      const res = makeRes();
+      await routes(makeGetReq('/p/sir-test', {
+        headers: { host: 'evil.example', 'x-forwarded-proto': 'javascript' },
+      }), res);
+      const html = String(res.body);
+      expect(res.statusCode).toBe(200);
+      expect(html).toContain('<link rel="canonical" href="https://worldofclaudecraft.com/p/sir-test">');
+      expect(html).toContain('property="og:url" content="https://worldofclaudecraft.com/p/sir-test"');
+      expect(html).toContain('property="og:image" content="https://worldofclaudecraft.com/p/sir-test/card.png"');
+      expect(html).toContain('href="https://worldofclaudecraft.com/?ref=sir-test"');
       expect(html).not.toContain('evil.example');
       expect(html).not.toContain('javascript://');
     });
@@ -454,6 +542,7 @@ describe('GET /p/<slug>', () => {
       }), res);
       const html = String(res.body);
       expect(res.statusCode).toBe(200);
+      expect(html).toContain('<link rel="canonical" href="https://ironforge.example.com/p/sir-test">');
       expect(html).toContain('property="og:url" content="https://ironforge.example.com/p/sir-test"');
       expect(html).toContain('property="og:image" content="https://ironforge.example.com/p/sir-test/card.png"');
       expect(html).toContain('href="https://ironforge.example.com/?ref=sir-test"');
@@ -472,7 +561,7 @@ describe('GET /p/<slug>', () => {
   it('returns 500 when the card metadata lookup throws', async () => {
     dbMock.query.mockImplementation((sql: string) => {
       const s = String(sql).replace(/\s+/g, ' ');
-      if (s.includes('SELECT title, description FROM player_cards')) return Promise.reject(new Error('db down'));
+      if (s.includes('SELECT title, description, locale')) return Promise.reject(new Error('db down'));
       return Promise.resolve({ rows: [] });
     });
     const res = makeRes();
@@ -509,7 +598,7 @@ describe('GET /p/<slug>', () => {
     expect(res.headers['Content-Type']).not.toBe('image/png');
     // a card-lookup query DID run (the slug was valid), but nothing was served
     expect(dbMock.query.mock.calls.some((c) =>
-      String(c[0]).includes('SELECT character_id, account_id, png, title, description FROM player_cards'))).toBe(true);
+      String(c[0]).includes('SELECT character_id, account_id, png, title, description, locale FROM player_cards'))).toBe(true);
   });
 
   it('404s an invalid slug without touching the database', async () => {

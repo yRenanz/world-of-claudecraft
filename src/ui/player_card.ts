@@ -80,7 +80,7 @@ export interface CardPose {
 }
 
 export const CARD_POSES: readonly CardPose[] = [
-  // Heroic raised weapon — epic across warrior/mage/hunter/etc. The default.
+  // Heroic raised weapon: epic across warrior/mage/hunter/etc. The default.
   { id: 'hero', labelKey: 'playerCard.poseHero', clips: ['Spellcast_Raise', 'Spellcasting', 'Idle'], fraction: 0.5 },
   // Class-appropriate combat action (melee swing / drawn bow / cast).
   { id: 'battle', labelKey: 'playerCard.poseBattle', clips: ['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal', 'Dualwield_Melee_Attack_Chop', '2H_Ranged_Shoot', 'Spellcast_Shoot', 'Idle'], fraction: 0.4 },
@@ -261,7 +261,7 @@ function drawHeader(ctx: CanvasRenderingContext2D, data: PlayerCardData): void {
 }
 
 function drawBadge(ctx: CanvasRenderingContext2D, tier: HolderTier, badge: HTMLImageElement, balance: number | null): void {
-  // Bottom-left of the right column (the footer band) — swapped with the brand
+  // Bottom-left of the right column (the footer band), swapped with the brand
   // mark, which now sits top-right. Badge on the left, tier + balance to its right.
   // Compact badge with a tight glow so it sits inside the footer band without
   // bleeding up into the gear panel above (which ends at y≈530).
@@ -280,7 +280,7 @@ function drawBadge(ctx: CanvasRenderingContext2D, tier: HolderTier, badge: HTMLI
   ctx.fillStyle = tier.ring;
   ctx.font = `700 18px ${TITLE_FONT}`;
   ctx.fillText(holderTierDisplayName(tier).toLocaleUpperCase(languageTag(getLanguage())), left, cy - 13);
-  // The actual on-chain bag — the flex.
+  // The actual on-chain bag: the flex.
   if (balance !== null) {
     ctx.fillStyle = COL.gold;
     ctx.font = `700 20px ${BODY_FONT}`;
@@ -358,7 +358,7 @@ function drawGear(ctx: CanvasRenderingContext2D, data: PlayerCardData): void {
 
 function drawFooter(ctx: CanvasRenderingContext2D, data: PlayerCardData, logo: HTMLImageElement | null): void {
   const y = CARD_H - 26;
-  // Brand mark: the full logo lockup, else a plain text wordmark — top-right now
+  // Brand mark: the full logo lockup, else a plain text wordmark, top-right now
   // (swapped with the holder badge, which moved to the bottom-left). Right-aligned
   // against the card's right margin, above the stats panel.
   if (logo && logo.width > 0) {

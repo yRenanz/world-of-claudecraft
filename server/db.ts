@@ -252,9 +252,11 @@ CREATE TABLE IF NOT EXISTS player_cards (
   png BYTEA NOT NULL,
   title TEXT NOT NULL DEFAULT '',
   description TEXT NOT NULL DEFAULT '',
+  locale TEXT NOT NULL DEFAULT 'en',
   realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+ALTER TABLE player_cards ADD COLUMN IF NOT EXISTS locale TEXT NOT NULL DEFAULT 'en';
 CREATE INDEX IF NOT EXISTS player_cards_account ON player_cards(account_id);
 -- Referral capture: when a new account registers via someone's card link
 -- (?ref=<slug>) we record who referred whom, once per referee. Reward payout is
@@ -521,6 +523,7 @@ export interface PlayerCardRow {
   png: Buffer;
   title: string;
   description: string;
+  locale: string;
 }
 
 // True when `slug` is free, or already owned by `exceptCharacterId` (so a
@@ -539,20 +542,21 @@ export async function upsertPlayerCard(card: {
   png: Buffer;
   title: string;
   description: string;
+  locale: string;
 }): Promise<void> {
   await pool.query(
-    `INSERT INTO player_cards (character_id, account_id, slug, png, title, description, realm, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, now())
+    `INSERT INTO player_cards (character_id, account_id, slug, png, title, description, locale, realm, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now())
      ON CONFLICT (character_id)
      DO UPDATE SET slug = EXCLUDED.slug, png = EXCLUDED.png, title = EXCLUDED.title,
-                   description = EXCLUDED.description, updated_at = now()`,
-    [card.characterId, card.accountId, card.slug, card.png, card.title, card.description, REALM],
+                   description = EXCLUDED.description, locale = EXCLUDED.locale, updated_at = now()`,
+    [card.characterId, card.accountId, card.slug, card.png, card.title, card.description, card.locale, REALM],
   );
 }
 
 export async function getPlayerCardBySlug(slug: string): Promise<PlayerCardRow | null> {
   const res = await pool.query(
-    'SELECT character_id, account_id, png, title, description FROM player_cards WHERE slug = $1',
+    'SELECT character_id, account_id, png, title, description, locale FROM player_cards WHERE slug = $1',
     [slug],
   );
   const row = res.rows[0];
@@ -563,15 +567,16 @@ export async function getPlayerCardBySlug(slug: string): Promise<PlayerCardRow |
     png: row.png as Buffer,
     title: row.title ?? '',
     description: row.description ?? '',
+    locale: row.locale ?? 'en',
   };
 }
 
 // Metadata-only read for the OG-unfurl HTML page, which doesn't need the (up to
 // ~4 MB) PNG bytes — keeps getPlayerCardBySlug's heavy SELECT for the image route.
-export async function getPlayerCardMetaBySlug(slug: string): Promise<{ title: string; description: string } | null> {
-  const res = await pool.query('SELECT title, description FROM player_cards WHERE slug = $1', [slug]);
+export async function getPlayerCardMetaBySlug(slug: string): Promise<{ title: string; description: string; locale: string } | null> {
+  const res = await pool.query('SELECT title, description, locale FROM player_cards WHERE slug = $1', [slug]);
   const row = res.rows[0];
-  return row ? { title: row.title ?? '', description: row.description ?? '' } : null;
+  return row ? { title: row.title ?? '', description: row.description ?? '', locale: row.locale ?? 'en' } : null;
 }
 
 // The account that owns a card slug — i.e. the referrer credited when someone

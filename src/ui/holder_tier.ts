@@ -2,7 +2,7 @@
 //
 // A purely cosmetic honor badge derived from how much $WOC a connected wallet
 // holds. It grants NO gameplay power (the vanilla-formula invariant forbids
-// pay-to-win) — it is flair for the player card and, later, nameplate cosmetics.
+// pay-to-win); it is flair for the player card and, later, nameplate cosmetics.
 //
 // This module is intentionally free of DOM, Three.js, and network imports: it is
 // plain data + a lookup, so it can be unit-tested in Node and reused anywhere.
@@ -78,31 +78,31 @@ const HOLDER_TIER_PRESENTATION: Record<HolderTierKey, HolderTierPresentation> = 
   },
   vaultwarden: {
     name: 'Vaultwarden',
-    flavor: 'Guarding a real vault now — 0.01% of all $WOC.',
+    flavor: 'Guarding a real vault now: 0.01% of all $WOC.',
     ring: '#57e0b9', glow: '#1fae86',
     glyph: `<rect x="12" y="16" width="40" height="32" rx="4" fill="none" stroke="${GLYPH_FILL}" stroke-width="4"/><circle cx="32" cy="32" r="7" fill="none" stroke="${GLYPH_FILL}" stroke-width="3.4"/><path d="M32 25v-3M32 39v3M25 32h-3M39 32h3" stroke="${GLYPH_FILL}" stroke-width="3.2" stroke-linecap="round"/>`,
   },
   whale: {
     name: 'Whale',
-    flavor: 'The deep parts when you swim — 0.1% of supply.',
+    flavor: 'The deep parts when you swim: 0.1% of supply.',
     ring: '#4ea8ff', glow: '#1f6fe0',
     glyph: `<path d="M10 30c10-10 30-12 40-2 3 3 5 3 8 1-1 7-7 11-14 11 1 4-1 8-5 9l2-7c-9 3-21 1-27-6-3-3-5-4-7-3 0-2 1-3 3-4Z" fill="${GLYPH_FILL}"/><circle cx="22" cy="30" r="2.2" fill="${'#1f6fe0'}"/>`,
   },
   leviathan: {
     name: 'Leviathan',
-    flavor: 'Markets feel you move — 1% of supply.',
+    flavor: 'Markets feel you move: 1% of supply.',
     ring: '#9b6cff', glow: '#6a37e0',
     glyph: `<path d="M8 40c4 0 6-6 10-6s6 6 10 6 6-9 10-9 6 9 10 9 5-4 8-4" fill="none" stroke="${GLYPH_FILL}" stroke-width="4" stroke-linecap="round"/><path d="M48 30c3-4 9-4 9-4s-2 6-6 7" fill="none" stroke="${GLYPH_FILL}" stroke-width="3.4" stroke-linecap="round"/><circle cx="51" cy="26" r="2" fill="${GLYPH_FILL}"/>`,
   },
   worldbearer: {
     name: 'Worldbearer',
-    flavor: 'You carry a piece of the world — 10% of supply.',
+    flavor: 'You carry a piece of the world: 10% of supply.',
     ring: '#ff5c8a', glow: '#e02a5c',
     glyph: `<circle cx="32" cy="32" r="18" fill="none" stroke="${GLYPH_FILL}" stroke-width="4"/><ellipse cx="32" cy="32" rx="8" ry="18" fill="none" stroke="${GLYPH_FILL}" stroke-width="3"/><path d="M14 32h36M17 22h30M17 42h30" stroke="${GLYPH_FILL}" stroke-width="3"/>`,
   },
   sovereign: {
     name: 'Sovereign',
-    flavor: 'The realm bends the knee — the entire supply.',
+    flavor: 'The realm bends the knee: the entire supply.',
     ring: '#ffe27a', glow: '#ffaa00',
     glyph: `<path d="M12 22l8 12 12-18 12 18 8-12v24H12V22Z" fill="${GLYPH_FILL}"/><circle cx="12" cy="20" r="3.4" fill="${GLYPH_FILL}"/><circle cx="32" cy="14" r="3.4" fill="${GLYPH_FILL}"/><circle cx="52" cy="20" r="3.4" fill="${GLYPH_FILL}"/><rect x="14" y="48" width="36" height="5" fill="${GLYPH_FILL}"/>`,
   },

@@ -1146,6 +1146,19 @@
     color: var(--gold); background: #120d07; border: 1px solid #463a1c; border-radius: 5px; font-family: var(--ui-font); }
   #player-card-modal .pc-status { margin-top: 10px; min-height: 16px; font-size: 12px;
     color: #c8b888; text-align: center; }
+  @media (pointer: coarse) {
+    #player-card-modal .pc-pose,
+    #player-card-modal .pc-actions .btn {
+      min-height: 40px;
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #player-card-modal .pc-link-input {
+      font-size: 16px;
+    }
+  }
 
   /* vendor */
   #vendor-window { width: 400px; }
@@ -2088,7 +2101,7 @@
   }
   .wallet-cta.busy { opacity: 0.6; pointer-events: none; }
 
-  /* Wallet row inside the (logged-in) character-select panel — the account
+  /* Wallet row inside the (logged-in) character-select panel: the account
      context where linking actually belongs. */
   .cs-wallet {
     display: flex;
@@ -5279,6 +5292,17 @@
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
+    font-size: 16px;
+  }
+  body.mobile-touch #player-card-modal .pc-pose,
+  body.mobile-touch #player-card-modal .pc-actions .btn {
+    min-height: 40px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  body.mobile-touch #player-card-modal .pc-link-input {
     font-size: 16px;
   }
   body.mobile-touch #char-window {

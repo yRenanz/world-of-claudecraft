@@ -1,8 +1,8 @@
-// Server-side $WOC balance reads — the ONLY place the Solana RPC endpoint is used.
+// Server-side $WOC balance reads: the ONLY place the Solana RPC endpoint is used.
 //
 // Both the in-world holder-tier flair (broadcast to nearby players) and the
 // connected wallet's own balance (drawn on the player card / bag, via the
-// /api/woc/balance proxy) are read here with a raw fetch — so the RPC URL, and any
+// /api/woc/balance proxy) are read here with a raw fetch, so the RPC URL, and any
 // API key embedded in it, never ship in the client bundle. Cached per wallet, since
 // balances move slowly and public RPCs are rate-limited.
 //
@@ -13,15 +13,25 @@ import type http from 'node:http';
 import { holderTierIndexForBalance } from '../src/sim/holder_tier';
 import { json } from './http_util';
 import { isSolanaAddress } from './wallet_link';
+import {
+  providerUsageSnapshot,
+  recordUsageCacheEvent,
+  recordUsageMetric,
+  resetUsageCacheForTests,
+  setUsageCacheSize,
+  type UsageCacheSnapshot,
+} from './provider_usage';
 
 const WOC_MINT = (process.env.WOC_MINT ?? process.env.VITE_WOC_MINT ?? '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth').trim();
 const SOLANA_RPC_URL = (process.env.SOLANA_RPC_URL ?? process.env.VITE_SOLANA_RPC_URL ?? 'https://api.mainnet-beta.solana.com').trim();
 // Balances move slowly relative to a play session; one RPC per wallet per this
 // window is plenty and keeps us well under public-RPC rate limits.
 const CACHE_TTL_MS = 5 * 60 * 1000;
+export const WOC_BALANCE_CACHE_MAX_ENTRIES = 1024;
 
 interface CacheEntry { balance: number; at: number; }
 const cache = new Map<string, CacheEntry>();
+setUsageCacheSize('woc.balance', cache.size, WOC_BALANCE_CACHE_MAX_ENTRIES);
 
 interface RpcTokenAmount {
   uiAmount?: unknown;
@@ -92,12 +102,41 @@ function parseTokenBalance(tokenAmount: unknown): number | null {
   return parseRawAmount(amount, decimals);
 }
 
+function rememberCacheEntry(pubkey: string, entry: CacheEntry): void {
+  cache.delete(pubkey);
+  cache.set(pubkey, entry);
+  evictOldestCacheEntries();
+  setUsageCacheSize('woc.balance', cache.size, WOC_BALANCE_CACHE_MAX_ENTRIES);
+}
+
+function evictOldestCacheEntries(): void {
+  while (cache.size > WOC_BALANCE_CACHE_MAX_ENTRIES) {
+    const oldest = cache.keys().next();
+    if (oldest.done) return;
+    cache.delete(oldest.value);
+    recordUsageCacheEvent('woc.balance', 'eviction');
+  }
+}
+
+export function resetWocBalanceCacheForTests(): void {
+  cache.clear();
+  resetUsageCacheForTests('woc.balance');
+  setUsageCacheSize('woc.balance', cache.size, WOC_BALANCE_CACHE_MAX_ENTRIES);
+}
+
+export function wocBalanceCacheStats(): UsageCacheSnapshot {
+  const stats = providerUsageSnapshot().caches.find((cacheStats) => cacheStats.key === 'woc.balance');
+  if (!stats) throw new Error('missing woc balance cache stats');
+  return stats;
+}
+
 /**
  * The owner's total $WOC across all their token accounts for the mint, in
  * human-readable units. Returns null on any RPC/parse failure so callers can
  * keep the last known value.
  */
 export async function fetchWocBalance(pubkey: string): Promise<number | null> {
+  recordUsageMetric('woc.balance.rpc');
   try {
     const res = await fetch(SOLANA_RPC_URL, {
       method: 'POST',
@@ -110,10 +149,16 @@ export async function fetchWocBalance(pubkey: string): Promise<number | null> {
       }),
       signal: AbortSignal.timeout(8000),
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      recordUsageMetric('woc.balance.rpc.failure');
+      return null;
+    }
     const data = (await res.json()) as RpcTokenAccountsResponse;
     const accounts = data?.result?.value;
-    if (!Array.isArray(accounts)) return null;
+    if (!Array.isArray(accounts)) {
+      recordUsageMetric('woc.balance.rpc.failure');
+      return null;
+    }
     let total = 0;
     for (const a of accounts) {
       const info = asRecord(a?.account?.data?.parsed?.info);
@@ -122,6 +167,7 @@ export async function fetchWocBalance(pubkey: string): Promise<number | null> {
     }
     return total;
   } catch (err) {
+    recordUsageMetric('woc.balance.rpc.failure');
     console.error('[woc] balance read failed for', pubkey, err);
     return null;
   }
@@ -136,10 +182,21 @@ export async function fetchWocBalance(pubkey: string): Promise<number | null> {
 export async function cachedWocBalance(pubkey: string): Promise<number | null> {
   const now = Date.now();
   const hit = cache.get(pubkey);
-  if (hit && now - hit.at < CACHE_TTL_MS) return hit.balance;
+  if (hit && now - hit.at < CACHE_TTL_MS) {
+    recordUsageCacheEvent('woc.balance', 'hit');
+    rememberCacheEntry(pubkey, hit);
+    return hit.balance;
+  }
+  recordUsageCacheEvent('woc.balance', hit ? 'stale' : 'miss');
   const balance = await fetchWocBalance(pubkey);
-  if (balance === null) return hit ? hit.balance : null; // keep last known, else null
-  cache.set(pubkey, { balance, at: now });
+  if (balance === null) {
+    recordUsageCacheEvent('woc.balance', 'failure');
+    if (!hit) return null;
+    rememberCacheEntry(pubkey, hit);
+    return hit.balance;
+  }
+  recordUsageCacheEvent('woc.balance', 'store');
+  rememberCacheEntry(pubkey, { balance, at: now });
   return balance;
 }
 
@@ -158,11 +215,12 @@ export async function holderInfoForPubkey(pubkey: string): Promise<{ tier: numbe
  * GET /api/woc/balance?owner=<pubkey> → { balance: number | null }
  *
  * Public proxy that keeps the RPC endpoint server-side. On-chain balances are
- * public, and this is narrow (only the $WOC mint, for one owner) — the address is
+ * public, and this is narrow (only the $WOC mint, for one owner); the address is
  * validated before any RPC, the per-wallet cache plus the route's IP rate-limit
  * bound load, so it can't be abused as a general RPC passthrough.
  */
 export async function handleWocBalance(res: http.ServerResponse, owner: string): Promise<void> {
+  recordUsageMetric('woc.balance.api');
   if (!isSolanaAddress(owner)) return json(res, 400, { error: 'invalid Solana wallet address' });
   const balance = await cachedWocBalance(owner);
   return json(res, 200, { balance });

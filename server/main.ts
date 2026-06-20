@@ -32,6 +32,7 @@ import { GameServer } from './game';
 import { REALM, REALM_DIRECTORY, REALM_ORIGINS } from './realm';
 import { webLoginEnforced, isWebClientRequest } from './web_login_guard';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
+import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
 
 const PORT = Number(process.env.PORT ?? 8787);
 const STATIC_DIR = path.join(__dirname, '..', 'dist');
@@ -128,42 +129,56 @@ export interface ReleaseEntry {
 }
 
 let releasesCache: { at: number; entries: ReleaseEntry[] } | null = null;
+setUsageCacheSize('github.releases', 0, RELEASES_SIZE);
 
 async function refreshReleases(): Promise<ReleaseEntry[]> {
-  const res = await fetch(
-    `https://api.github.com/repos/${GITHUB_REPO}/releases?per_page=${RELEASES_SIZE}`,
-    {
-      headers: {
-        Accept: 'application/vnd.github+json',
-        'X-GitHub-Api-Version': '2022-11-28',
-        'User-Agent': 'world-of-claudecraft-server',
-        ...(GITHUB_TOKEN ? { Authorization: `Bearer ${GITHUB_TOKEN}` } : {}),
+  recordUsageMetric('github.releases.fetch');
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/${GITHUB_REPO}/releases?per_page=${RELEASES_SIZE}`,
+      {
+        headers: {
+          Accept: 'application/vnd.github+json',
+          'X-GitHub-Api-Version': '2022-11-28',
+          'User-Agent': 'world-of-claudecraft-server',
+          ...(GITHUB_TOKEN ? { Authorization: `Bearer ${GITHUB_TOKEN}` } : {}),
+        },
+        signal: AbortSignal.timeout(8000),
       },
-      signal: AbortSignal.timeout(8000),
-    },
-  );
-  if (!res.ok) throw new Error(`github releases ${res.status}`);
-  const raw = (await res.json()) as any[];
-  const entries: ReleaseEntry[] = (Array.isArray(raw) ? raw : [])
-    .filter((r) => r && !r.draft) // skip unpublished drafts
-    .map((r) => ({
-      id: Number(r.id),
-      tag: String(r.tag_name ?? ''),
-      name: String(r.name || r.tag_name || ''),
-      body: String(r.body ?? '').slice(0, RELEASE_BODY_MAX),
-      url: String(r.html_url ?? ''),
-      prerelease: Boolean(r.prerelease),
-      publishedAt: String(r.published_at ?? r.created_at ?? ''),
-    }));
-  releasesCache = { at: Date.now(), entries };
-  return entries;
+    );
+    if (!res.ok) throw new Error(`github releases ${res.status}`);
+    const raw = (await res.json()) as any[];
+    const entries: ReleaseEntry[] = (Array.isArray(raw) ? raw : [])
+      .filter((r) => r && !r.draft) // skip unpublished drafts
+      .map((r) => ({
+        id: Number(r.id),
+        tag: String(r.tag_name ?? ''),
+        name: String(r.name || r.tag_name || ''),
+        body: String(r.body ?? '').slice(0, RELEASE_BODY_MAX),
+        url: String(r.html_url ?? ''),
+        prerelease: Boolean(r.prerelease),
+        publishedAt: String(r.published_at ?? r.created_at ?? ''),
+      }));
+    releasesCache = { at: Date.now(), entries };
+    recordUsageCacheEvent('github.releases', 'store');
+    setUsageCacheSize('github.releases', entries.length, RELEASES_SIZE);
+    return entries;
+  } catch (err) {
+    recordUsageMetric('github.releases.fetch.failure');
+    throw err;
+  }
 }
 
 async function getReleases(): Promise<ReleaseEntry[]> {
-  if (releasesCache && Date.now() - releasesCache.at < RELEASES_TTL_MS) return releasesCache.entries;
+  if (releasesCache && Date.now() - releasesCache.at < RELEASES_TTL_MS) {
+    recordUsageCacheEvent('github.releases', 'hit');
+    return releasesCache.entries;
+  }
+  recordUsageCacheEvent('github.releases', releasesCache ? 'stale' : 'miss');
   try {
     return await refreshReleases();
   } catch (err) {
+    recordUsageCacheEvent('github.releases', 'failure');
     console.error('github releases refresh failed:', err);
     return releasesCache?.entries ?? [];
   }
@@ -538,6 +553,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       return json(res, 200, { realm: REALM, scope, metric: 'lifetimeXp', leaders: entries.slice(0, limit) });
     }
     if (req.method === 'GET' && url === '/api/releases') {
+      recordUsageMetric('github.releases.api');
       // public News & Updates feed, mirrored from GitHub Releases and served
       // from the in-memory cache (refreshed at most every RELEASES_TTL_MS).
       // Optional ?limit=N (1..RELEASES_SIZE).
@@ -571,20 +587,28 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     // server-side so it never ships in the client bundle. Public (on-chain
     // balances are public) but narrow + IP rate-limited + per-wallet cached.
     if (req.method === 'GET' && url === '/api/woc/balance') {
-      if (rateLimited(req)) return json(res, 429, { error: 'rate limited' });
+      if (rateLimited(req)) {
+        recordUsageMetric('woc.balance.rate_limited');
+        return json(res, 429, { error: 'rate limited' });
+      }
       const owner = new URLSearchParams((req.url ?? '').split('?')[1] ?? '').get('owner') ?? '';
       return handleWocBalance(res, owner);
     }
     // Shareable player card: publish (PNG body) + referral stats for the card.
     if (req.method === 'POST' && url === '/api/card') {
+      recordUsageMetric('card.publish.request');
       if (cardUploadContentLengthTooLarge(req)) {
+        recordUsageMetric('card.publish.rejected');
         res.shouldKeepAlive = false;
         res.setHeader('Connection', 'close');
         return json(res, 413, { error: 'image too large' });
       }
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
-      if (cardUploadRateLimited(req, accountId)) return json(res, 429, { error: 'rate limited' });
+      if (cardUploadRateLimited(req, accountId)) {
+        recordUsageMetric('card.publish.rate_limited');
+        return json(res, 429, { error: 'rate limited' });
+      }
       return handleCardUpload(req, res, accountId);
     }
     if (req.method === 'GET' && url === '/api/referrals') {

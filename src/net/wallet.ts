@@ -3,7 +3,7 @@
 // connection; the account↔wallet *link* is performed by the server after the
 // wallet signs a challenge (see src/net/online.ts + server/wallet.ts).
 //
-// Lives in src/net/ and is never imported by src/sim/ — the deterministic core
+// Lives in src/net/ and is never imported by src/sim/: the deterministic core
 // stays free of network/wallet dependencies.
 import './wallet-polyfill';
 import { createAppKit } from '@reown/appkit';
@@ -30,7 +30,7 @@ const listeners = new Set<(state: WalletState) => void>();
 export function initWallet(): AppKitInstance {
   if (appkit) return appkit;
   if (!PROJECT_ID) {
-    console.warn('[wallet] VITE_REOWN_PROJECT_ID is not set — add it to .env.local to enable wallet connect.');
+    console.warn('[wallet] VITE_REOWN_PROJECT_ID is not set: add it to .env.local to enable wallet connect.');
   }
   appkit = createAppKit({
     adapters: [new SolanaAdapter()],
@@ -93,8 +93,8 @@ export async function signMessageBase58(message: string): Promise<string> {
 }
 
 // ── $WOC balance ────────────────────────────────────────────────────────────
-// Read through the server proxy (GET /api/woc/balance). The Solana RPC endpoint —
-// and any API key embedded in it — lives ONLY on the server (see
+// Read through the server proxy (GET /api/woc/balance). The Solana RPC endpoint
+// and any API key embedded in it live ONLY on the server (see
 // server/woc_balance.ts), so nothing secret is inlined into this bundle. The
 // request is same-origin: the server that served this page holds the key.
 export async function fetchWocBalance(owner: string): Promise<number | null> {

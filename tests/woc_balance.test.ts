@@ -1,7 +1,15 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import bs58 from 'bs58';
-import { fetchWocBalance, holderInfoForPubkey, cachedWocBalance, handleWocBalance } from '../server/woc_balance';
+import {
+  WOC_BALANCE_CACHE_MAX_ENTRIES,
+  fetchWocBalance,
+  holderInfoForPubkey,
+  cachedWocBalance,
+  handleWocBalance,
+  resetWocBalanceCacheForTests,
+  wocBalanceCacheStats,
+} from '../server/woc_balance';
 
 // A real 32-byte base58 Solana address (passes isSolanaAddress).
 const VALID_ADDR = bs58.encode(Uint8Array.from({ length: 32 }, (_, i) => i + 1));
@@ -58,7 +66,11 @@ function mockRawRpc(body: unknown) {
   return vi.fn(async () => ({ ok: true, json: async () => body }));
 }
 
-afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
+afterEach(() => {
+  resetWocBalanceCacheForTests();
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
+});
 
 describe('server import boundary', () => {
   it('keeps holder tier math out of src/ui imports', () => {
@@ -185,7 +197,7 @@ describe('holderTierForPubkey', () => {
 
     // Past the 5-minute TTL the cache entry is stale → next call re-fetches.
     vi.advanceTimersByTime(5 * 60 * 1000 + 1);
-    const second = mockRpc([100_000]); // Vaultwarden (tier 6) — a different balance
+    const second = mockRpc([100_000]); // Vaultwarden (tier 6), a different balance
     vi.stubGlobal('fetch', second);
     expect(await holderTierForPubkey('tierExpiry')).toBe(6); // re-fetched the new tier
     expect(second).toHaveBeenCalledTimes(1);
@@ -196,7 +208,7 @@ describe('holderTierForPubkey', () => {
     vi.stubGlobal('fetch', mockRpc([10_000])); // Gilded (tier 5)
     expect(await holderTierForPubkey('tierKeepLast')).toBe(5); // prime the cache
 
-    // After the TTL the entry is stale, so the next call must re-fetch — but the
+    // After the TTL the entry is stale, so the next call must re-fetch, but the
     // RPC now fails, so it keeps the last known tier rather than dropping to 0.
     vi.advanceTimersByTime(5 * 60 * 1000 + 1);
     vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('rpc down'); }));
@@ -236,7 +248,7 @@ describe('holderInfoForPubkey (tier + exact balance)', () => {
     vi.stubGlobal('fetch', mockRpc([12_345])); // Gilded (tier 5), exact balance 12345
     expect(await holderInfoForPubkey('infoKeepLast')).toEqual({ tier: 5, balance: 12_345 });
 
-    // Past the TTL the cache is stale, so the next call re-fetches — but the RPC
+    // Past the TTL the cache is stale, so the next call re-fetches, but the RPC
     // now fails, so it must keep the last known {tier, balance}, not drop to 0.
     vi.advanceTimersByTime(5 * 60 * 1000 + 1);
     vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('rpc down'); }));
@@ -258,6 +270,22 @@ describe('cachedWocBalance', () => {
     expect(f).toHaveBeenCalledTimes(1);
   });
 
+  it('tracks cache hits, misses, stores and current cache size', async () => {
+    const f = mockRpc([2_500]);
+    vi.stubGlobal('fetch', f);
+    expect(await cachedWocBalance('cacheStats')).toBe(2_500);
+    expect(await cachedWocBalance('cacheStats')).toBe(2_500);
+
+    expect(wocBalanceCacheStats()).toEqual(expect.objectContaining({
+      entries: 1,
+      maxEntries: WOC_BALANCE_CACHE_MAX_ENTRIES,
+      hits: 1,
+      misses: 1,
+      stores: 1,
+      failures: 0,
+    }));
+  });
+
   it('keeps the last known balance when a refresh fails after the TTL', async () => {
     vi.useFakeTimers();
     vi.stubGlobal('fetch', mockRpc([777]));
@@ -270,6 +298,24 @@ describe('cachedWocBalance', () => {
   it('returns null for a never-seen wallet when the RPC fails', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('rpc down'); }));
     expect(await cachedWocBalance('cacheUnseen')).toBeNull();
+  });
+
+  it('evicts the oldest cached balance when successful unique wallets exceed the cap', async () => {
+    const f = mockRpc([1]);
+    vi.stubGlobal('fetch', f);
+    for (let i = 0; i < WOC_BALANCE_CACHE_MAX_ENTRIES; i++) {
+      expect(await cachedWocBalance(`cacheBounded${i}`)).toBe(1);
+    }
+    expect(f).toHaveBeenCalledTimes(WOC_BALANCE_CACHE_MAX_ENTRIES);
+
+    expect(await cachedWocBalance('cacheBounded0')).toBe(1);
+    expect(f).toHaveBeenCalledTimes(WOC_BALANCE_CACHE_MAX_ENTRIES);
+
+    expect(await cachedWocBalance(`cacheBounded${WOC_BALANCE_CACHE_MAX_ENTRIES}`)).toBe(1);
+    expect(f).toHaveBeenCalledTimes(WOC_BALANCE_CACHE_MAX_ENTRIES + 1);
+
+    expect(await cachedWocBalance('cacheBounded1')).toBe(1);
+    expect(f).toHaveBeenCalledTimes(WOC_BALANCE_CACHE_MAX_ENTRIES + 2);
   });
 });
 

@@ -245,8 +245,9 @@ export class Api {
   // realm-relative public page path; main.ts normalizes it to an absolute URL
   // before injecting it into the share UI.
   // The body is the raw PNG, so this bypasses the JSON `post` helper.
-  async uploadCard(characterId: number, png: Blob): Promise<{ url: string }> {
-    const res = await fetch(`${this.base}/api/card?character=${characterId}`, {
+  async uploadCard(characterId: number, png: Blob, lang = 'en'): Promise<{ url: string }> {
+    const params = new URLSearchParams({ character: String(characterId), lang });
+    const res = await fetch(`${this.base}/api/card?${params.toString()}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'image/png',

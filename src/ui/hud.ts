@@ -522,6 +522,7 @@ export class Hud {
   // Pending lazy-load of the mech GLB + chromas; the reveal waits on it.
   private mechAssetsPromise: Promise<void> | null = null;
   private cardModalEl: HTMLElement | null = null;
+  private cardModalReturnFocus: HTMLElement | null = null;
   // current typeahead state: which input, its results, and the keyboard-
   // highlighted row (-1 = none), so Enter/Arrow keys can pick a suggestion
   private socialSuggest: { field: string; items: { name: string; cls: string; level: number }[]; index: number } = { field: '', items: [], index: -1 };
@@ -5964,14 +5965,15 @@ export class Hud {
     const preview = this.charPreview;
     if (!preview) return;
 
-    this.cardModalEl?.remove();
+    this.closePlayerCardModal(false);
+    this.cardModalReturnFocus = this.currentFocusableElement();
     const back = document.createElement('div');
     back.className = 'modal-backdrop';
     back.id = 'player-card-modal';
     const poseBtns = CARD_POSES.map((p, i) =>
       `<button type="button" class="btn pc-pose${i === 0 ? ' sel' : ''}" data-pose="${i}">${esc(t(p.labelKey))}</button>`).join('');
-    back.innerHTML = `<div class="window panel pc-modal">`
-      + `<div class="panel-title"><span>${esc(t('playerCard.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('playerCard.close'))}">${svgIcon('close')}</button></div>`
+    back.innerHTML = `<div class="panel pc-modal" role="dialog" aria-modal="true" aria-labelledby="player-card-modal-title">`
+      + `<div class="panel-title"><span id="player-card-modal-title">${esc(t('playerCard.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('playerCard.close'))}">${svgIcon('close')}</button></div>`
       + `<div class="pc-preview pc-loading">${esc(t('playerCard.loading'))}</div>`
       + `<div class="pc-poses" role="group" aria-label="${esc(t('playerCard.poseGroup'))}">${poseBtns}</div>`
       + `<div class="pc-actions"></div>`
@@ -5981,19 +5983,21 @@ export class Hud {
       + `</div>`;
     document.body.appendChild(back);
     this.cardModalEl = back;
-    const close = () => { back.remove(); if (this.cardModalEl === back) this.cardModalEl = null; };
+    const close = () => this.closePlayerCardModal();
     back.addEventListener('click', (e) => { if (e.target === back) close(); });
+    back.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      e.preventDefault();
+      e.stopPropagation();
+      close();
+    });
     back.querySelector('[data-close]')?.addEventListener('click', () => { audio.click(); close(); });
+    this.focusFirstInteractive(back, '[data-close]');
 
     const previewBox = back.querySelector('.pc-preview') as HTMLElement;
     const status = back.querySelector('.pc-status') as HTMLElement;
     const linkRow = back.querySelector('.pc-link') as HTMLElement;
     const setStatus = (msg: string) => { status.textContent = msg; };
-
-    // Referral info + realm standing are online-only (null offline). Fetch once
-    // and reuse across pose re-renders.
-    const [referral, standing] = await Promise.all([fetchReferralInfo(), fetchStanding()]);
-    if (this.cardModalEl !== back) return; // modal closed while awaiting
 
     // Current card state, shared with the action handlers by reference so a pose
     // change (which re-captures + re-composites) also invalidates any publish.
@@ -6001,6 +6005,14 @@ export class Hud {
       { canvas: null, data: null, published: null };
 
     const poseButtons = Array.from(back.querySelectorAll<HTMLButtonElement>('.pc-pose'));
+    let requestedPoseIndex = 0;
+    let metadataReady = false;
+    let referral: Awaited<ReturnType<typeof fetchReferralInfo>> = null;
+    let standing: CharacterStanding | null = null;
+    const selectPose = (poseIndex: number): void => {
+      requestedPoseIndex = poseIndex;
+      poseButtons.forEach((b, i) => b.classList.toggle('sel', i === poseIndex));
+    };
     // Generation guard: rapid pose clicks fire concurrent async renders; only the
     // most recent one may apply its result, or a slow earlier render could
     // overwrite a newer pose and desync state.canvas from what's shown.
@@ -6008,7 +6020,7 @@ export class Hud {
     const compose = async (poseIndex: number): Promise<void> => {
       const seq = ++composeSeq;
       const pose = CARD_POSES[poseIndex];
-      poseButtons.forEach((b, i) => b.classList.toggle('sel', i === poseIndex));
+      selectPose(poseIndex);
       try {
         const characterImage = preview.captureCloseup({ poseClips: pose.clips, poseFraction: pose.fraction });
         const data = this.buildPlayerCardData(characterImage, referral, standing);
@@ -6034,14 +6046,35 @@ export class Hud {
     };
 
     poseButtons.forEach((b, i) => b.addEventListener('click', () => {
-      if (b.classList.contains('sel')) return;
+      if (requestedPoseIndex === i) return;
       audio.click();
+      if (!metadataReady) {
+        selectPose(i);
+        return;
+      }
       void compose(i);
     }));
 
-    await compose(0);
+    // Referral info + realm standing are online-only (null offline). Fetch once
+    // and reuse across pose re-renders. Pose clicks before this resolves update
+    // requestedPoseIndex, so the latest visible choice renders when ready.
+    [referral, standing] = await Promise.all([fetchReferralInfo(), fetchStanding()]);
+    metadataReady = true;
+    if (this.cardModalEl !== back) return; // modal closed while awaiting
+
+    await compose(requestedPoseIndex);
     if (this.cardModalEl !== back) return;
     this.wireCardActions(back, state, setStatus);
+  }
+
+  private closePlayerCardModal(restoreFocus = true): void {
+    const back = this.cardModalEl;
+    if (!back) return;
+    back.remove();
+    if (this.cardModalEl === back) this.cardModalEl = null;
+    const target = this.cardModalReturnFocus;
+    this.cardModalReturnFocus = null;
+    if (restoreFocus) this.restoreFocus(target);
   }
 
   private wireCardActions(
@@ -6084,7 +6117,7 @@ export class Hud {
         audio.click();
         xb.disabled = true;
         try {
-          // X's intent URL can only carry text + a link — it cannot attach media.
+          // X's intent URL can only carry text + a link; it cannot attach media.
           // So copy the card PNG to the clipboard first (inside the click gesture,
           // passing the blob promise to ClipboardItem so the write stays valid
           // while the PNG encodes) for the user to paste (⌘V) into the post. The
@@ -6179,7 +6212,7 @@ export class Hud {
   private cardShareText(data: PlayerCardData): string {
     const tier = holderTierForBalance(data.balance);
     const tierBit = tier ? t('playerCard.shareTierBit', { tier: holderTierDisplayName(tier) }) : '';
-    // The URL X appends to this text is the player's card page — it unfurls the
+    // The URL X appends to this text is the player's card page; it unfurls the
     // card image and credits the referral when a recruit joins through it.
     return t('playerCard.shareText', {
       level: formatNumber(data.level, { maximumFractionDigits: 0 }),
@@ -6200,10 +6233,10 @@ export class Hud {
     const num = (n: number) => formatNumber(n, { maximumFractionDigits: 0 });
     const pct = (n: number) => `${formatNumber(n * 100, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
 
-    // Realm standing by lifetime XP — the same metric the in-game leaderboard
+    // Realm standing by lifetime XP: the same metric the in-game leaderboard
     // ranks on (server: lifetimeXpStanding). Surfaced as a "TOP N%" flex when the
     // realm has enough players to be meaningful and the character is in the top
-    // half — no one wants to broadcast "Top 90%".
+    // half, since no one wants to broadcast "Top 90%".
     let topPercent: number | null = null;
     if (standing && standing.total >= 5 && standing.rank >= 1) {
       const p100 = (standing.rank / standing.total) * 100;
@@ -6262,7 +6295,7 @@ export class Hud {
     };
   }
 
-  // Client-side mirror of the server's slugify (server/player_card.ts) — used
+  // Client-side mirror of the server's slugify (server/player_card.ts), used
   // only for the footer handle preview before the card is published.
   private cardSlug(name: string): string {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
@@ -7204,7 +7237,7 @@ export class Hud {
     const className = classDisplayName(cls);
     const el = $('#inspect-window');
     this.closeOtherWindows('#inspect-window');
-    // $WOC holder-tier flair — cosmetic badge for a connected/holder wallet,
+    // $WOC holder-tier flair: cosmetic badge for a connected/holder wallet,
     // broadcast per-entity via the `ht`/`hb` identity fields (server-set). Shown
     // only when the inspected player has a tier (> 0); the exact balance rides
     // along in `hb` and reads out beneath the rung name when present.
@@ -7955,7 +7988,7 @@ export class Hud {
 
   // True while a menu that should pause character movement is up.
   isModalOpen(): boolean {
-    return this.optionsOpen || this.emoteWheelOpen || $('#emote-editor').style.display === 'block';
+    return this.optionsOpen || this.emoteWheelOpen || $('#emote-editor').style.display === 'block' || this.cardModalEl !== null;
   }
 
   toggleOptionsMenu(): void {
@@ -8590,6 +8623,7 @@ export class Hud {
 
   // Closes the topmost UI. Returns true if something was closed.
   closeAll(): boolean {
+    if (this.cardModalEl) { this.closePlayerCardModal(); return true; }
     const ctx = $('#ctx-menu');
     if (ctx.style.display !== 'none' && ctx.style.display !== '') { this.closeContextMenu(); return true; }
     if (this.emoteWheelOpen) { this.hideEmoteWheel(); return true; }

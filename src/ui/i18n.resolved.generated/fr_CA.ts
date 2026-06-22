@@ -533,6 +533,17 @@ export const fr_CA: EnTranslations = {
       "label": "Langue",
       "select": "Choisir une langue"
     },
+    "search": {
+      "label": "Search",
+      "placeholder": "Search the guide",
+      "noResults": "No matches",
+      "typePage": "Page",
+      "typeClass": "Class",
+      "typeZone": "Zone",
+      "typeCreature": "Creatures",
+      "typeDungeon": "Dungeon",
+      "typeTerm": "Term"
+    },
     "home": {
       "eyebrow": "MMO de style classique sur navigateur",
       "title": "World of ClaudeCraft",

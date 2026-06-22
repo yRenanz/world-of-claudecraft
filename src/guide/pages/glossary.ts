@@ -6,8 +6,8 @@ import { lead } from './ui';
 import type { GuidePage } from './types';
 
 // Each term carries a slug for a stable per-term anchor (#term-<slug>), so other pages
-// can deep-link a piece of jargon to its definition.
-const TERMS: { slug: string; term: TranslationKey; def: TranslationKey }[] = [
+// can deep-link a piece of jargon to its definition. Exported so site search can index it.
+export const GLOSSARY_TERMS: { slug: string; term: TranslationKey; def: TranslationKey }[] = [
   { slug: 'aggro', term: 'guide.glossary.aggroTerm', def: 'guide.glossary.aggroDef' },
   { slug: 'threat', term: 'guide.glossary.threatTerm', def: 'guide.glossary.threatDef' },
   { slug: 'gcd', term: 'guide.glossary.gcdTerm', def: 'guide.glossary.gcdDef' },
@@ -30,7 +30,7 @@ const TERMS: { slug: string; term: TranslationKey; def: TranslationKey }[] = [
 export const glossary: GuidePage = {
   titleKey: 'guide.nav.glossary',
   render() {
-    const items = TERMS
+    const items = GLOSSARY_TERMS
       .map(({ slug, term, def }) => `<div class="guide-term" id="term-${esc(slug)}"><dt>${esc(t(term))}</dt><dd>${esc(t(def))}</dd></div>`)
       .join('');
     return `

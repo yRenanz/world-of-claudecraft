@@ -533,6 +533,17 @@ export const en_XA: EnTranslations = {
       "label": "[Ļáñĝúáĝé]",
       "select": "[Çĥóóšé á ļáñĝúáĝé]"
     },
+    "search": {
+      "label": "[Šéáŕçĥ]",
+      "placeholder": "[Šéáŕçĥ ţĥé ĝúíðé]",
+      "noResults": "[Ñó ɱáţçĥéš]",
+      "typePage": "[Þáĝé]",
+      "typeClass": "[Çļášš]",
+      "typeZone": "[Žóñé]",
+      "typeCreature": "[Çŕéáţúŕéš]",
+      "typeDungeon": "[Ðúñĝéóñ]",
+      "typeTerm": "[Ţéŕɱ]"
+    },
     "home": {
       "eyebrow": "[Çļáššíç-šţýļé ƀŕóŵšéŕ ⱮⱮÓ]",
       "title": "[Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ]",

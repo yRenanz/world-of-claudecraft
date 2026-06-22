@@ -533,6 +533,17 @@ export const ru_RU: EnTranslations = {
       "label": "Язык",
       "select": "Выберите язык"
     },
+    "search": {
+      "label": "Search",
+      "placeholder": "Search the guide",
+      "noResults": "No matches",
+      "typePage": "Page",
+      "typeClass": "Class",
+      "typeZone": "Zone",
+      "typeCreature": "Creatures",
+      "typeDungeon": "Dungeon",
+      "typeTerm": "Term"
+    },
     "home": {
       "eyebrow": "Классическая браузерная MMO",
       "title": "World of ClaudeCraft",

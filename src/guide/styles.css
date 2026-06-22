@@ -1176,3 +1176,67 @@ a.guide-poi:hover { color: var(--g-gold); border-color: var(--g-border); text-de
 .guide-seq-dir { font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--g-text-muted); }
 .guide-seq-name { font-family: var(--g-font-display); font-weight: 600; color: var(--g-text); }
 .guide-seq-spacer { display: block; }
+
+/* ============================================================ header search */
+.guide-search { position: relative; display: flex; align-items: center; }
+.guide-search-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+.guide-search-input {
+  width: 180px;
+  max-width: 100%;
+  min-height: var(--g-control-h-sm);
+  padding: var(--g-xs2) var(--g-sm);
+  background: var(--g-bg-2);
+  color: var(--g-text);
+  border: 1px solid var(--g-border-soft);
+  border-radius: var(--g-radius);
+  font-family: var(--g-font-ui);
+  font-size: 14px;
+}
+.guide-search-input::placeholder { color: var(--g-text-muted); }
+.guide-search-input:hover { border-color: var(--g-border); }
+.guide-search-results {
+  position: absolute;
+  inset-block-start: calc(100% + var(--g-xs));
+  inset-inline-end: 0;
+  z-index: 120;
+  width: min(320px, 86vw);
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: var(--g-xs);
+  background: var(--g-bg-2);
+  border: 1px solid var(--g-border);
+  border-radius: var(--g-radius);
+  box-shadow: 0 10px 30px #00000066;
+}
+.guide-search-opt {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--g-sm);
+  padding: var(--g-sm);
+  border-radius: var(--g-radius-sm);
+  color: var(--g-text);
+}
+.guide-search-opt:hover,
+.guide-search-opt.is-active { background: var(--g-wash); text-decoration: none; }
+.guide-search-opt.is-active { outline: 1px solid var(--g-border); }
+.guide-search-opt-label { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.guide-search-opt-type { flex: none; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--g-text-muted); }
+.guide-search-empty { margin: 0; padding: var(--g-sm); color: var(--g-text-muted); font-size: 14px; }
+
+@media (pointer: coarse) { .guide-search-input { min-height: var(--g-touch); font-size: 16px; } }
+@media (max-width: 720px) {
+  .guide-search { width: 100%; }
+  .guide-search-input { width: 100%; }
+  .guide-search-results { inset-inline: 0; width: auto; }
+}

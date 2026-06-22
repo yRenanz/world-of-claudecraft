@@ -533,6 +533,17 @@ export const ko_KR: EnTranslations = {
       "label": "언어",
       "select": "언어 선택"
     },
+    "search": {
+      "label": "Search",
+      "placeholder": "Search the guide",
+      "noResults": "No matches",
+      "typePage": "Page",
+      "typeClass": "Class",
+      "typeZone": "Zone",
+      "typeCreature": "Creatures",
+      "typeDungeon": "Dungeon",
+      "typeTerm": "Term"
+    },
     "home": {
       "eyebrow": "클래식 스타일 브라우저 MMO",
       "title": "World of ClaudeCraft",

@@ -8,6 +8,7 @@ import { esc } from '../ui/esc';
 import {
   GUIDE_BASE, hrefFor, topbarRoutes, groupedRoutes, type GuideGroup,
 } from './routes';
+import { mountSearch } from './search';
 
 export interface GuideChrome {
   root: HTMLElement;
@@ -52,6 +53,17 @@ function sidebarHtml(): string {
   return groups;
 }
 
+function searchHtml(): string {
+  return `
+    <div class="guide-search" role="search">
+      <label class="guide-search-label" for="guide-search-input">${esc(t('guide.search.label'))}</label>
+      <input id="guide-search-input" class="guide-search-input" type="search" role="combobox"
+        aria-expanded="false" aria-controls="guide-search-results" aria-autocomplete="list"
+        autocomplete="off" placeholder="${esc(t('guide.search.placeholder'))}" />
+      <div id="guide-search-results" class="guide-search-results" role="listbox" aria-label="${esc(t('guide.search.label'))}" hidden></div>
+    </div>`;
+}
+
 function languagePickerHtml(): string {
   const current = getLanguage();
   const options = supportedLanguages
@@ -82,6 +94,7 @@ export function buildChrome(mount: HTMLElement, opts: ChromeOptions, signal: Abo
         <nav class="guide-primary-nav" id="guide-primary-nav" aria-label="${esc(t('guide.nav.primary'))}">
           ${topNavHtml()}
           <div class="guide-nav-actions">
+            ${searchHtml()}
             ${languagePickerHtml()}
             <a class="guide-cta" href="/play">${esc(t('guide.nav.playNow'))}</a>
           </div>
@@ -150,6 +163,9 @@ export function buildChrome(mount: HTMLElement, opts: ChromeOptions, signal: Abo
   langSelect.addEventListener('change', () => {
     opts.onLanguageChange(langSelect.value as SupportedLanguage);
   });
+
+  // Header search: builds its index from already-loaded data and navigates via the router.
+  mountSearch(mount, signal);
 
   return {
     root: mount,

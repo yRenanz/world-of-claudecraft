@@ -533,6 +533,17 @@ export const zh_CN: EnTranslations = {
       "label": "语言",
       "select": "选择语言"
     },
+    "search": {
+      "label": "Search",
+      "placeholder": "Search the guide",
+      "noResults": "No matches",
+      "typePage": "Page",
+      "typeClass": "Class",
+      "typeZone": "Zone",
+      "typeCreature": "Creatures",
+      "typeDungeon": "Dungeon",
+      "typeTerm": "Term"
+    },
     "home": {
       "eyebrow": "经典风格浏览器 MMO",
       "title": "World of ClaudeCraft",

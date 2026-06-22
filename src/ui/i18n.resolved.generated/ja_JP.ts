@@ -533,6 +533,17 @@ export const ja_JP: EnTranslations = {
       "label": "言語",
       "select": "言語を選択"
     },
+    "search": {
+      "label": "Search",
+      "placeholder": "Search the guide",
+      "noResults": "No matches",
+      "typePage": "Page",
+      "typeClass": "Class",
+      "typeZone": "Zone",
+      "typeCreature": "Creatures",
+      "typeDungeon": "Dungeon",
+      "typeTerm": "Term"
+    },
     "home": {
       "eyebrow": "クラシックスタイルのブラウザMMO",
       "title": "World of ClaudeCraft",

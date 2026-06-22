@@ -84,6 +84,19 @@ export const guideStrings = {
     select: "Choose a language",
   },
 
+  // Site search (header combobox).
+  search: {
+    label: "Search",
+    placeholder: "Search the guide",
+    noResults: "No matches",
+    typePage: "Page",
+    typeClass: "Class",
+    typeZone: "Zone",
+    typeCreature: "Creatures",
+    typeDungeon: "Dungeon",
+    typeTerm: "Term",
+  },
+
   // Home / overview landing.
   home: {
     eyebrow: "Classic-style browser MMO",

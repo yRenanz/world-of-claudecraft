@@ -44,3 +44,27 @@ export function archiveFallbackName(original: string, characterId: number): stri
   const keep = Math.max(1, MAX_NAME_LEN - tag.length);
   return original.slice(0, keep) + tag;
 }
+
+// How many suffixed candidates to try before falling back to the id-based name.
+// Normally resolves on the first candidate; the bound just protects against a
+// pathological realm where many archival placeholders already collide.
+export const ARCHIVE_SCAN_LIMIT = 64;
+
+// Pick a collision-free archival name for the orphaned character. Scans the
+// suffixed candidates in order, skipping any the injected `isTaken` predicate
+// reports as already used (case-insensitive, in this realm) by another
+// character, and on the practically impossible exhaustion returns the id-based
+// fallback that cannot collide. Kept IO-free (the DB lookup is injected) so the
+// scan/increment/fallback decision is unit-testable without a Postgres client;
+// server/db.ts supplies the real SQL-backed predicate.
+export async function chooseArchiveName(
+  original: string,
+  characterId: number,
+  isTaken: (candidate: string) => Promise<boolean>,
+): Promise<string> {
+  for (let index = 1; index <= ARCHIVE_SCAN_LIMIT; index++) {
+    const candidate = freedArchiveCandidate(original, index);
+    if (!(await isTaken(candidate))) return candidate;
+  }
+  return archiveFallbackName(original, characterId);
+}

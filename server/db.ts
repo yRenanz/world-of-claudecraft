@@ -6,7 +6,7 @@ import type { ChatLogRow } from './chat_log';
 import { SOCIAL_SCHEMA } from './social_db';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import { REALM } from './realm';
-import { archiveFallbackName, freedArchiveCandidate } from './reclaim_name';
+import { chooseArchiveName } from './reclaim_name';
 
 try {
   process.loadEnvFile?.();
@@ -1121,18 +1121,15 @@ export async function reclaimDeactivatedName(name: string): Promise<boolean> {
     }
     // Find an archival placeholder for the orphaned character that collides with
     // no other name in this realm (case-insensitive), mirroring the dedupe scheme.
-    // Bounded scan (normally resolves on the first candidate); on the practically
-    // impossible exhaustion, fall back to an id-based name that cannot collide.
-    const ARCHIVE_SCAN_LIMIT = 64;
-    let freed = archiveFallbackName(row.name, row.id);
-    for (let index = 1; index <= ARCHIVE_SCAN_LIMIT; index++) {
-      const candidate = freedArchiveCandidate(row.name, index);
+    // The scan/increment/fallback decision lives in the pure chooseArchiveName;
+    // here we just supply the SQL-backed "is this candidate already taken?" probe.
+    const freed = await chooseArchiveName(row.name, row.id, async (candidate) => {
       const clash = await client.query(
         `SELECT 1 FROM characters WHERE realm = $1 AND lower(name) = lower($2) AND id <> $3 LIMIT 1`,
         [REALM, candidate, row.id],
       );
-      if ((clash.rowCount ?? 0) === 0) { freed = candidate; break; }
-    }
+      return (clash.rowCount ?? 0) > 0;
+    });
     await client.query(
       `UPDATE characters SET name = $2, force_rename = TRUE, updated_at = now() WHERE id = $1`,
       [row.id, freed],

@@ -130,7 +130,7 @@ try {
 
   // 5. Reactivate A (admin-only in prod; done directly here) and show the old
   //    character now carries an archival name + force_rename prompt.
-  const react = spawnSync('psql', [DATABASE_URL, '-c', `UPDATE accounts SET deactivated_at = NULL WHERE username = '${userA}';`], { encoding: 'utf8' });
+  const react = spawnSync('psql', [DATABASE_URL, '-v', `un=${userA}`, '-c', `UPDATE accounts SET deactivated_at = NULL WHERE username = :'un';`], { encoding: 'utf8' });
   log('reactivate A via DB:', react.stdout.trim() || react.stderr.trim());
   const aChars = await api('/api/characters', { token: tokenA });
   log('A characters after reactivation:', JSON.stringify(aChars.data.characters));

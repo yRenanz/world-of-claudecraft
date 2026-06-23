@@ -1,7 +1,11 @@
-import { describe, it, expect } from 'vitest';
-import { tutorialBodyPlan, tutorialNeedsRerender, tutorialStepDiffersByTouch } from '../src/ui/tutorial_copy';
-import type { TutorialStep } from '../src/ui/tutorial';
+import { describe, expect, it } from 'vitest';
 import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
+import type { TutorialStep } from '../src/ui/tutorial';
+import {
+  tutorialBodyPlan,
+  tutorialNeedsRerender,
+  tutorialStepDiffersByTouch,
+} from '../src/ui/tutorial_copy';
 
 describe('tutorialBodyPlan', () => {
   const STEPS: TutorialStep[] = ['move', 'seek', 'talk', 'slay', 'return', 'done'];

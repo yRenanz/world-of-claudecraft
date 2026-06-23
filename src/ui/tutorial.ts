@@ -12,14 +12,14 @@
 // Reads through IWorld only (src/ CLAUDE.md). The starter ids below mirror the
 // shipped zone-1 content (the same QUESTS the HUD already imports).
 
-import type { IWorld } from '../world_api';
-import type { Renderer } from '../render/renderer';
 import type { Keybinds } from '../game/keybinds';
+import type { Renderer } from '../render/renderer';
+import { PLAYER_START, QUESTS, ZONES } from '../sim/data';
 import { dist2d, INTERACT_RANGE } from '../sim/types';
-import { QUESTS, ZONES, PLAYER_START } from '../sim/data';
-import { t, formatNumber } from './i18n';
+import type { IWorld } from '../world_api';
 import type { TranslationKey } from './i18n';
-import { tutorialBodyPlan, tutorialNeedsRerender, type TutorialParam } from './tutorial_copy';
+import { formatNumber, t } from './i18n';
+import { type TutorialParam, tutorialBodyPlan, tutorialNeedsRerender } from './tutorial_copy';
 
 // Starter content the onboarding guides the player toward — all derived from the
 // shipped sim sources so a content rename or a moved spawn can't silently desync
@@ -27,7 +27,8 @@ import { tutorialBodyPlan, tutorialNeedsRerender, type TutorialParam } from './t
 const STARTER_QUEST = ZONES[0]?.welcomeQuestId ?? 'q_wolves';
 const STARTER_DEF = QUESTS[STARTER_QUEST];
 const GIVER_NPC = STARTER_DEF?.giverNpcId ?? 'marshal_redbrook';
-const STARTER_MOB = STARTER_DEF?.objectives?.find((o) => o.type === 'kill')?.targetMobId ?? 'forest_wolf';
+const STARTER_MOB =
+  STARTER_DEF?.objectives?.find((o) => o.type === 'kill')?.targetMobId ?? 'forest_wolf';
 const SPAWN = { x: PLAYER_START.x, y: 0, z: PLAYER_START.z }; // dist2d ignores y
 const MOVE_THRESHOLD = 3; // yards from spawn before "find your footing" is satisfied
 const GIVER_RANGE = INTERACT_RANGE + 2; // matches the sim's accept-quest reach
@@ -154,7 +155,10 @@ export class TutorialOverlay {
     for (const e of world.entities.values()) {
       if (e.kind !== 'mob' || e.templateId !== templateId || e.dead) continue;
       const d = dist2d(p.pos, e.pos);
-      if (d < bestD) { bestD = d; best = e; }
+      if (d < bestD) {
+        bestD = d;
+        best = e;
+      }
     }
     return best;
   }
@@ -163,7 +167,10 @@ export class TutorialOverlay {
     const def = QUESTS[STARTER_QUEST];
     const needed = def?.objectives?.[0]?.count ?? 0;
     const current = world.questLog.get(STARTER_QUEST)?.counts?.[0] ?? 0;
-    return t('hud.tutorial.slayProgress', { current: formatNumber(Math.min(current, needed)), needed: formatNumber(needed) });
+    return t('hud.tutorial.slayProgress', {
+      current: formatNumber(Math.min(current, needed)),
+      needed: formatNumber(needed),
+    });
   }
 
   private ensureDom(): void {
@@ -216,7 +223,9 @@ export class TutorialOverlay {
     if (!this.root) return;
 
     const moveKeys = ['forward', 'turnLeft', 'back', 'turnRight']
-      .map((id) => keybinds.primaryLabel(id)).filter(Boolean).join('/');
+      .map((id) => keybinds.primaryLabel(id))
+      .filter(Boolean)
+      .join('/');
     // Fall back to the translated "Unbound" label so a cleared bind never leaves
     // a literal blank gap in "press  to speak" (mirrors the HUD keybind list).
     const interactKey = keybinds.primaryLabel('interact') || t('hud.options.unbound');
@@ -247,9 +256,13 @@ export class TutorialOverlay {
     this.bodyEl.textContent = t(plan.bodyKey, params);
 
     const idx = STEP_ORDER.indexOf(this.step!);
-    this.stepEl.textContent = idx >= 0
-      ? t('hud.tutorial.stepLabel', { current: formatNumber(idx + 1), total: formatNumber(STEP_ORDER.length) })
-      : '';
+    this.stepEl.textContent =
+      idx >= 0
+        ? t('hud.tutorial.stepLabel', {
+            current: formatNumber(idx + 1),
+            total: formatNumber(STEP_ORDER.length),
+          })
+        : '';
 
     if (this.step === 'slay') {
       this.progressEl.textContent = this.slayProgress(world);
@@ -258,7 +271,8 @@ export class TutorialOverlay {
       this.progressEl.style.display = 'none';
     }
 
-    this.skipBtn.textContent = this.step === 'done' ? t('hud.tutorial.dismiss') : t('hud.tutorial.skip');
+    this.skipBtn.textContent =
+      this.step === 'done' ? t('hud.tutorial.dismiss') : t('hud.tutorial.skip');
     this.root.classList.toggle('tut-done', this.step === 'done');
   }
 
@@ -271,7 +285,10 @@ export class TutorialOverlay {
     } else if (this.step === 'slay') {
       target = this.nearestMob(world, STARTER_MOB)?.pos ?? null;
     }
-    if (!target) { this.hideArrow(); return; }
+    if (!target) {
+      this.hideArrow();
+      return;
+    }
 
     const v = renderer.worldToScreen(target.x, target.y + 2.2, target.z);
     const margin = 56;
@@ -281,7 +298,10 @@ export class TutorialOverlay {
     let sy = v.y;
     // Behind the camera projects inverted; mirror through screen centre so the
     // marker still points the right way.
-    if (v.behind) { sx = w - v.x; sy = h - v.y; }
+    if (v.behind) {
+      sx = w - v.x;
+      sy = h - v.y;
+    }
     const cx = w / 2;
     const cy = h / 2;
     const angle = Math.atan2(sy - cy, sx - cx);
@@ -310,8 +330,16 @@ export class TutorialOverlay {
 }
 
 function readDone(): boolean {
-  try { return localStorage.getItem(STORAGE_KEY) === 'done'; } catch { return false; }
+  try {
+    return localStorage.getItem(STORAGE_KEY) === 'done';
+  } catch {
+    return false;
+  }
 }
 function writeDone(): void {
-  try { localStorage.setItem(STORAGE_KEY, 'done'); } catch { /* private mode */ }
+  try {
+    localStorage.setItem(STORAGE_KEY, 'done');
+  } catch {
+    /* private mode */
+  }
 }

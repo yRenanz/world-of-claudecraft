@@ -280,8 +280,11 @@ async function deviceAuthorization(req: http.IncomingMessage, res: http.ServerRe
   const client = clientId ? await getOAuthClient(pool, clientId) : null;
   if (!client) return oauthError(res, 400, 'invalid_client', 'unknown client');
   const deviceCode = newToken();
+  // `userCode` is the dashed display form (XXXX-XXXX); store the normalized form
+  // so it matches the lookup in approveDevice (which normalizes the submitted
+  // code before an exact-match query). Without this, approval never matches.
   const userCode = newUserCode();
-  await createDeviceCode(pool, { deviceCode, userCode, clientId, scope, ttlSeconds: DEVICE_TTL_SECONDS });
+  await createDeviceCode(pool, { deviceCode, userCode: normalizeUserCode(userCode), clientId, scope, ttlSeconds: DEVICE_TTL_SECONDS });
   const base = publicOrigin(req);
   json(res, 200, {
     device_code: deviceCode,

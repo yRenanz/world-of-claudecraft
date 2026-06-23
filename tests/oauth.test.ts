@@ -168,6 +168,30 @@ describe('device-code grant', () => {
     expect(r.json.interval).toBeGreaterThan(0);
     expect(oauthDb.createDeviceCode).toHaveBeenCalled();
   });
+
+  it('stores the user code normalized so approval matches the lookup', async () => {
+    // Regression: the displayed user_code is dashed (XXXX-XXXX) but it must be
+    // stored normalized, because approveDevice normalizes the submitted code and
+    // looks it up with an exact match. If they disagree, approval never works.
+    const start = await call('POST', '/oauth/device_authorization', { client_id: 'companion' });
+    const displayed = start.json.user_code as string;
+    expect(displayed).toContain('-');
+
+    const stored = (oauthDb.createDeviceCode as any).mock.calls[0][1].userCode as string;
+    expect(stored).toBe(normalizeUserCode(displayed));
+    expect(stored).not.toContain('-');
+
+    // Approving with the dashed code the user sees must resolve to the stored value.
+    (oauthDb.getDeviceByUserCode as any).mockResolvedValueOnce({
+      device_code: 'dc', user_code: stored, client_id: 'companion', scope: 'character:read',
+      account_id: null, approved: false, expired: false, consumed: false,
+    });
+    (oauthDb.approveDeviceCode as any).mockResolvedValueOnce(true);
+    const approve = await call('POST', '/oauth/device', { user_code: displayed }, BEARER);
+    expect(approve.status).toBe(200);
+    expect(oauthDb.getDeviceByUserCode).toHaveBeenCalledWith(expect.anything(), stored);
+    expect(oauthDb.approveDeviceCode).toHaveBeenCalledWith(expect.anything(), stored, 5);
+  });
 });
 
 describe('authorize approval reuses the web session', () => {

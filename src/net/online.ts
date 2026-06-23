@@ -16,9 +16,10 @@ import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import {
   isOverheadEmoteId,
   type AccountCosmetics, type ArenaInfo, type CharacterSearchResult, type DuelInfo, type FriendInfo,
-  type IWorld, type LeaderboardEntry, type MarketInfo, type OverheadEmoteId,
+  type IWorld, type LeaderboardEntry, type LeaderboardPage, type MarketInfo, type OverheadEmoteId,
   type PartyInfo, type PresenceStatus, type SocialInfo, type TradeInfo,
 } from '../world_api';
+import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 
 // ---------------------------------------------------------------------------
 // REST
@@ -1379,13 +1380,21 @@ export class ClientWorld implements IWorld {
   leaveDungeon(): void {
     this.cmd({ cmd: 'leave_dungeon' });
   }
-  async leaderboard(): Promise<LeaderboardEntry[]> {
+  async leaderboard(page = 0, pageSize = LEADERBOARD_PAGE_SIZE): Promise<LeaderboardPage> {
+    const empty: LeaderboardPage = { leaders: [], page: 0, pageCount: 1, total: 0, pageSize };
     try {
-      const res = await fetch(apiUrl('/api/leaderboard?metric=lifetimeXp&limit=100', this.base));
-      if (!res.ok) return [];
-      return (await res.json()).leaders ?? [];
+      const res = await fetch(apiUrl(`/api/leaderboard?metric=lifetimeXp&page=${page}&pageSize=${pageSize}`, this.base));
+      if (!res.ok) return empty;
+      const data = await res.json();
+      return {
+        leaders: data.leaders ?? [],
+        page: data.page ?? page,
+        pageCount: data.pageCount ?? 1,
+        total: data.total ?? (data.leaders?.length ?? 0),
+        pageSize: data.pageSize ?? pageSize,
+      };
     } catch {
-      return [];
+      return empty;
     }
   }
   prestige(): void {

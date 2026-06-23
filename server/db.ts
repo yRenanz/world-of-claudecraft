@@ -7,6 +7,7 @@ import type { ChatLogRow } from './chat_log';
 import { SOCIAL_SCHEMA } from './social_db';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import { REALM } from './realm';
+import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 
 try {
   process.loadEnvFile?.();
@@ -1366,7 +1367,9 @@ export interface LifetimeXpLeaderRow {
 // it is scoped to this process's realm (the in-game panel). Both paths sort on
 // the indexed lifetime-XP expression and are read through the main.ts cache.
 export async function topLifetimeXp(limit = 100, opts: { global?: boolean } = {}): Promise<LifetimeXpLeaderRow[]> {
-  const cap = Math.max(1, Math.min(100, limit));
+  // Capped at LEADERBOARD_MAX (1000): the in-game board pages through this whole
+  // cached window, so a realm with hundreds of max-level players is fully ranked.
+  const cap = Math.max(1, Math.min(LEADERBOARD_MAX, limit));
   const res = opts.global
     ? await pool.query(
         `SELECT name, class, level, realm,

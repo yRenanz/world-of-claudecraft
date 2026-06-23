@@ -30,7 +30,8 @@ import {
   TAUNT_FORCE_SECONDS, addThreat, clearThreat, stealthDetectionRadius, threatEntries, threatModifier, topThreatValue,
 } from './threat';
 import { groundHeight, WATER_LEVEL } from './world';
-import type { AccountCosmetics, LeaderboardEntry } from '../world_api';
+import type { AccountCosmetics } from '../world_api';
+import { paginateLeaderboard, LEADERBOARD_PAGE_SIZE, type LeaderboardPage } from './leaderboard_page';
 import {
   AbilityDef, AbilityEffect, Aura, AuraKind, CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION, CONSUME_DURATION, ItemDef,
   DEFAULT_PARTY_LOOT_STRATEGIES,
@@ -1349,7 +1350,8 @@ export class Sim {
   }
   // Offline leaderboard: rank the players the local sim knows about by lifetime
   // XP. Online play overrides this with the cached, realm-scoped server query.
-  leaderboard(): Promise<LeaderboardEntry[]> {
+  // Paged through the same helper the server uses so both worlds behave alike.
+  leaderboard(page = 0, pageSize = LEADERBOARD_PAGE_SIZE): Promise<LeaderboardPage> {
     const rows = [...this.players.values()]
       .map((m) => {
         const e = this.entities.get(m.entityId);
@@ -1366,7 +1368,7 @@ export class Sim {
         lifetimeXp: meta.lifetimeXp,
         prestigeRank: meta.prestigeRank,
       }));
-    return Promise.resolve(rows);
+    return Promise.resolve(paginateLeaderboard(rows, page, pageSize));
   }
   get known(): ResolvedAbility[] {
     return this.primary.known;

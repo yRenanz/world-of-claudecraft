@@ -11,6 +11,7 @@ import {
   accountById, characterCountForAccount, updatePasswordHash, revokeTokensExcept, setAccountEmail, setAccountDeactivated,
 } from './db';
 import { virtualLevel } from '../src/sim/types';
+import { paginateLeaderboard, LEADERBOARD_PAGE_SIZE, LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import type { LeaderboardEntry } from '../src/world_api';
@@ -103,7 +104,9 @@ function initialCharacterState(cls: PlayerClass, name: string, skin: number): im
 // most once per LEADERBOARD_TTL_MS, plus the boot warm-up below.
 // ---------------------------------------------------------------------------
 const LEADERBOARD_TTL_MS = 30_000;
-const LEADERBOARD_SIZE = 100;
+// Cache the full exposed depth (LEADERBOARD_MAX) once per scope; the REST handler
+// pages through it as an in-memory slice, so no extra query per page click.
+const LEADERBOARD_SIZE = LEADERBOARD_MAX;
 // One cache per scope: 'realm' for the in-game panel, 'global' for the
 // cross-realm home-page board.
 const leaderboardCache: Record<'realm' | 'global', { at: number; entries: LeaderboardEntry[] } | null> = {
@@ -711,13 +714,23 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // lifetime-XP leaderboard (Max-Level XP Overflow), served from the
       // in-memory cache. metric is fixed to lifetimeXp. ?scope=global ranks
       // across every realm (home page); default is this process's realm (the
-      // in-game panel). Optional ?limit=N (1..100). `url` is the path only, so
-      // the query string is parsed from req.url.
+      // in-game panel). `url` is the path only, so the query string is parsed
+      // from req.url.
       const params = new URLSearchParams((req.url ?? '').split('?')[1] ?? '');
       const scope: 'realm' | 'global' = params.get('scope') === 'global' ? 'global' : 'realm';
-      const limit = Math.max(1, Math.min(LEADERBOARD_SIZE, Number(params.get('limit')) || LEADERBOARD_SIZE));
       const entries = await getLeaderboard(scope);
-      return json(res, 200, { realm: REALM, scope, metric: 'lifetimeXp', leaders: entries.slice(0, limit) });
+      // Legacy ?limit=N (home-page board): top N as a single page, no paging UI.
+      const limitParam = params.get('limit');
+      if (limitParam !== null) {
+        const limit = Math.max(1, Math.min(LEADERBOARD_SIZE, Number(limitParam) || LEADERBOARD_SIZE));
+        const leaders = entries.slice(0, limit);
+        return json(res, 200, { realm: REALM, scope, metric: 'lifetimeXp', leaders, page: 0, pageCount: 1, total: leaders.length, pageSize: limit });
+      }
+      // Paged in-game board: ?page=N (0-based) & ?pageSize=M, clamped server-side.
+      const pageSize = Number(params.get('pageSize')) || LEADERBOARD_PAGE_SIZE;
+      const page = Number(params.get('page')) || 0;
+      const slice = paginateLeaderboard(entries, page, pageSize);
+      return json(res, 200, { realm: REALM, scope, metric: 'lifetimeXp', ...slice });
     }
     if (req.method === 'GET' && url === '/api/releases') {
       recordUsageMetric('github.releases.api');

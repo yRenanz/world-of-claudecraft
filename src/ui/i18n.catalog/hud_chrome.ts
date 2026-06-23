@@ -104,6 +104,20 @@ export const hudChromeStrings = {
     heading: 'Heading',
     minimapZoom: 'Minimap zoom',
   },
+  // Raid-lockout badge on the minimap rim + its hover/tap panel: the title, the
+  // accessible label, the "all ready" line, and the unlock-countdown templates
+  // (digits run through formatNumber; the units reorder per locale).
+  raidLockout: {
+    title: "Raid Lockouts",
+    allReady: "All raids ready",
+    daysHours: "{d}d {h}h",
+    hoursMinutes: "{h}h {m}m",
+    minutes: "{m}m",
+    lessThanMinute: "<1m",
+    // Entry-denied toast, enriched client-side with the live unlock countdown
+    // ({raid} = the localized raid name, {time} = the formatted countdown).
+    lockedToast: "You are locked to {raid}. Unlocks in {time}.",
+  },
   // Eight-point compass abbreviations as drawn on the heading strip. Each locale
   // overrides with its own established compass abbreviations (e.g. West = "O" in
   // Spanish, "O" in French/Italian/Portuguese, "З" in Russian).

@@ -238,6 +238,15 @@ export const en_XA: EnTranslations = {
       "heading": "[Ĥéáðíñĝ]",
       "minimapZoom": "[Ɱíñíɱáþ žóóɱ]"
     },
+    "raidLockout": {
+      "title": "[Ŕáíð Ļóçķóúţš]",
+      "allReady": "[Áļļ ŕáíðš ŕéáðý]",
+      "daysHours": "[{d}ð {h}ĥ]",
+      "hoursMinutes": "[{h}ĥ {m}ɱ]",
+      "minutes": "[{m}ɱ]",
+      "lessThanMinute": "[<1ɱ]",
+      "lockedToast": "[Ýóú áŕé ļóçķéð ţó {raid}. Úñļóçķš íñ {time}.]"
+    },
     "compass": {
       "N": "[Ñ]",
       "NE": "[ÑÉ]",

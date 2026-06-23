@@ -14,6 +14,13 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.raidLockout.title': '團隊副本鎖定',
+  'hudChrome.raidLockout.allReady': '所有團隊副本就緒',
+  'hudChrome.raidLockout.daysHours': '{d}天{h}小時',
+  'hudChrome.raidLockout.hoursMinutes': '{h}小時{m}分',
+  'hudChrome.raidLockout.minutes': '{m}分',
+  'hudChrome.raidLockout.lessThanMinute': '<1分',
+  'hudChrome.raidLockout.lockedToast': '你已鎖定到{raid}。{time}後解鎖。',
   'hudChrome.theme.preset': '介面主題',
   'hudChrome.theme.customColors': '自訂顏色',
   'hudChrome.theme.reset': '重設',
@@ -3124,6 +3131,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_crown.name': '喚雷者之冠',
   'entities.items.stormcallers_spaulders.name': '喚雷者肩甲',
   'hud.chat.context.convertToRaid': '轉換為團隊',
+  'hud.chat.context.convertToParty': '轉換為隊伍',
+  'hudChrome.raidConvert.leaderOnly': '只有團隊領袖可以轉換為隊伍。',
+  'hudChrome.raidConvert.notRaid': '你的隊伍並非團隊。',
+  'hudChrome.raidConvert.toPartyDone': '你的團隊已轉換回隊伍。',
+  'hudChrome.raidConvert.tooLarge': '超過五名成員的團隊無法轉換回隊伍。',
   'hud.social.raidTab': '團隊',
   'hud.social.raidEmpty': '將隊伍轉換為團隊後，可在這裡管理團隊分組。',
   'hud.social.raidGroupEmpty': '此小隊沒有玩家。',

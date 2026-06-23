@@ -238,6 +238,15 @@ export const ru_RU: EnTranslations = {
       "heading": "Направление",
       "minimapZoom": "Масштаб миникарты"
     },
+    "raidLockout": {
+      "title": "Блокировки рейдов",
+      "allReady": "Все рейды доступны",
+      "daysHours": "{d}д {h}ч",
+      "hoursMinutes": "{h}ч {m}м",
+      "minutes": "{m}м",
+      "lessThanMinute": "<1м",
+      "lockedToast": "Вы привязаны к {raid}. Разблокировка через {time}."
+    },
     "compass": {
       "N": "С",
       "NE": "СВ",
@@ -552,10 +561,10 @@ export const ru_RU: EnTranslations = {
       "noMatch": "Нет предметов, соответствующих фильтрам."
     },
     "raidConvert": {
-      "toPartyDone": "Your raid has converted back to a party.",
-      "notRaid": "Your group is not a raid.",
-      "leaderOnly": "Only the raid leader may convert to a party.",
-      "tooLarge": "A raid with more than five members cannot convert back to a party."
+      "toPartyDone": "Ваш рейд снова преобразован в группу.",
+      "notRaid": "Ваша группа не является рейдом.",
+      "leaderOnly": "Только лидер рейда может преобразовать рейд в группу.",
+      "tooLarge": "Рейд, в котором более пяти участников, нельзя преобразовать обратно в группу."
     }
   },
   "guide": {
@@ -2276,7 +2285,7 @@ export const ru_RU: EnTranslations = {
         "report": "Пожаловаться на игрока",
         "removeParty": "Удалить из группы",
         "convertToRaid": "Преобразовать в рейд",
-        "convertToParty": "Convert to party",
+        "convertToParty": "Преобразовать в группу",
         "cancel": "Отмена"
       }
     },

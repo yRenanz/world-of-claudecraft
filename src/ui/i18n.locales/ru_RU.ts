@@ -14,6 +14,13 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.raidLockout.title': 'Блокировки рейдов',
+  'hudChrome.raidLockout.allReady': 'Все рейды доступны',
+  'hudChrome.raidLockout.daysHours': '{d}д {h}ч',
+  'hudChrome.raidLockout.hoursMinutes': '{h}ч {m}м',
+  'hudChrome.raidLockout.minutes': '{m}м',
+  'hudChrome.raidLockout.lessThanMinute': '<1м',
+  'hudChrome.raidLockout.lockedToast': 'Вы привязаны к {raid}. Разблокировка через {time}.',
   'hudChrome.theme.preset': 'Тема интерфейса',
   'hudChrome.theme.customColors': 'Свои цвета',
   'hudChrome.theme.reset': 'Сброс',
@@ -3308,6 +3315,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_crown.name': 'Корона призывателя бурь',
   'entities.items.stormcallers_spaulders.name': 'Наплечники призывателя бурь',
   'hud.chat.context.convertToRaid': 'Преобразовать в рейд',
+  'hud.chat.context.convertToParty': 'Преобразовать в группу',
+  'hudChrome.raidConvert.leaderOnly': 'Только лидер рейда может преобразовать рейд в группу.',
+  'hudChrome.raidConvert.notRaid': 'Ваша группа не является рейдом.',
+  'hudChrome.raidConvert.toPartyDone': 'Ваш рейд снова преобразован в группу.',
+  'hudChrome.raidConvert.tooLarge':
+    'Рейд, в котором более пяти участников, нельзя преобразовать обратно в группу.',
   'hud.social.raidTab': 'Рейд',
   'hud.social.raidEmpty': 'Преобразуйте группу в рейд, чтобы управлять рейдовыми группами здесь.',
   'hud.social.raidGroupEmpty': 'В этой группе нет игроков.',

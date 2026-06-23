@@ -14,6 +14,13 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.raidLockout.title': 'レイドロックアウト',
+  'hudChrome.raidLockout.allReady': 'すべてのレイドが利用可能',
+  'hudChrome.raidLockout.daysHours': '{d}日{h}時間',
+  'hudChrome.raidLockout.hoursMinutes': '{h}時間{m}分',
+  'hudChrome.raidLockout.minutes': '{m}分',
+  'hudChrome.raidLockout.lessThanMinute': '1分未満',
+  'hudChrome.raidLockout.lockedToast': '{raid}にロックされています。解除まで{time}。',
   'hudChrome.theme.preset': 'UIテーマ',
   'hudChrome.theme.customColors': 'カスタムカラー',
   'hudChrome.theme.reset': 'リセット',
@@ -3259,6 +3266,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_crown.name': '嵐呼びの冠',
   'entities.items.stormcallers_spaulders.name': '嵐呼びの肩当て',
   'hud.chat.context.convertToRaid': 'レイドに変換',
+  'hud.chat.context.convertToParty': 'パーティに変換',
+  'hudChrome.raidConvert.leaderOnly': 'パーティに変換できるのはレイドリーダーだけです。',
+  'hudChrome.raidConvert.notRaid': 'パーティはレイドではありません。',
+  'hudChrome.raidConvert.toPartyDone': 'レイドがパーティに戻りました。',
+  'hudChrome.raidConvert.tooLarge': 'メンバーが5人を超えるレイドはパーティに戻せません。',
   'hud.social.raidTab': 'レイド',
   'hud.social.raidEmpty': 'パーティをレイドに変換すると、ここでレイドグループを管理できます。',
   'hud.social.raidGroupEmpty': 'このグループにプレイヤーはいません。',

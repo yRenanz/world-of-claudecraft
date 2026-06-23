@@ -238,6 +238,15 @@ export const en: EnTranslations = {
       "heading": "Heading",
       "minimapZoom": "Minimap zoom"
     },
+    "raidLockout": {
+      "title": "Raid Lockouts",
+      "allReady": "All raids ready",
+      "daysHours": "{d}d {h}h",
+      "hoursMinutes": "{h}h {m}m",
+      "minutes": "{m}m",
+      "lessThanMinute": "<1m",
+      "lockedToast": "You are locked to {raid}. Unlocks in {time}."
+    },
     "compass": {
       "N": "N",
       "NE": "NE",

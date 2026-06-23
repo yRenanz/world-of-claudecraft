@@ -14,6 +14,13 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.raidLockout.title': '레이드 잠금',
+  'hudChrome.raidLockout.allReady': '모든 레이드 준비됨',
+  'hudChrome.raidLockout.daysHours': '{d}일 {h}시간',
+  'hudChrome.raidLockout.hoursMinutes': '{h}시간 {m}분',
+  'hudChrome.raidLockout.minutes': '{m}분',
+  'hudChrome.raidLockout.lessThanMinute': '1분 미만',
+  'hudChrome.raidLockout.lockedToast': '{raid}에 잠겨 있습니다. {time} 후 해제됩니다.',
   'hudChrome.theme.preset': 'UI 테마',
   'hudChrome.theme.customColors': '사용자 지정 색상',
   'hudChrome.theme.reset': '초기화',
@@ -3266,6 +3273,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_crown.name': '폭풍소환사의 관',
   'entities.items.stormcallers_spaulders.name': '폭풍소환사의 어깨갑옷',
   'hud.chat.context.convertToRaid': '공격대로 전환',
+  'hud.chat.context.convertToParty': '파티로 전환',
+  'hudChrome.raidConvert.leaderOnly': '공격대장만 파티로 전환할 수 있습니다.',
+  'hudChrome.raidConvert.notRaid': '현재 파티는 공격대가 아닙니다.',
+  'hudChrome.raidConvert.toPartyDone': '공격대가 파티로 다시 전환되었습니다.',
+  'hudChrome.raidConvert.tooLarge':
+    '인원이 5명을 초과하는 공격대는 파티로 다시 전환할 수 없습니다.',
   'hud.social.raidTab': '공격대',
   'hud.social.raidEmpty': '파티를 공격대로 전환하면 여기에서 공격대 조를 관리할 수 있습니다.',
   'hud.social.raidGroupEmpty': '이 조에는 플레이어가 없습니다.',

@@ -238,6 +238,15 @@ export const de_DE: EnTranslations = {
       "heading": "Blickrichtung",
       "minimapZoom": "Minikarten-Zoom"
     },
+    "raidLockout": {
+      "title": "Schlachtzug-Sperren",
+      "allReady": "Alle Schlachtzüge bereit",
+      "daysHours": "{d}T {h}Std",
+      "hoursMinutes": "{h}Std {m}Min",
+      "minutes": "{m}Min",
+      "lessThanMinute": "<1Min",
+      "lockedToast": "Du bist für {raid} gesperrt. Freischaltung in {time}."
+    },
     "compass": {
       "N": "N",
       "NE": "NO",
@@ -552,10 +561,10 @@ export const de_DE: EnTranslations = {
       "noMatch": "Keine Gegenstände entsprechen Euren Filtern."
     },
     "raidConvert": {
-      "toPartyDone": "Your raid has converted back to a party.",
-      "notRaid": "Your group is not a raid.",
-      "leaderOnly": "Only the raid leader may convert to a party.",
-      "tooLarge": "A raid with more than five members cannot convert back to a party."
+      "toPartyDone": "Euer Schlachtzug wurde wieder in eine Gruppe umgewandelt.",
+      "notRaid": "Eure Gruppe ist kein Schlachtzug.",
+      "leaderOnly": "Nur der Schlachtzugsleiter darf in eine Gruppe umwandeln.",
+      "tooLarge": "Ein Schlachtzug mit mehr als fünf Mitgliedern kann nicht wieder in eine Gruppe umgewandelt werden."
     }
   },
   "guide": {
@@ -2276,7 +2285,7 @@ export const de_DE: EnTranslations = {
         "report": "Spieler melden",
         "removeParty": "Aus Gruppe entfernen",
         "convertToRaid": "In Schlachtzug umwandeln",
-        "convertToParty": "Convert to party",
+        "convertToParty": "In Gruppe umwandeln",
         "cancel": "Abbrechen"
       }
     },

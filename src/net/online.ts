@@ -43,6 +43,7 @@ import {
   type OverheadEmoteId,
   type PartyInfo,
   type PresenceStatus,
+  type RaidLockout,
   type SocialInfo,
   type TradeInfo,
 } from '../world_api';
@@ -1216,6 +1217,7 @@ export class ClientWorld implements IWorld {
       if (s.qlog !== undefined)
         this.questLog = new Map((s.qlog as QuestProgress[]).map((q) => [q.questId, q]));
       if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
+      if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
       // talent state (heavy field, sent on change): mirror it, then resolve known
       // with the precomputed modifiers so granted abilities + tweaks show locally.
@@ -1644,6 +1646,19 @@ export class ClientWorld implements IWorld {
   }
   leaveDungeon(): void {
     this.cmd({ cmd: 'leave_dungeon' });
+  }
+  // Raid lockouts mirrored from snapshot self as {dungeonId: expiryEpochMs}; the
+  // remaining time is derived locally so the countdown ticks down without traffic.
+  private selfLockouts: Record<string, number> = {};
+  raidLockouts(): RaidLockout[] {
+    const now = Date.now();
+    const src = this.selfLockouts ?? {};
+    const out: RaidLockout[] = [];
+    for (const id of Object.keys(src)) {
+      const msRemaining = src[id] - now;
+      if (msRemaining > 0) out.push({ id, msRemaining });
+    }
+    return out;
   }
   async leaderboard(page = 0, pageSize = LEADERBOARD_PAGE_SIZE): Promise<LeaderboardPage> {
     const empty: LeaderboardPage = { leaders: [], page: 0, pageCount: 1, total: 0, pageSize };

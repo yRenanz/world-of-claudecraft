@@ -1650,6 +1650,15 @@ export class Sim {
   get questsDone(): Set<string> {
     return this.primary.questsDone;
   }
+  raidLockouts(): import('../world_api').RaidLockout[] {
+    const now = this.lockoutNowMs();
+    const out: import('../world_api').RaidLockout[] = [];
+    for (const [id, until] of this.primary.raidLockouts) {
+      const msRemaining = until - now;
+      if (msRemaining > 0) out.push({ id, msRemaining });
+    }
+    return out;
+  }
   get counters(): RewardCounters {
     return this.primary.counters;
   }
@@ -6590,10 +6599,6 @@ export class Sim {
           break;
         }
         if (d > this.mobEffectiveMeleeRange(mob)) { mob.aiState = 'chase'; break; }
-        if (d > this.mobEffectiveMeleeRange(mob, target)) {
-          mob.aiState = 'chase';
-          break;
-        }
         mob.facing = angleTo(mob.pos, target.pos);
         mob.swingTimer -= DT;
         if (mob.swingTimer <= 0) {

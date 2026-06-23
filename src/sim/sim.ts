@@ -6206,15 +6206,14 @@ export class Sim {
     return combatProfileForMob(mob.templateId, mob.scale);
   }
 
-  private mobEffectiveMeleeRange(mob: Entity, target: Entity): number {
+  private mobEffectiveMeleeRange(mob: Entity): number {
     const profile = this.mobCombatProfile(mob);
-    const targetMoved = dist2d(target.pos, target.prevPos) > 0.05;
     const mobMoved = dist2d(mob.pos, mob.prevPos) > 0.05;
-    return effectiveMobMeleeRange(profile, targetMoved, mobMoved);
+    return effectiveMobMeleeRange(profile, mobMoved);
   }
 
   private tryMobMeleeSwingInRange(mob: Entity, target: Entity): boolean {
-    if (dist2d(mob.pos, target.pos) > this.mobEffectiveMeleeRange(mob, target)) return false;
+    if (dist2d(mob.pos, target.pos) > this.mobEffectiveMeleeRange(mob)) return false;
     mob.aiState = 'attack';
     mob.facing = angleTo(mob.pos, target.pos);
     if (mob.swingTimer <= 0) {
@@ -6590,6 +6589,7 @@ export class Sim {
           this.updateRangedPetAttack(mob, target, spell);
           break;
         }
+        if (d > this.mobEffectiveMeleeRange(mob)) { mob.aiState = 'chase'; break; }
         if (d > this.mobEffectiveMeleeRange(mob, target)) {
           mob.aiState = 'chase';
           break;

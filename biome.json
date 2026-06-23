@@ -15,6 +15,7 @@
       "!**/*.generated.ts",
       "!src/ui/i18n.resolved.generated",
       "!src/admin/i18n.resolved.generated",
+      "!src/ui/i18n.status.summary.json",
       "!**/*.min.js"
     ]
   },
@@ -38,5 +39,27 @@
     "rules": {
       "preset": "recommended"
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["src/sim/rng.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noAssignInExpressions": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/net/online.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "warn"
+          }
+        }
+      }
+    }
+  ]
 }

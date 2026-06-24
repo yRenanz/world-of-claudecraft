@@ -2131,7 +2131,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.deepfen_pearl.name': 'Pérola de Deepfen',
   'entities.items.highwatch_summons.name': 'Convocação de Highwatch',
   'entities.items.ridge_stalker_pelt.name': 'Pele de espreitador da crista',
-  'entities.items.pristine_ridge_stalker_pelt.name': 'Pele imaculada de espreitador da crista',
+  'entities.items.old_cragmaws_pelt.name': 'Pele do Velho Cragmaw',
   'entities.items.cragmaw_huntcord.name': 'Cinta de caça de Cragmaw',
   'entities.items.glowing_wax.name': 'Cera brilhante',
   'entities.items.ogre_war_totem.name': 'Totem de guerra ogro',

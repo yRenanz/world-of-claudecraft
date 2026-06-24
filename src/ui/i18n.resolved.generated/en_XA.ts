@@ -3898,8 +3898,8 @@ export const en_XA: EnTranslations = {
       "ridge_stalker_pelt": {
         "name": "[Ŕíðĝé Šţáļķéŕ Þéļţ]"
       },
-      "pristine_ridge_stalker_pelt": {
-        "name": "[Þŕíšţíñé Ŕíðĝé Šţáļķéŕ Þéļţ]"
+      "old_cragmaws_pelt": {
+        "name": "[Óļð Çŕáĝɱáŵ'š Þéļţ]"
       },
       "glowing_wax": {
         "name": "[Ĝļóŵíñĝ Ŵáẋ]"

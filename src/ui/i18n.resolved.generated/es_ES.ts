@@ -3898,8 +3898,8 @@ export const es_ES: EnTranslations = {
       "ridge_stalker_pelt": {
         "name": "Piel de acechador de la cresta"
       },
-      "pristine_ridge_stalker_pelt": {
-        "name": "Piel prístina de acechador de la cresta"
+      "old_cragmaws_pelt": {
+        "name": "Piel del Viejo Cragmaw"
       },
       "glowing_wax": {
         "name": "Cera resplandeciente"

@@ -3898,8 +3898,8 @@ export const ko_KR: EnTranslations = {
       "ridge_stalker_pelt": {
         "name": "산등성이 추적자 가죽"
       },
-      "pristine_ridge_stalker_pelt": {
-        "name": "온전한 산등성이 추적자 가죽"
+      "old_cragmaws_pelt": {
+        "name": "늙은 크래그모의 가죽"
       },
       "glowing_wax": {
         "name": "빛나는 밀랍"

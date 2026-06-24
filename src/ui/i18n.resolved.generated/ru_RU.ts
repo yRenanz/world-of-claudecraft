@@ -3898,8 +3898,8 @@ export const ru_RU: EnTranslations = {
       "ridge_stalker_pelt": {
         "name": "Шкура хребтового охотника"
       },
-      "pristine_ridge_stalker_pelt": {
-        "name": "Безупречная шкура хребтового охотника"
+      "old_cragmaws_pelt": {
+        "name": "Шкура Старого Крэгмо"
       },
       "glowing_wax": {
         "name": "Светящийся воск"

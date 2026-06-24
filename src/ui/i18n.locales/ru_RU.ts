@@ -2140,7 +2140,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.deepfen_pearl.name': 'Жемчужина Глубокой Топи',
   'entities.items.highwatch_summons.name': 'Призыв Хайвотча',
   'entities.items.ridge_stalker_pelt.name': 'Шкура хребтового охотника',
-  'entities.items.pristine_ridge_stalker_pelt.name': 'Безупречная шкура хребтового охотника',
+  'entities.items.old_cragmaws_pelt.name': 'Шкура Старого Крэгмо',
   'entities.items.cragmaw_huntcord.name': 'Охотничий пояс Крэгмо',
   'entities.items.glowing_wax.name': 'Светящийся воск',
   'entities.items.ogre_war_totem.name': 'Боевой тотем огра',

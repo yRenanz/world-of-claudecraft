@@ -3898,8 +3898,8 @@ export const fr_FR: EnTranslations = {
       "ridge_stalker_pelt": {
         "name": "Peau de rôdeur de la crête"
       },
-      "pristine_ridge_stalker_pelt": {
-        "name": "Peau immaculée de rôdeur de la crête"
+      "old_cragmaws_pelt": {
+        "name": "Peau du vieux Cragmaw"
       },
       "glowing_wax": {
         "name": "Cire luisante"

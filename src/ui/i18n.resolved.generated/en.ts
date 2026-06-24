@@ -3898,8 +3898,8 @@ export const en: EnTranslations = {
       "ridge_stalker_pelt": {
         "name": "Ridge Stalker Pelt"
       },
-      "pristine_ridge_stalker_pelt": {
-        "name": "Pristine Ridge Stalker Pelt"
+      "old_cragmaws_pelt": {
+        "name": "Old Cragmaw's Pelt"
       },
       "glowing_wax": {
         "name": "Glowing Wax"

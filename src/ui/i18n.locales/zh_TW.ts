@@ -2011,7 +2011,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.deepfen_pearl.name': '深沼珍珠',
   'entities.items.highwatch_summons.name': '高望召令',
   'entities.items.ridge_stalker_pelt.name': '山脊潛伏者毛皮',
-  'entities.items.pristine_ridge_stalker_pelt.name': '無瑕的山脊潛伏者毛皮',
+  'entities.items.old_cragmaws_pelt.name': '老裂顎的毛皮',
   'entities.items.cragmaw_huntcord.name': '裂顎的狩獵腰索',
   'entities.items.glowing_wax.name': '發光蠟塊',
   'entities.items.ogre_war_totem.name': '食人魔戰爭圖騰',

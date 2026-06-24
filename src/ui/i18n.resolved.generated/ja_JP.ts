@@ -3898,8 +3898,8 @@ export const ja_JP: EnTranslations = {
       "ridge_stalker_pelt": {
         "name": "尾根の追跡者の毛皮"
       },
-      "pristine_ridge_stalker_pelt": {
-        "name": "極上の尾根の追跡者の毛皮"
+      "old_cragmaws_pelt": {
+        "name": "老いたるクラッグモウの毛皮"
       },
       "glowing_wax": {
         "name": "光る蝋"

@@ -3898,8 +3898,8 @@ export const de_DE: EnTranslations = {
       "ridge_stalker_pelt": {
         "name": "Balg eines Gratpirschers"
       },
-      "pristine_ridge_stalker_pelt": {
-        "name": "Makelloser Balg eines Gratpirschers"
+      "old_cragmaws_pelt": {
+        "name": "Balg des alten Cragmaw"
       },
       "glowing_wax": {
         "name": "Glühendes Wachs"

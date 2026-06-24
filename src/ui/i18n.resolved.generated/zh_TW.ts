@@ -3898,8 +3898,8 @@ export const zh_TW: EnTranslations = {
       "ridge_stalker_pelt": {
         "name": "山脊潛伏者毛皮"
       },
-      "pristine_ridge_stalker_pelt": {
-        "name": "無瑕的山脊潛伏者毛皮"
+      "old_cragmaws_pelt": {
+        "name": "老裂顎的毛皮"
       },
       "glowing_wax": {
         "name": "發光蠟塊"

@@ -3898,8 +3898,8 @@ export const it_IT: EnTranslations = {
       "ridge_stalker_pelt": {
         "name": "Pelliccia di predatore del crinale"
       },
-      "pristine_ridge_stalker_pelt": {
-        "name": "Pelliccia immacolata di predatore del crinale"
+      "old_cragmaws_pelt": {
+        "name": "Pelliccia del Vecchio Cragmaw"
       },
       "glowing_wax": {
         "name": "Cera luminosa"

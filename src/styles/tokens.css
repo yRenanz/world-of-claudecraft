@@ -1,0 +1,102 @@
+/* tokens.css: the :root design tokens (palette, typography, spacing, scrollbar,
+   cursors, viewport). Relocated verbatim from the inline <style> of index.html
+   under @layer tokens; every name and resolved value is preserved. The one change
+   is the cursor url()s, rewritten from page-relative './ui/cursors/...' to
+   root-absolute '/ui/cursors/...' so they resolve from a bundled stylesheet exactly
+   as they did inline (a relative url() in a bundled CSS file resolves against
+   src/styles/, not the page root).
+
+   The runtime-written custom properties stay here as :root defaults so the runtime
+   overrides still cascade on top: src/ui/theme.ts writes the --color-* accents and
+   the viewport resizer writes --app-vw / --app-vh, both onto documentElement inline
+   style, which always wins over this stylesheet rule. --range-fill is NOT a token
+   here: it is the slider track's inline var(--range-fill, 0%) fallback in base.css,
+   written per element by the HUD, never on :root.
+
+   See docs/frontend-modernization/phase-01-css-lightning-tokens-base.md. */
+@layer tokens {
+  :root {
+    --gold: #ffd100;
+    --gold-dim: #c8a838;
+    --border: #6f5a2a;
+    /* --panel-base is the single themeable frame colour; --panel-bg derives the
+       shipped gradient from it (overwritten wholesale by the theme system). */
+    --panel-base: #15151f;
+    --panel-bg: linear-gradient(170deg, #15151ff2 0%, #0b0b12f2 60%, #08080df2 100%);
+    /* Typography — Cinzel (heraldic display/headings), Alegreya Sans (UI + body),
+       Alegreya (serif flavour prose). Legacy token names alias the canonical set
+       so every existing usage resolves to the new system. */
+    --font-display: "Cinzel", "Palatino Linotype", Palatino, Georgia, serif;
+    --font-ui: "Alegreya Sans", "Segoe UI", system-ui, "Helvetica Neue", sans-serif;
+    --font-serif: "Alegreya", "Palatino Linotype", Palatino, Georgia, serif;
+    --title-font: var(--font-display);
+    --font-heading: var(--font-display);
+    --ui-font: var(--font-ui);
+    --font-sans: var(--font-ui);
+    --body-font: var(--font-ui);
+
+    /* --gold is the single source of truth for the primary accent */
+    --color-primary: var(--gold);
+    --color-primary-dim: var(--gold-dim);
+    --color-primary-glow: rgba(255, 209, 0, 0.2);
+    --color-primary-glow-heavy: rgba(255, 209, 0, 0.4);
+
+    /* resource bars / unit-frame states / auras (previously hardcoded across CSS + JS) */
+    --color-hp: #1eb838;
+    --color-mana: #2b7bd4;
+    --color-rage: #c0392b;
+    --color-energy: #e4c531;
+    --color-hostile: #ff6b5e;
+    --color-friendly: #9fdc7f;
+    --color-buff: #3a6ea8;
+    --color-debuff: #c0392b;
+
+    --color-bg-dark: #08080d;
+    --color-bg-input: #0a0a0f;
+    --color-border-default: #4e3d1d;
+    --color-border-focus: #c8a838;
+    --color-border-invalid: #ff8f85;
+    --color-border-valid: #48e060;
+
+    --color-text-light: #f0ebd8;
+    --color-text-muted: #998d6a;
+    /* Accent/gold for text on panel surfaces, and overlay text that floats
+       over the 3D world. The theme system (src/ui/theme.ts) recomputes
+       --color-accent/--color-gold per preset so they stay AA-readable on a
+       light panel, and keeps --color-text-overlay light with a text-shadow. */
+    --color-gold: var(--gold);
+    --color-accent: var(--gold);
+    --color-text-overlay: #f4eede;
+    --panel-edge: #08080d;
+    --color-text-error: #ff8f85;
+    --color-text-success: #7fdc4f;
+
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+
+    --radius-sm: 4px;
+    --radius-md: 8px;
+
+    --transition-speed: 0.25s;
+    --transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Custom scrollbar tokens */
+    --scrollbar-thumb: #5c4722;
+    --scrollbar-track: rgba(10, 10, 15, 0.7);
+    --scrollbar-thumb-hover: #7c6233;
+    --scrollbar-border: #7c6233;
+    --app-vw: 100vw;
+    --app-vh: 100vh;
+    /* Shared with src/game/cursors.ts — keep hotspots in sync.
+       --cursor-arrow = default; --cursor-point = interactive/hover (gauntlet finger). */
+    --cursor-arrow: url("/ui/cursors/arrow.png") 7 2, default;
+    --cursor-point: url("/ui/cursors/gauntlet.png") 6 4, pointer;
+    --cursor-grab: url("/ui/cursors/hand-grab.png") 11 16, grabbing;
+    /* Back-compat aliases */
+    --cursor-hand: var(--cursor-arrow);
+    --cursor-sword: var(--cursor-point);
+    --cursor-shield: var(--cursor-point);
+  }
+}

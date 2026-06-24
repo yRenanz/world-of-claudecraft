@@ -2,6 +2,15 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
+// Phase P1 of the frontend modernization moved the :root tokens and the reset/base
+// block (universal reset, scrollbars, forms, the global canvas/#ui/#nameplates base
+// rules) out of index.html's inline <style> into src/styles/base.css, loaded by the
+// game entries via the src/styles/index.css barrel. Assertions on those base rules
+// read base.css; the HUD/shell rules still inline in index.html keep reading `html`.
+const baseCss = readFileSync(new URL('../src/styles/base.css', import.meta.url), 'utf8').replace(
+  /\r\n/g,
+  '\n',
+);
 const playHtml = readFileSync(new URL('../play.html', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
@@ -265,8 +274,8 @@ describe('client HTML shell', () => {
   });
 
   it('does not expose inert scrollbars on fixed mobile game overlays', () => {
-    expect(html).toContain(
-      '#ui { position: fixed; left: 0; top: 0; width: var(--app-vw); max-width: 100vw; height: var(--app-vh); overflow: hidden;',
+    expect(baseCss).toContain(
+      '#ui {\n    position: fixed;\n    left: 0;\n    top: 0;\n    width: var(--app-vw);\n    max-width: 100vw;\n    height: var(--app-vh);\n    overflow: hidden;',
     );
     expect(html).toContain(
       'body.mobile-touch.game-active #ui,\n  body.mobile-touch.game-active #nameplates,\n  body.mobile-touch.game-active #mobile-controls {\n    overflow: hidden;\n    scrollbar-width: none;',
@@ -417,8 +426,8 @@ describe('client HTML shell', () => {
   });
 
   it('keeps the mobile homepage scrollable with a sticky header', () => {
-    expect(html).toContain('touch-action: pan-y; overscroll-behavior-y: auto;');
-    expect(html).toContain('body.game-active {\n    overflow: hidden;\n    touch-action: none;');
+    expect(baseCss).toContain('touch-action: pan-y;\n    overscroll-behavior-y: auto;');
+    expect(baseCss).toContain('body.game-active {\n    overflow: hidden;\n    touch-action: none;');
     expect(html).toContain('-webkit-overflow-scrolling: touch;');
     expect(html).toContain(
       'body.mobile-touch .homepage-header {\n    display: flex;\n    position: sticky;\n    top: 0;\n    z-index: 120;',

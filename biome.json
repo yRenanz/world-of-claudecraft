@@ -51,6 +51,19 @@
       }
     },
     {
+      "includes": ["src/styles/**"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noImportantStyles": "off"
+          },
+          "style": {
+            "noDescendingSpecificity": "off"
+          }
+        }
+      }
+    },
+    {
       "includes": ["src/sim/rng.ts"],
       "linter": {
         "rules": {

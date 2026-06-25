@@ -203,6 +203,9 @@ describe('client HTML shell', () => {
     expect(hudTs).toContain(
       "if (ev.level === 5) trackMetaPixel('ReachedLevel5', { level: ev.level });",
     );
+    expect(mainTs).toContain("trackMetaPixel('AccountCreated');");
+    expect(mainTs).toContain("'GitHubClick'");
+    expect(mainTs).toContain("'DiscordClick'");
   });
 
   it('excludes wallet verification surfaces from native app builds', () => {

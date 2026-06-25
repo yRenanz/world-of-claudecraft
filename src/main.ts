@@ -378,6 +378,37 @@ function resetTurnstile(): void {
   if (ts && turnstileWidgetId !== undefined) ts.reset(turnstileWidgetId);
 }
 
+function trackMetaPixel(eventName: string, data?: Record<string, unknown>): void {
+  const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
+  if (typeof fbq !== 'function') return;
+  fbq('trackCustom', eventName, data ?? {});
+}
+
+function trackCommunityLinkClicks(): void {
+  document.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((link) => {
+    let url: URL;
+    try {
+      url = new URL(link.href);
+    } catch {
+      return;
+    }
+    const host = url.hostname.toLowerCase();
+    const isGitHub = host === 'github.com' || host.endsWith('.github.com');
+    const isDiscord =
+      host === 'discord.gg' ||
+      host.endsWith('.discord.gg') ||
+      host === 'discord.com' ||
+      host.endsWith('.discord.com');
+    if (!isGitHub && !isDiscord) return;
+    link.addEventListener('click', () => {
+      trackMetaPixel(isGitHub ? 'GitHubClick' : 'DiscordClick', {
+        url: url.toString(),
+        path: url.pathname,
+      });
+    });
+  });
+}
+
 function localizedSiteUrl(lang: SupportedLanguage): string {
   if (lang === 'en') return SITE_URL;
   const url = new URL(SITE_URL);
@@ -5554,6 +5585,7 @@ function wireStartScreens(): void {
         }
       } else {
         await api.register(username, password, token, REFERRAL_SLUG, nativeAttestation);
+        trackMetaPixel('AccountCreated');
       }
     } catch (err) {
       // Auth itself failed (bad credentials, taken username, Turnstile reject…).
@@ -6002,6 +6034,7 @@ function wireStartScreens(): void {
     void renderAccountPortal();
   });
   setupNavBtn($('#nav-btn-logout'), '#hero-view', logoutAccount);
+  trackCommunityLinkClicks();
   setupAccountPortal();
   // Restore a persisted session: show the Account tab immediately, then confirm
   // the stored token is still valid against the server (clearing it if not).

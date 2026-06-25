@@ -5743,7 +5743,7 @@
     bottom: 6px;
     text-align: center;
     font-size: 10.5px;
-    color: var(--color-text-muted) b0;
+    color: color-mix(in srgb, var(--color-text-muted) 69%, transparent);
     pointer-events: none;
     text-shadow: 1px 1px 2px #000;
   }

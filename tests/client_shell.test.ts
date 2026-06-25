@@ -200,6 +200,57 @@ describe('client HTML shell', () => {
     }
   });
 
+  it('labels the target frame as a role=group with a localized name in BOTH entries', () => {
+    // P11b makes #target-frame a second unit_frame instance and gives it a
+    // role="group" with a t()-localized accessible name via data-i18n-aria (hydrated
+    // in main.ts, the same path as the player frame). index.html and play.html ship
+    // the same in-game HUD, so the group label must be present in BOTH or a screen
+    // reader on one announces a bare unlabelled div. Pinning the full opening tag also
+    // locks the attribute order + the exact i18n key across entries.
+    for (const entry of [html, playHtml]) {
+      expect(entry).toContain(
+        'id="target-frame" class="unitframe" role="group" data-i18n-aria="hudChrome.unitFrame.targetLabel"',
+      );
+    }
+  });
+
+  it('drives the target frame as a unit_frame instance with a cached absorb node (P11b)', () => {
+    // The target absorb overlay is resolved ONCE (no per-frame updateAbsorb document
+    // query), and the family painter drives the frame, so the old hardcoded
+    // '#tf-absorb' selector + the per-frame updateAbsorb method are gone.
+    expect(hudTs).toContain("private targetAbsorbEl = $('#tf-absorb');");
+    expect(hudTs).toContain('private readonly targetFramePainter = new UnitFramePainter(');
+    // The per-frame updateAbsorb method + call are gone (the word may still appear in
+    // explanatory comments, so pin the call + def, not the bare word).
+    expect(hudTs).not.toContain('private updateAbsorb');
+    expect(hudTs).not.toContain('this.updateAbsorb(');
+    // The '#tf-absorb' node is QUERIED exactly ONCE (the cached field), never
+    // re-queried per frame the way the old updateAbsorb('#tf-absorb', ...) did. Match
+    // the query call, not the bare selector (which still appears in comments).
+    expect(hudTs.match(/\$\('#tf-absorb'\)/g)).toHaveLength(1);
+  });
+
+  it('routes the target elite class + name color + combo pips through the elided writers (P11b)', () => {
+    // The two raw writes the four original writers cannot express (the elite class and
+    // the hostile/friendly name color) go through the P10a toggleClass / setStyleProp,
+    // and the combo pip `on` toggle through toggleClass. No raw classList/style write
+    // on the target frame survives (those silently collapse the hot-DOM skip rate).
+    expect(hudTs).toContain("this.toggleClass(this.targetFrameEl, 'elite'");
+    expect(hudTs).toMatch(/this\.setStyleProp\(\s*this\.targetNameEl,\s*'color',/);
+    expect(hudTs).toContain("this.toggleClass(pip as HTMLElement, 'on', i < points);");
+    expect(hudTs).not.toContain("this.targetFrameEl.classList.toggle('elite'");
+    expect(hudTs).not.toContain('this.targetNameEl.style.color');
+    expect(hudTs).not.toContain("pip.classList.toggle('on'");
+  });
+
+  it('lazy-builds the combo pips once, then only toggles them (P11b)', () => {
+    // The 5-pip row is built ONCE (guarded by children.length !== COMBO_PIP_COUNT),
+    // never rebuilt per frame; a per-frame innerHTML rebuild would tank the skip rate
+    // while passing tsc + the painter tests.
+    expect(hudTs).toContain('if (this.comboRowEl.children.length !== COMBO_PIP_COUNT) {');
+    expect(hudTs).toContain('for (let i = 0; i < COMBO_PIP_COUNT; i++) {');
+  });
+
   it('keeps the Account nav tab hidden unless a session is restored', () => {
     expect(html).toContain('<li class="nav-item" id="nav-item-account" hidden>');
     expect(html).toContain('<li class="nav-item" id="nav-item-logout" hidden>');
@@ -550,7 +601,9 @@ describe('client HTML shell', () => {
     expect(hudTs).toContain("private playerFrameEl = $('#player-frame');");
     expect(hudTs).toContain('this.playerFrameEl,');
     expect(xpBarPainterTs).toContain("const XP_FILL_PROP = '--xp-fill';");
-    expect(xpBarPainterTs).toContain('this.writers.setStyleProp(this.bar, XP_FILL_PROP, fillFrac4);');
+    expect(xpBarPainterTs).toContain(
+      'this.writers.setStyleProp(this.bar, XP_FILL_PROP, fillFrac4);',
+    );
     expect(xpBarPainterTs).toContain(
       'this.writers.setStyleProp(this.playerFrame, XP_FILL_PROP, fillFrac4);',
     );

@@ -158,8 +158,11 @@ describe('options_window: stays a cold window', () => {
   it('exposes no per-frame refresh and is never wired into Hud.update', () => {
     // the painter is open-on-demand only: no refreshIfChanged/update method
     expect(painter).not.toContain('refreshIfChanged');
-    // Hud.update() must not touch the options window
-    const update = hudTs.slice(hudTs.indexOf('update('));
+    // Hud.update() must not touch the options window. Anchor on the actual method
+    // definition (not the first 'update(' literal anywhere, which can be a comment
+    // mentioning hud.update() and gives a bogus slice); the per-frame body runs from
+    // there to its 2-space-indented closing brace (nested blocks indent deeper).
+    const update = hudTs.slice(hudTs.indexOf('\n  update(): void {'));
     const nextMethodEnd = update.indexOf('\n  }\n');
     expect(update.slice(0, nextMethodEnd)).not.toContain('optionsWindow');
   });

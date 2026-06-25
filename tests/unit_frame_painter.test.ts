@@ -249,6 +249,38 @@ describe('UnitFramePainter: the portrait repaint gate (decision 9, lastPortraitT
     expect(repaintPortrait).toHaveBeenLastCalledWith('mob:b');
   });
 
+  it('repaints again when the same unit re-appears after being hidden (the -999 reset)', () => {
+    // The old target block reset lastPortraitTarget to -999 on no-target, so
+    // re-acquiring the SAME target (or a new mob reusing its entity id) redrew the
+    // portrait. The painter folds that into the !present path: hiding clears the gate
+    // so the next present paint with the same key repaints.
+    const repaintPortrait = vi.fn();
+    const painter = new UnitFramePainter(recordingFacet().writers, FULL_ELEMENTS, {
+      shownDisplay: 'flex',
+      repaintPortrait,
+    });
+    painter.paint(unitFrameView(playerDescriptor({ portraitKey: 'mob:5' })));
+    expect(repaintPortrait).toHaveBeenCalledTimes(1);
+    painter.paint(unitFrameView(playerDescriptor({ present: false }))); // hidden
+    painter.paint(unitFrameView(playerDescriptor({ portraitKey: 'mob:5' }))); // same id back
+    expect(repaintPortrait).toHaveBeenCalledTimes(2);
+  });
+
+  it('invalidatePortrait forces the next present paint to repaint even with an unchanged key', () => {
+    // The Hud calls invalidatePortrait() when the 3D portrait ASSETS load after mount
+    // (onPortraitsReady), where the inline block reset its -999 sentinel.
+    const repaintPortrait = vi.fn();
+    const painter = new UnitFramePainter(recordingFacet().writers, FULL_ELEMENTS, {
+      repaintPortrait,
+    });
+    painter.paint(unitFrameView(playerDescriptor({ portraitKey: 'mob:7' })));
+    painter.paint(unitFrameView(playerDescriptor({ portraitKey: 'mob:7' })));
+    expect(repaintPortrait).toHaveBeenCalledTimes(1); // gated: same key
+    painter.invalidatePortrait();
+    painter.paint(unitFrameView(playerDescriptor({ portraitKey: 'mob:7' })));
+    expect(repaintPortrait).toHaveBeenCalledTimes(2); // forced repaint, same key
+  });
+
   it('never repaints when no callback is wired (the player frame)', () => {
     // Drive ONE no-callback instance across frames with a CHANGING key (not two fresh
     // instances): the gate must run on the stateful lastPortraitKey, not throw (the

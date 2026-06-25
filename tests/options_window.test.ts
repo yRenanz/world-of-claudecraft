@@ -1,0 +1,120 @@
+import { readFileSync } from 'node:fs';
+import { describe, expect, it } from 'vitest';
+
+// Source-level guards for the options painter. The pure control descriptors +
+// the per-kind dispatch coercion are unit-tested in options_view.test.ts; here we
+// pin the decision-12 no-magic-values contract, the tier boundary (decisions
+// 6/8), the changeLanguage hardening (PR #730), the WCAG 2.2 AA focus-return +
+// roles/aria, the bug-report + keybind dispatch, and that the window stays cold
+// (never wired into the per-frame Hud.update path).
+const painter = readFileSync(new URL('../src/ui/options_window.ts', import.meta.url), 'utf8');
+const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+
+describe('options_window: no magic values (decision 12)', () => {
+  it('carries no literal hex color in TS (colors live in the extracted stylesheet)', () => {
+    const hex = painter.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [];
+    expect(hex, `hex colors must move to tokens/CSS: ${hex.join(', ')}`).toEqual([]);
+  });
+
+  it('names its numeric thresholds instead of bare literals', () => {
+    expect(painter).toContain('BUG_DESC_MAX_LEN');
+    expect(painter).toContain('RANGE_FILL_FULL_PCT');
+    // the bare 2000 / 100 literals only appear in the named-constant definitions
+    expect(painter.match(/\b2000\b/g) ?? []).toHaveLength(1);
+  });
+
+  it('uses no em or en dashes (ASCII separators only)', () => {
+    expect(painter.includes('—'), 'em dash found').toBe(false);
+    expect(painter.includes('–'), 'en dash found').toBe(false);
+  });
+});
+
+describe('options_window: tier boundary (decisions 6/8)', () => {
+  it('reads the graphics preset as a plain setting value, never the governor/cutoff', () => {
+    expect(painter).not.toContain('ui_effects_profile');
+    expect(painter).not.toContain('EFFECTS_QUALITY_LOW_CUTOFF');
+    // no governor read (a call/access); the word may appear in a boundary comment
+    expect(painter).not.toMatch(/governor\s*[.(]/);
+    expect(painter).not.toMatch(/\.state\(\)\.levels/);
+  });
+});
+
+describe('options_window: WCAG 2.2 AA (decision 10)', () => {
+  it('returns focus to the opener on every close path', () => {
+    expect(painter).toContain('captureFocus');
+    expect(painter).toContain('restoreFocus');
+    // close() drops the panel AND restores focus to the captured opener
+    const close = painter.slice(painter.indexOf('close(): void {'));
+    expect(close).toContain('this.deps.restoreFocus(target)');
+  });
+
+  it('exposes programmatic roles/labels on its controls', () => {
+    // sliders are native range inputs (role=slider) with an aria-label
+    expect(painter).toContain("slider.type = 'range'");
+    expect(painter).toContain("slider.setAttribute('aria-label', label)");
+    // toggles expose their pressed state
+    expect(painter).toContain("toggle.setAttribute('aria-pressed'");
+    // the async status + error nodes are live regions
+    expect(painter).toContain("status.setAttribute('role', 'status')");
+    expect(painter).toContain("error.setAttribute('role', 'alert')");
+  });
+});
+
+describe('options_window: changeLanguage hardening (PR #730)', () => {
+  it('guards re-entry, reverts in place on failure, and never sticks busy', () => {
+    const lang = painter.slice(
+      painter.indexOf('private languageSelect'),
+      painter.indexOf('private renderThemeControls'),
+    );
+    expect(lang).toContain('let busy = false');
+    expect(lang).toContain(
+      'if (busy || !isSupportedLanguage(selected) || selected === getLanguage())',
+    );
+    expect(lang).toContain('.changeLanguage(selected');
+    // success re-renders the panel; failure reverts the dropdown in place
+    expect(lang).toContain('this.renderInterface()');
+    expect(lang).toContain('this.deps.setDropdownValue(dropdown, getLanguage())');
+    // the trigger never gets stuck disabled on a throw
+    expect(lang).toContain('.catch(');
+    expect(lang).toContain('.finally(');
+  });
+});
+
+describe('options_window: bug-report dispatch + async states (cluster 2)', () => {
+  it('preserves the submit action and the no-text / in-flight / failure states', () => {
+    const bug = painter.slice(
+      painter.indexOf('private renderBugReport'),
+      painter.indexOf('private localizeBugReportError'),
+    );
+    // no-text guard short-circuits with the describe-first message
+    expect(bug).toContain("error.textContent = t('hudChrome.bugReport.describeFirst')");
+    // in-flight: the button is disabled while the submit promise is pending
+    expect(bug).toContain('submit.disabled = true');
+    // the submit action and its honest dropped-screenshot reporting are intact
+    expect(bug).toContain('hooks\n        .submit({ description');
+    expect(bug).toContain('hudChrome.bugReport.submittedNoShot');
+    // failure: re-enable + localized error
+    expect(bug).toContain('submit.disabled = false');
+    expect(bug).toContain('this.localizeBugReportError(err)');
+  });
+});
+
+describe('options_window: keybind rebind dispatch (cluster 5)', () => {
+  it('captures a key and binds it to the same action/index', () => {
+    expect(painter).toContain('private beginCapture(actionId: string, index: number');
+    expect(painter).toContain('hooks.captureKey((code)');
+    expect(painter).toContain('this.deps.keybinds().bind(actionId, index, code)');
+    expect(painter).toContain('this.deps.refreshKeybindLabels()');
+  });
+});
+
+describe('options_window: stays a cold window', () => {
+  it('exposes no per-frame refresh and is never wired into Hud.update', () => {
+    // the painter is open-on-demand only: no refreshIfChanged/update method
+    expect(painter).not.toContain('refreshIfChanged');
+    // Hud.update() must not touch the options window
+    const update = hudTs.slice(hudTs.indexOf('update('));
+    const nextMethodEnd = update.indexOf('\n  }\n');
+    expect(update.slice(0, nextMethodEnd)).not.toContain('optionsWindow');
+  });
+});

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
 import { MOBS } from '../src/sim/data';
 import { createMob, recalcPlayerStats } from '../src/sim/entity';
+import { devourBeneficialAura } from '../src/sim/mob/mob_swing';
 import type { Aura, PlayerClass } from '../src/sim/types';
 
 const SEED = 42;
@@ -75,7 +76,7 @@ describe('mob purge affix (Devour Magic)', () => {
     player.auras = [];
     pushBuff(player, 'buff_armor', 80, 'b1');
     pushBuff(player, 'buff_ap', 40, 'b2');
-    const removed = (sim as any).devourBeneficialAura(player, 'Devour Magic');
+    const removed = devourBeneficialAura((sim as any).ctx, player, 'Devour Magic');
     expect(removed).toBe(true);
     expect(player.auras.length).toBe(1); // exactly one eaten
   });
@@ -87,7 +88,7 @@ describe('mob purge affix (Devour Magic)', () => {
     player.auras = [];
     pushBuff(player, 'dot', 5, 'd1'); // harmful DoT
     pushBuff(player, 'buff_int', -18, 'd2'); // enfeeble-style stat drain
-    const removed = (sim as any).devourBeneficialAura(player, 'Devour Magic');
+    const removed = devourBeneficialAura((sim as any).ctx, player, 'Devour Magic');
     expect(removed).toBe(false);
     expect(player.auras.length).toBe(2); // both left untouched
   });

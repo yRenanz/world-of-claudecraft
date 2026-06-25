@@ -327,6 +327,14 @@ export interface SimContextCallbacks {
   respawnMob(mob: Entity): void;
   // --- boss-death dialogue hook (N1 owns the body; left here by M2) ---
   onBossDeath(mob: Entity): void;
+
+  // M3 mob on-hit affix cascade (mob/mob_swing): two stat helpers the cascade
+  // reaches back for. Both STAY on Sim. `effectiveArmor` is the cleave-splash armor
+  // read; `recalcPlayer` rebakes a player victim's derived stats after Devour Magic
+  // strips a beneficial aura (wraps the Sim players-map lookup + recalcPlayerStats so
+  // the module never touches the map directly).
+  effectiveArmor(e: Entity): number;
+  recalcPlayer(target: Entity): void;
 }
 
 // The seam consumed by extracted modules.
@@ -547,5 +555,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     despawnPet: host.despawnPet,
     respawnMob: host.respawnMob,
     onBossDeath: host.onBossDeath,
+    // M3 mob-swing affix cascade seam.
+    effectiveArmor: host.effectiveArmor,
+    recalcPlayer: host.recalcPlayer,
   };
 }

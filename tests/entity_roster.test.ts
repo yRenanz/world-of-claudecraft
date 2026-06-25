@@ -214,6 +214,8 @@ function makeCtx() {
     despawnPet: vi.fn(),
     respawnMob: vi.fn(),
     onBossDeath: vi.fn(),
+    effectiveArmor: vi.fn(() => 0),
+    recalcPlayer: vi.fn(),
   };
   const ctx = createSimContext(host);
   return {

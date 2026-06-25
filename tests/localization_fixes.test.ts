@@ -756,7 +756,8 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
   // modules: C1 -> src/sim/combat/damage.ts (the frenzy proc + pet "<name> dies."
   // line), A1+ -> src/sim/social/*.ts (the party machine, later duel/arena/fiesta/
   // markers), G1a -> src/sim/progression/talents.ts (talent validation toasts),
-  // M2 -> src/sim/mob/locomotion.ts (the boss "unleashes" lines), I1 ->
+  // M2 -> src/sim/mob/locomotion.ts (the boss "unleashes" lines), M3 ->
+  // src/sim/mob/mob_swing.ts (the knockback "unleashes" line), I1 ->
   // src/sim/instances/dungeons.ts (raid-door seals, lockout, "instances busy"). They
   // emit via this.ctx.* / bare ctx.* through SimContext. Scan ALL of them alongside
   // sim.ts so every language-agnostic sim emit stays under the drift guard; they are
@@ -775,6 +776,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/combat/damage.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/progression/talents.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/locomotion.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/mob_swing.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/instances/dungeons.ts'), 'utf8'),
     socialSrc,
   ].join('\n');

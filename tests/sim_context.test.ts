@@ -135,6 +135,9 @@ const CALLBACK_KEYS = [
   'instanceOriginOf',
   'enterDungeon',
   'leaveDungeon',
+  // M3 mob-swing affix cascade surface.
+  'effectiveArmor',
+  'recalcPlayer',
 ] as const;
 
 // A fully-spied fake host. `clock` is mutable so a test can prove the context reads
@@ -286,6 +289,8 @@ function makeFakeHost() {
     despawnPet: vi.fn(),
     respawnMob: vi.fn(),
     onBossDeath: vi.fn(),
+    effectiveArmor: vi.fn(() => 0),
+    recalcPlayer: vi.fn(),
   };
   return { host, rng, entities, clock };
 }

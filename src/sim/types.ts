@@ -33,6 +33,9 @@ export const CAST_COMPLETE_EPS = 1e-9;
 export const FISHING_CAST_ID = 'fishing';
 export const FISHING_CAST_NAME = 'Fishing';
 export const FISHING_CAST_TIME = 5;
+// The warlock Demon Heal channel id (shared by the casting/channel path on Sim and
+// the pet-command healPet/applyDemonHealTick slice; here so both import it cycle-free).
+export const DEMON_HEAL_CAST_ID = 'demon_heal';
 
 export type PlayerClass =
   | 'warrior'
@@ -44,6 +47,12 @@ export type PlayerClass =
   | 'mage'
   | 'warlock'
   | 'druid';
+
+// Classes that command a persistent pet (hunter beast, warlock demon). Pure
+// predicate, here so the pet-command slice imports it without a sim.ts cycle.
+export function isPetClass(cls: PlayerClass): boolean {
+  return cls === 'hunter' || cls === 'warlock';
+}
 // '1v1'/'2v2' are the ranked Ashen Coliseum ladders; 'fiesta' is the
 // dopamine-maxxed 2v2 party mode (score-based, respawns, augments, a shrinking
 // ring) — see docs/design and the Fiesta region of sim.ts.

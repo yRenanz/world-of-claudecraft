@@ -92,6 +92,9 @@ function makeCtx() {
     get cfg() {
       return cfg;
     },
+    nextId: 1,
+    delvePetStash: new Map(),
+    pendingMobRespawns: [],
     emit,
     clearEntityMarker,
     pulseGroundAoE,
@@ -121,6 +124,12 @@ function makeCtx() {
     summonPet: vi.fn(),
     petOf: vi.fn(() => null),
     completeTame: vi.fn(),
+    error: vi.fn(),
+    spendResource: vi.fn(),
+    playerGcdFor: vi.fn(() => 0),
+    healingThreat: vi.fn(),
+    countItem: vi.fn(() => 0),
+    removeItem: vi.fn(),
     partyOf: vi.fn(() => null),
     removeFromParty: vi.fn(),
     onInventoryChangedForQuests: vi.fn(),

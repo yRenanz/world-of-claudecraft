@@ -15,9 +15,19 @@
 import type { TalentModifiers } from './content/talents';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
 import type { Rng } from './rng';
-import type { ArenaMatch, DuelState, Party, PlayerMeta } from './sim';
+import type { ArenaMatch, DuelState, Party, PendingMobRespawn, PetState, PlayerMeta } from './sim';
 import type { SpatialGrid } from './spatial';
-import type { Aura, CrowdControlDrCategory, DelveRun, Entity, SimConfig, SimEvent, Vec3 } from './types';
+import type {
+  Aura,
+  CrowdControlDrCategory,
+  DelveRun,
+  Entity,
+  ErrorReason,
+  PlayerClass,
+  SimConfig,
+  SimEvent,
+  Vec3,
+} from './types';
 
 // Live primitive views onto the running Sim. These are GETTERS, not snapshots:
 // `time`/`tickCount` advance every tick, and the `rng`/`entities` identities are
@@ -50,6 +60,17 @@ export interface SimContextPrimitives {
   // Resolved sim config (M2: mob movement reads cfg.seed for terrain height).
   // [DEDUPE with C1, which also adds it.]
   readonly cfg: Required<Omit<SimConfig, 'noPlayer'>>;
+  // Shared id counter (P1b: completeTame/restorePet/createDemonPet allocate via
+  // `ctx.nextId++`, exactly `this.nextId++`). Writable; the backing field stays on
+  // Sim. [DEDUPE with I1, which also adds it (get+set).]
+  nextId: number;
+  // Mid-delve pet snapshot store keyed by owner pid (P1b). Live view; the backing Map
+  // stays on Sim so stowPetForDelve/restorePetFromDelveStash/serializePet all read the
+  // SAME instance. Mutated in place (set/delete), so read-only ref. [DEDUPE with I2a.]
+  readonly delvePetStash: Map<number, PetState>;
+  // Wild-respawn queue (P1b: completeTame pushes the tamed beast's respawn). Live view;
+  // the backing array stays on Sim, mutated in place (push), so read-only ref.
+  readonly pendingMobRespawns: PendingMobRespawn[];
 }
 
 // Cross-system callbacks. Each signature mirrors the still-on-`Sim` method it
@@ -123,6 +144,17 @@ export interface SimContextCallbacks {
   summonPet(owner: Entity, templateId: string): void;
   petOf(ownerPid: number, includeDead?: boolean): Entity | null;
   completeTame(player: Entity, target: Entity): void;
+
+  // P1b pet commands consume these shared helpers; all STAY on Sim (their eventual
+  // owners are other tracks not in this base, which flip points-at at integration:
+  // error A1/G1a, spendResource/playerGcdFor C4a, healingThreat C2/C3, countItem Q1,
+  // removeItem L2). DEDUPE to one each when those tracks integrate.
+  error(pid: number, text: string, reason?: ErrorReason): void;
+  spendResource(p: Entity, cost: number): void;
+  playerGcdFor(cls: PlayerClass): number;
+  healingThreat(source: Entity, target: Entity, healed: number): void;
+  countItem(itemId: string, pid?: number): number;
+  removeItem(itemId: string, count: number, pid?: number): void;
 
   // A1/T1 raid markers + party; Q1 quest credit on inventory change.
   clearEntityMarker(entityId: number): void;
@@ -277,6 +309,18 @@ export function createSimContext(host: SimContextHost): SimContext {
     get cfg() {
       return host.cfg;
     },
+    get nextId() {
+      return host.nextId;
+    },
+    set nextId(v) {
+      host.nextId = v;
+    },
+    get delvePetStash() {
+      return host.delvePetStash;
+    },
+    get pendingMobRespawns() {
+      return host.pendingMobRespawns;
+    },
     emit: host.emit,
     dealDamage: host.dealDamage,
     handleDeath: host.handleDeath,
@@ -304,6 +348,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     summonPet: host.summonPet,
     petOf: host.petOf,
     completeTame: host.completeTame,
+    error: host.error,
+    spendResource: host.spendResource,
+    playerGcdFor: host.playerGcdFor,
+    healingThreat: host.healingThreat,
+    countItem: host.countItem,
+    removeItem: host.removeItem,
     clearEntityMarker: host.clearEntityMarker,
     partyOf: host.partyOf,
     removeFromParty: host.removeFromParty,

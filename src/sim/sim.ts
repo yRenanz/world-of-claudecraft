@@ -141,6 +141,7 @@ import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from '
 import { runMobSwingAffixes } from './mob/mob_swing';
 import * as lifecycle from './mob/lifecycle';
 import * as petAi from './pet/pet_ai';
+import * as petCommands from './pet/pet_commands';
 import { combatProfileForMob, effectiveMobMeleeRange, type MobCombatProfile } from './mob_combat';
 import {
   findPlayerPath,
@@ -198,6 +199,7 @@ import {
   type CurrencyLootStrategy,
   canPrestige,
   DEFAULT_PARTY_LOOT_STRATEGIES,
+  DEMON_HEAL_CAST_ID,
   type DelveDef,
   type DelveModuleDef,
   type DelveObjectState,
@@ -235,7 +237,6 @@ import {
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
   type OverheadEmoteId,
-  PET_GROWL_INTERVAL,
   PET_TELEPORT_DISTANCE,
   type PetMode,
   type PlayerClass,
@@ -387,7 +388,6 @@ const PVP_CC_DR_MULTIPLIERS = [1, 0.5, 0.25] as const;
 const PVP_POLYMORPH_DR_DURATIONS = [10, 5, 1] as const;
 const PVP_FEAR_DR_DURATIONS = [8, 4, 2, 1] as const;
 const SHAMAN_SHOCK_COOLDOWN_IDS = ['earth_shock', 'flame_shock', 'frost_shock'] as const;
-const DEMON_HEAL_CAST_ID = 'demon_heal';
 const SAY_RANGE = 25; // /say carries a short distance; /yell across a camp
 const YELL_RANGE = 100;
 const OVERHEAD_EMOTE_DURATION = 3.2;
@@ -553,21 +553,20 @@ const FOLLOW_STOP_DIST = 3; // /follow trails this close behind the leader (yard
 const FOLLOW_MAX_RANGE = 60; // give up follow once the leader is this far away
 // Pet-AI tick tuning (PET_LEASH/PET_FOLLOW_DISTANCE/PET_PATH_*/PET_WAYPOINT_REACHED/
 // PET_ASSIST_RANGE/PET_AGGRESSIVE_RANGE/PET_OWNER_IDLE_TICKS) moved with the slice to
-// src/sim/pet/pet_ai.ts (P1a). PET_GROWL_INTERVAL + PET_TELEPORT_DISTANCE are shared
-// with on-Sim pet code, so they relocated to ./types and are imported above.
+// src/sim/pet/pet_ai.ts (P1a). PET_GROWL_INTERVAL + PET_TELEPORT_DISTANCE relocated to
+// ./types: PET_GROWL_INTERVAL is now consumed only by pet_ai.ts + pet_commands.ts
+// (petTaunt, P1b); PET_TELEPORT_DISTANCE is still imported above for the on-Sim
+// delve-companion follow.
 // A pet only keeps its OWNER flagged in combat while it is actively trading blows
 // (its combatTimer resets to 0 on every hit dealt/taken). A pet that merely holds a
 // target it is chasing or can't reach stops dragging the owner into perpetual combat
 // past this window, so the owner's out-of-combat health regen resumes. Matches the
 // 5s combat-linger used for the owner's own inCombat flag.
 const PET_COMBAT_LINGER = 5;
-const PET_TAUNT_RANGE = 5;
-const PET_FEED_DURATION = 5;
-const PET_FEED_TICK = 1;
-const DEMON_HEAL_MANA_COST = 55;
-const DEMON_HEAL_DURATION = 5;
-const DEMON_HEAL_TICK = 1;
-const TAMED_TARGET_RESPAWN_SECONDS = 60;
+// PET_TAUNT_RANGE / PET_FEED_DURATION / PET_FEED_TICK / DEMON_HEAL_MANA_COST /
+// DEMON_HEAL_DURATION / DEMON_HEAL_TICK / TAMED_TARGET_RESPAWN_SECONDS moved with the
+// slice to src/sim/pet/pet_commands.ts (P1b); DEMON_HEAL_CAST_ID -> ./types (shared
+// with the still-on-Sim updateCasting channel-tick arm).
 const LOOT_ROLL_TIMEOUT = 30;
 const FRIENDLY_NPC_REJECTED_AURA_KINDS: ReadonlySet<AuraKind> = new Set([
   'dot',
@@ -962,9 +961,9 @@ export interface PetState {
   autoTaunt?: boolean;
 }
 
-const PET_NAME_RE = /^[A-Za-z][A-Za-z '-]{1,15}$/;
-
-interface PendingMobRespawn {
+// PendingMobRespawn is exported so SimContext can type the live `pendingMobRespawns`
+// view that pet_commands.ts (completeTame) pushes the tamed beast's respawn into.
+export interface PendingMobRespawn {
   templateId: string;
   level: number;
   pos: Vec3;
@@ -1050,9 +1049,6 @@ function ignoresDamagePushback(abilityId: string): boolean {
   return abilityId === 'ghost_wolf';
 }
 
-function isPetClass(cls: PlayerClass): boolean {
-  return cls === 'hunter' || cls === 'warlock';
-}
 
 export class Sim {
   cfg: Required<Omit<SimConfig, 'noPlayer'>>;
@@ -1962,6 +1958,18 @@ export class Sim {
       get cfg() {
         return sim.cfg;
       },
+      get nextId() {
+        return sim.nextId;
+      },
+      set nextId(v) {
+        sim.nextId = v;
+      },
+      get delvePetStash() {
+        return sim.delvePetStash;
+      },
+      get pendingMobRespawns() {
+        return sim.pendingMobRespawns;
+      },
       emit: sim.emit.bind(sim),
       dealDamage: sim.dealDamage.bind(sim),
       handleDeath: sim.handleDeath.bind(sim),
@@ -1989,6 +1997,15 @@ export class Sim {
       summonPet: sim.summonPet.bind(sim),
       petOf: sim.petOf.bind(sim),
       completeTame: sim.completeTame.bind(sim),
+      // P1b shared consumes (all STAY on Sim; other tracks own + flip at integration).
+      // error is LATE-BOUND (arrow, not .bind) so tests can swap (sim as any).error
+      // after ctx is built and still observe the message through ctx.error.
+      error: (pid, text, reason) => sim.error(pid, text, reason),
+      spendResource: sim.spendResource.bind(sim),
+      playerGcdFor: sim.playerGcdFor.bind(sim),
+      healingThreat: sim.healingThreat.bind(sim),
+      countItem: sim.countItem.bind(sim),
+      removeItem: sim.removeItem.bind(sim),
       clearEntityMarker: sim.clearEntityMarker.bind(sim),
       partyOf: sim.partyOf.bind(sim),
       removeFromParty: sim.removeFromParty.bind(sim),
@@ -2030,7 +2047,7 @@ export class Sim {
       resetNythraxisEncounter: sim.resetNythraxisEncounter.bind(sim),
       updateFearMovement: sim.updateFearMovement.bind(sim),
       delveDetectMult: sim.delveDetectMult.bind(sim),
-      despawnPet: sim.despawnPet.bind(sim),
+      despawnPet: (pet) => petCommands.despawnPet(sim.ctx, pet),
       // M4 mob death lifecycle: the five execution bodies live in mob/lifecycle.ts;
       // handleDeath + the updateMob corpse-tick reach them through these seam
       // bindings (late-bound arrows so sim.ctx resolves at call time, after the ctor
@@ -2646,26 +2663,15 @@ export class Sim {
     return Math.max(0, attackPower);
   }
 
-  private nonPlayerAuraHp(aura: Aura): number {
-    if (aura.kind === 'buff_sta') return aura.value * 10;
-    if (aura.kind === 'buff_allstats') return aura.value * 10;
-    return 0;
-  }
-
+  // Non-player stat-aura HP bookkeeping moved to pet/pet_commands.ts (P1b); Sim keeps
+  // these thin delegates for the applyAura/aura-expiry callers (this.applyNonPlayerStatAura)
+  // and respawnMob's ctx.clearNonPlayerStatAuras.
   private applyNonPlayerStatAura(target: Entity, aura: Aura, direction: 1 | -1): void {
-    if (target.kind === 'player') return;
-    const hpDelta = this.nonPlayerAuraHp(aura) * direction;
-    if (hpDelta === 0) return;
-    const hpFrac = target.maxHp > 0 ? target.hp / target.maxHp : 1;
-    target.maxHp = Math.max(1, target.maxHp + hpDelta);
-    target.hp = target.dead
-      ? 0
-      : Math.max(1, Math.min(target.maxHp, Math.round(target.maxHp * hpFrac)));
+    petCommands.applyNonPlayerStatAura(this.ctx, target, aura, direction);
   }
 
   private clearNonPlayerStatAuras(target: Entity): void {
-    if (target.kind === 'player') return;
-    for (const aura of target.auras) this.applyNonPlayerStatAura(target, aura, -1);
+    petCommands.clearNonPlayerStatAuras(this.ctx, target);
   }
 
   private syncPetAspect(pet: Entity, owner: Entity): void {
@@ -4587,565 +4593,93 @@ export class Sim {
   // Hunter pets
   // -------------------------------------------------------------------------
 
+  // Pet commands & lifecycle moved to src/sim/pet/pet_commands.ts (P1b). Sim keeps
+  // same-named thin delegates: the 9 public commands satisfy IWorld, and the lifecycle
+  // helpers stay reachable for the foreign this.X/sim.X callers (persistence, the
+  // updateCasting Demon-Heal-channel arm, the /pet + /pettaunt handlers, delve enter/
+  // exit, and the tests). The seam (ctx) carries petOf/summonPet/completeTame/
+  // despawnPersistentPet/despawnPet/clearNonPlayerStatAuras into the module.
   petOf(ownerPid: number, includeDead = false): Entity | null {
-    for (const e of this.entities.values()) {
-      if (
-        e.kind === 'mob' &&
-        e.ownerId === ownerPid &&
-        !this.isDelveCompanionMob(e) &&
-        (includeDead || !e.dead)
-      )
-        return e;
-    }
-    return null;
+    return petCommands.petOf(this.ctx, ownerPid, includeDead);
   }
 
   private serializePet(ownerPid: number): PetState | null {
-    const pet = this.petOf(ownerPid, true);
-    // While the owner is inside a delve their pet is despawned and parked in
-    // delvePetStash (stowPetForDelve). It has no live entity, so fall back to the
-    // stashed snapshot, otherwise a save taken mid-delve (autosave, disconnect, or
-    // shutdown saveAll) would persist pet:null and lose the pet on reload.
-    if (!pet) return this.delvePetStash.get(ownerPid) ?? null;
-    return {
-      templateId: pet.templateId,
-      name: pet.name,
-      level: pet.level,
-      hp: pet.dead ? 0 : Math.max(1, Math.min(pet.maxHp, pet.hp)),
-      dead: pet.dead,
-      mode: pet.petMode,
-      autoTaunt: pet.petAutoTaunt,
-    };
+    return petCommands.serializePet(this.ctx, ownerPid);
   }
 
   private restorePet(owner: Entity, state: PetState): void {
-    const template = MOBS[state.templateId];
-    if (!template) return;
-    const level = owner.level;
-    const pos = this.groundPos(owner.pos.x + 2, owner.pos.z + 1);
-    const pet = createMob(this.nextId++, template, level, pos);
-    pet.name = this.cleanPetName(state.name) ?? template.name;
-    pet.ownerId = owner.id;
-    pet.petMode = state.mode ?? 'defensive';
-    pet.petTauntTimer = 0;
-    pet.petAutoTaunt = state.autoTaunt ?? false;
-    pet.petManualTauntPending = false;
-    pet.hostile = false;
-    pet.aiState = state.dead ? 'dead' : 'idle';
-    pet.aggroTargetId = null;
-    pet.inCombat = false;
-    pet.tappedById = null;
-    pet.loot = null;
-    pet.lootable = false;
-    pet.wanderTarget = null;
-    clearThreat(pet);
-    if (state.dead) {
-      pet.dead = true;
-      pet.hp = 0;
-      pet.corpseTimer = Infinity;
-      pet.respawnTimer = Infinity;
-    } else {
-      pet.hp = Math.max(1, Math.min(pet.maxHp, Math.round(state.hp) || pet.maxHp));
-    }
-    this.addEntity(pet);
+    petCommands.restorePet(this.ctx, owner, state);
   }
 
   private syncPetLevel(owner: Entity): void {
-    const pet = this.petOf(owner.id, true);
-    if (!pet || pet.level === owner.level) return;
-    const template = MOBS[pet.templateId];
-    if (!template) return;
-    const hpFrac = pet.maxHp > 0 ? pet.hp / pet.maxHp : 1;
-    const scaled = createMob(-1, template, owner.level, pet.pos);
-    pet.level = scaled.level;
-    pet.maxHp = scaled.maxHp;
-    pet.weapon = scaled.weapon;
-    pet.stats.armor = scaled.stats.armor;
-    pet.moveSpeed = scaled.moveSpeed;
-    pet.scale = scaled.scale;
-    pet.color = scaled.color;
-    pet.hp = pet.dead ? 0 : Math.max(1, Math.min(pet.maxHp, Math.round(pet.maxHp * hpFrac)));
-  }
-
-  private cleanPetName(raw: string): string | null {
-    const name = raw.trim().replace(/\s+/g, ' ');
-    return PET_NAME_RE.test(name) ? name : null;
+    petCommands.syncPetLevel(this.ctx, owner);
   }
 
   private tameError(p: Entity, target: Entity): string | null {
-    if (target.kind !== 'mob' || !target.hostile) return 'You cannot tame that.';
-    const template = MOBS[target.templateId];
-    if (!template || (template.family !== 'beast' && template.family !== 'spider'))
-      return 'Only beasts can be tamed.';
-    if (template.elite || template.boss || template.rare)
-      return 'That beast is too strong to tame.';
-    if (target.level > p.level) return 'That beast is too high level for you to tame.';
-    if (target.spawnPos.x > DUNGEON_X_THRESHOLD) return 'You cannot tame dungeon creatures.';
-    if (this.petOf(p.id, true)) return 'You already have a pet.';
-    return null;
+    return petCommands.tameError(this.ctx, p, target);
   }
 
   private completeTame(p: Entity, target: Entity): void {
-    const err = this.tameError(p, target);
-    if (err) {
-      this.error(p.id, err);
-      return;
-    }
-    const template = MOBS[target.templateId];
-    const pet = createMob(
-      this.nextId++,
-      template,
-      target.level,
-      this.groundPos(p.pos.x + 2, p.pos.z + 1),
-    );
-    pet.name = target.name;
-    pet.ownerId = p.id;
-    pet.petMode = 'defensive';
-    pet.petTauntTimer = 0;
-    pet.petAutoTaunt = false;
-    pet.petManualTauntPending = false;
-    pet.hostile = false;
-    pet.aiState = 'idle';
-    pet.aggroTargetId = null;
-    pet.inCombat = false;
-    pet.tappedById = null;
-    pet.auras = [];
-    pet.hp = pet.maxHp;
-    pet.loot = null;
-    pet.lootable = false;
-    pet.wanderTarget = null;
-    clearThreat(pet);
-
-    this.pendingMobRespawns.push({
-      templateId: target.templateId,
-      level: target.level,
-      pos: { ...target.spawnPos },
-      facing: target.facing,
-      dungeonId: target.dungeonId,
-      timer: TAMED_TARGET_RESPAWN_SECONDS,
-    });
-    this.clearEntityMarker(target.id);
-    this.dropEntity(target.id);
-
-    // The owned copy is friendly now: nobody keeps swinging at the old target,
-    // other mobs forget both the old entity and the new pet starts clean.
-    for (const other of this.players.values()) {
-      const e = this.entities.get(other.entityId);
-      if (e && e.targetId === target.id) e.autoAttack = false;
-    }
-    for (const m of this.entities.values()) {
-      if (m.kind !== 'mob') continue;
-      m.threat.delete(target.id);
-      if (m.aggroTargetId === target.id && !m.dead && m.aiState !== 'dead') this.retargetMob(m);
-    }
-    this.addEntity(pet);
-    this.syncPetLevel(p);
-    this.emit({
-      type: 'log',
-      text: `${pet.name} is now your loyal companion.`,
-      color: '#8f8',
-      pid: p.id,
-    });
-    this.emit({ type: 'aura', targetId: pet.id, name: 'Tamed', gained: true });
+    petCommands.completeTame(this.ctx, p, target);
   }
 
   private summonPet(owner: Entity, templateId: string): void {
-    const template = MOBS[templateId];
-    if (!template) {
-      this.error(owner.id, 'That summon is unavailable.');
-      return;
-    }
-    const existing = this.petOf(owner.id, true);
-    if (existing) {
-      this.despawnPersistentPet(existing);
-      if (existing.templateId === templateId && !existing.dead) {
-        this.emit({
-          type: 'log',
-          text: `${existing.name} fades back into the void.`,
-          color: '#b894ff',
-          pid: owner.id,
-        });
-        return;
-      }
-    }
-
-    const pet = this.createDemonPet(owner, templateId);
-    if (!pet) return;
-    this.emit({
-      type: 'log',
-      text: `${pet.name} answers your summons.`,
-      color: '#b894ff',
-      pid: owner.id,
-    });
-    this.emit({ type: 'aura', targetId: pet.id, name: 'Summoned', gained: true });
+    petCommands.summonPet(this.ctx, owner, templateId);
   }
 
   private createDemonPet(owner: Entity, mobId: string, emit = false): Entity | null {
-    const template = MOBS[mobId];
-    if (!template) return null;
-    const pet = createMob(
-      this.nextId++,
-      template,
-      owner.level,
-      this.groundPos(owner.pos.x + 2, owner.pos.z + 1),
-    );
-    pet.name = template.name;
-    pet.ownerId = owner.id;
-    pet.petMode = 'defensive';
-    pet.petTauntTimer = 0;
-    pet.petAutoTaunt = false;
-    pet.petManualTauntPending = false;
-    pet.hostile = false;
-    pet.aiState = 'idle';
-    pet.aggroTargetId = null;
-    pet.inCombat = false;
-    pet.tappedById = null;
-    pet.auras = [];
-    pet.hp = pet.maxHp;
-    pet.loot = null;
-    pet.lootable = false;
-    pet.wanderTarget = null;
-    clearThreat(pet);
-    this.addEntity(pet);
-    if (emit)
-      this.emit({
-        type: 'log',
-        text: `${pet.name} answers your summons.`,
-        color: '#b894ff',
-        pid: owner.id,
-      });
-    return pet;
+    return petCommands.createDemonPet(this.ctx, owner, mobId, emit);
   }
 
   private despawnPersistentPet(pet: Entity): void {
-    this.clearNonPlayerStatAuras(pet);
-    pet.auras = [];
-    clearThreat(pet);
-    for (const m of this.entities.values()) {
-      if (m.kind !== 'mob' || m.id === pet.id) continue;
-      m.threat.delete(pet.id);
-      if (m.aggroTargetId === pet.id && !m.dead && m.aiState !== 'dead') this.retargetMob(m);
-    }
-    this.dropEntity(pet.id);
+    petCommands.despawnPersistentPet(this.ctx, pet);
   }
 
   abandonPet(pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    if (r.meta.cls !== 'hunter') {
-      this.error(r.e.id, 'Only hunters can abandon pets.');
-      return;
-    }
-    const pet = this.petOf(r.e.id, true);
-    if (!pet) {
-      this.error(r.e.id, 'You have no pet.');
-      return;
-    }
-    this.emit({ type: 'log', text: `You abandon ${pet.name}.`, color: '#f66', pid: r.e.id });
-    this.despawnPersistentPet(pet);
+    petCommands.abandonPet(this.ctx, pid);
   }
 
   renamePet(name: string, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    if (!isPetClass(r.meta.cls)) {
-      this.error(r.e.id, 'Only pet classes can rename pets.');
-      return;
-    }
-    const pet = this.petOf(r.e.id, true);
-    if (!pet) {
-      this.error(r.e.id, 'You have no pet.');
-      return;
-    }
-    const clean = this.cleanPetName(name);
-    if (!clean) {
-      this.error(
-        r.e.id,
-        'Pet name must be 2-16 letters/spaces/hyphen/apostrophe and start with a letter.',
-      );
-      return;
-    }
-    pet.name = clean;
-    this.emit({ type: 'log', text: `Your pet is now named ${clean}.`, color: '#8f8', pid: r.e.id });
+    petCommands.renamePet(this.ctx, name, pid);
   }
 
   revivePet(pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    if (!isPetClass(r.meta.cls)) {
-      this.error(r.e.id, 'Only pet classes can revive pets.');
-      return;
-    }
-    const pet = this.petOf(r.e.id, true);
-    if (!pet) {
-      this.error(r.e.id, 'You have no pet.');
-      return;
-    }
-    if (!pet.dead) {
-      this.error(r.e.id, 'Your pet is already alive.');
-      return;
-    }
-    pet.dead = false;
-    pet.hostile = false;
-    pet.ownerId = r.e.id;
-    pet.aiState = 'idle';
-    pet.aggroTargetId = null;
-    pet.inCombat = false;
-    pet.corpseTimer = 0;
-    pet.respawnTimer = 0;
-    pet.loot = null;
-    pet.lootable = false;
-    pet.tappedById = null;
-    clearThreat(pet);
-    pet.pos = this.groundPos(r.e.pos.x + 2, r.e.pos.z + 1);
-    pet.prevPos = { ...pet.pos };
-    this.rebucket(pet);
-    pet.hp = Math.max(1, Math.round(pet.maxHp * 0.35));
-    this.emit({
-      type: 'log',
-      text: `${pet.name} returns to your side.`,
-      color: '#8f8',
-      pid: r.e.id,
-    });
+    petCommands.revivePet(this.ctx, pid);
   }
 
   petAttack(pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    if (!isPetClass(r.meta.cls)) {
-      this.error(r.e.id, 'Only pet classes can command pets.');
-      return;
-    }
-    r.meta.lastActiveTick = this.tickCount; // commanding the pet is a deliberate action
-    const pet = this.petOf(r.e.id);
-    if (!pet) {
-      this.error(r.e.id, 'You have no living pet.');
-      return;
-    }
-    const target = r.e.targetId !== null ? this.entities.get(r.e.targetId) : null;
-    if (!target || target.dead || !this.isHostileTo(pet, target)) {
-      this.error(r.e.id, 'Your pet needs a hostile target.');
-      return;
-    }
-    pet.aggroTargetId = target.id;
-    pet.inCombat = true;
-    if (target.kind === 'mob' && target.hostile) addThreat(target, pet.id, 1);
+    petCommands.petAttack(this.ctx, pid);
   }
 
   petTaunt(pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    if (!isPetClass(r.meta.cls)) {
-      this.error(r.e.id, 'Only pet classes can command pets.');
-      return;
-    }
-    r.meta.lastActiveTick = this.tickCount; // commanding the pet is a deliberate action
-    const pet = this.petOf(r.e.id);
-    if (!pet) {
-      this.error(r.e.id, 'You have no living pet.');
-      return;
-    }
-    if (pet.petTauntTimer > 0) {
-      this.error(r.e.id, 'Pet taunt is not ready.');
-      return;
-    }
-    const target =
-      pet.aggroTargetId !== null
-        ? (this.entities.get(pet.aggroTargetId) ?? null)
-        : r.e.targetId !== null
-          ? (this.entities.get(r.e.targetId) ?? null)
-          : null;
-    if (target?.kind !== 'mob' || target.dead || !target.hostile || target.ownerId !== null) {
-      this.error(r.e.id, 'Your pet needs a hostile target.');
-      return;
-    }
-    pet.aggroTargetId = target.id;
-    pet.inCombat = true;
-    addThreat(target, pet.id, 1);
-    if (dist2d(pet.pos, target.pos) > PET_TAUNT_RANGE) {
-      pet.petManualTauntPending = true;
-      return;
-    }
-    this.applyTaunt(pet, target);
-    pet.petManualTauntPending = false;
-    pet.petTauntTimer = PET_GROWL_INTERVAL;
+    petCommands.petTaunt(this.ctx, pid);
   }
 
   feedPet(itemId: string, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    if (r.meta.cls !== 'hunter') {
-      this.error(r.e.id, 'Only hunters can feed pets.');
-      return;
-    }
-    const pet = this.petOf(r.e.id);
-    if (!pet) {
-      this.error(r.e.id, 'You have no living pet.');
-      return;
-    }
-    const item = ITEMS[itemId];
-    if (item?.kind !== 'food' || !item.foodHp) {
-      this.error(r.e.id, 'Your pet can only eat food.');
-      return;
-    }
-    if (this.countItem(itemId, r.e.id) <= 0) {
-      this.error(r.e.id, "You don't have that item.");
-      return;
-    }
-    if (pet.hp >= pet.maxHp) {
-      this.error(r.e.id, 'Your pet is already at full health.');
-      return;
-    }
-    this.removeItem(itemId, 1, r.e.id);
-    pet.auras = pet.auras.filter((a) => a.id !== 'feed_pet');
-    this.applyAura(pet, {
-      id: 'feed_pet',
-      name: 'Fed',
-      kind: 'hot',
-      value: Math.max(1, Math.ceil(item.foodHp / PET_FEED_DURATION)),
-      duration: PET_FEED_DURATION,
-      remaining: PET_FEED_DURATION,
-      sourceId: r.e.id,
-      school: 'nature',
-      tickInterval: PET_FEED_TICK,
-      tickTimer: PET_FEED_TICK,
-    });
-    this.emit({ type: 'log', text: `You feed ${pet.name}.`, color: '#8f8', pid: r.e.id });
+    petCommands.feedPet(this.ctx, itemId, pid);
   }
 
   healPet(pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    if (r.meta.cls !== 'warlock') {
-      this.error(r.e.id, 'Only warlocks can channel demon healing.');
-      return;
-    }
-    if (r.e.dead) {
-      this.error(r.e.id, 'You are dead.');
-      return;
-    }
-    if (this.isStunned(r.e)) {
-      this.error(r.e.id, 'You are stunned.');
-      return;
-    }
-    if (r.e.castingAbility) {
-      this.error(r.e.id, 'You are busy.');
-      return;
-    }
-    const pet = this.petOf(r.e.id);
-    if (!pet) {
-      this.error(r.e.id, 'You have no living demon.');
-      return;
-    }
-    if (pet.hp >= pet.maxHp) {
-      this.error(r.e.id, 'Your demon is already at full health.');
-      return;
-    }
-    if (r.e.resource < DEMON_HEAL_MANA_COST) {
-      this.error(r.e.id, 'Not enough mana!');
-      return;
-    }
-    this.spendResource(r.e, DEMON_HEAL_MANA_COST);
-    r.e.castingAbility = DEMON_HEAL_CAST_ID;
-    r.e.castTotal = DEMON_HEAL_DURATION;
-    r.e.castRemaining = DEMON_HEAL_DURATION;
-    r.e.channeling = true;
-    r.e.channelTickEvery = DEMON_HEAL_TICK;
-    r.e.channelTickTimer = DEMON_HEAL_TICK;
-    r.e.gcdRemaining = Math.max(r.e.gcdRemaining, this.playerGcdFor(r.meta.cls));
-    this.emit({
-      type: 'log',
-      text: `You channel healing into ${pet.name}.`,
-      color: '#b894ff',
-      pid: r.e.id,
-    });
-    this.emit({
-      type: 'castStart',
-      entityId: r.e.id,
-      ability: DEMON_HEAL_CAST_ID,
-      time: DEMON_HEAL_DURATION,
-    });
+    petCommands.healPet(this.ctx, pid);
   }
 
   private applyDemonHealTick(owner: Entity): void {
-    const pet = this.petOf(owner.id);
-    if (!pet) {
-      this.cancelCast(owner);
-      return;
-    }
-    const amount = Math.max(1, Math.ceil(pet.maxHp * 0.08));
-    const healed = Math.min(amount, pet.maxHp - pet.hp);
-    if (healed <= 0) return;
-    pet.hp += healed;
-    this.emit({
-      type: 'heal2',
-      sourceId: owner.id,
-      targetId: pet.id,
-      amount: healed,
-      crit: false,
-      ability: 'Demon Heal',
-    });
-    this.healingThreat(owner, pet, healed);
+    petCommands.applyDemonHealTick(this.ctx, owner);
   }
 
   setPetMode(mode: PetMode, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    if (!isPetClass(r.meta.cls)) {
-      this.error(r.e.id, 'Only pet classes can command pets.');
-      return;
-    }
-    r.meta.lastActiveTick = this.tickCount; // commanding the pet is a deliberate action
-    const pet = this.petOf(r.e.id, true);
-    if (!pet) {
-      this.error(r.e.id, 'You have no pet.');
-      return;
-    }
-    pet.petMode = mode;
-    if (mode === 'passive') {
-      pet.aggroTargetId = null;
-      pet.inCombat = false;
-      pet.autoAttack = false;
-      pet.petManualTauntPending = false;
-    }
-    this.emit({ type: 'log', text: `${pet.name} is now ${mode}.`, color: '#ffd100', pid: r.e.id });
+    petCommands.setPetMode(this.ctx, mode, pid);
   }
 
   setPetAutoTaunt(enabled: boolean, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    if (!isPetClass(r.meta.cls)) {
-      this.error(r.e.id, 'Only pet classes can command pets.');
-      return;
-    }
-    r.meta.lastActiveTick = this.tickCount; // commanding the pet is a deliberate action
-    const pet = this.petOf(r.e.id, true);
-    if (!pet) {
-      this.error(r.e.id, 'You have no pet.');
-      return;
-    }
-    pet.petAutoTaunt = enabled;
+    petCommands.setPetAutoTaunt(this.ctx, enabled, pid);
   }
 
-  /** Remove a summoned demon from the world entirely, scrubbing any references
-   *  (player targets/combo, other mobs' hate) the way boss adds are despawned. */
-  private despawnPet(pet: Entity): void {
-    for (const meta of this.players.values()) {
-      const e = this.entities.get(meta.entityId);
-      if (!e) continue;
-      if (e.targetId === pet.id) e.targetId = null;
-      if (e.comboTargetId === pet.id) {
-        e.comboTargetId = null;
-        e.comboPoints = 0;
-      }
-    }
-    for (const m of this.entities.values()) {
-      if (m.kind !== 'mob' || m.id === pet.id) continue;
-      m.threat.delete(pet.id);
-      if (m.aggroTargetId === pet.id && !m.dead && m.aiState !== 'dead') this.retargetMob(m);
-    }
-    this.dropEntity(pet.id);
-  }
+  // despawnPet (summoned-demon hard despawn: player-target + threat scrub) moved to
+  // pet/pet_commands.ts (P1b). No Sim delegate: the death/corpse-tick caller in
+  // mob/locomotion.ts and the in-module stowPetForDelve demon path reach it via the
+  // seam (ctx.despawnPet -> petCommands.despawnPet). Distinct from despawnPersistentPet
+  // (threat scrub only), which Sim keeps as a delegate for removePlayer.
 
   // -------------------------------------------------------------------------
   // Auto-attack & melee
@@ -13474,17 +13008,7 @@ export class Sim {
   // Distinct from /pet (vitals) and /cooldowns (the player's own ability map,
   // which never holds this timer).
   private petTauntReadout(owner: Entity): string {
-    const pet = this.petOf(owner.id);
-    if (!pet) return 'You do not have a pet.';
-    if (pet.petTauntTimer <= 0) {
-      return pet.petAutoTaunt
-        ? `Your pet's Growl is ready. Auto-taunt is on.`
-        : `Your pet's Growl is ready. Auto-taunt is off.`;
-    }
-    const seconds = Math.ceil(pet.petTauntTimer);
-    return pet.petAutoTaunt
-      ? `Your pet's Growl is on cooldown. Auto-taunt is on. Ready in ${seconds}s.`
-      : `Your pet's Growl is on cooldown. Auto-taunt is off. Ready in ${seconds}s.`;
+    return petCommands.petTauntReadout(this.ctx, owner);
   }
   // Druid forms park the mana bar in savedMana and run on rage/energy instead
   // (entity.ts:126-130). That parked pool has no in-game UI — the bar shows the
@@ -13684,12 +13208,7 @@ export class Sim {
   // and current health. Reads live pet state via petOf() so it stays accurate
   // regardless of how the pet was acquired (tame, summon).
   private petReadout(owner: Entity): string {
-    const pet = this.petOf(owner.id);
-    if (!pet) return 'You do not have a pet.';
-    const family = MOBS[pet.templateId]?.family;
-    const kind = family ? ` ${family}` : '';
-    const pct = pet.maxHp > 0 ? Math.round((pet.hp / pet.maxHp) * 100) : 0;
-    return `Your pet: ${pet.name} (level ${pet.level}${kind}) — HP ${pet.hp}/${pet.maxHp} (${pct}%).`;
+    return petCommands.petReadout(this.ctx, owner);
   }
   // Build the self-only "/session" line from this session's RewardCounters.
   // Counters are reset each boot (freshCounters), so this is always per-session.
@@ -14060,23 +13579,11 @@ export class Sim {
   }
 
   private stowPetForDelve(pid: number): void {
-    const meta = this.players.get(pid);
-    if (!meta || !isPetClass(meta.cls)) return;
-    const pet = this.petOf(pid, true);
-    if (!pet) return;
-    const state = this.serializePet(pid);
-    if (state) this.delvePetStash.set(pid, state);
-    if (MOBS[pet.templateId]?.family === 'demon') this.despawnPet(pet);
-    else this.despawnPersistentPet(pet);
+    petCommands.stowPetForDelve(this.ctx, pid);
   }
 
   private restorePetFromDelveStash(pid: number): void {
-    const state = this.delvePetStash.get(pid);
-    if (!state) return;
-    this.delvePetStash.delete(pid);
-    const e = this.entities.get(pid);
-    if (!e || this.petOf(pid, true)) return;
-    this.restorePet(e, state);
+    petCommands.restorePetFromDelveStash(this.ctx, pid);
   }
 
   private canEnterDelve(pid: number): string | null {

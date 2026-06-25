@@ -755,6 +755,104 @@ function questCollectTurnIn(): Scenario {
   };
 }
 
+// Dungeon instancing (I1): a party walks through the Hollow Crypt door (the
+// updateDoorTriggers door-trigger teleport -> enterDungeon -> claimInstance, which
+// draws rng.int once per spawn). The second party member walks the same door and
+// joins the SAME instance via instanceKeyFor (no re-claim, no rng). Both then walk
+// the exit portal back out (updateDoorTriggers exit branch -> leaveDungeon), and
+// finally the empty instance resets (updateInstances -> freeInstance despawns the
+// mobs/objects/exit and nulls partyKey).
+function dungeonInstances(): Scenario {
+  return {
+    name: 'dungeon_instances',
+    coverage: [
+      'updateDoorTriggers door-trigger enter (~14612)',
+      'enterDungeon -> claimInstance rng.int per spawn (~14774) + addEntity mobs/objects/exit',
+      'party shares ONE instance via instanceKeyFor (second member joins, no re-claim)',
+      'updateDoorTriggers exit portal -> leaveDungeon (~14620)',
+      'updateInstances empty-reset -> freeInstance despawn + partyKey null (~14841/14816)',
+    ],
+    sampleEvery: 5,
+    build: () => new Sim({ seed: 1016, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const a = sim.addPlayer('warrior', 'Aaa');
+      const b = sim.addPlayer('mage', 'Bbb');
+      sim.partyInvite(b, a);
+      sim.partyAccept(b);
+      const ea = sim.entities.get(a) as AnyEntity;
+      const eb = sim.entities.get(b) as AnyEntity;
+      beef(ea);
+      beef(eb);
+      // Walk player A onto the Hollow Crypt door -> the movement-pass door trigger
+      // enters the dungeon and claims a fresh instance (rng.int per spawned mob).
+      const door = [...sim.entities.values()].find(
+        (e: AnyEntity) => e.templateId === 'dungeon_door' && e.dungeonId === 'hollow_crypt',
+      ) as AnyEntity;
+      teleport(sim, ea, door.pos.x, door.pos.z);
+      rec.tick(1);
+      // Player B walks the same door -> same instanceKeyFor -> joins A's instance.
+      teleport(sim, eb, door.pos.x, door.pos.z);
+      rec.tick(1);
+      const inst = (sim.instances as any[]).find(
+        (i) => i.dungeonId === 'hollow_crypt' && i.partyKey !== null,
+      );
+      rec.track(...inst.mobIds, ...inst.objectIds);
+      if (inst.exitId != null) rec.track(inst.exitId);
+      rec.notes.slotA = sim.instanceSlotAt(ea.pos);
+      rec.notes.slotB = sim.instanceSlotAt(eb.pos);
+      rec.notes.instMobIds = [...inst.mobIds];
+      rec.snapshot('entered');
+      // Walk both out via the exit portal (the inside branch of updateDoorTriggers).
+      const exit = sim.entities.get(inst.exitId) as AnyEntity;
+      teleport(sim, ea, exit.pos.x, exit.pos.z);
+      rec.tick(1);
+      teleport(sim, eb, exit.pos.x, exit.pos.z);
+      rec.tick(1);
+      rec.snapshot('left');
+      // Reset-when-empty: nobody inside, jump the empty timer past INSTANCE_EMPTY_TIMEOUT
+      // (300s) so a single updateInstances cycle (% 20) runs freeInstance.
+      inst.emptyFor = 100000;
+      rec.tick(20);
+      rec.snapshot('reset');
+    },
+  };
+}
+
+// Dungeon raid lockout (I1): a five-strong attuned raid is blocked from re-entering
+// the Nythraxis arena by an active raid lockout. Exercises enterDungeon's raid gating
+// (convertPartyToRaid + canEnterNythraxisRaid attunement) and the isRaidLocked block
+// emitting "You are locked to Nythraxis Raid Arena." (no rng drawn).
+function dungeonRaidLockout(): Scenario {
+  return {
+    name: 'dungeon_raid_lockout',
+    coverage: [
+      'enterDungeon raid gating: convertPartyToRaid + canEnterNythraxisRaid attunement (~14640)',
+      'isRaidLocked active lockout blocks entry (~14706) + locked-to-arena emit',
+    ],
+    sampleEvery: 10,
+    build: () => new Sim({ seed: 1017, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const leader = sim.addPlayer('warrior', 'Lead');
+      // convertPartyToRaid requires a full party of five.
+      while ((sim.partyOf(leader)?.members.length ?? 1) < 5) {
+        const pid = sim.addPlayer('priest', `Fill${sim.players.size}`);
+        sim.partyInvite(pid, leader);
+        sim.partyAccept(pid);
+      }
+      sim.convertPartyToRaid(leader);
+      const meta = sim.players.get(leader) as any;
+      meta.questsDone.add('q_nythraxis_bound_guardian'); // attune past the royal-door seal
+      meta.raidLockouts.set('nythraxis_boss_arena', 999999999); // active lockout (far future ms)
+      rec.snapshot('locked');
+      sim.enterDungeon('nythraxis_boss_arena', leader); // blocked by isRaidLocked
+      rec.snapshot('lockout-blocked');
+      rec.tick(1);
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -771,4 +869,6 @@ export const SCENARIOS: Scenario[] = [
   delveDeath(),
   questKillCredit(),
   questCollectTurnIn(),
+  dungeonInstances(),
+  dungeonRaidLockout(),
 ];

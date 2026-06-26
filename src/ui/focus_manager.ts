@@ -30,12 +30,18 @@
 import { nextFocusIndex } from './focus_order';
 
 /**
- * The canonical focusable selector, lifted to ONE named constant (it was previously
- * spelled inline in Hud.focusFirstInteractive). Used everywhere the manager queries a
- * window's focusable set; never re-spelled.
+ * The canonical focusable set for the Tab CYCLE: every keyboard-focusable element in a
+ * trapped window, INCLUDING the window close (X) button. Before P15a there was no trap,
+ * so native Tab order reached the X; the cycle must keep it reachable (closing a window
+ * from the keyboard must never depend on Escape alone). Lifted to ONE named constant (it
+ * was previously spelled inline in Hud.focusFirstInteractive); never re-spelled.
+ *
+ * Focus-FIRST-on-open is a derivation of this set, not a second selector: focusFirst()
+ * skips the [data-close] X so opening a window lands on a meaningful control rather than
+ * the dismiss affordance, falling back to the X only when it is the sole focusable.
  */
 export const FOCUSABLE_SELECTOR =
-  'button:not([disabled]):not([data-close]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export interface FocusTrapOptions {
   /**
@@ -105,9 +111,17 @@ export class FocusManager {
    */
   focusFirst(root: HTMLElement, preferredSelector?: string): void {
     window.setTimeout(() => {
-      const target =
-        (preferredSelector ? root.querySelector<HTMLElement>(preferredSelector) : null) ??
-        root.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
+      if (preferredSelector) {
+        const preferred = root.querySelector<HTMLElement>(preferredSelector);
+        if (preferred) {
+          preferred.focus();
+          return;
+        }
+      }
+      const focusables = [...root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)];
+      // Skip the close (X) button on open so focus lands on a meaningful control, not the
+      // dismiss affordance; fall back to it only when it is the sole focusable element.
+      const target = focusables.find((el) => !el.matches('[data-close]')) ?? focusables[0];
       (target ?? root).focus();
     }, 0);
   }

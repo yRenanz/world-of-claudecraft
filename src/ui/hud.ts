@@ -3005,6 +3005,11 @@ export class Hud {
     let handle: FocusTrapHandle | null = null;
     return {
       captureFocus: () => {
+        // Defensive: if a prior trap for this window was never released (a re-open
+        // without an intervening close), drop it first so a double-capture cannot
+        // orphan a trap on the manager's stack (the self-heal would clear it on the
+        // next Tab, but releasing here keeps the stack honest).
+        handle?.release(false);
         const opener = this.focusManager.activeFocusable();
         handle = this.focusManager.open({ root: () => $(rootSel), returnFocusTo: opener });
         return opener;

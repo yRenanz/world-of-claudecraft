@@ -18,8 +18,7 @@ import {
   fctTtlScale,
   MINIMAP_REDRAW_INTERVAL_LOW_MS,
   minimapRedrawIntervalMs,
-  PARTY_FRAME_NONSELF_INTERVAL_LOW_MS,
-  partyFrameNonSelfIntervalMs,
+  nonSelfRepaintDue,
   TARGET_FRAME_NONSELF_INTERVAL_LOW_MS,
   targetFrameNonSelfIntervalMs,
 } from '../src/game/ui_tier_knobs';
@@ -46,7 +45,6 @@ describe('ui_tier_knobs - determinism (pure: same input, same output)', () => {
       expect(auraVisibleCap(tier)).toBe(auraVisibleCap(tier));
       expect(auraRefreshIntervalMs(tier)).toBe(auraRefreshIntervalMs(tier));
       expect(targetFrameNonSelfIntervalMs(tier)).toBe(targetFrameNonSelfIntervalMs(tier));
-      expect(partyFrameNonSelfIntervalMs(tier)).toBe(partyFrameNonSelfIntervalMs(tier));
     }
   });
 });
@@ -66,7 +64,6 @@ describe('ui_tier_knobs - no-op on full tiers (ultra byte-equivalent to pre-tier
       expect(minimapRedrawIntervalMs(tier)).toBe(0);
       expect(auraRefreshIntervalMs(tier)).toBe(0);
       expect(targetFrameNonSelfIntervalMs(tier)).toBe(0);
-      expect(partyFrameNonSelfIntervalMs(tier)).toBe(0);
     }
   });
 
@@ -82,7 +79,7 @@ describe('ui_tier_knobs - no-op on full tiers (ultra byte-equivalent to pre-tier
     // for a future-dated lastAt: there is no extra throttle on medium/high/ultra.
     expect(cadenceDue(0, 0, minimapRedrawIntervalMs('ultra'))).toBe(true);
     expect(cadenceDue(1_000_000, 0, targetFrameNonSelfIntervalMs('high'))).toBe(true);
-    expect(cadenceDue(0, 0, partyFrameNonSelfIntervalMs('medium'))).toBe(true);
+    expect(cadenceDue(0, 0, auraRefreshIntervalMs('medium'))).toBe(true);
   });
 });
 
@@ -100,14 +97,52 @@ describe('ui_tier_knobs - low sheds cost on every knob', () => {
     expect(fctMaxConcurrent('low', FCT_MAX_CONCURRENT_LOW + 10)).toBe(FCT_MAX_CONCURRENT_LOW);
   });
 
-  it('minimap redraw throttles, auras cap + coarsen, non-self frames slow on low', () => {
+  it('minimap redraw throttles, auras cap + coarsen, target frame slows on low', () => {
     expect(minimapRedrawIntervalMs('low')).toBe(MINIMAP_REDRAW_INTERVAL_LOW_MS);
     expect(minimapRedrawIntervalMs('low')).toBeGreaterThan(0);
     expect(auraVisibleCap('low')).toBe(AURA_VISIBLE_CAP_LOW);
     expect(auraVisibleCap('low')).toBeLessThan(AURA_VISIBLE_CAP_FULL);
     expect(auraRefreshIntervalMs('low')).toBe(AURA_REFRESH_INTERVAL_LOW_MS);
     expect(targetFrameNonSelfIntervalMs('low')).toBe(TARGET_FRAME_NONSELF_INTERVAL_LOW_MS);
-    expect(partyFrameNonSelfIntervalMs('low')).toBe(PARTY_FRAME_NONSELF_INTERVAL_LOW_MS);
+  });
+});
+
+describe('ui_tier_knobs - LOW shed magnitudes are pinned to literals (perf-gate bounds)', () => {
+  // The full-tier values are literal-pinned above (1, +Infinity, 0). Pin the LOW shed
+  // amounts to literals too, so retuning how much low sheds (e.g. a tighter aura cap that
+  // would hide more, or a shorter TTL) is a DELIBERATE change that must edit this test,
+  // not a silent drift the self-referential `toBe(CONST)` assertions would pass. These are
+  // also the values the per-tier perf gate and the fairness review reasoned about.
+  it('pins each low-tier constant', () => {
+    expect(FCT_MAX_CONCURRENT_LOW).toBe(24);
+    expect(FCT_TTL_SCALE_LOW).toBe(0.6);
+    expect(AURA_VISIBLE_CAP_LOW).toBe(8);
+    expect(MINIMAP_REDRAW_INTERVAL_LOW_MS).toBe(250);
+    expect(AURA_REFRESH_INTERVAL_LOW_MS).toBe(250);
+    expect(TARGET_FRAME_NONSELF_INTERVAL_LOW_MS).toBe(100);
+  });
+});
+
+describe('ui_tier_knobs - nonSelfRepaintDue (a target SWAP bypasses the tier throttle)', () => {
+  // The load-bearing fairness rule for the target frame + target debuff strip: a target
+  // SWAP must repaint immediately so a throttled low player never sees the PREVIOUS
+  // target's HP / debuffs; otherwise the tier cadence governs. Lifted out of hud.update()
+  // so the swap-bypass is unit-testable (a `||`->`&&` typo here would strand a stale
+  // target on low).
+  it('repaints immediately on a subject change even when the cadence is NOT due', () => {
+    // intervalMs 100, only 10ms elapsed -> cadence not due, but the subject changed.
+    expect(nonSelfRepaintDue(true, 1000, 1010, 100)).toBe(true);
+  });
+
+  it('honors the throttle when the subject did NOT change', () => {
+    expect(nonSelfRepaintDue(false, 1000, 1010, 100)).toBe(false); // not due yet
+    expect(nonSelfRepaintDue(false, 1000, 1100, 100)).toBe(true); // exactly due
+    expect(nonSelfRepaintDue(false, 1000, 2000, 100)).toBe(true); // past due
+  });
+
+  it('on the full tiers (interval 0) always repaints, swap or not', () => {
+    expect(nonSelfRepaintDue(false, 1000, 1000, targetFrameNonSelfIntervalMs('ultra'))).toBe(true);
+    expect(nonSelfRepaintDue(false, 9999, 1000, auraRefreshIntervalMs('high'))).toBe(true);
   });
 });
 
@@ -123,6 +158,13 @@ describe('ui_tier_knobs - cadenceDue semantics', () => {
     expect(cadenceDue(1000, 1000, 0)).toBe(true);
     expect(cadenceDue(5000, 1000, 0)).toBe(true); // even a future lastAt
     expect(cadenceDue(1000, 1000, -1)).toBe(true);
+  });
+
+  it('a future / rewound lastAt under a positive interval SUPPRESSES (does not force) a fire', () => {
+    // now < lastAt (a non-monotonic or rewound clock): now - lastAt is negative, so a
+    // positive interval is not yet due. Pins the chosen behavior (suppress, not fire) so a
+    // sign flip in cadenceDue would be caught.
+    expect(cadenceDue(5000, 1000, 250)).toBe(false);
   });
 });
 
@@ -193,7 +235,6 @@ describe('ui_tier_knobs - behavioral: only the tier moves a knob', () => {
       auraCap: auraVisibleCap(tier),
       auraRefresh: auraRefreshIntervalMs(tier),
       target: targetFrameNonSelfIntervalMs(tier),
-      party: partyFrameNonSelfIntervalMs(tier),
     });
     const before = ALL_TIERS.map(snapshot);
     // Unrelated churn that a governor-driven knob would react to (it must not here).
@@ -204,5 +245,59 @@ describe('ui_tier_knobs - behavioral: only the tier moves a knob', () => {
     expect(before[0].fctCap).toBeLessThan(before[3].fctCap);
     expect(before[0].auraCap).toBeLessThan(before[3].auraCap);
     expect(before[0].minimap).toBeGreaterThan(before[3].minimap);
+  });
+});
+
+describe('ui_tier_knobs - two-controller WIRING: Hud.fxTier reads the static stamp, not the governor', () => {
+  // The pure source scan above proves the KNOB module never reads a governor. But the
+  // actual two-controller seam is Hud.fxTier(): the knobs only stay governor-free if the
+  // Hud feeds them the STATIC data-fx-level stamp (written solely by the P5 preset applier)
+  // and never an FPS-governor level. The painter/cadence unit tests inject the tier
+  // directly, so they would all stay green if fxTier() were rewired to the governor. This
+  // scans the actual fxTier() method body in hud.ts to pin that wiring.
+  const hudSrc = readFileSync(fileURLToPath(new URL('../src/ui/hud.ts', import.meta.url)), 'utf8');
+  // Isolate the fxTier() method body (private fxTier(): UiEffectsTier { ... }).
+  const fxTierMatch = hudSrc.match(
+    /private\s+fxTier\s*\(\s*\)\s*:\s*UiEffectsTier\s*\{([\s\S]*?)\n\s{2}\}/,
+  );
+
+  it('Hud defines a fxTier() method', () => {
+    expect(fxTierMatch).not.toBeNull();
+  });
+
+  it('fxTier() resolves the STATIC data-fx-level stamp via coerceFxTier', () => {
+    const body = fxTierMatch?.[1] ?? '';
+    expect(body).toMatch(/document\.documentElement\.dataset\.fxLevel/);
+    expect(body).toMatch(/coerceFxTier/);
+  });
+
+  it('fxTier() never reads the FPS governor (the two-controller hazard)', () => {
+    const body = fxTierMatch?.[1] ?? '';
+    expect(body).not.toMatch(/governor/i);
+    expect(body).not.toMatch(/\.state\s*\(/);
+    expect(body).not.toMatch(/\.levels\b/);
+  });
+});
+
+describe('ui_tier_knobs - party frames are deliberately NOT tiered (a healer signal stays full-rate)', () => {
+  // The senior re-audit removed the party-frame throttle: party-member HP is a healer's
+  // only actionable signal (no self-dispel), so it stays on the 4Hz mediumHud band for
+  // EVERY tier. Pin that decision by source scan so re-adding a party tier knob (the exact
+  // deleted names) is a conscious, test-touching change, not a silent re-handicap of low.
+  const knobSrc = readFileSync(
+    fileURLToPath(new URL('../src/game/ui_tier_knobs.ts', import.meta.url)),
+    'utf8',
+  );
+  const hudSrc = readFileSync(fileURLToPath(new URL('../src/ui/hud.ts', import.meta.url)), 'utf8');
+
+  it('the tier-knobs module exposes NO party-frame interval knob', () => {
+    expect(knobSrc).not.toMatch(/partyFrameNonSelfIntervalMs/);
+    expect(knobSrc).not.toMatch(/PARTY_FRAME_NONSELF_INTERVAL_LOW_MS/);
+  });
+
+  it('hud calls updatePartyFrames() with no party tier gate', () => {
+    expect(hudSrc).toMatch(/this\.updatePartyFrames\(\)/);
+    expect(hudSrc).not.toMatch(/partyFrameNonSelfIntervalMs/);
+    expect(hudSrc).not.toMatch(/lastPartyFramesAt/);
   });
 });

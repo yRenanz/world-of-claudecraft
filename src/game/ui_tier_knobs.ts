@@ -105,18 +105,26 @@ export function auraRefreshIntervalMs(tier: UiEffectsTier): number {
 }
 
 // ---------------------------------------------------------------------------
-// Party / target NON-SELF cadence (Slice D): on low, the non-self frames (party members
-// and the target) refresh slower; the SELF/player frame always stays full-rate (it is a
-// separate painter instance with no gate). The target frame is per-frame today; the
-// party frame is already on the ~4Hz mediumHud band, so low halves it to ~2Hz.
+// Target NON-SELF cadence (Slice D): on low, the TARGET frame body (HP / level /
+// portrait) refreshes slower; the SELF/player frame always stays full-rate (a separate
+// painter instance with no gate). Target HP is a COARSE read (execute range, is-it-dead)
+// resolved well inside the ~200ms human reaction loop, and the interrupt-critical cast
+// bar is painted OUTSIDE this throttle, so a 100ms (2-tick) target-body cadence sheds
+// portrait / HP-bar redraw smoothness without degrading any signal the player reacts to.
+//
+// PARTY frames are deliberately NOT tiered. Party-member HP is a healer's only actionable
+// signal (the game has no self-dispel, so the frame IS the read), and the population most
+// likely to run the low preset is large-raid players, exactly where a healer must not be
+// handicapped. Tiering it would make the game worse to play on low for the role that needs
+// it most, so P14a leaves party on the ~4Hz mediumHud band it already runs at on EVERY
+// tier. (Senior re-audit decision: tier COSMETIC richness, never ACTIONABLE info latency;
+// the only graphics knobs touching party are the shared cosmetic ones, not a per-tier shed.)
 // ---------------------------------------------------------------------------
 
-/** Minimum ms between target-frame refreshes on low (~10Hz, down from per-frame). A
- *  target SWAP bypasses this so selecting a new target updates immediately. */
+/** Minimum ms between target-frame BODY refreshes on low (~10Hz, down from per-frame). A
+ *  target SWAP bypasses this (nonSelfRepaintDue) so selecting a new target updates
+ *  immediately; the target cast bar is never throttled. */
 export const TARGET_FRAME_NONSELF_INTERVAL_LOW_MS = 100;
-/** Minimum ms between party-frame refreshes on low (~2Hz, down from the ~4Hz mediumHud
- *  band the party already runs on). */
-export const PARTY_FRAME_NONSELF_INTERVAL_LOW_MS = 500;
 
 /** Minimum ms between target-frame refreshes for `tier`. 0 (full tiers) = per-frame
  *  (unchanged); low throttles. */
@@ -124,10 +132,20 @@ export function targetFrameNonSelfIntervalMs(tier: UiEffectsTier): number {
   return tier === 'low' ? TARGET_FRAME_NONSELF_INTERVAL_LOW_MS : 0;
 }
 
-/** Minimum ms between party-frame refreshes for `tier`. 0 (full tiers) = no extra
- *  throttle on top of the mediumHud band (unchanged); low throttles further. */
-export function partyFrameNonSelfIntervalMs(tier: UiEffectsTier): number {
-  return tier === 'low' ? PARTY_FRAME_NONSELF_INTERVAL_LOW_MS : 0;
+/** Whether a tier-throttled NON-SELF element (the target frame, the target debuff strip)
+ *  repaints this frame: ALWAYS on a subject change (a target SWAP must never leave the
+ *  previous target's HP / debuffs on screen while throttled), otherwise only once the tier
+ *  cadence is due. With intervalMs <= 0 (the full tiers) cadenceDue is always true, so this
+ *  collapses to the unchanged every-frame path. Pure (now injected): the swap-bypass is the
+ *  load-bearing correctness rule, so it is lifted here to be unit-testable rather than left
+ *  inline in hud.update(). */
+export function nonSelfRepaintDue(
+  subjectChanged: boolean,
+  lastAt: number,
+  now: number,
+  intervalMs: number,
+): boolean {
+  return subjectChanged || cadenceDue(lastAt, now, intervalMs);
 }
 
 // ---------------------------------------------------------------------------

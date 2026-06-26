@@ -12,11 +12,10 @@ import { sfx } from '../game/sfx';
 import type { UiEffectsTier } from '../game/ui_effects_profile';
 import {
   auraRefreshIntervalMs,
-  auraVisibleCap,
   cadenceDue,
   coerceFxTier,
   minimapRedrawIntervalMs,
-  partyFrameNonSelfIntervalMs,
+  nonSelfRepaintDue,
   targetFrameNonSelfIntervalMs,
 } from '../game/ui_tier_knobs';
 import { voice } from '../game/voice';
@@ -890,13 +889,14 @@ export class Hud {
   // P14a per-element tier cadence stamps (graphics-tier knobs). Each gates a non-self /
   // canvas redraw to a slower interval on the LOW static preset; on every other tier the
   // interval is 0 (cadenceDue is always true), so these are no-ops and the path is the
-  // unchanged per-frame path. The SELF/player frame has no stamp (it always paints).
+  // unchanged per-frame path. The SELF/player frame has no stamp (it always paints), and
+  // party frames are deliberately not stamped (party-member HP is a healer's actionable
+  // signal, so it stays on the mediumHud band for every tier: see ui_tier_knobs Slice D).
   private lastMinimapDrawAt = 0;
   private lastBuffBarPaintAt = 0;
   private lastTargetDebuffsPaintAt = 0;
   private lastTargetFramePaintAt = 0;
   private lastTargetFrameId: number | null = null;
-  private lastPartyFramesAt = 0;
   private charPreview: CharacterPreview | null = null;
   private charPreviewCanvas: HTMLCanvasElement | null = null;
   // Cosmetic skin-select event overlay (opened by the skinEvent cue). The shared
@@ -4177,8 +4177,12 @@ export class Hud {
       // mechanic indicator), so only the unit_frame body is throttled.
       const targetChanged = target.id !== this.lastTargetFrameId;
       if (
-        targetChanged ||
-        cadenceDue(this.lastTargetFramePaintAt, now, targetFrameNonSelfIntervalMs(fxTier))
+        nonSelfRepaintDue(
+          targetChanged,
+          this.lastTargetFramePaintAt,
+          now,
+          targetFrameNonSelfIntervalMs(fxTier),
+        )
       ) {
         this.lastTargetFramePaintAt = now;
         this.lastTargetFrameId = target.id;
@@ -4216,8 +4220,12 @@ export class Hud {
       // shows the previous target's debuffs while throttled on low; otherwise the full
       // tiers repaint every frame and low coarsens to ~4Hz.
       if (
-        targetChanged ||
-        cadenceDue(this.lastTargetDebuffsPaintAt, now, auraRefreshIntervalMs(fxTier))
+        nonSelfRepaintDue(
+          targetChanged,
+          this.lastTargetDebuffsPaintAt,
+          now,
+          auraRefreshIntervalMs(fxTier),
+        )
       ) {
         this.lastTargetDebuffsPaintAt = now;
         this.targetDebuffsPainter.paint(this.targetDebuffsView.tick(target));
@@ -4407,13 +4415,12 @@ export class Hud {
 
       this.updateQuestTracker();
       this.updateDelveTracker();
-      // P14a Slice D: party members are NON-SELF frames. They already run on the ~4Hz
-      // mediumHud band; on low slow them further (~2Hz). The full tiers return interval 0,
-      // so cadenceDue is always true and party stays on the unchanged mediumHud cadence.
-      if (cadenceDue(this.lastPartyFramesAt, now, partyFrameNonSelfIntervalMs(fxTier))) {
-        this.lastPartyFramesAt = now;
-        this.updatePartyFrames();
-      }
+      // Party frames run on the ~4Hz mediumHud band (the enclosing block) for EVERY tier.
+      // P14a deliberately does NOT tier them down on low: party-member HP is a healer's
+      // only actionable signal (no self-dispel), so a graphics preset must not slow it
+      // (ui_tier_knobs Slice D). updatePartyFrames already short-circuits an unchanged
+      // party via its signature, so an idle frame is near-free without a tier gate.
+      this.updatePartyFrames();
       this.updateTradeWindow();
       this.updateArenaStatus();
       this.updateFiestaHud();

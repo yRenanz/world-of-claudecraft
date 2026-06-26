@@ -17,10 +17,12 @@
 // through the facet's setText.
 //
 // NO-MAGIC-VALUES (decision 12, canvas sub-rule): a 2D context cannot read CSS vars, so
-// the painter resolves the `--color-minimap-*` tokens via getComputedStyle ONCE per
-// redraw (cached for the frame, never per-marker); every other literal (canvas size,
-// base scale, clip inset, marker radii, rect size, outline width, the NPC glyph font +
-// offsets, the arrow geometry) is a named constant.
+// the painter resolves the `--color-minimap-*` tokens via getComputedStyle and caches
+// them on the instance (never per-marker, and now never per-redraw: the tokens are static
+// `:root` design tokens, src/styles/tokens.css, with no runtime mutation, so one resolve
+// serves every redraw). Every other literal (canvas size, base scale, clip inset, marker
+// radii, rect size, outline width, the NPC glyph font + offsets, the arrow geometry) is a
+// named constant.
 
 import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X } from '../sim/data';
 import type { IWorld } from '../world_api';
@@ -67,8 +69,9 @@ const NPC_GLYPH_OFFSET_Y = 3;
 
 const FULL_CIRCLE = Math.PI * 2;
 
-// The `--color-minimap-*` design tokens the painter resolves once per redraw. These
-// mirror the colors the inline overworld minimap used verbatim.
+// The `--color-minimap-*` design tokens the painter resolves once and caches (they are
+// static; see resolveColors). These mirror the colors the inline overworld minimap used
+// verbatim.
 const MINIMAP_COLOR_TOKENS = {
   allyFriend: '--color-minimap-ally-friend',
   allyGuild: '--color-minimap-ally-guild',
@@ -94,6 +97,13 @@ export type MinimapColors = Record<keyof typeof MINIMAP_COLOR_TOKENS, string>;
  */
 export class MinimapPainter {
   private readonly markers = createMinimapMarkers();
+  // The resolved `--color-minimap-*` tokens, cached after the first successful resolve.
+  // They are static `:root` tokens (src/styles/tokens.css) with no runtime mutation (no
+  // setProperty, no theme / forced-colors / media-query redefinition), so re-reading them
+  // via getComputedStyle on every ~10Hz redraw was wasted work and risked a synchronous
+  // style recalc (the minimap redraws after other HUD style writes in the same frame). If
+  // a runtime theme / contrast toggle is ever added, invalidate this cache from that signal.
+  private colors: MinimapColors | null = null;
 
   constructor(
     private readonly writers: PainterHostWriters,
@@ -101,15 +111,20 @@ export class MinimapPainter {
     private readonly localizeZone: (zoneId: string) => string,
   ) {}
 
-  /** Read the minimap color tokens in one getComputedStyle pass (decision 12: a 2D
-   *  context can only read a CSS var this way; never per-marker). */
+  /** Resolve the minimap color tokens in one getComputedStyle pass (decision 12: a 2D
+   *  context can only read a CSS var this way; never per-marker), then cache them: the
+   *  tokens are static, so subsequent redraws reuse the cached values. */
   private resolveColors(): MinimapColors {
+    if (this.colors) return this.colors;
     const cs = getComputedStyle(document.documentElement);
     const read = (token: string): string => cs.getPropertyValue(token).trim();
     const colors = {} as MinimapColors;
     for (const key of Object.keys(MINIMAP_COLOR_TOKENS) as (keyof typeof MINIMAP_COLOR_TOKENS)[]) {
       colors[key] = read(MINIMAP_COLOR_TOKENS[key]);
     }
+    // Cache only once the tokens actually resolved: a redraw before the stylesheet is
+    // applied would read '' and must not be frozen (it self-heals on the next redraw).
+    if (colors.player) this.colors = colors;
     return colors;
   }
 

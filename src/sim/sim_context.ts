@@ -22,6 +22,7 @@ import type {
   DuelState,
   FiestaState,
   InstanceSlot,
+  ItemUseResult,
   JoinableChannel,
   Party,
   PendingMobRespawn,
@@ -42,6 +43,7 @@ import type {
   QuestProgress,
   SimConfig,
   SimEvent,
+  SkinCatalog,
   Vec3,
 } from './types';
 
@@ -495,6 +497,22 @@ export interface SimContextCallbacks {
   // moveSpeedMult/swingIntervalMult are M2 decls above -> all deduped.)
   setPlayerLevel(level: number, pid?: number): void;
   notice(pid: number, text: string, color?: string): void;
+
+  // L2 inventory/vendor (src/sim/items.ts): the four helpers the moved useItem
+  // dispatches to that STAY on Sim (their owning facets are decided later). W2 owns
+  // these declarations; each is a thin late-bound delegate to the still-on-Sim method.
+  // startFishing's body stays on Sim (fishing facet TBD); unlockMechChromaFromItem /
+  // openSkinSelect are cosmetics internals (facet W7); isSwimming is a shared terrain
+  // predicate. unlockMechChromaFromItem's return value flows out through useItem to the
+  // server `use` case (result?.type === 'mechChroma').
+  startFishing(p: Entity, meta: PlayerMeta): void;
+  unlockMechChromaFromItem(
+    meta: PlayerMeta,
+    itemId: string,
+    chromaId: string,
+  ): ItemUseResult | undefined;
+  openSkinSelect(meta: PlayerMeta, catalog: SkinCatalog, itemId: string): void;
+  isSwimming(e: Entity): boolean;
 }
 
 // The seam consumed by extracted modules.
@@ -800,5 +818,10 @@ export function createSimContext(host: SimContextHost): SimContext {
     // G2 social plumbing passthroughs (hasPendingSocialInvite already bound above; deduped).
     setPlayerLevel: host.setPlayerLevel,
     notice: host.notice,
+    // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
+    startFishing: host.startFishing,
+    unlockMechChromaFromItem: host.unlockMechChromaFromItem,
+    openSkinSelect: host.openSkinSelect,
+    isSwimming: host.isSwimming,
   };
 }

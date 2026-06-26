@@ -275,6 +275,11 @@ function makeCtx() {
     // G2 social plumbing (hasPendingSocialInvite already stubbed above; deduped).
     setPlayerLevel: vi.fn(),
     notice: vi.fn(),
+    // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
+    startFishing: vi.fn(),
+    unlockMechChromaFromItem: vi.fn(),
+    openSkinSelect: vi.fn(),
+    isSwimming: vi.fn(() => false),
   };
   const ctx = createSimContext(host);
   return {

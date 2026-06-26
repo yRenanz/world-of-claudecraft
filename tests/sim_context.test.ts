@@ -187,6 +187,11 @@ const CALLBACK_KEYS = [
   // G2 social plumbing (hasPendingSocialInvite already listed above; deduped).
   'setPlayerLevel',
   'notice',
+  // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
+  'startFishing',
+  'unlockMechChromaFromItem',
+  'openSkinSelect',
+  'isSwimming',
 ] as const;
 
 // A fully-spied fake host. `clock` is mutable so a test can prove the context reads
@@ -399,6 +404,11 @@ function makeFakeHost() {
     // G2 social plumbing (hasPendingSocialInvite already stubbed above; deduped).
     setPlayerLevel: vi.fn(),
     notice: vi.fn(),
+    // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
+    startFishing: vi.fn(),
+    unlockMechChromaFromItem: vi.fn(),
+    openSkinSelect: vi.fn(),
+    isSwimming: vi.fn(() => false),
   };
   return { host, rng, entities, clock };
 }

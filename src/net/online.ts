@@ -1234,6 +1234,10 @@ export class ClientWorld implements IWorld {
       this.restedXp = s.rxp ?? 0;
       this.prestigeRank = s.prk ?? 0;
       if (s.milestones !== undefined) this.unlockedMilestones = s.milestones;
+      // IWorldInventory facet (W2) self-decode: copper rides every self-frame (?? 0);
+      // inv/buyback/equip are delta-guarded (a missing field keeps the prior mirror).
+      // Terse keys (inv/buyback/equip/copper) and the per-field guards are unchanged by
+      // the move; the offline counterpart is src/sim/items.ts.
       this.copper = s.copper ?? 0;
       if (s.inv !== undefined) {
         this.inventory = s.inv;
@@ -1446,6 +1450,9 @@ export class ClientWorld implements IWorld {
   acceptLinkedQuest(questId: string, fromPid: number): void {
     this.cmd({ cmd: 'qlinkaccept', quest: questId, from: fromPid });
   }
+  // IWorldInventory facet (W2): the eight item/vendor command senders. Each is a thin
+  // cmd() emit whose offline counterpart is the moved src/sim/items.ts body resolved on
+  // the server. The move changes no wire field or command string.
   equipItem(itemId: string): void {
     this.cmd({ cmd: 'equip', item: itemId });
   }

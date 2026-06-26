@@ -187,6 +187,7 @@ import {
 import * as companionMod from './delves/companion';
 import * as lockpickMod from './delves/lockpick_controller';
 import { Market, MARKET_MAX_LISTINGS, type MarketListing, type MarketSave } from './market';
+import * as items from './items';
 import { formatMoney } from './format_money';
 import * as runsMod from './delves/runs';
 import * as chatMod from './social/chat';
@@ -244,8 +245,6 @@ import {
   type AuraKind,
   angleTo,
   armorReduction,
-  CONSUME_DURATION,
-  CONSUME_TICKS,
   type CrowdControlDrCategory,
   DELVE_COMPANION_HEAL_INTERVAL,
   type DelveDef,
@@ -434,7 +433,7 @@ export const MAX_CHAT_MESSAGE_LEN = 255;
 // The World Market (the Merchant's auction house) moved to market.ts (L2); the
 // MARKET_* consts live there now. MARKET_MAX_LISTINGS is re-imported above for the
 // /listings readout (the one in-sim.ts consumer left behind).
-const VENDOR_BUYBACK_LIMIT = 12;
+// VENDOR_BUYBACK_LIMIT moved to items.ts (W2) with the vendor sell/buyback methods.
 // INSTANCE_EMPTY_TIMEOUT relocated to types.ts (I1); no longer referenced in sim.ts.
 // Delve run-lifecycle consts moved to src/sim/delves/runs.ts (I2a): the solid-prop
 // radii (DELVE_CHEST/GRAVE/WALL_SOLID_R), DELVE_INTERACT_RANGE, DELVE_BAD_AIR_INTERVAL,
@@ -458,7 +457,7 @@ const MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE; // rise/run above which a ground
 // Murlocs (the clustered water mobs players call "frogs") used to pull too much,
 // chain-aggroing the whole pond and making solo pulls impossible (#102). Tune
 // per family here; everything else falls back to the default.
-const POTION_COOLDOWN = 60; // seconds; shared cooldown across combat potions (#103)
+// POTION_COOLDOWN moved to items.ts (W2) with the useItem potion branch.
 const DEFAULT_SOCIAL_PULL_RADIUS = 5;
 const SOCIAL_PULL_RADIUS: Partial<Record<MobFamily, number>> = {
   murloc: 8,
@@ -2146,6 +2145,16 @@ export class Sim {
       // already bound above; isRooted/moveSpeedMult/swingIntervalMult are M2 bindings above.)
       setPlayerLevel: sim.setPlayerLevel.bind(sim),
       notice: sim.notice.bind(sim),
+      // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved items.useItem
+      // dispatches to. Late-bound arrows (looked up at call time, not `.bind`d at ctor)
+      // so they preserve the pre-move `this.X` dynamic-dispatch semantics, including tests
+      // that reassign a Sim method post-construction. startFishing/unlockMechChromaFromItem/
+      // openSkinSelect are private on Sim; isSwimming is public. The owning facets stay TBD.
+      startFishing: (p, meta) => sim.startFishing(p, meta),
+      unlockMechChromaFromItem: (meta, itemId, chromaId) =>
+        sim.unlockMechChromaFromItem(meta, itemId, chromaId),
+      openSkinSelect: (meta, catalog, itemId) => sim.openSkinSelect(meta, catalog, itemId),
+      isSwimming: (e) => sim.isSwimming(e),
     };
     return createSimContext(host);
   }
@@ -4184,71 +4193,15 @@ export class Sim {
   }
 
   discardItem(itemId: string, count = 1, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta } = r;
-    const def = ITEMS[itemId];
-    const available = this.countItem(itemId, meta.entityId);
-    if (!def || available <= 0) {
-      this.error(meta.entityId, "You don't have that item.");
-      return;
-    }
-    if (def.noDiscard) return;
-    const discardCount = Number.isFinite(count) ? Math.min(Math.floor(count), available) : 0;
-    if (discardCount <= 0) return;
-    this.removeItem(itemId, discardCount, meta.entityId);
-    this.emit({
-      type: 'log',
-      // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
-      text: `Discarded ${def.name}${discardCount > 1 ? ' x' + discardCount : ''}.`,
-      color: '#999',
-      pid: meta.entityId,
-    });
+    items.discardItem(this.ctx, itemId, count, pid);
   }
 
   equipItem(itemId: string, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta, e: p } = r;
-    const def = ITEMS[itemId];
-    if (!def?.slot || (def.kind !== 'weapon' && def.kind !== 'armor')) return;
-    if (this.countItem(itemId, meta.entityId) <= 0) return;
-    if (!canEquipItem(meta.cls, def)) {
-      this.error(meta.entityId, 'You cannot equip that.');
-      return;
-    }
-    const slot = def.slot;
-    const old = meta.equipment[slot];
-    this.removeItem(itemId, 1, meta.entityId);
-    if (old) this.addItemSilent(old, 1, meta);
-    meta.equipment[slot] = itemId;
-    recalcPlayerStats(p, meta.cls, meta.equipment, this.playerMods(meta));
-    this.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });
+    items.equipItem(this.ctx, itemId, pid);
   }
 
-  // Remove the piece in `slot` back to the bags, leaving the slot empty. Unlike
-  // equipItem (which only swaps in a replacement) this is the way to fully
-  // unequip. Bags are uncapped, so the returned item never has nowhere to go.
   unequipItem(slot: EquipSlot, pid?: number): boolean {
-    const r = this.resolve(pid);
-    if (!r) return false;
-    const { meta, e: p } = r;
-    const itemId = meta.equipment[slot];
-    if (!itemId) return false;
-    delete meta.equipment[slot];
-    // addItemSilent (not addItem): returning a piece you already owned to bags is
-    // not a fresh acquisition, so it must not fire collect-quest credit. No quest
-    // today keys on an unequip, so there is nothing to award here regardless.
-    this.addItemSilent(itemId, 1, meta);
-    recalcPlayerStats(p, meta.cls, meta.equipment, this.playerMods(meta));
-    const def = ITEMS[itemId];
-    this.emit({
-      type: 'log',
-      text: `Unequipped ${def?.name ?? itemId}.`,
-      color: '#8f8',
-      pid: meta.entityId,
-    });
-    return true;
+    return items.unequipItem(this.ctx, slot, pid);
   }
 
   private hasFishableWaterAhead(p: Entity): boolean {
@@ -4344,285 +4297,23 @@ export class Sim {
   }
 
   useItem(itemId: string, pid?: number): ItemUseResult | undefined {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta, e: p } = r;
-    const def = ITEMS[itemId];
-    if (!def) return;
-    if (this.countItem(itemId, meta.entityId) <= 0) {
-      this.error(meta.entityId, "You don't have that item.");
-      return;
-    }
-    if (def.use?.type === 'fishing') {
-      this.startFishing(p, meta);
-      return;
-    }
-    if (def.use?.type === 'mechChroma') {
-      return this.unlockMechChromaFromItem(meta, itemId, def.use.chromaId);
-    }
-    if (def.use?.type === 'skinSelect') {
-      this.openSkinSelect(meta, def.use.catalog ?? 'class', itemId);
-      return;
-    }
-    if (p.castingAbility === FISHING_CAST_ID) {
-      this.error(meta.entityId, 'You are busy.');
-      return;
-    }
-    if (p.dead) return;
-    if (def.kind === 'food' || def.kind === 'drink') {
-      if (p.inCombat) {
-        this.error(meta.entityId, "You can't do that while in combat.");
-        return;
-      }
-      if (this.isSwimming(p)) {
-        this.error(meta.entityId, "You can't do that while swimming.");
-        return;
-      }
-      this.removeItem(itemId, 1, meta.entityId);
-      p.sitting = true;
-      // food and drink occupy separate slots, so you can do both at once
-      const slot = def.kind === 'food' ? 'eating' : 'drinking';
-      p[slot] = {
-        itemId,
-        kind: def.kind,
-        hpPer2s: def.foodHp ? Math.round(def.foodHp / CONSUME_TICKS) : 0,
-        manaPer2s: def.drinkMana ? Math.round(def.drinkMana / CONSUME_TICKS) : 0,
-        remaining: CONSUME_DURATION,
-      };
-      this.emit({
-        type: 'log',
-        text: def.kind === 'food' ? 'You sit down to eat.' : 'You sit down to drink.',
-        color: '#999',
-        pid: meta.entityId,
-      });
-    } else if (def.kind === 'potion') {
-      // instant, usable in combat, on a shared 60s cooldown (#103)
-      if (this.time < p.potionCooldownUntil) {
-        this.error(meta.entityId, 'That potion is not ready yet.');
-        return;
-      }
-      const restoresMana =
-        (def.potionMana ?? 0) > 0 && p.resourceType === 'mana' && p.resource < p.maxResource;
-      const restoresHp = (def.potionHp ?? 0) > 0 && p.hp < p.maxHp;
-      if (!restoresHp && !restoresMana) {
-        this.error(
-          meta.entityId,
-          p.hp >= p.maxHp && (def.potionMana ?? 0) === 0
-            ? 'You are already at full health.'
-            : 'Nothing to restore.',
-        );
-        return;
-      }
-      this.removeItem(itemId, 1, meta.entityId);
-      p.potionCooldownUntil = this.time + POTION_COOLDOWN;
-      if (restoresHp) {
-        const heal = Math.min(Math.round(def.potionHp! * this.healingTakenMult(p)), p.maxHp - p.hp);
-        p.hp += heal;
-        this.emit({ type: 'heal', targetId: p.id, amount: heal });
-      }
-      if (restoresMana) {
-        p.resource = Math.min(p.maxResource, p.resource + def.potionMana!);
-      }
-      this.emit({ type: 'log', text: `You quaff ${def.name}.`, color: '#c9f', pid: meta.entityId });
-    } else if (def.kind === 'elixir') {
-      // Battle elixir: grant a temporary stat-buff aura. Usable in combat (classic),
-      // no shared potion cooldown; re-quaffing refreshes the buff via applyAura.
-      const elx = def.elixir;
-      if (!elx) return;
-      this.removeItem(itemId, 1, meta.entityId);
-      this.applyAura(p, {
-        id: `elixir_${itemId}`,
-        name: elx.aura,
-        kind: elx.kind,
-        remaining: elx.duration,
-        duration: elx.duration,
-        value: elx.value,
-        sourceId: p.id,
-        school: 'nature',
-      });
-      this.emit({ type: 'log', text: `You quaff ${def.name}.`, color: '#c9f', pid: meta.entityId });
-    } else if (def.kind === 'weapon' || def.kind === 'armor') {
-      this.equipItem(itemId, meta.entityId);
-    }
+    return items.useItem(this.ctx, itemId, pid);
   }
 
   buyItem(npcId: number, itemId: string, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta, e: p } = r;
-    const npc = this.entities.get(npcId);
-    const def = ITEMS[itemId];
-    if (npc?.kind !== 'npc' || npc.vendorItems.length === 0) {
-      this.error(meta.entityId, 'That merchant is not available.');
-      return;
-    }
-    if (!npc.vendorItems.includes(itemId)) {
-      this.error(meta.entityId, 'That item is not sold here.');
-      return;
-    }
-    if (!def?.buyValue) {
-      this.error(meta.entityId, 'That item is not for sale.');
-      return;
-    }
-    if (dist2d(p.pos, npc.pos) > INTERACT_RANGE + 2) {
-      this.error(meta.entityId, 'Too far away.');
-      return;
-    }
-    if (meta.copper < def.buyValue) {
-      this.error(meta.entityId, 'Not enough money.');
-      return;
-    }
-    meta.copper -= def.buyValue;
-    this.addItem(itemId, 1, meta.entityId);
-    this.emit({ type: 'vendor', action: 'buy', itemId, pid: meta.entityId });
-  }
-
-  private vendorInRange(p: Entity): boolean {
-    return [...this.entities.values()].some(
-      (e) =>
-        e.kind === 'npc' && e.vendorItems.length > 0 && dist2d(p.pos, e.pos) <= INTERACT_RANGE + 2,
-    );
-  }
-
-  private recordVendorBuyback(meta: PlayerMeta, itemId: string, count: number): void {
-    const existingIndex = meta.vendorBuyback.findIndex((s) => s.itemId === itemId);
-    if (existingIndex >= 0) {
-      const [existing] = meta.vendorBuyback.splice(existingIndex, 1);
-      existing.count += count;
-      meta.vendorBuyback.unshift(existing);
-    } else {
-      meta.vendorBuyback.unshift({ itemId, count });
-    }
-    while (meta.vendorBuyback.length > VENDOR_BUYBACK_LIMIT) meta.vendorBuyback.pop();
+    items.buyItem(this.ctx, npcId, itemId, pid);
   }
 
   sellItem(itemId: string, count = 1, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta, e: p } = r;
-    const def = ITEMS[itemId];
-    const available = this.countItem(itemId, meta.entityId);
-    if (!def || available <= 0) {
-      this.error(meta.entityId, "You don't have that item.");
-      return;
-    }
-    if (p.dead) {
-      this.error(meta.entityId, "You can't do that while dead.");
-      return;
-    }
-    const sellCount = Number.isFinite(count) ? Math.min(Math.floor(count), available) : 0;
-    if (sellCount <= 0) return;
-    if (!this.vendorInRange(p)) {
-      this.error(meta.entityId, 'There is no merchant nearby.');
-      return;
-    }
-    if (def.noVendorSell) {
-      this.error(meta.entityId, 'That item is not for sale.');
-      return;
-    }
-    if (def.kind === 'quest') {
-      this.error(meta.entityId, 'You cannot sell quest items.');
-      return;
-    }
-    this.removeItem(itemId, sellCount, meta.entityId);
-    this.recordVendorBuyback(meta, itemId, sellCount);
-    const payout = def.sellValue * sellCount;
-    meta.copper += payout;
-    this.emit({ type: 'vendor', action: 'sell', itemId, pid: meta.entityId });
-    this.emit({
-      type: 'loot',
-      // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
-      text: `Sold ${def.name}${sellCount > 1 ? ' x' + sellCount : ''} for ${formatMoney(payout)}.`,
-      pid: meta.entityId,
-    });
+    items.sellItem(this.ctx, itemId, count, pid);
   }
 
-  // Bulk-sell every gray (poor-quality) item in the bags in one action, applying the
-  // same rules as the per-item sellItem path: quest items and noVendorSell items are
-  // left untouched and each sold stack is recorded for buyback. One summary loot line
-  // is emitted instead of one per stack.
   sellAllJunk(pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta, e: p } = r;
-    if (p.dead) {
-      this.error(meta.entityId, "You can't do that while dead.");
-      return;
-    }
-    if (!this.vendorInRange(p)) {
-      this.error(meta.entityId, 'There is no merchant nearby.');
-      return;
-    }
-    const junk = meta.inventory
-      .filter((s) => {
-        const def = ITEMS[s.itemId];
-        return (
-          !!def &&
-          def.quality === 'poor' &&
-          def.kind !== 'quest' &&
-          !def.noVendorSell &&
-          s.count > 0
-        );
-      })
-      .map((s) => ({ itemId: s.itemId, count: s.count }));
-    if (junk.length === 0) return; // nothing gray to sell; the vendor UI keeps the button disabled here
-    let total = 0;
-    let soldCount = 0;
-    for (const { itemId, count } of junk) {
-      const def = ITEMS[itemId]!;
-      this.removeItem(itemId, count, meta.entityId);
-      this.recordVendorBuyback(meta, itemId, count);
-      total += def.sellValue * count;
-      soldCount += count;
-    }
-    meta.copper += total;
-    this.emit({ type: 'vendor', action: 'sell', pid: meta.entityId });
-    this.emit({
-      type: 'loot',
-      text: `Sold ${soldCount} junk item${soldCount === 1 ? '' : 's'} for ${formatMoney(total)}.`,
-      pid: meta.entityId,
-    });
+    items.sellAllJunk(this.ctx, pid);
   }
 
   buyBackItem(itemId: string, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta, e: p } = r;
-    const def = ITEMS[itemId];
-    const slot = meta.vendorBuyback.find((s) => s.itemId === itemId);
-    if (!def || !slot || slot.count <= 0) {
-      this.error(meta.entityId, 'That item is not available for buyback.');
-      return;
-    }
-    if (p.dead) {
-      this.error(meta.entityId, "You can't do that while dead.");
-      return;
-    }
-    if (!this.vendorInRange(p)) {
-      this.error(meta.entityId, 'There is no merchant nearby.');
-      return;
-    }
-    if (meta.copper < def.sellValue) {
-      this.error(meta.entityId, 'Not enough money.');
-      return;
-    }
-    meta.copper -= def.sellValue;
-    slot.count -= 1;
-    if (slot.count <= 0) meta.vendorBuyback = meta.vendorBuyback.filter((s) => s !== slot);
-    this.addItemSilent(itemId, 1, meta);
-    this.ctx.onInventoryChangedForQuests(meta);
-    this.emit({ type: 'vendor', action: 'buyback', itemId, pid: meta.entityId });
-    this.emit({
-      type: 'loot',
-      text: `Bought back ${def.name} for ${formatMoney(def.sellValue)}.`,
-      pid: meta.entityId,
-    });
-  }
-
-  private addItemSilent(itemId: string, count: number, meta: PlayerMeta): void {
-    const existing = meta.inventory.find((s) => s.itemId === itemId);
-    if (existing) existing.count += count;
-    else meta.inventory.push({ itemId, count });
+    items.buyBackItem(this.ctx, itemId, pid);
   }
 
   private maybeAutoEquip(itemId: string, meta: PlayerMeta): void {

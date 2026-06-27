@@ -205,16 +205,33 @@ describe('client HTML shell', () => {
     }
   });
 
-  it('carries chat + combat live regions in BOTH entries without double-announcing (P15a)', () => {
+  it('carries the combat / target / chat live regions in BOTH entries without double-announcing (P15a + P18d)', () => {
     for (const entry of [html, playHtml]) {
-      // The chat pane is a polite log AND the "skip to chat" landing target.
+      // P18d: the chat pane keeps role="log" + tabindex="-1" (visible scrollback + the "skip
+      // to chat" landing target) but flips to aria-live="off": role="log" carries an IMPLICIT
+      // polite, and #chatlog goes display:none on the combat tab, so it must NOT announce.
+      // Chat is announced by the tab-independent #chat-live region instead.
       expect(entry).toContain(
+        '<div id="chatlog" class="chat-pane active" role="log" aria-live="off" tabindex="-1">',
+      );
+      expect(entry).not.toContain(
         '<div id="chatlog" class="chat-pane active" role="log" aria-live="polite" tabindex="-1">',
       );
       // The off-screen polite combat summary the throttled announcer writes; a separate
       // node so it never re-announces what an existing aria-live / role=alert speaks.
       expect(entry).toContain(
         '<div id="combat-live" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">',
+      );
+      // P18d item 1: the polite target-name region, announced once per target CHANGE,
+      // mirroring the #combat-live template (a separate off-screen status node, NOT inside
+      // #target-frame).
+      expect(entry).toContain(
+        '<div id="target-live" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">',
+      );
+      // P18d items 3 + 5: the tab-independent polite chat region (always in the layout, so it
+      // announces regardless of which chat tab's pane is visible), mirroring #combat-live.
+      expect(entry).toContain(
+        '<div id="chat-live" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">',
       );
     }
     // Wired into the single combatLog funnel, throttled (never assertive-spammed).

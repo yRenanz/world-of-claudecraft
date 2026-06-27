@@ -71,3 +71,46 @@ describe('CombatAnnouncer burst throttle', () => {
     expect(calls).toEqual(['a', 'c']);
   });
 });
+
+describe('CombatAnnouncer identical-summary re-announce (P18d item 4)', () => {
+  it('forces a byte-different sink write when the same summary repeats, so AT re-reads it', () => {
+    const { sink, calls } = recorder();
+    const announcer = new CombatAnnouncer(sink);
+    // The exact same routine line three intervals apart: a screen reader that suppresses
+    // unchanged live text would stay silent on lines 2 and 3 without a forced mutation.
+    announcer.push('The Kobold resists your Frostbolt.', 0);
+    announcer.push('The Kobold resists your Frostbolt.', COMBAT_ANNOUNCE_INTERVAL_MS);
+    announcer.push('The Kobold resists your Frostbolt.', COMBAT_ANNOUNCE_INTERVAL_MS * 2);
+    expect(calls.length).toBe(3);
+    // First is the clean summary; each consecutive identical one is byte-different from its
+    // immediate predecessor so the live region re-announces.
+    expect(calls[0]).toBe('The Kobold resists your Frostbolt.');
+    expect(calls[1]).not.toBe(calls[0]);
+    expect(calls[2]).not.toBe(calls[1]);
+    // The marker never changes how the line reads aloud: trimming it returns the original.
+    expect(calls[1].trim()).toBe('The Kobold resists your Frostbolt.');
+    expect(calls[2].trim()).toBe('The Kobold resists your Frostbolt.');
+  });
+
+  it('leaves a changed summary byte-faithful (no marker on non-identical text)', () => {
+    const { sink, calls } = recorder();
+    const announcer = new CombatAnnouncer(sink);
+    announcer.push('You hit the Kobold for 42.', 0);
+    announcer.push('You hit the Kobold for 7.', COMBAT_ANNOUNCE_INTERVAL_MS);
+    expect(calls).toEqual(['You hit the Kobold for 42.', 'You hit the Kobold for 7.']);
+  });
+
+  it('stays deterministic: the same sequence yields the same sink writes (no clock/random)', () => {
+    const run = (): string[] => {
+      const { sink, calls } = recorder();
+      const a = new CombatAnnouncer(sink);
+      a.push('x', 0);
+      a.push('x', COMBAT_ANNOUNCE_INTERVAL_MS);
+      a.push('x', COMBAT_ANNOUNCE_INTERVAL_MS * 2);
+      a.push('y', COMBAT_ANNOUNCE_INTERVAL_MS * 3);
+      a.push('x', COMBAT_ANNOUNCE_INTERVAL_MS * 4);
+      return calls;
+    };
+    expect(run()).toEqual(run());
+  });
+});

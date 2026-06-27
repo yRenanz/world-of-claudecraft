@@ -103,6 +103,7 @@ import { assembleBugReportMeta } from './ui/bug_report';
 import { chatInputSize } from './ui/chat_input_autosize';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
 import { tEntity } from './ui/entity_i18n';
+import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import { Hud } from './ui/hud';
 import {
   ensureLocaleLoaded,
@@ -4494,51 +4495,49 @@ const walletBalanceText = (n: number): string =>
   t('wallet.balanceAmount', { amount: formatWoc(n) });
 let walletPickerModal: HTMLDivElement | null = null;
 let walletPickerResolve: ((id: string | null) => void) | null = null;
-let walletPickerReturnFocus: HTMLElement | null = null;
+// One module-local FocusManager INSTANCE for the pre-game wallet-picker modal (P18d item 6):
+// the shared focus-trap implementation, not a second hand-rolled one. It is an instance, NOT
+// a module singleton exported from focus_manager (decision 9 forbids the singleton), mirroring
+// how Hud owns its own FocusManager; the pre-game shell cannot reach Hud's private instance, so
+// a dedicated instance is the correct unification. It owns trap + focus-first + return-to-opener
+// only; this modal keeps its OWN Escape + backdrop-click close (below) because the manager
+// deliberately owns no Escape and the wallet picker is not a hud.closeAll window.
+const walletFocusManager = new FocusManager();
+let walletPickerFocusHandle: FocusTrapHandle | null = null;
 
-function walletPickerFocusable(root: HTMLElement): HTMLElement[] {
-  return Array.from(
-    root.querySelectorAll<HTMLElement>(
-      'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-    ),
-  ).filter(
-    (el) =>
-      !el.hasAttribute('disabled') &&
-      !el.getAttribute('aria-hidden') &&
-      (el.offsetParent !== null || el === document.activeElement),
-  );
-}
-
-function closeWalletPicker(id: string | null): void {
+function closeWalletPicker(id: string | null, returnFocus = true): void {
   const modal = walletPickerModal;
   const resolve = walletPickerResolve;
+  const focusHandle = walletPickerFocusHandle;
   walletPickerModal = null;
   walletPickerResolve = null;
+  walletPickerFocusHandle = null;
   if (modal) modal.remove();
-  const returnFocus = walletPickerReturnFocus;
-  walletPickerReturnFocus = null;
-  if (returnFocus?.isConnected) returnFocus.focus();
+  // Return focus to the opener through the shared FocusManager (replacing the manual
+  // returnFocus.focus()): release() pops the trap and refocuses the recorded opener. The
+  // re-entrant re-open path passes returnFocus=false: the manager defers the opener focus a
+  // tick, so without this the prior modal's deferred focus would land AFTER the new modal's
+  // synchronous initial focus and steal it back to the old opener (the old code returned focus
+  // synchronously, so the new modal's focus simply overwrote it; release(false) preserves that
+  // net behavior).
+  focusHandle?.release(returnFocus);
   if (resolve) resolve(id);
 }
 
-// P15b assessment: this modal is already fully keyboard-accessible on its own (role=dialog
-// + aria-modal + labelledby/describedby, the Tab cycle in the keydown below, Escape close,
-// initial focus, and return-to-opener), so there is no accessibility gap to fix here. Folding
-// it into the shared src/ui/focus_manager FocusManager would be an architecture-consistency
-// change only: the manager is a Hud instance (decision 9, instance-parameterized), not
-// reachable from these top-level main.ts functions without making it a module singleton
-// (which decision 9 deliberately avoided) or threading it across the boundary. Because the
-// modal is already accessible and the wallet-connect flow is sensitive, the shared-manager
-// unification is left as a non-blocking consistency follow-up rather than a P15b a11y fix.
+// The wallet picker uses the shared src/ui/focus_manager FocusManager (P18d item 6), so there
+// is ONE focus-trap implementation. It keeps its own Escape + backdrop-click close because the
+// manager owns no Escape and this is a pre-game shell modal, not a hud.closeAll window; the
+// FocusManager is a module-local INSTANCE (decision 9 forbids a module singleton).
 function showWalletPicker(
   wallets: readonly WalletOption[],
   selectedId: string | null,
 ): Promise<string | null> {
-  if (walletPickerResolve) closeWalletPicker(null);
+  if (walletPickerResolve) closeWalletPicker(null, false);
   return new Promise((resolve) => {
     walletPickerResolve = resolve;
-    walletPickerReturnFocus =
-      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    // Capture the opener BEFORE focus moves into the modal; the FocusManager returns focus
+    // here on release().
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
     const back = document.createElement('div');
     back.className = 'modal-backdrop wallet-picker-backdrop';
@@ -4610,33 +4609,28 @@ function showWalletPicker(
     back.appendChild(panel);
     document.body.appendChild(back);
     walletPickerModal = back;
+    // Install the shared focus trap over the panel: Tab/Shift+Tab cycle + return-to-opener.
+    // This replaces the deleted hand-rolled focusable list + inline Tab cycle, so there is one
+    // focus-trap implementation (the manager re-queries the panel's focusables on each Tab).
+    walletPickerFocusHandle = walletFocusManager.open({ root: () => panel, returnFocusTo: opener });
 
     const close = () => closeWalletPicker(null);
     closeBtn.addEventListener('click', close);
     back.addEventListener('click', (e) => {
       if (e.target === back) close();
     });
+    // Keep ONLY the modal's own Escape (the FocusManager owns no Escape, and this is a
+    // pre-game shell modal, not a hud.closeAll window). Tab/Shift+Tab is the shared trap's job.
     back.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        e.stopPropagation();
-        close();
-        return;
-      }
-      if (e.key !== 'Tab') return;
-      const focusable = walletPickerFocusable(back);
-      if (focusable.length === 0) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
+      if (e.key !== 'Escape') return;
+      e.preventDefault();
+      e.stopPropagation();
+      close();
     });
 
+    // Initial focus preserved byte-faithfully: the selected option, else the first option,
+    // else the close button. Kept explicit (synchronous) so the initial-focus behavior is
+    // unchanged; the shared manager owns the Tab trap + return-to-opener.
     const initialFocus =
       back.querySelector<HTMLElement>('.wallet-picker-option.selected') ??
       back.querySelector<HTMLElement>('.wallet-picker-option') ??

@@ -826,7 +826,7 @@
   }
   .equip-slot .slot-name {
     font-size: 10px;
-    color: #998d6a;
+    color: var(--color-text-muted);
   }
   .equip-slot .slot-item {
     font-size: 11px;
@@ -1458,7 +1458,7 @@
     align-items: center;
     justify-content: center;
     color: #fff6e8;
-    background: #c0392b;
+    background: var(--color-debuff);
     border: 1px solid #3a0803;
     border-radius: 50%;
     font: 800 11px / 1 var(--body-font);
@@ -2239,6 +2239,11 @@
     width: 100%;
     font-size: 12px;
     padding: 3px 4px;
+    /* SC 2.5.8 (target size, minimum): the 12px font + 3px padding lands ~20px tall on
+       desktop, under the 24px floor. The mobile touch override (body.mobile-touch
+       .bag-item { min-height: 40px } in hud.mobile.css) is more specific and still wins,
+       so the stronger 40x40 mobile floor is not weakened. */
+    min-height: 24px;
     border: 0;
     border-radius: 3px;
     cursor: var(--cursor-point);
@@ -2504,7 +2509,7 @@
     text-decoration: none;
   }
   .soc-sub {
-    color: #998d6a;
+    color: var(--color-text-muted);
     font-size: 11px;
     white-space: nowrap;
     overflow: hidden;
@@ -2512,7 +2517,7 @@
   }
   /* status column never word-wraps (zone + status stack via an explicit break) */
   .soc-meta {
-    color: #998d6a;
+    color: var(--color-text-muted);
     font-size: 11px;
     text-align: right;
     line-height: 1.25;
@@ -2650,7 +2655,7 @@
     padding: 2px 4px 6px;
   }
   .soc-guild-head .gm {
-    color: #998d6a;
+    color: var(--color-text-muted);
     font-size: 11px;
   }
   .raid-groups {
@@ -2795,7 +2800,7 @@
     cursor: not-allowed;
   }
   .arena-bracket-tag {
-    color: #998d6a;
+    color: var(--color-text-muted);
     font-size: 11px;
     margin-left: 4px;
   }
@@ -2869,7 +2874,7 @@
     outline: 1px solid #ffb24a55;
   }
   .ladder-row .rank {
-    color: #998d6a;
+    color: var(--color-text-muted);
     text-align: right;
   }
   .ladder-row .lr-name {
@@ -3008,7 +3013,7 @@
     border-bottom-color: #cc9a3c;
   }
   .mkt-tab .pip {
-    color: #9fdc7f;
+    color: var(--color-friendly);
     font-size: 10.5px;
   }
   .mkt-search {
@@ -3284,7 +3289,7 @@
     margin-bottom: 10px;
   }
   .mkt-sell-pick.empty {
-    color: #998d6a;
+    color: var(--color-text-muted);
     font-size: 12px;
     justify-content: center;
     font-style: italic;
@@ -3318,7 +3323,7 @@
     font-size: 12px;
   }
   .mkt-coin-tag {
-    color: #998d6a;
+    color: var(--color-text-muted);
     font-size: 11px;
     margin-right: 6px;
   }
@@ -4058,7 +4063,11 @@
     font-weight: 600;
     cursor: var(--cursor-point);
     opacity: 0;
-    transition: border-color 0.12s, box-shadow 0.12s, color 0.12s, opacity 0.12s;
+    transition:
+      border-color 0.12s,
+      box-shadow 0.12s,
+      color 0.12s,
+      opacity 0.12s;
   }
   .equip-slot:hover .equip-unequip-btn,
   .equip-slot:focus-within .equip-unequip-btn,
@@ -4072,7 +4081,9 @@
     box-shadow: 0 0 7px rgba(202, 164, 114, 0.4);
   }
   @media (prefers-reduced-motion: reduce) {
-    .equip-slot .equip-unequip-btn { transition: none; }
+    .equip-slot .equip-unequip-btn {
+      transition: none;
+    }
   }
   /* Bags window lights up as a drop target while dragging a piece off the paperdoll. */
   #bags.drop-target {

@@ -29,6 +29,7 @@ import {
   type ArenaView,
   buildArenaView,
 } from './arena_window_view';
+import { markDialogRoot } from './dialog_root';
 import { tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { formatNumber, t } from './i18n';
@@ -85,10 +86,7 @@ export class ArenaWindow {
     // of the (stable, never-replaced) root node, so set it ONCE here on open rather than
     // re-writing it inside render(), which the 250ms mediumHud band repeats while the
     // window is open. The innerHTML rebuilds in render() only replace the children.
-    root.setAttribute('role', 'dialog');
-    root.setAttribute('aria-modal', 'false');
-    root.setAttribute('aria-labelledby', 'arena-title');
-    root.setAttribute('tabindex', '-1');
+    markDialogRoot(root, { labelledBy: 'arena-title' });
     root.style.display = 'block';
     this.lastSig = '';
     this.fetchLeaderboard(this.bracket);

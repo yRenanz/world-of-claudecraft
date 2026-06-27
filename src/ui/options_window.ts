@@ -40,6 +40,7 @@ import {
 } from '../game/settings';
 import type { IWorld } from '../world_api';
 import type { ChatClock } from './chat_timestamp';
+import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import type { BugReportHooks, OptionsHooks } from './hud';
 import {
@@ -263,23 +264,19 @@ export class OptionsWindow {
     const el = this.deps.root();
     // WCAG 2.2 AA (P15b): the Esc/options menu is a focus-trapped window, so name the
     // root and give it a dialog role.
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-modal', 'false');
-    el.setAttribute('tabindex', '-1');
     // Name the dialog per sub-view. Every sub-view paints a <span id="options-title">
     // via panelTitle()/settingsViewShell() EXCEPT Performance, whose title comes from
     // the self-contained perf_overlay_settings panel (buildTitle has no such id). That
     // one view names itself with aria-label from the same key its title renders
-    // (hudChrome.perf.title, no new key), so aria-labelledby never dangles on a nameless
-    // dialog. Keeping the choice here, beside the role, avoids leaking the options-title
-    // DOM-id contract into the perf module (P15b re-audit fix).
-    if (this.view === 'performance') {
-      el.removeAttribute('aria-labelledby');
-      el.setAttribute('aria-label', t('hudChrome.perf.title'));
-    } else {
-      el.removeAttribute('aria-label');
-      el.setAttribute('aria-labelledby', 'options-title');
-    }
+    // (hudChrome.perf.title, no new key); markDialogRoot clears the opposite name so
+    // aria-labelledby never dangles on a nameless dialog. Keeping the choice here avoids
+    // leaking the options-title DOM-id contract into the perf module (P15b re-audit fix).
+    markDialogRoot(
+      el,
+      this.view === 'performance'
+        ? { label: t('hudChrome.perf.title') }
+        : { labelledBy: 'options-title' },
+    );
     // The wide multi-column layouts belong to their own sub-views; clear each when
     // leaving it so the other sub-views (and the main menu) keep their default width.
     if (this.view !== 'keybinds') el.classList.remove('kb-wide');

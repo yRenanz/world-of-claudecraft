@@ -20,6 +20,7 @@
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { PlayerClass } from '../sim/types';
 import type { IWorld, LeaderboardPage } from '../world_api';
+import { markDialogRoot } from './dialog_root';
 import { tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { formatNumber, t } from './i18n';
@@ -95,10 +96,7 @@ export class LeaderboardWindow {
   async render(focus: FocusTarget = null): Promise<void> {
     const el = this.deps.root();
     const world = this.deps.world();
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-modal', 'false');
-    el.setAttribute('aria-labelledby', 'leaderboard-title');
-    el.setAttribute('tabindex', '-1');
+    markDialogRoot(el, { labelledBy: 'leaderboard-title' });
     el.innerHTML = this.titleHtml(world.realm) + this.loadingBodyHtml();
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     if (focus === 'open') (el.querySelector('[data-close]') as HTMLElement | null)?.focus();

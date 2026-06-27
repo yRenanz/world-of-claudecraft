@@ -22,6 +22,7 @@ import { ITEMS } from '../sim/data';
 import type { EquipSlot, PlayerClass } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
+import { markDialogRoot } from './dialog_root';
 import { itemDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { formatNumber, t } from './i18n';
@@ -137,10 +138,7 @@ export class CharWindow {
     const className = classDisplayName(world.cfg.playerClass);
     const level = formatNumber(p.level, { maximumFractionDigits: 0 });
     // WCAG 2.2 AA (P15b): name the focus-trapped root via the character title span.
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-modal', 'false');
-    el.setAttribute('tabindex', '-1');
-    el.setAttribute('aria-labelledby', 'char-title');
+    markDialogRoot(el, { labelledBy: 'char-title' });
     let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
     html += `<div class="paperdoll">
       <div class="equip-col" id="equip-col-left"></div>

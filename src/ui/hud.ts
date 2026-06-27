@@ -145,6 +145,7 @@ import {
 import { type CardinalId, compassView } from './compass';
 import { formatMinimapCoords } from './coords';
 import { DelveMapPainter } from './delve_map_painter';
+import { markDialogRoot } from './dialog_root';
 import { dropdownKeyNav } from './dropdown_nav';
 import { emoteIconUrl } from './emote_icons';
 import { itemDisplayName, tEntity } from './entity_i18n';
@@ -7261,10 +7262,7 @@ export class Hud {
         ),
       )
       .map((qp) => qp.questId);
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-modal', 'false');
-    el.setAttribute('aria-labelledby', 'quest-dialog-title');
-    el.setAttribute('tabindex', '-1');
+    markDialogRoot(el, { labelledBy: 'quest-dialog-title' });
     const npcName = def ? npcDisplayName(npc.templateId) : mobDisplayName(npc.templateId);
     const npcTitle = def ? npcDisplayTitle(def.id) : '';
     let html = `<div class="panel-title"><span id="quest-dialog-title">${esc(npcName)}<span class="quest-muted"> &lt;${esc(npcTitle)}&gt;</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
@@ -7339,10 +7337,7 @@ export class Hud {
       this.sim.player.name,
     );
     voice.play(state === 'ready' ? `quest__${questId}__complete` : `quest__${questId}__offer`);
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-modal', 'false');
-    el.setAttribute('aria-labelledby', 'quest-dialog-title');
-    el.setAttribute('tabindex', '-1');
+    markDialogRoot(el, { labelledBy: 'quest-dialog-title' });
     let html = `<div class="panel-title"><span id="quest-dialog-title">${esc(questTitle(questId))}${this.questSuggestedPlayersHtml(quest.suggestedPlayers)}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
     if (state === 'available' && quest.minLevel) {
       html += `<div class="qd-req">${esc(t('questUi.detail.requiresLevel', { level: this.questNumber(quest.minLevel) }))}</div>`;
@@ -7423,10 +7418,7 @@ export class Hud {
     const inSharerParty =
       fromPid !== undefined &&
       (this.sim.partyInfo?.members.some((m) => m.pid === fromPid) ?? false);
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-modal', 'false');
-    el.setAttribute('aria-labelledby', 'quest-dialog-title');
-    el.setAttribute('tabindex', '-1');
+    markDialogRoot(el, { labelledBy: 'quest-dialog-title' });
     let html = `<div class="panel-title"><span id="quest-dialog-title">${esc(questTitle(questId))}${this.questSuggestedPlayersHtml(quest.suggestedPlayers)} <span class="quest-muted">&lt;${esc(t('hudChrome.questShare.dialogTitle'))}&gt;</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
     if (quest.minLevel)
       html += `<div class="qd-req">${esc(t('questUi.detail.requiresLevel', { level: this.questNumber(quest.minLevel) }))}</div>`;
@@ -7485,10 +7477,7 @@ export class Hud {
       questNarrative(questId, 'completion', this.sim.player.name),
     ];
     const clampedPage = Math.max(0, Math.min(page, pages.length - 1));
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-modal', 'false');
-    el.setAttribute('aria-labelledby', 'quest-dialog-title');
-    el.setAttribute('tabindex', '-1');
+    markDialogRoot(el, { labelledBy: 'quest-dialog-title' });
     el.innerHTML =
       `<div class="panel-title"><span id="quest-dialog-title">${esc(questTitle(questId))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="qd-text">${esc(pages[clampedPage])}</div>`;
@@ -9012,6 +9001,10 @@ export class Hud {
     el.id = 'confirm-dialog';
     el.className = 'window panel';
     el.style.display = 'block';
+    // Left inline (NOT markDialogRoot): this prompt sets no tabindex and carries no
+    // accessible name today, so folding it through the helper would ADD tabindex=-1 and
+    // change behavior (P18a is byte-preserving). Naming + tabindex for this dialog is a
+    // later per-window a11y task, not this extraction.
     el.setAttribute('role', 'dialog');
     el.setAttribute('aria-modal', 'true');
     el.innerHTML =

@@ -21,6 +21,7 @@ import { ABILITIES, CLASSES } from '../sim/data';
 import type { ResolvedAbility } from '../sim/sim';
 import type { AbilityDef, PlayerClass } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { markDialogRoot } from './dialog_root';
 import { tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hotbar';
@@ -112,10 +113,7 @@ export class SpellbookWindow {
       hasFormBars: this.deps.hasFormBars(),
     });
     const className = this.classDisplayName(view.classId);
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-modal', 'false');
-    el.setAttribute('tabindex', '-1');
-    el.setAttribute('aria-label', t('abilityUi.spellbook.title'));
+    markDialogRoot(el, { label: t('abilityUi.spellbook.title') });
     // "Reset bar" only applies to classes with per-form bars (druid); other classes
     // have a single bar, so the button is omitted for them.
     const resetBtnHtml = view.hasFormBars

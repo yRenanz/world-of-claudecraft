@@ -23,6 +23,7 @@
 import { CLASSES } from '../sim/data';
 import type { PlayerClass } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { markDialogRoot } from './dialog_root';
 import { tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { formatNumber, t, tPlural } from './i18n';
@@ -200,10 +201,7 @@ export class SocialWindow {
     if (!el.classList.contains('open')) return;
     // WCAG 2.2 AA (P15b): name the focus-trapped root so AT users entering the trap
     // land on a labeled dialog (the sibling cold windows all set this).
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-modal', 'false');
-    el.setAttribute('tabindex', '-1');
-    el.setAttribute('aria-label', t('hud.social.title'));
+    markDialogRoot(el, { label: t('hud.social.title') });
     const w = this.deps.world();
     const tab = this.tab;
     const online = w.socialInfo !== null;

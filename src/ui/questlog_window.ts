@@ -20,6 +20,7 @@
 import { ITEMS, NPCS } from '../sim/data';
 import type { PlayerClass } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { markDialogRoot } from './dialog_root';
 import { itemDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { formatNumber, t } from './i18n';
@@ -107,10 +108,7 @@ export class QuestLogWindow {
     });
     this.selected = view.selectedQuestId;
 
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-modal', 'false');
-    el.setAttribute('aria-labelledby', 'quest-log-title');
-    el.setAttribute('tabindex', '-1');
+    markDialogRoot(el, { labelledBy: 'quest-log-title' });
     el.innerHTML = `<div class="panel-title"><span id="quest-log-title">${esc(t('questUi.log.title'))} <span class="quest-muted">${esc(
       t('questUi.log.summary', {
         active: this.questNumber(view.summary.active),

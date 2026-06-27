@@ -32,10 +32,12 @@ import {
 } from '../sim/content/talents';
 import { ABILITIES } from '../sim/data';
 import { MAX_LEVEL, type PlayerClass } from '../sim/types';
+import { markDialogRoot } from './dialog_root';
 import { tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
+import { rovingTarget } from './roving_index';
 import { roleLabel, tTalent } from './talent_i18n';
 import { talentChoiceIconDataUrl, talentNodeIconDataUrl } from './talent_icons';
 import { buildTalentsView, type TalentsView, type TalentTreeVM } from './talents_view';
@@ -160,10 +162,7 @@ export class TalentsWindow {
     // land on a labeled dialog, not an anonymous group. innerHTML below replaces the
     // children, not these own-element attributes, so setting them once per render is
     // idempotent and covers both the coming-soon and the populated branch.
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-modal', 'false');
-    el.setAttribute('tabindex', '-1');
-    el.setAttribute('aria-label', t('game.talents.title'));
+    markDialogRoot(el, { label: t('game.talents.title') });
     const cls = this.deps.playerClass();
     // A real <button> close (was a non-focusable <span>): keyboard-reachable and named,
     // matching the sibling cold windows. focusFirst skips [data-close] on open.
@@ -209,19 +208,9 @@ export class TalentsWindow {
       tab.addEventListener('click', () => switchTab(tab));
       tab.addEventListener('keydown', (e) => {
         const ke = e as KeyboardEvent;
-        if (
-          ke.key === 'ArrowRight' ||
-          ke.key === 'ArrowLeft' ||
-          ke.key === 'Home' ||
-          ke.key === 'End'
-        ) {
+        const next = rovingTarget(ke.key, i, tabs.length, 'horizontal');
+        if (next !== null) {
           ke.preventDefault();
-          const next =
-            ke.key === 'Home'
-              ? 0
-              : ke.key === 'End'
-                ? tabs.length - 1
-                : (i + (ke.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length;
           const target = tabs[next];
           if (target && target !== tab) {
             switchTab(target);
@@ -278,29 +267,12 @@ export class TalentsWindow {
       card.addEventListener('click', () => this.setSpec(stage, sp.id));
       card.addEventListener('keydown', (e) => {
         const ke = e as KeyboardEvent;
-        if (
-          ke.key === 'ArrowDown' ||
-          ke.key === 'ArrowRight' ||
-          ke.key === 'ArrowUp' ||
-          ke.key === 'ArrowLeft' ||
-          ke.key === 'Home' ||
-          ke.key === 'End'
-        ) {
+        const i = specCards.findIndex((c) => c.el === card);
+        const next = rovingTarget(ke.key, i, specCards.length, 'both');
+        if (next !== null) {
           ke.preventDefault();
-          const i = specCards.findIndex((c) => c.el === card);
-          const n = specCards.length;
-          if (n > 0) {
-            const next =
-              ke.key === 'Home'
-                ? 0
-                : ke.key === 'End'
-                  ? n - 1
-                  : ke.key === 'ArrowDown' || ke.key === 'ArrowRight'
-                    ? (i + 1) % n
-                    : (i - 1 + n) % n;
-            this.setSpec(stage, specCards[next].id);
-            (this.deps.root().querySelector('.tal-spec.sel') as HTMLElement | null)?.focus();
-          }
+          this.setSpec(stage, specCards[next].id);
+          (this.deps.root().querySelector('.tal-spec.sel') as HTMLElement | null)?.focus();
           return;
         }
         this.keyboardActivate(ke, () => this.setSpec(stage, sp.id));
@@ -548,24 +520,10 @@ export class TalentsWindow {
           dismiss(true);
           return;
         }
-        if (ke.key === 'ArrowDown' || ke.key === 'ArrowRight') {
+        const next = rovingTarget(ke.key, i, opts.length, 'both');
+        if (next !== null) {
           ke.preventDefault();
-          focusOpt(i + 1);
-          return;
-        }
-        if (ke.key === 'ArrowUp' || ke.key === 'ArrowLeft') {
-          ke.preventDefault();
-          focusOpt(i - 1);
-          return;
-        }
-        if (ke.key === 'Home') {
-          ke.preventDefault();
-          focusOpt(0);
-          return;
-        }
-        if (ke.key === 'End') {
-          ke.preventDefault();
-          focusOpt(opts.length - 1);
+          focusOpt(next);
           return;
         }
         this.keyboardActivate(ke, () => choose(optEl));

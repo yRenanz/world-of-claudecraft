@@ -68,22 +68,14 @@ See `README.md` for the full host/develop/play guide and the classic-fidelity ch
   `tests/architecture.test.ts`.)
 - **Gameplay math follows real classic-era MMO formulas** (rage, hit tables, armor DR,
   XP curves; see `README.md` and `docs/design/`). Don't invent balance numbers.
-- **Graphics and performance settings are gameplay-neutral.** No graphics or performance
-  preset (the static `data-fx-level` tier, reduce-motion, any per-element tier knob) may
-  give a player a gameplay ADVANTAGE or DISADVANTAGE. A tier may shed COSMETIC richness
-  (floating-combat-text volume/lifetime, minimap redraw smoothness, buff-icon overflow,
-  portrait/HP-bar redraw smoothness within about 200ms) but NEVER actionable information a
-  player reads and reacts to: own debuffs, party/raid member HP, the target/boss cast bar,
-  target HP granularity, enemy/aggro positions. Test for a new tier knob: if it hides or
-  delays something a player acts on, it is not allowed. This generalizes the HUD
-  two-controller rule (tier knobs read the STATIC `data-fx-level` preset via
-  `src/game/ui_effects_profile.ts`, never the FPS governor; detail in `src/ui/CLAUDE.md`).
-  Enforced by the tier-knob fairness scans (`tests/ui_tier_knobs.test.ts` + the
-  `ui_tier_knobs` purity row in `tests/architecture.test.ts`), the debuff-priority aura cap
-  (`tests/auras_painter.test.ts`), and the stat-sap wire-parity round-trip
-  (`tests/snapshots.test.ts` + `tests/auras_view.test.ts`, so a stat-draining `buff_*`
-  classifies as a debuff identically online and offline). See
-  `docs/design/graphics-settings-fairness.md`.
+- **Graphics and performance settings are gameplay-neutral.** No preset or tier knob (the
+  static `data-fx-level`, reduce-motion, the FPS governor) may confer a gameplay advantage or
+  disadvantage. A tier may shed COSMETIC richness (FCT volume/lifetime, redraw smoothness, icon
+  overflow within about 200ms) but NEVER actionable information a player reacts to: own debuffs,
+  party/raid HP, the target/boss cast bar, target HP granularity, enemy/aggro positions. Tier
+  knobs read the STATIC preset via `src/game/ui_effects_profile.ts`, never the governor. Rule of
+  thumb: if it hides or delays something a player acts on, it is not allowed. Exemplars and the
+  fairness tests: `src/ui/CLAUDE.md` + `docs/design/graphics-settings-fairness.md`.
 - **Don't hand-edit generated files**, e.g. `src/render/assets/manifest.generated.ts`
   (regenerate via the build).
 - **i18n: every player-visible string is a `t()` key**, classified by render sink,
@@ -119,15 +111,25 @@ See `README.md` for the full host/develop/play guide and the classic-fidelity ch
 - **Commits:** Conventional Commits with a scope (`feat(talents): ...`, `fix(net): ...`,
   `test(sim): ...`). Branches: `feature/<slug>`, `fix/<slug>`.
 
-## Modularity, module-first for new code
-Large coordinator files are normal (`hud.ts`, `main.ts`, `renderer.ts`, and the `sim.ts`
-tick coordinator). Do NOT split one just to hit a line count. But NEW self-contained
-behavior belongs in its own small module behind an existing seam, not bolted onto a
-coordinator as another method cluster or banner section. If the work does not need a
-coordinator's private mutable state, it is a sibling module. The repo is already
-refactored this way on both sides: `sim.ts` delegates each game SYSTEM to a module behind
-the `SimContext` seam, and `hud.ts` composes per-window/per-frame painters over pure
-view-cores. Use the seams this repo already has, do not invent new ones:
+## Modularity, module-first for new code (read before touching a big file)
+The four logic monoliths (`src/ui/hud.ts` ~10k, `src/sim/sim.ts` ~7.5k, `src/main.ts` ~6.4k,
+`src/render/renderer.ts` ~4.5k) are coordinators, not a license to grow them. They are ACTIVE
+extraction targets (the `SimContext` campaign has already lifted ~12k lines of game systems out
+of `Sim`), so the rule is: never GROW one. Do NOT split a coordinator just to hit a line count,
+but every NEW self-contained behavior lands as its own small, tested module behind an existing
+seam, not as another method cluster or banner section. The deciding question is one: **does this
+code need the coordinator's private mutable state** (the live `Sim` loop, the `Hud` DOM and
+per-frame buffers, the renderer's scene graph)? If no, it is a sibling module, every time. If
+only partly, extract the pure part (math, formatting, id/state resolution) into a host-agnostic
+module a Vitest imports directly and leave the coordinator a thin consumer.
+- **`src/main.ts` is a firewall, not a home.** Client-bootstrap helpers (mobile, fullscreen,
+  shell, loading, analytics, graphics detection) belong in `src/game/` or `src/ui/` sibling
+  modules. It is the one monolith with no seam and still accreting; never add a top-level
+  function here when a sibling module will do.
+- **Data-as-code is exempt.** Large declarative tables (`src/sim/content/*`,
+  `src/ui/i18n.catalog/*`, `talent_i18n.ts`, `sim_i18n.ts`) are correctly big; module-first is
+  about LOGIC, never data. Do not "modularize" a data table.
+Use the seams this repo already has, do not invent new ones:
 - New render/ui feature: extend `IWorld` (`src/world_api.ts`) first, implement in BOTH
   `Sim` and `ClientWorld`, then consume via `IWorld`. render/ui never import a concrete world.
 - New HUD component (a self-contained window OR a per-frame frame/bar): its own module the
@@ -135,15 +137,10 @@ view-cores. Use the seams this repo already has, do not invent new ones:
   (`src/ui/<name>_view.ts`, DOM/Three-free, Node-tested, in the `UI_PURE_CORES` allowlist)
   plus a thin write-elided painter on the `PainterHost` seam (`src/ui/painter_host.ts`),
   INSTANCE-PARAMETERIZED (take a descriptor/id, no hardcoded element id). Reuse a FAMILY
-  before bespoke: a unit-style frame is a `UnitFramePainter`; an extra action bar a new
-  `ActionBarPainter(descriptor)`. Guarded by the UI-purity scan in
-  `tests/architecture.test.ts`, which is COMPLETENESS-checked: every on-disk
-  `*_view`/`*_core` under `src/ui` (and `src/render`) must be in the `UI_PURE_CORES`
-  (resp. `RENDER_PURE_CORES`) allowlist, so a new core that forgets to register fails the
-  test. The standing per-frame perf floor is `tests/hud_perf_budget.test.ts`; the cold-window
-  and per-frame DOM-id / write guards live in `tests/client_shell.test.ts` (they point at the
-  painter that owns each element now, not `hud.ts`). Full recipe + the a11y / perf / token /
-  canvas contracts: `src/ui/CLAUDE.md` + `src/styles/CLAUDE.md`.
+  before bespoke (a unit-style frame is a `UnitFramePainter`; an extra action bar a new
+  `ActionBarPainter(descriptor)`). The full recipe, the `*_view` completeness scan, the
+  per-frame perf floor, and the a11y / token / canvas contracts live in `src/ui/CLAUDE.md`
+  + `src/styles/CLAUDE.md`.
 - New visual system: a new `src/render/<thing>.ts` the renderer calls, not a method bank on `renderer.ts`.
 - New sim SYSTEM behavior (a combat/mob/social/economy mechanic, not just a data record):
   its own module behind the `SimContext` seam (`src/sim/sim_context.ts`), with backing
@@ -158,14 +155,12 @@ view-cores. Use the seams this repo already has, do not invent new ones:
   public surface (templates: `src/render/characters/`, `src/ui/i18n.catalog/`), plus a local `CLAUDE.md`.
 
 Extract on the rule of three, not before: leave two similar blocks alone; a third copy,
-or one block with a single nameable responsibility, earns its own module. Never add an
-abstraction for one use or a hypothetical future need. Lift pure presentation/domain
-logic (geometry, formatting, id/state resolution) out of DOM/render/sim modules into a
-small host-agnostic module a Vitest imports directly, leaving the render side a thin
-consumer (reference: `src/ui/unit_portrait.ts` core plus `unit_portrait_painter.ts`).
-Fix bugs test-first: a failing test that reproduces the bug, then the smallest change
-that turns it green. Detailed heuristics and the bug-fix workflow live in the
-`extract-and-test` skill (`.claude/skills/extract-and-test/`).
+or one block with a single nameable responsibility, earns its own module. Never abstract
+for one use or a hypothetical future need (the pure-core + thin-consumer reference is
+`src/ui/unit_portrait.ts` + `unit_portrait_painter.ts`). Fix bugs test-first: a failing
+test that reproduces the bug, then the smallest change that turns it green. Detailed
+heuristics and the bug-fix workflow live in the `extract-and-test` skill
+(`.claude/skills/extract-and-test/`).
 
 ## Testing & verification
 - Logic/unit: Vitest (`tests/`). Add or update tests when you change sim or server behavior.
@@ -178,6 +173,13 @@ that turns it green. Detailed heuristics and the bug-fix workflow live in the
   never skipped: a `Stop` hook (`.claude/hooks/qa-stop.sh`) blocks instantly on an em/en dash,
   emoji, stray `.only(`, or `debugger`; the `.githooks/pre-push` floor runs `tsc`, the guard
   tests, biome, and the copy scan at push time. See `docs/qa-gate.md` and `.claude/hooks/README.md`.
+- **Biome / formatting / CI.** Biome 2.5.0 (`biome.json`: 2-space, lineWidth 100, single quotes,
+  trailing commas). CI and the pre-push floor gate CHANGED FILES ONLY (`npm run ci:changed` =
+  `biome ci --changed`) and fail on errors and format diffs, NOT on lint warnings. Whole-repo
+  `biome check .` is intentionally RED (~1000+ pre-existing issues): a DEFERRED chore, not your
+  regression, do not fix it. NEVER run a whole-repo `--write` (`check:fix`/`format`/`lint:fix`,
+  or `biome ... .`); it reformats a monolith into a huge unrelated diff. Format only the files
+  you changed: `npx @biomejs/biome check --write <changed-file.ts>`.
 
 ## Working style and effort by model
 This whole file is the baseline for **any** model: obey all of it. Your active model is
@@ -192,20 +194,22 @@ correct.
   end to end and carry long-horizon tasks (migrations, multi-file refactors) to completion
   without pausing after each step, as long as the build and tests stay green. Front-load
   the spec: state the task, intent, constraints, and the acceptance check in one turn
-  rather than revealing them piecemeal. Effort: `xhigh` for coding and agentic work,
-  `high` minimum for intelligence-sensitive work; reserve `max` for genuinely frontier
-  problems and measure, since it overthinks and oscillates on structured tasks. The
-  operator can push further with ultracode (`xhigh` plus deterministic Workflow fan-out).
+  rather than revealing them piecemeal. Effort: `xhigh` is the recommended start for coding
+  and agentic work, `high` the minimum for intelligence-sensitive work; reserve `max` for
+  genuinely frontier problems and measure, since it overthinks and oscillates on structured
+  tasks. (4.8 recalibrated the levels: `high` thinks somewhat less and `xhigh` substantially
+  more than 4.7, so re-baseline if you tuned against 4.7.) The operator can push further with
+  ultracode (`xhigh` plus deterministic Workflow fan-out).
 - **Fan out, and review for coverage (Opus 4.8):** 4.8 under-spawns by default, so
   explicitly fan out parallel subagents across independent files, subsystems, or batch
   items; do not spawn for work doable in one response. Before declaring done, have a fresh
   subagent review your own diff: its job is COVERAGE (report every correctness or
   requirement gap with confidence and severity), not filtering, which happens in a later
-  pass. The repo ships purpose-built reviewers in `.claude/agents/`: `qa-checklist` (the
-  evergreen end-of-contribution gate, also reachable as `/qa`), `architecture-reviewer`
-  (determinism + the `SimContext` seam for `src/sim/` changes), `cross-platform-sync`,
-  `migration-safety`, `privacy-security-review`, and the `release-malware-audit` release gate;
-  plus a `feature-plan` skill and an `extract-and-test` skill. Prefer those over ad-hoc subagents.
+  pass. The repo ships purpose-built reviewers in `.claude/agents/` (dispatch via `/qa`):
+  `qa-checklist` (the end-of-contribution gate), `architecture-reviewer` (determinism + the
+  `SimContext` seam for `src/sim/`), `cross-platform-sync`, `migration-safety`,
+  `privacy-security-review`, and the `release-malware-audit` release gate; plus the
+  `feature-plan` and `extract-and-test` skills. Prefer those over ad-hoc subagents.
 - **State rule scope literally.** 4.8 follows instructions literally and will not
   generalize a rule across cases unless told. When an invariant covers every case (every
   player string is a `t()` key; all sim randomness goes through `Rng`), say "every" or

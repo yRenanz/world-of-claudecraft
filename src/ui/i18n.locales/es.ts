@@ -239,6 +239,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.playerCard.showWalletBadge': 'Mostrar insignia de cartera',
   'hudChrome.options.uiScale': 'Escala de la interfaz',
   'hudChrome.options.highContrastBackground': 'Fondo de alto contraste',
+  'hudChrome.options.showItemLevel': 'Mostrar nivel de objeto',
+  'hudChrome.options.itemLevelLine': 'Nivel de objeto {level}',
+  'hudChrome.options.itemScoreLine': 'Puntuación {score}',
   'hudChrome.landing.highContrast': 'Alto contraste',
   'hudChrome.landing.highContrastAria':
     'Alternar el fondo de alto contraste: desactiva el tráiler en movimiento para que el texto de la pantalla de inicio siga siendo legible',
@@ -1654,7 +1657,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Explota contra el enemigo y causa {damage} de daño de Fuego. Instantáneo.',
   'entities.abilities.arcane_missiles.name': 'Misiles Arcanos',
   'entities.abilities.arcane_missiles.description':
-    'Lanza Misiles Arcanos al enemigo, causando 8 de daño Arcano cada segundo durante 3 s.',
+    'Lanza Misiles Arcanos al enemigo, causando {damage} de daño Arcano cada segundo durante 3 s.',
   'entities.abilities.polymorph.name': 'Polimorfia',
   'entities.abilities.polymorph.description':
     'Transforma al enemigo en oveja durante hasta 15 s. La oveja deambula y se cura rápidamente. Cualquier daño rompe el efecto. Solo bestias y humanoides.',
@@ -1832,7 +1835,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Una plegaria lenta pero poderosa que sana a un objetivo amistoso por {damage}.',
   'entities.abilities.mind_flay.name': 'Tortura mental',
   'entities.abilities.mind_flay.description':
-    'Asalta la mente del objetivo con energía de las Sombras e inflige 12 de daño cada segundo durante 3 s.',
+    'Asalta la mente del objetivo con energía de las Sombras e inflige {damage} de daño cada segundo durante 3 s.',
   'entities.abilities.flash_heal.name': 'Sanación relámpago',
   'entities.abilities.flash_heal.description':
     'Una plegaria rápida que sana a un objetivo amistoso por {damage}.',
@@ -1887,7 +1890,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Maldice al objetivo con agonía: {damage} de daño de las Sombras durante 24 s.',
   'entities.abilities.drain_life.name': 'Drenar vida',
   'entities.abilities.drain_life.description':
-    'Drena la vida del objetivo y te transfiere 7 de salud cada segundo durante 5 s.',
+    'Drena la vida del objetivo y te transfiere {damage} de salud cada segundo durante 5 s.',
   'entities.abilities.fear.name': 'Miedo',
   'entities.abilities.fear.description':
     'Siembra terror en el enemigo y lo deja encogido durante hasta 8 s. Cualquier daño rompe el efecto.',
@@ -4776,4 +4779,57 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.school.shadow': 'Sombras',
   'hudChrome.auraEffect.school.holy': 'Sagrado',
   'hudChrome.auraEffect.school.nature': 'Naturaleza',
+  'hudChrome.masterLoot.title': 'Botin maestro',
+  'hudChrome.masterLoot.enableLabel': 'Botin maestro',
+  'hudChrome.masterLoot.enableAria': 'Activar botin maestro',
+  'hudChrome.masterLoot.looterLabel': 'Maestro del botin',
+  'hudChrome.masterLoot.leaderOption': 'Lider del grupo',
+  'hudChrome.masterLoot.thresholdLabel': 'Umbral',
+  'hudChrome.masterLoot.thresholdUncommon': 'Poco comun o superior',
+  'hudChrome.masterLoot.thresholdRare': 'Raro o superior',
+  'hudChrome.masterLoot.thresholdEpic': 'Epico o superior',
+  'hudChrome.masterLoot.assignPrompt': 'Asignar {item}',
+  'hudChrome.masterLoot.assignAria': 'Asignar {item} a {name}',
+  'hudChrome.masterLoot.rollButton': 'Tirar',
+  'hudChrome.masterLoot.selectAll': 'Elegir todos',
+  'hudChrome.masterLoot.methodMaster':
+    'Metodo de botin cambiado a botin maestro. Maestro del botin: {name}.',
+  'hudChrome.masterLoot.methodGroup': 'Metodo de botin cambiado a botin de grupo.',
+  'hudChrome.masterLoot.assigned': '{looter} asigno {item} a {target}.',
+  'hudChrome.masterLoot.unassigned': '{item} no fue asignado y queda libre para todos.',
+  'hudChrome.masterLoot.leaderOnly': 'Solo el lider del grupo puede cambiar el metodo de botin.',
+  'entities.itemSets.crownforged.name': 'Equipo de batalla Forjacorona',
+  'entities.itemSets.crownforged.bonus2': 'Aumenta el poder de ataque en 40.',
+  'entities.itemSets.crownforged.bonus3': 'Aumenta la fuerza en 15 y el aguante en 15.',
+  'entities.itemSets.deathlord.name': 'Equipo de batalla del Señor de la Muerte',
+  'entities.itemSets.deathlord.bonus2': 'Aumenta el poder de ataque en 40.',
+  'entities.itemSets.deathlord.bonus3': 'Aumenta la fuerza en 15 y el aguante en 15.',
+  'entities.itemSets.necromancers.name': 'Vestiduras del nigromante',
+  'entities.itemSets.necromancers.bonus2':
+    'Reduce un 50% el retroceso de lanzamiento causado por daño.',
+  'entities.itemSets.necromancers.bonus3': 'El daño recibido no retrasa tus lanzamientos.',
+  'entities.itemSets.nighttalon.name': 'Atuendo de cuero Garra Nocturna',
+  'entities.itemSets.nighttalon.bonus2': 'Aumenta el poder de ataque en 40.',
+  'entities.itemSets.nighttalon.bonus3':
+    'Aumenta la agilidad en 15 y la probabilidad de crítico en 2%.',
+  'entities.itemSets.soulflame.name': 'Vestiduras de Llama de Alma',
+  'entities.itemSets.soulflame.bonus2':
+    'Reduce un 50% el retroceso de lanzamiento causado por daño.',
+  'entities.itemSets.soulflame.bonus3': 'El daño recibido no retrasa tus lanzamientos.',
+  'entities.itemSets.stormcallers.name': 'Vestiduras del Invocatormentas',
+  'entities.itemSets.stormcallers.bonus2':
+    'Reduce un 50% el retroceso de lanzamiento causado por daño.',
+  'entities.itemSets.stormcallers.bonus3': 'El daño recibido no retrasa tus lanzamientos.',
+  'entities.itemSets.wyrmshadow.name': 'Atuendo de Sombra de Vermis',
+  'entities.itemSets.wyrmshadow.bonus2': 'Aumenta el poder de ataque en 40.',
+  'entities.itemSets.wyrmshadow.bonus3':
+    'Aumenta la agilidad en 15 y la probabilidad de crítico en 2%.',
+  'hudChrome.itemSet.header': '{name} ({have}/{total})',
+  'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
+  'hud.combat.floatingResist': 'Resistido',
+  'hud.combat.resisted': '{target} resiste tu {ability}.',
+  'hudChrome.abilityScaling.bonus': '(+{value})',
+  'hudChrome.itemArmorType.cloth': 'Tela',
+  'hudChrome.itemArmorType.leather': 'Cuero',
+  'hudChrome.itemArmorType.mail': 'Malla',
 };

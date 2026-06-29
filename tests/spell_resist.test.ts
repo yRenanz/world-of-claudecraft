@@ -9,6 +9,7 @@ import { castAbility, updateCasting } from '../src/sim/combat/casting_lifecycle'
 import { isSpellResisted, spellResistChance } from '../src/sim/combat/spell_resist';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { Sim } from '../src/sim/sim';
 import { type Entity, type PlayerClass, spellHitChance } from '../src/sim/types';
 
@@ -50,7 +51,7 @@ function makeSim(cls: PlayerClass, level: number): { sim: AnySim; p: AnyEntity; 
 }
 
 function spawnTarget(sim: AnySim, p: AnyEntity, level: number, dz = 4): AnyEntity {
-  const mob = createMob(sim.nextId++, MOBS['forest_wolf'], level, {
+  const mob = createMob(sim.nextId++, MOBS.forest_wolf, level, {
     x: p.pos.x,
     y: p.pos.y,
     z: p.pos.z + dz,
@@ -79,6 +80,12 @@ describe('spell_resist: cast outcome labeling', () => {
     castAbility(sim.ctx, 'fireball', p.id);
     let n = 0;
     while (p.castingAbility && n++ < 1000) updateCasting(sim.ctx, p, meta);
+    // Fireball is a projectile: its hit roll and damage now resolve on impact, not on
+    // cast. The bolt homes on its (static) target, so step it directly until it lands
+    // (a full sim.tick() would also let the level-60 mob kill the mage mid-flight,
+    // fizzling the projectile before it arrives).
+    for (let i = 0; i < 200 && sim.ctx.pendingProjectiles.length > 0; i++)
+      advancePendingProjectiles(sim.ctx);
 
     const dmg = events.filter((e) => e.type === 'damage' && e.targetId === mob.id);
     expect(dmg.length).toBeGreaterThan(0);

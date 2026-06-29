@@ -222,6 +222,9 @@ export const nl_NL: EnTranslations = {
     "rest": {
       "resting": "Aan het rusten"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Je Held",
       "targetLabel": "Je Doelwit",
@@ -317,7 +320,10 @@ export const nl_NL: EnTranslations = {
       "showWalletOnCharacterScreen": "Portemonnee tonen op personagescherm",
       "showWalletOnPlayerCard": "Portemonnee tonen op spelerskaart",
       "uiScale": "UI-schaal",
-      "highContrastBackground": "Hoog-contrastachtergrond"
+      "highContrastBackground": "Hoog-contrastachtergrond",
+      "showItemLevel": "Itemniveau tonen",
+      "itemLevelLine": "Itemniveau {level}",
+      "itemScoreLine": "Score {score}"
     },
     "controller": {
       "title": "Controller",
@@ -447,6 +453,10 @@ export const nl_NL: EnTranslations = {
     },
     "tips": {
       "joinChannels": "Tip: typ /join world of /join lfg om te chatten met spelers over het hele rijk."
+    },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
     },
     "questShare": {
       "notShareable": "Deze queeste kan niet gedeeld worden.",
@@ -584,6 +594,26 @@ export const nl_NL: EnTranslations = {
       "exportDone": "Je gegevens zijn gedownload. We hebben je een bevestiging gemaild.",
       "exportFailed": "Je gegevens konden niet worden geëxporteerd. Probeer het zo dadelijk opnieuw."
     },
+    "masterLoot": {
+      "title": "Meesterbuit",
+      "enableLabel": "Meesterbuit",
+      "enableAria": "Meesterbuit inschakelen",
+      "looterLabel": "Buitmeester",
+      "leaderOption": "Groepsleider",
+      "thresholdLabel": "Drempel",
+      "thresholdUncommon": "Ongewoon en hoger",
+      "thresholdRare": "Zeldzaam en hoger",
+      "thresholdEpic": "Episch en hoger",
+      "assignPrompt": "{item} toewijzen",
+      "assignAria": "{item} toewijzen aan {name}",
+      "rollButton": "Rollen",
+      "selectAll": "Alles selecteren",
+      "methodMaster": "Buitmethode ingesteld op meesterbuit. Buitmeester: {name}.",
+      "methodGroup": "Buitmethode ingesteld op groepsbuit.",
+      "assigned": "{looter} heeft {item} toegewezen aan {target}.",
+      "unassigned": "{item} is niet toegewezen en is vrij voor iedereen.",
+      "leaderOnly": "Alleen de groepsleider kan de buitmethode wijzigen."
+    },
     "bags": {
       "filterGroupAria": "Tassen filteren op categorie",
       "filterAll": "Alle",
@@ -607,9 +637,9 @@ export const nl_NL: EnTranslations = {
       "tooLarge": "Een raid met meer dan vijf leden kan niet terug omgezet worden naar een groep."
     },
     "itemArmorType": {
-      "cloth": "Cloth",
-      "leather": "Leather",
-      "mail": "Mail"
+      "cloth": "Stof",
+      "leather": "Leer",
+      "mail": "Maliën"
     },
     "auraEffect": {
       "dot": "Brengt elke {interval} s {value} {school}schade toe",
@@ -2719,7 +2749,7 @@ export const nl_NL: EnTranslations = {
     "combat": {
       "floatingMiss": "Mis",
       "floatingDodge": "Ontwijking",
-      "floatingResist": "Resist",
+      "floatingResist": "Weerstaan",
       "cannotMove": "Kan niet bewegen!",
       "attack": "aanval",
       "damageDone": "Je {ability} raakt {target} voor {amount}.",
@@ -2728,7 +2758,7 @@ export const nl_NL: EnTranslations = {
       "damageTakenCrit": "{source} raakt je kritiek voor {amount}.",
       "miss": "Je {ability} mist {target}.",
       "dodged": "Je {ability} wordt ontweken door {target}.",
-      "resisted": "Your {ability} is resisted by {target}.",
+      "resisted": "{target} weerstaat je {ability}.",
       "healSelf": "Je {ability} geneest je voor {amount}.",
       "healSelfCrit": "Je {ability} geneest je kritiek voor {amount}.",
       "healOther": "Je {ability} geneest {target} voor {amount}.",
@@ -3459,7 +3489,7 @@ export const nl_NL: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Arcane Projectielen",
-        "description": "Lanceert Arcane Projectielen op de vijand en veroorzaakt elke seconde 8 Arcane schade gedurende 3 sec."
+        "description": "Lanceert Arcane Projectielen op de vijand en veroorzaakt elke seconde {damage} Arcane schade gedurende 3 sec."
       },
       "polymorph": {
         "name": "Gedaanteverwisseling",
@@ -3707,7 +3737,7 @@ export const nl_NL: EnTranslations = {
       },
       "mind_flay": {
         "name": "Geestesmarteling",
-        "description": "Bestookt de geest van het doelwit met Schaduwenergie en brengt elke seconde 12 schade toe gedurende 3 sec."
+        "description": "Bestookt de geest van het doelwit met Schaduwenergie en brengt elke seconde {damage} schade toe gedurende 3 sec."
       },
       "flash_heal": {
         "name": "Snelle Genezing",
@@ -3783,7 +3813,7 @@ export const nl_NL: EnTranslations = {
       },
       "drain_life": {
         "name": "Leven Aftappen",
-        "description": "Tapt het leven van het doelwit af en draagt elke seconde 7 levenskracht naar je over gedurende 5 sec."
+        "description": "Tapt het leven van het doelwit af en draagt elke seconde {damage} levenskracht naar je over gedurende 5 sec."
       },
       "fear": {
         "name": "Angst",
@@ -6359,6 +6389,43 @@ export const nl_NL: EnTranslations = {
         "name": "Het Ingestorte Reliekschrijn",
         "enterText": "Je daalt af in het ingestorte reliekschrijn.",
         "leaveText": "Je klimt terug omhoog naar Broeder Halven bij de reliekschrijnruïne."
+      }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "Kroongesmede gevechtsuitrusting",
+        "bonus2": "Verhoogt aanvalskracht met 40.",
+        "bonus3": "Verhoogt kracht met 15 en uithoudingsvermogen met 15."
+      },
+      "deathlord": {
+        "name": "Gevechtsuitrusting van de Dodenheer",
+        "bonus2": "Verhoogt aanvalskracht met 40.",
+        "bonus3": "Verhoogt kracht met 15 en uithoudingsvermogen met 15."
+      },
+      "necromancers": {
+        "name": "Gewaden van de necromant",
+        "bonus2": "Vermindert terugslag bij spreuken door schade met 50%.",
+        "bonus3": "Opgelopen schade vertraagt je spreuken niet."
+      },
+      "nighttalon": {
+        "name": "Nachtklauw leren uitrusting",
+        "bonus2": "Verhoogt aanvalskracht met 40.",
+        "bonus3": "Verhoogt behendigheid met 15 en kritieke kans met 2%."
+      },
+      "soulflame": {
+        "name": "Zielenvlamgewaden",
+        "bonus2": "Vermindert terugslag bij spreuken door schade met 50%.",
+        "bonus3": "Opgelopen schade vertraagt je spreuken niet."
+      },
+      "stormcallers": {
+        "name": "Gewaden van de Stormroeper",
+        "bonus2": "Vermindert terugslag bij spreuken door schade met 50%.",
+        "bonus3": "Opgelopen schade vertraagt je spreuken niet."
+      },
+      "wyrmshadow": {
+        "name": "Wurmschaduw-uitrusting",
+        "bonus2": "Verhoogt aanvalskracht met 40.",
+        "bonus3": "Verhoogt behendigheid met 15 en kritieke kans met 2%."
       }
     }
   },

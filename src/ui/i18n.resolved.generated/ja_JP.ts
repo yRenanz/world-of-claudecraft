@@ -222,6 +222,9 @@ export const ja_JP: EnTranslations = {
     "rest": {
       "resting": "休息中"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "あなたのキャラクター",
       "targetLabel": "あなたのターゲット",
@@ -317,7 +320,10 @@ export const ja_JP: EnTranslations = {
       "showWalletOnCharacterScreen": "キャラクター画面にウォレットを表示",
       "showWalletOnPlayerCard": "プレイヤーカードにウォレットを表示",
       "uiScale": "UIスケール",
-      "highContrastBackground": "高コントラスト背景"
+      "highContrastBackground": "高コントラスト背景",
+      "showItemLevel": "アイテムレベルを表示",
+      "itemLevelLine": "アイテムレベル {level}",
+      "itemScoreLine": "スコア {score}"
     },
     "controller": {
       "title": "コントローラー",
@@ -447,6 +453,10 @@ export const ja_JP: EnTranslations = {
     },
     "tips": {
       "joinChannels": "ヒント：/join world または /join lfg と入力すると、レルム全体のプレイヤーとチャットできます。"
+    },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
     },
     "questShare": {
       "notShareable": "このクエストは共有できません。",
@@ -583,6 +593,26 @@ export const ja_JP: EnTranslations = {
       "exportBtn": "データをダウンロード",
       "exportDone": "データをダウンロードしました。確認のメールをお送りしました。",
       "exportFailed": "データをエクスポートできませんでした。しばらくしてからやり直してください。"
+    },
+    "masterLoot": {
+      "title": "マスタールート",
+      "enableLabel": "マスタールート",
+      "enableAria": "マスタールートを有効化",
+      "looterLabel": "分配担当",
+      "leaderOption": "パーティリーダー",
+      "thresholdLabel": "品質しきい値",
+      "thresholdUncommon": "アンコモン以上",
+      "thresholdRare": "レア以上",
+      "thresholdEpic": "エピック以上",
+      "assignPrompt": "{item}を分配",
+      "assignAria": "{item}を{name}に分配",
+      "rollButton": "ロール",
+      "selectAll": "全員選択",
+      "methodMaster": "分配方式をマスタールートに設定しました。分配担当：{name}。",
+      "methodGroup": "分配方式をグループルートに設定しました。",
+      "assigned": "{looter}が{item}を{target}に分配しました。",
+      "unassigned": "{item}は分配されず、誰でも入手できます。",
+      "leaderOnly": "分配方式を変更できるのはパーティリーダーだけです。"
     },
     "bags": {
       "filterGroupAria": "バッグをカテゴリーで絞り込む",
@@ -3459,7 +3489,7 @@ export const ja_JP: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "アーケインミサイル",
-        "description": "敵にアーケインミサイルを放ち、3秒間、毎秒8の秘術ダメージを与えます。"
+        "description": "敵にアーケインミサイルを放ち、3秒間、毎秒{damage}の秘術ダメージを与えます。"
       },
       "polymorph": {
         "name": "ポリモーフ",
@@ -3707,7 +3737,7 @@ export const ja_JP: EnTranslations = {
       },
       "mind_flay": {
         "name": "マインドフレイ",
-        "description": "暗黒エネルギーで対象の精神を攻撃し、3秒間、毎秒12ダメージを与えます。"
+        "description": "暗黒エネルギーで対象の精神を攻撃し、3秒間、毎秒{damage}ダメージを与えます。"
       },
       "flash_heal": {
         "name": "フラッシュヒール",
@@ -3783,7 +3813,7 @@ export const ja_JP: EnTranslations = {
       },
       "drain_life": {
         "name": "ドレインライフ",
-        "description": "対象の生命力を吸収し、5秒間、毎秒7の体力を自分に移します。"
+        "description": "対象の生命力を吸収し、5秒間、毎秒{damage}の体力を自分に移します。"
       },
       "fear": {
         "name": "フィアー",
@@ -6359,6 +6389,43 @@ export const ja_JP: EnTranslations = {
         "name": "崩れた聖遺物庫",
         "enterText": "あなたは崩れた聖遺物庫へと降りていく。",
         "leaveText": "あなたは聖遺物庫の廃墟にいるハルヴェン修道士のもとへ登り戻る。"
+      }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "冠鋳の戦装束",
+        "bonus2": "攻撃力が40上昇します。",
+        "bonus3": "筋力が15、スタミナが15上昇します。"
+      },
+      "deathlord": {
+        "name": "死王の戦装束",
+        "bonus2": "攻撃力が40上昇します。",
+        "bonus3": "筋力が15、スタミナが15上昇します。"
+      },
+      "necromancers": {
+        "name": "死霊術師の法衣",
+        "bonus2": "ダメージによる詠唱押し戻しを50%軽減します。",
+        "bonus3": "詠唱中にダメージを受けても押し戻されません。"
+      },
+      "nighttalon": {
+        "name": "夜爪の革装束",
+        "bonus2": "攻撃力が40上昇します。",
+        "bonus3": "敏捷性が15、クリティカル率が2%上昇します。"
+      },
+      "soulflame": {
+        "name": "魂炎の法衣",
+        "bonus2": "ダメージによる詠唱押し戻しを50%軽減します。",
+        "bonus3": "詠唱中にダメージを受けても押し戻されません。"
+      },
+      "stormcallers": {
+        "name": "嵐呼びの法衣",
+        "bonus2": "ダメージによる詠唱押し戻しを50%軽減します。",
+        "bonus3": "詠唱中にダメージを受けても押し戻されません。"
+      },
+      "wyrmshadow": {
+        "name": "竜影の装束",
+        "bonus2": "攻撃力が40上昇します。",
+        "bonus3": "敏捷性が15、クリティカル率が2%上昇します。"
       }
     }
   },

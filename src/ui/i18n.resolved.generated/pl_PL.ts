@@ -222,6 +222,9 @@ export const pl_PL: EnTranslations = {
     "rest": {
       "resting": "Odpoczynek"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Twój bohater",
       "targetLabel": "Twój cel",
@@ -317,7 +320,10 @@ export const pl_PL: EnTranslations = {
       "showWalletOnCharacterScreen": "Pokaż sakiewkę na ekranie postaci",
       "showWalletOnPlayerCard": "Pokaż sakiewkę na karcie gracza",
       "uiScale": "Skala interfejsu",
-      "highContrastBackground": "Tło o wysokim kontraście"
+      "highContrastBackground": "Tło o wysokim kontraście",
+      "showItemLevel": "Pokaż poziom przedmiotu",
+      "itemLevelLine": "Poziom przedmiotu {level}",
+      "itemScoreLine": "Ocena {score}"
     },
     "controller": {
       "title": "Kontroler",
@@ -447,6 +453,10 @@ export const pl_PL: EnTranslations = {
     },
     "tips": {
       "joinChannels": "Wskazówka: wpisz /join world lub /join lfg, aby rozmawiać z graczami z całego realmu."
+    },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
     },
     "questShare": {
       "notShareable": "Tego zadania nie można udostępnić.",
@@ -584,6 +594,26 @@ export const pl_PL: EnTranslations = {
       "exportDone": "Twoje dane zostały pobrane. Wysłaliśmy ci potwierdzenie e-mailem.",
       "exportFailed": "Nie udało się wyeksportować twoich danych. Spróbuj ponownie za chwilę."
     },
+    "masterLoot": {
+      "title": "Mistrz lupow",
+      "enableLabel": "Mistrz lupow",
+      "enableAria": "Wlacz mistrza lupow",
+      "looterLabel": "Mistrz lupow",
+      "leaderOption": "Przywodca grupy",
+      "thresholdLabel": "Prog",
+      "thresholdUncommon": "Niezwykle i wyzej",
+      "thresholdRare": "Rzadkie i wyzej",
+      "thresholdEpic": "Epickie i wyzej",
+      "assignPrompt": "Przydziel {item}",
+      "assignAria": "Przydziel {item} graczowi {name}",
+      "rollButton": "Rzut",
+      "selectAll": "Zaznacz wszystko",
+      "methodMaster": "Metoda lupow ustawiona na mistrza lupow. Mistrz lupow: {name}.",
+      "methodGroup": "Metoda lupow ustawiona na lup grupowy.",
+      "assigned": "{looter} przydzielil {item} graczowi {target}.",
+      "unassigned": "{item} nie zostal przydzielony i jest wolny dla wszystkich.",
+      "leaderOnly": "Tylko przywodca grupy moze zmienic metode lupow."
+    },
     "bags": {
       "filterGroupAria": "Filtruj torby według kategorii",
       "filterAll": "Wszystko",
@@ -607,9 +637,9 @@ export const pl_PL: EnTranslations = {
       "tooLarge": "Rajd liczący ponad pięciu członków nie może zostać przekształcony z powrotem w drużynę."
     },
     "itemArmorType": {
-      "cloth": "Cloth",
-      "leather": "Leather",
-      "mail": "Mail"
+      "cloth": "Tkanina",
+      "leather": "Skóra",
+      "mail": "Kolczuga"
     },
     "auraEffect": {
       "dot": "Zadaje {value} obrażeń od {school} co {interval} s",
@@ -2719,7 +2749,7 @@ export const pl_PL: EnTranslations = {
     "combat": {
       "floatingMiss": "Pudło",
       "floatingDodge": "Unik",
-      "floatingResist": "Resist",
+      "floatingResist": "Odparto",
       "cannotMove": "Nie można się ruszyć!",
       "attack": "atak",
       "damageDone": "Twój {ability} trafia {target}, zadając {amount}.",
@@ -2728,7 +2758,7 @@ export const pl_PL: EnTranslations = {
       "damageTakenCrit": "{source} trafia cię krytycznie, zadając {amount}.",
       "miss": "Twój {ability} chybia {target}.",
       "dodged": "Twój {ability} zostaje uniknięty przez {target}.",
-      "resisted": "Your {ability} is resisted by {target}.",
+      "resisted": "{target} odpiera twoje {ability}.",
       "healSelf": "Twój {ability} leczy cię o {amount}.",
       "healSelfCrit": "Twój {ability} leczy cię krytycznie o {amount}.",
       "healOther": "Twój {ability} leczy {target} o {amount}.",
@@ -3459,7 +3489,7 @@ export const pl_PL: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Arkaniczne pociski",
-        "description": "Wystrzeliwuje arkaniczne pociski we wroga, zadając 8 obrażeń arkanicznych co sekundę przez 3 sek."
+        "description": "Wystrzeliwuje arkaniczne pociski we wroga, zadając {damage} obrażeń arkanicznych co sekundę przez 3 sek."
       },
       "polymorph": {
         "name": "Polimorfia",
@@ -3707,7 +3737,7 @@ export const pl_PL: EnTranslations = {
       },
       "mind_flay": {
         "name": "Smaganie umysłu",
-        "description": "Naciera na umysł celu energią cienia, zadając 12 obrażeń co sekundę przez 3 sek."
+        "description": "Naciera na umysł celu energią cienia, zadając {damage} obrażeń co sekundę przez 3 sek."
       },
       "flash_heal": {
         "name": "Błyskawiczne leczenie",
@@ -3783,7 +3813,7 @@ export const pl_PL: EnTranslations = {
       },
       "drain_life": {
         "name": "Wyssanie życia",
-        "description": "Wysysa życie celu, przekazując ci 7 zdrowia co sekundę przez 5 sek."
+        "description": "Wysysa życie celu, przekazując ci {damage} zdrowia co sekundę przez 5 sek."
       },
       "fear": {
         "name": "Strach",
@@ -6359,6 +6389,43 @@ export const pl_PL: EnTranslations = {
         "name": "Zawalony Relikwiarz",
         "enterText": "Schodzisz do zawalonego relikwiarza.",
         "leaveText": "Wspinasz się z powrotem do Brata Halvena przy ruinie relikwiarza."
+      }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "Koronokuty rynsztunek bojowy",
+        "bonus2": "Zwiększa siłę ataku o 40.",
+        "bonus3": "Zwiększa siłę o 15 i wytrzymałość o 15."
+      },
+      "deathlord": {
+        "name": "Rynsztunek bojowy Władcy Śmierci",
+        "bonus2": "Zwiększa siłę ataku o 40.",
+        "bonus3": "Zwiększa siłę o 15 i wytrzymałość o 15."
+      },
+      "necromancers": {
+        "name": "Szaty nekromanty",
+        "bonus2": "Zmniejsza opóźnianie zaklęć przez obrażenia o 50%.",
+        "bonus3": "Otrzymywane obrażenia nie opóźniają rzucania zaklęć."
+      },
+      "nighttalon": {
+        "name": "Skórzany rynsztunek Nocnego Szpona",
+        "bonus2": "Zwiększa siłę ataku o 40.",
+        "bonus3": "Zwiększa zręczność o 15 i szansę na trafienie krytyczne o 2%."
+      },
+      "soulflame": {
+        "name": "Szaty Płomienia Duszy",
+        "bonus2": "Zmniejsza opóźnianie zaklęć przez obrażenia o 50%.",
+        "bonus3": "Otrzymywane obrażenia nie opóźniają rzucania zaklęć."
+      },
+      "stormcallers": {
+        "name": "Szaty Przyzywacza Burz",
+        "bonus2": "Zmniejsza opóźnianie zaklęć przez obrażenia o 50%.",
+        "bonus3": "Otrzymywane obrażenia nie opóźniają rzucania zaklęć."
+      },
+      "wyrmshadow": {
+        "name": "Rynsztunek Cienia Żmija",
+        "bonus2": "Zwiększa siłę ataku o 40.",
+        "bonus3": "Zwiększa zręczność o 15 i szansę na trafienie krytyczne o 2%."
       }
     }
   },

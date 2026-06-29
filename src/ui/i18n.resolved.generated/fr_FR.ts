@@ -222,6 +222,9 @@ export const fr_FR: EnTranslations = {
     "rest": {
       "resting": "Au repos"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Votre personnage",
       "targetLabel": "Votre cible",
@@ -317,7 +320,10 @@ export const fr_FR: EnTranslations = {
       "showWalletOnCharacterScreen": "Afficher le portefeuille sur l’écran des personnages",
       "showWalletOnPlayerCard": "Afficher le portefeuille sur la carte de joueur",
       "uiScale": "Échelle de l’interface",
-      "highContrastBackground": "Arrière-plan à contraste élevé"
+      "highContrastBackground": "Arrière-plan à contraste élevé",
+      "showItemLevel": "Afficher le niveau d'objet",
+      "itemLevelLine": "Niveau d'objet {level}",
+      "itemScoreLine": "Score {score}"
     },
     "controller": {
       "title": "Manette",
@@ -447,6 +453,10 @@ export const fr_FR: EnTranslations = {
     },
     "tips": {
       "joinChannels": "Conseil : tapez /join world ou /join lfg pour discuter avec les joueurs de tout le royaume."
+    },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
     },
     "questShare": {
       "notShareable": "Cette quête ne peut pas être partagée.",
@@ -584,6 +594,26 @@ export const fr_FR: EnTranslations = {
       "exportDone": "Vos données ont été téléchargées. Nous vous avons envoyé une confirmation par e-mail.",
       "exportFailed": "Impossible d'exporter vos données. Réessayez dans un moment."
     },
+    "masterLoot": {
+      "title": "Butin de maitre",
+      "enableLabel": "Butin de maitre",
+      "enableAria": "Activer le butin de maitre",
+      "looterLabel": "Maitre du butin",
+      "leaderOption": "Chef de groupe",
+      "thresholdLabel": "Seuil",
+      "thresholdUncommon": "Inhabituel et plus",
+      "thresholdRare": "Rare et plus",
+      "thresholdEpic": "Epique et plus",
+      "assignPrompt": "Attribuer {item}",
+      "assignAria": "Attribuer {item} a {name}",
+      "rollButton": "Tirer au sort",
+      "selectAll": "Tout selectionner",
+      "methodMaster": "Mode de butin defini sur butin de maitre. Maitre du butin: {name}.",
+      "methodGroup": "Mode de butin defini sur butin de groupe.",
+      "assigned": "{looter} a attribue {item} a {target}.",
+      "unassigned": "{item} n a pas ete attribue et devient libre pour tous.",
+      "leaderOnly": "Seul le chef de groupe peut changer le mode de butin."
+    },
     "bags": {
       "filterGroupAria": "Filtrer les sacs par catégorie",
       "filterAll": "Tous",
@@ -607,9 +637,9 @@ export const fr_FR: EnTranslations = {
       "tooLarge": "Un raid de plus de cinq membres ne peut pas être reconverti en groupe."
     },
     "itemArmorType": {
-      "cloth": "Cloth",
-      "leather": "Leather",
-      "mail": "Mail"
+      "cloth": "Tissu",
+      "leather": "Cuir",
+      "mail": "Mailles"
     },
     "auraEffect": {
       "dot": "Inflige {value} points de dégâts de {school} toutes les {interval} s",
@@ -2719,7 +2749,7 @@ export const fr_FR: EnTranslations = {
     "combat": {
       "floatingMiss": "Raté",
       "floatingDodge": "Esquive",
-      "floatingResist": "Resist",
+      "floatingResist": "Résisté",
       "cannotMove": "Immobilisé !",
       "attack": "attaque",
       "damageDone": "Votre {ability} touche {target} pour {amount}.",
@@ -2728,7 +2758,7 @@ export const fr_FR: EnTranslations = {
       "damageTakenCrit": "{source} vous inflige un coup critique pour {amount}.",
       "miss": "Votre {ability} rate {target}.",
       "dodged": "{target} esquive votre {ability}.",
-      "resisted": "Your {ability} is resisted by {target}.",
+      "resisted": "{target} résiste à votre {ability}.",
       "healSelf": "Votre {ability} vous rend {amount} points de vie.",
       "healSelfCrit": "Votre {ability} vous rend un soin critique de {amount}.",
       "healOther": "Votre {ability} soigne {target} pour {amount}.",
@@ -3459,7 +3489,7 @@ export const fr_FR: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Projectiles des Arcanes",
-        "description": "Lance des Projectiles des Arcanes sur l'ennemi et inflige 8 points de dégâts des Arcanes chaque seconde pendant 3 s."
+        "description": "Lance des Projectiles des Arcanes sur l'ennemi et inflige {damage} points de dégâts des Arcanes chaque seconde pendant 3 s."
       },
       "polymorph": {
         "name": "Métamorphose",
@@ -3707,7 +3737,7 @@ export const fr_FR: EnTranslations = {
       },
       "mind_flay": {
         "name": "Fouet mental",
-        "description": "Assaille l'esprit de la cible avec de l'énergie d'Ombre et inflige 12 points de dégâts chaque seconde pendant 3 s."
+        "description": "Assaille l'esprit de la cible avec de l'énergie d'Ombre et inflige {damage} points de dégâts chaque seconde pendant 3 s."
       },
       "flash_heal": {
         "name": "Soins rapides",
@@ -3783,7 +3813,7 @@ export const fr_FR: EnTranslations = {
       },
       "drain_life": {
         "name": "Drain de vie",
-        "description": "Draine la vie de la cible et vous transfère 7 points de vie chaque seconde pendant 5 s."
+        "description": "Draine la vie de la cible et vous transfère {damage} points de vie chaque seconde pendant 5 s."
       },
       "fear": {
         "name": "Peur",
@@ -6359,6 +6389,43 @@ export const fr_FR: EnTranslations = {
         "name": "Le Reliquaire effondré",
         "enterText": "Vous descendez dans le reliquaire effondré.",
         "leaveText": "Vous remontez auprès du frère Halven, à la ruine du reliquaire."
+      }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "Tenue de guerre Couronneforge",
+        "bonus2": "Augmente la puissance d'attaque de 40.",
+        "bonus3": "Augmente la force de 15 et l'endurance de 15."
+      },
+      "deathlord": {
+        "name": "Tenue de guerre du seigneur de la mort",
+        "bonus2": "Augmente la puissance d'attaque de 40.",
+        "bonus3": "Augmente la force de 15 et l'endurance de 15."
+      },
+      "necromancers": {
+        "name": "Robe du nécromancien",
+        "bonus2": "Réduit de 50% le recul des incantations causé par les dégâts.",
+        "bonus3": "Les dégâts subis ne retardent pas l'incantation."
+      },
+      "nighttalon": {
+        "name": "Tenue de cuir Serre-nuit",
+        "bonus2": "Augmente la puissance d'attaque de 40.",
+        "bonus3": "Augmente l’agilité de 15 et les chances de critique de 2%."
+      },
+      "soulflame": {
+        "name": "Robe de Flamme d’âme",
+        "bonus2": "Réduit de 50% le recul des incantations causé par les dégâts.",
+        "bonus3": "Les dégâts subis ne retardent pas l'incantation."
+      },
+      "stormcallers": {
+        "name": "Robe de l’Appel-tempête",
+        "bonus2": "Réduit de 50% le recul des incantations causé par les dégâts.",
+        "bonus3": "Les dégâts subis ne retardent pas l'incantation."
+      },
+      "wyrmshadow": {
+        "name": "Tenue d’Ombre-drake",
+        "bonus2": "Augmente la puissance d'attaque de 40.",
+        "bonus3": "Augmente l’agilité de 15 et les chances de critique de 2%."
       }
     }
   },

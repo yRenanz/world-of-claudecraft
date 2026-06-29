@@ -222,6 +222,9 @@ export const zh_CN: EnTranslations = {
     "rest": {
       "resting": "休息中"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "你的角色",
       "targetLabel": "你的目标",
@@ -317,7 +320,10 @@ export const zh_CN: EnTranslations = {
       "showWalletOnCharacterScreen": "在角色界面显示钱包",
       "showWalletOnPlayerCard": "在玩家卡片显示钱包",
       "uiScale": "界面缩放",
-      "highContrastBackground": "高对比度背景"
+      "highContrastBackground": "高对比度背景",
+      "showItemLevel": "显示物品等级",
+      "itemLevelLine": "物品等级 {level}",
+      "itemScoreLine": "评分 {score}"
     },
     "controller": {
       "title": "手柄",
@@ -447,6 +453,10 @@ export const zh_CN: EnTranslations = {
     },
     "tips": {
       "joinChannels": "提示：输入 /join world 或 /join lfg，与全服玩家聊天。"
+    },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
     },
     "questShare": {
       "notShareable": "该任务无法分享。",
@@ -583,6 +593,26 @@ export const zh_CN: EnTranslations = {
       "exportBtn": "下载我的数据",
       "exportDone": "你的数据已下载。我们已向你发送确认邮件。",
       "exportFailed": "无法导出你的数据。请稍后重试。"
+    },
+    "masterLoot": {
+      "title": "队长分配",
+      "enableLabel": "队长分配",
+      "enableAria": "启用队长分配",
+      "looterLabel": "分配者",
+      "leaderOption": "队长",
+      "thresholdLabel": "品质门槛",
+      "thresholdUncommon": "优秀及以上",
+      "thresholdRare": "稀有及以上",
+      "thresholdEpic": "史诗及以上",
+      "assignPrompt": "分配{item}",
+      "assignAria": "将{item}分配给{name}",
+      "rollButton": "掷骰",
+      "selectAll": "全选",
+      "methodMaster": "拾取方式已设为队长分配。分配者：{name}。",
+      "methodGroup": "拾取方式已设为小队拾取。",
+      "assigned": "{looter}将{item}分配给了{target}。",
+      "unassigned": "{item}未被分配，现可自由拾取。",
+      "leaderOnly": "只有队长才能更改拾取方式。"
     },
     "bags": {
       "filterGroupAria": "按类别筛选背包",
@@ -3459,7 +3489,7 @@ export const zh_CN: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "奥术飞弹",
-        "description": "向敌人发射奥术飞弹，持续 3 秒，每秒造成 8 点奥术伤害。"
+        "description": "向敌人发射奥术飞弹，持续 3 秒，每秒造成 {damage} 点奥术伤害。"
       },
       "polymorph": {
         "name": "变形术",
@@ -3707,7 +3737,7 @@ export const zh_CN: EnTranslations = {
       },
       "mind_flay": {
         "name": "精神鞭笞",
-        "description": "用暗影能量攻击目标的心灵，持续 3 秒，每秒造成 12 点伤害。"
+        "description": "用暗影能量攻击目标的心灵，持续 3 秒，每秒造成 {damage} 点伤害。"
       },
       "flash_heal": {
         "name": "快速治疗",
@@ -3783,7 +3813,7 @@ export const zh_CN: EnTranslations = {
       },
       "drain_life": {
         "name": "吸取生命",
-        "description": "吸取目标的生命，持续 5 秒，每秒向你转移 7 点生命值。"
+        "description": "吸取目标的生命，持续 5 秒，每秒向你转移 {damage} 点生命值。"
       },
       "fear": {
         "name": "恐惧",
@@ -6359,6 +6389,43 @@ export const zh_CN: EnTranslations = {
         "name": "坍塌的圣物库",
         "enterText": "你向下深入坍塌的圣物库。",
         "leaveText": "你攀回圣物库废墟旁的哈尔文修士身边。"
+      }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "铸冠战装",
+        "bonus2": "攻击强度提高 40 点。",
+        "bonus3": "力量提高 15 点，耐力提高 15 点。"
+      },
+      "deathlord": {
+        "name": "死王战甲",
+        "bonus2": "攻击强度提高 40 点。",
+        "bonus3": "力量提高 15 点，耐力提高 15 点。"
+      },
+      "necromancers": {
+        "name": "死灵法师法衣",
+        "bonus2": "受到伤害造成的施法延退降低 50%。",
+        "bonus3": "施法时不会因受到伤害而被延退。"
+      },
+      "nighttalon": {
+        "name": "夜爪皮甲",
+        "bonus2": "攻击强度提高 40 点。",
+        "bonus3": "敏捷提高 15 点，致命一击几率提高 2%。"
+      },
+      "soulflame": {
+        "name": "魂焰法衣",
+        "bonus2": "受到伤害造成的施法延退降低 50%。",
+        "bonus3": "施法时不会因受到伤害而被延退。"
+      },
+      "stormcallers": {
+        "name": "唤雷者法衣",
+        "bonus2": "受到伤害造成的施法延退降低 50%。",
+        "bonus3": "施法时不会因受到伤害而被延退。"
+      },
+      "wyrmshadow": {
+        "name": "龙影外衣",
+        "bonus2": "攻击强度提高 40 点。",
+        "bonus3": "敏捷提高 15 点，致命一击几率提高 2%。"
       }
     }
   },

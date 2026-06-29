@@ -9,108 +9,24 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
-  ],
-  "es_ES": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
-  ],
-  "fr_FR": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
-  ],
-  "fr_CA": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
-  ],
-  "de_DE": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
-  ],
+  "it_IT": [],
+  "de_DE": [],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
-  ],
+  "pt_BR": [],
   "ru_RU": [],
-  "nl_NL": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
-  ],
-  "pl_PL": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
-  ],
-  "id_ID": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
-  ],
-  "tr_TR": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
-  ],
-  "sv_SE": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
-  ],
-  "vi_VN": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
-  ],
-  "da_DK": [
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
-  ]
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

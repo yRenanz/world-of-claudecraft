@@ -239,6 +239,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.playerCard.showWalletBadge': 'Mostra distintivo portafoglio',
   'hudChrome.options.uiScale': "Scala dell'interfaccia",
   'hudChrome.options.highContrastBackground': 'Sfondo a contrasto elevato',
+  'hudChrome.options.showItemLevel': 'Mostra livello oggetto',
+  'hudChrome.options.itemLevelLine': 'Livello oggetto {level}',
+  'hudChrome.options.itemScoreLine': 'Punteggio {score}',
   'hudChrome.landing.highContrast': 'Contrasto elevato',
   'hudChrome.landing.highContrastAria':
     'Attiva/disattiva lo sfondo a contrasto elevato: disabilita il trailer in movimento per mantenere leggibile il testo della schermata iniziale',
@@ -1645,7 +1648,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Investe il nemico per {damage} danni da Fuoco. Istantaneo.',
   'entities.abilities.arcane_missiles.name': 'Dardi Arcani',
   'entities.abilities.arcane_missiles.description':
-    'Lancia Dardi Arcani contro il nemico, infliggendo 8 danni Arcani ogni secondo per 3 s.',
+    'Lancia Dardi Arcani contro il nemico, infliggendo {damage} danni Arcani ogni secondo per 3 s.',
   'entities.abilities.polymorph.name': 'Metamorfosi',
   'entities.abilities.polymorph.description':
     "Trasforma il nemico in una pecora per un massimo di 15 s. La pecora vaga e guarisce rapidamente. Qualsiasi danno interrompe l'effetto. Solo bestie e umanoidi.",
@@ -1822,7 +1825,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Una preghiera lenta ma potente che cura un bersaglio alleato di {damage}.',
   'entities.abilities.mind_flay.name': 'Flagello Mentale',
   'entities.abilities.mind_flay.description':
-    "Assale la mente del bersaglio con energia d'Ombra, infliggendo 12 danni ogni secondo per 3 s.",
+    "Assale la mente del bersaglio con energia d'Ombra, infliggendo {damage} danni ogni secondo per 3 s.",
   'entities.abilities.flash_heal.name': 'Cura Rapida',
   'entities.abilities.flash_heal.description':
     'Una preghiera veloce che cura un bersaglio alleato di {damage}.',
@@ -1877,7 +1880,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Maledice il bersaglio con agonia: {damage} danni da Ombra in 24 s.',
   'entities.abilities.drain_life.name': 'Risucchio di Vita',
   'entities.abilities.drain_life.description':
-    'Risucchia la vita del bersaglio, trasferendoti 7 salute ogni secondo per 5 s.',
+    'Risucchia la vita del bersaglio, trasferendoti {damage} salute ogni secondo per 5 s.',
   'entities.abilities.fear.name': 'Paura',
   'entities.abilities.fear.description':
     "Terrorizza il nemico, lasciandolo tremante per un massimo di 8 s. Qualsiasi danno interrompe l'effetto.",
@@ -4762,4 +4765,56 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.school.shadow': 'Ombra',
   'hudChrome.auraEffect.school.holy': 'Sacro',
   'hudChrome.auraEffect.school.nature': 'Natura',
+  'hudChrome.masterLoot.title': 'Bottino maestro',
+  'hudChrome.masterLoot.enableLabel': 'Bottino maestro',
+  'hudChrome.masterLoot.enableAria': 'Attiva bottino maestro',
+  'hudChrome.masterLoot.looterLabel': 'Maestro del bottino',
+  'hudChrome.masterLoot.leaderOption': 'Capogruppo',
+  'hudChrome.masterLoot.thresholdLabel': 'Soglia',
+  'hudChrome.masterLoot.thresholdUncommon': 'Non comune e superiore',
+  'hudChrome.masterLoot.thresholdRare': 'Raro e superiore',
+  'hudChrome.masterLoot.thresholdEpic': 'Epico e superiore',
+  'hudChrome.masterLoot.assignPrompt': 'Assegna {item}',
+  'hudChrome.masterLoot.assignAria': 'Assegna {item} a {name}',
+  'hudChrome.masterLoot.rollButton': 'Tira',
+  'hudChrome.masterLoot.selectAll': 'Seleziona tutto',
+  'hudChrome.masterLoot.methodMaster':
+    'Metodo bottino impostato su bottino maestro. Maestro del bottino: {name}.',
+  'hudChrome.masterLoot.methodGroup': 'Metodo bottino impostato su bottino di gruppo.',
+  'hudChrome.masterLoot.assigned': '{looter} ha assegnato {item} a {target}.',
+  'hudChrome.masterLoot.unassigned': '{item} non e stato assegnato ed e libero per tutti.',
+  'hudChrome.masterLoot.leaderOnly': 'Solo il capogruppo puo cambiare il metodo bottino.',
+  'entities.itemSets.crownforged.name': 'Tenuta da battaglia Forgiacorona',
+  'entities.itemSets.crownforged.bonus2': "Aumenta la potenza d'attacco di 40.",
+  'entities.itemSets.crownforged.bonus3': 'Aumenta la forza di 15 e la vigoria di 15.',
+  'entities.itemSets.deathlord.name': 'Tenuta da battaglia del Signore della Morte',
+  'entities.itemSets.deathlord.bonus2': "Aumenta la potenza d'attacco di 40.",
+  'entities.itemSets.deathlord.bonus3': 'Aumenta la forza di 15 e la vigoria di 15.',
+  'entities.itemSets.necromancers.name': 'Vesti del negromante',
+  'entities.itemSets.necromancers.bonus2': 'Riduce del 50% il ritardo al lancio causato dai danni.',
+  'entities.itemSets.necromancers.bonus3':
+    'I danni subiti non ritardano il lancio degli incantesimi.',
+  'entities.itemSets.nighttalon.name': 'Tenuta di cuoio Artiglio Notturno',
+  'entities.itemSets.nighttalon.bonus2': "Aumenta la potenza d'attacco di 40.",
+  'entities.itemSets.nighttalon.bonus3':
+    'Aumenta l’agilità di 15 e la probabilità di critico del 2%.',
+  'entities.itemSets.soulflame.name': 'Vesti Fiamma dell’Anima',
+  'entities.itemSets.soulflame.bonus2': 'Riduce del 50% il ritardo al lancio causato dai danni.',
+  'entities.itemSets.soulflame.bonus3': 'I danni subiti non ritardano il lancio degli incantesimi.',
+  'entities.itemSets.stormcallers.name': 'Vesti del Chiamatempeste',
+  'entities.itemSets.stormcallers.bonus2': 'Riduce del 50% il ritardo al lancio causato dai danni.',
+  'entities.itemSets.stormcallers.bonus3':
+    'I danni subiti non ritardano il lancio degli incantesimi.',
+  'entities.itemSets.wyrmshadow.name': 'Tenuta Ombra del Dragone',
+  'entities.itemSets.wyrmshadow.bonus2': "Aumenta la potenza d'attacco di 40.",
+  'entities.itemSets.wyrmshadow.bonus3':
+    'Aumenta l’agilità di 15 e la probabilità di critico del 2%.',
+  'hudChrome.itemSet.header': '{name} ({have}/{total})',
+  'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
+  'hud.combat.floatingResist': 'Resistito',
+  'hud.combat.resisted': '{target} resiste al tuo {ability}.',
+  'hudChrome.abilityScaling.bonus': '(+{value})',
+  'hudChrome.itemArmorType.cloth': 'Stoffa',
+  'hudChrome.itemArmorType.leather': 'Cuoio',
+  'hudChrome.itemArmorType.mail': 'Maglia',
 };

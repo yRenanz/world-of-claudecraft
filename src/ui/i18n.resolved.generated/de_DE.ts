@@ -222,6 +222,9 @@ export const de_DE: EnTranslations = {
     "rest": {
       "resting": "Erholung"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
     "unitFrame": {
       "playerLabel": "Euer Charakter",
       "targetLabel": "Euer Ziel",
@@ -317,7 +320,10 @@ export const de_DE: EnTranslations = {
       "showWalletOnCharacterScreen": "Wallet auf dem Charakterbildschirm anzeigen",
       "showWalletOnPlayerCard": "Wallet auf der Spielerkarte anzeigen",
       "uiScale": "UI-Skalierung",
-      "highContrastBackground": "Hintergrund mit hohem Kontrast"
+      "highContrastBackground": "Hintergrund mit hohem Kontrast",
+      "showItemLevel": "Gegenstandsstufe anzeigen",
+      "itemLevelLine": "Gegenstandsstufe {level}",
+      "itemScoreLine": "Wertung {score}"
     },
     "controller": {
       "title": "Controller",
@@ -447,6 +453,10 @@ export const de_DE: EnTranslations = {
     },
     "tips": {
       "joinChannels": "Tipp: Gebt /join world oder /join lfg ein, um mit Spielern im ganzen Realm zu chatten."
+    },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
     },
     "questShare": {
       "notShareable": "Diese Quest kann nicht geteilt werden.",
@@ -584,6 +594,26 @@ export const de_DE: EnTranslations = {
       "exportDone": "Eure Daten wurden heruntergeladen. Wir haben Euch eine Bestätigung per E-Mail gesendet.",
       "exportFailed": "Eure Daten konnten nicht exportiert werden. Versucht es gleich noch einmal."
     },
+    "masterLoot": {
+      "title": "Pluendermeister",
+      "enableLabel": "Pluendermeister",
+      "enableAria": "Pluendermeister aktivieren",
+      "looterLabel": "Pluendermeister",
+      "leaderOption": "Gruppenleiter",
+      "thresholdLabel": "Schwelle",
+      "thresholdUncommon": "Ungewoehnlich und hoeher",
+      "thresholdRare": "Selten und hoeher",
+      "thresholdEpic": "Episch und hoeher",
+      "assignPrompt": "{item} zuweisen",
+      "assignAria": "{item} an {name} zuweisen",
+      "rollButton": "Wuerfeln",
+      "selectAll": "Alle auswaehlen",
+      "methodMaster": "Beutemethode auf Pluendermeister gesetzt. Pluendermeister: {name}.",
+      "methodGroup": "Beutemethode auf Gruppenbeute gesetzt.",
+      "assigned": "{looter} hat {item} an {target} zugewiesen.",
+      "unassigned": "{item} wurde nicht zugewiesen und ist fuer alle frei.",
+      "leaderOnly": "Nur der Gruppenleiter kann die Beutemethode aendern."
+    },
     "bags": {
       "filterGroupAria": "Taschen nach Kategorie filtern",
       "filterAll": "Alle",
@@ -607,9 +637,9 @@ export const de_DE: EnTranslations = {
       "tooLarge": "Ein Schlachtzug mit mehr als fünf Mitgliedern kann nicht wieder in eine Gruppe umgewandelt werden."
     },
     "itemArmorType": {
-      "cloth": "Cloth",
-      "leather": "Leather",
-      "mail": "Mail"
+      "cloth": "Stoff",
+      "leather": "Leder",
+      "mail": "Kette"
     },
     "auraEffect": {
       "dot": "Verursacht alle {interval} s {value} {school}schaden",
@@ -2719,7 +2749,7 @@ export const de_DE: EnTranslations = {
     "combat": {
       "floatingMiss": "Verfehlt",
       "floatingDodge": "Ausgewichen",
-      "floatingResist": "Resist",
+      "floatingResist": "Widerstand",
       "cannotMove": "Bewegungsunfähig!",
       "attack": "Angriff",
       "damageDone": "Euer {ability} trifft {target} für {amount}.",
@@ -2728,7 +2758,7 @@ export const de_DE: EnTranslations = {
       "damageTakenCrit": "{source} trifft Euch kritisch für {amount}.",
       "miss": "Euer {ability} verfehlt {target}.",
       "dodged": "{target} weicht Eurem {ability} aus.",
-      "resisted": "Your {ability} is resisted by {target}.",
+      "resisted": "{target} widersteht Eurem {ability}.",
       "healSelf": "Euer {ability} heilt Euch um {amount}.",
       "healSelfCrit": "Euer {ability} heilt Euch kritisch um {amount}.",
       "healOther": "Euer {ability} heilt {target} um {amount}.",
@@ -3459,7 +3489,7 @@ export const de_DE: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Arkane Geschosse",
-        "description": "Schleudert Arkane Geschosse auf den Gegner und verursacht 3 Sek. lang jede Sekunde 8 Arkanschaden."
+        "description": "Schleudert Arkane Geschosse auf den Gegner und verursacht 3 Sek. lang jede Sekunde {damage} Arkanschaden."
       },
       "polymorph": {
         "name": "Verwandlung",
@@ -3707,7 +3737,7 @@ export const de_DE: EnTranslations = {
       },
       "mind_flay": {
         "name": "Gedankenschinden",
-        "description": "Greift den Geist des Ziels mit Schattenenergie an und verursacht 3 Sek. lang jede Sekunde 12 Schaden."
+        "description": "Greift den Geist des Ziels mit Schattenenergie an und verursacht 3 Sek. lang jede Sekunde {damage} Schaden."
       },
       "flash_heal": {
         "name": "Blitzheilung",
@@ -3783,7 +3813,7 @@ export const de_DE: EnTranslations = {
       },
       "drain_life": {
         "name": "Blutsauger",
-        "description": "Entzieht dem Ziel Leben und überträgt euch 5 Sek. lang jede Sekunde 7 Gesundheit."
+        "description": "Entzieht dem Ziel Leben und überträgt euch 5 Sek. lang jede Sekunde {damage} Gesundheit."
       },
       "fear": {
         "name": "Furcht",
@@ -6359,6 +6389,43 @@ export const de_DE: EnTranslations = {
         "name": "Das Eingestürzte Reliquiar",
         "enterText": "Du steigst hinab in das eingestürzte Reliquiar.",
         "leaveText": "Du kletterst zurück zu Bruder Halven bei der Reliquiarruine."
+      }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "Kronengeschmiedete Kriegstracht",
+        "bonus2": "Erhöht Angriffskraft um 40.",
+        "bonus3": "Erhöht Stärke um 15 und Ausdauer um 15."
+      },
+      "deathlord": {
+        "name": "Kriegstracht des Todesfürsten",
+        "bonus2": "Erhöht Angriffskraft um 40.",
+        "bonus3": "Erhöht Stärke um 15 und Ausdauer um 15."
+      },
+      "necromancers": {
+        "name": "Gewänder des Nekromanten",
+        "bonus2": "Verringert Zauberrückstoß durch Schaden um 50%.",
+        "bonus3": "Erlittener Schaden verzögert das Zauberwirken nicht."
+      },
+      "nighttalon": {
+        "name": "Nachtkrallen-Ledertracht",
+        "bonus2": "Erhöht Angriffskraft um 40.",
+        "bonus3": "Erhöht Beweglichkeit um 15 und kritische Trefferchance um 2%."
+      },
+      "soulflame": {
+        "name": "Seelenflammengewänder",
+        "bonus2": "Verringert Zauberrückstoß durch Schaden um 50%.",
+        "bonus3": "Erlittener Schaden verzögert das Zauberwirken nicht."
+      },
+      "stormcallers": {
+        "name": "Gewänder des Sturmrufers",
+        "bonus2": "Verringert Zauberrückstoß durch Schaden um 50%.",
+        "bonus3": "Erlittener Schaden verzögert das Zauberwirken nicht."
+      },
+      "wyrmshadow": {
+        "name": "Wyrmschattentracht",
+        "bonus2": "Erhöht Angriffskraft um 40.",
+        "bonus3": "Erhöht Beweglichkeit um 15 und kritische Trefferchance um 2%."
       }
     }
   },

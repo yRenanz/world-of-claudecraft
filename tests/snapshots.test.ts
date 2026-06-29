@@ -208,6 +208,24 @@ describe('Combat Mech held weapon over the wire', () => {
   });
 });
 
+describe('combat ratings over the wire', () => {
+  it('mirrors Ranged Attack Power so online hunter attack-spell tooltips can scale', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'hunter', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.tick();
+    const e = sim.player;
+    expect(e.rangedPower).toBeGreaterThan(0);
+
+    const wire = wireEntity(e);
+    expect(wire.rp).toBe(e.rangedPower);
+
+    const client = bareClient(e.id + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    const mirrored = client.entities.get(e.id)!;
+    expect(mirrored.rangedPower).toBe(e.rangedPower);
+  });
+});
+
 describe('delta snapshots', () => {
   let server: GameServer;
   let fc: FakeClient;
@@ -477,6 +495,50 @@ describe('delta snapshots', () => {
     expect(snap.self.inv.some((s: any) => s.itemId === 'baked_bread')).toBe(true);
     expect(snap.self).not.toHaveProperty('qlog');
     expect(snap.self).not.toHaveProperty('stats');
+  });
+
+  it('resends equip + inv on the next snapshot after an online unequip', () => {
+    // A fresh warrior starts with worn_sword equipped in mainhand (its class
+    // startWeapon). unequipItem returns the piece to bags via the sim's
+    // addItemSilent, which (unlike the addItem/removeItem hub) does NOT bump
+    // PlayerMeta.wireRev and emits only a log event, so the gated equip/inv block
+    // is resent promptly only because unequip_item is a HEAVY_SELF_CMD. Without
+    // that the client would show the item still equipped (and missing from bags)
+    // until the ~2 s staggered safety refresh.
+    const client = bareClient(session.pid);
+    expect(server.sim.meta(session.pid)!.equipment.mainhand).toBe('worn_sword');
+
+    // Flush the first full snapshot to the client so it has the equipped state,
+    // then confirm the heavy block is quiet: with the gate on, a no-op
+    // re-broadcast omits equip/inv (the staggered refresh is not due this tick),
+    // so any later resend is the command dirtying the session, not the refresh.
+    broadcast(server);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    expect(client.equipment.mainhand).toBe('worn_sword');
+    fc.sent.length = 0;
+    broadcast(server);
+    const quiet = lastSnap(fc.sent);
+    expect(quiet.self).not.toHaveProperty('equip');
+    expect(quiet.self).not.toHaveProperty('inv');
+
+    // Unequip the mainhand and broadcast once: the very next snapshot must carry
+    // the updated equip + inv, not wait for the safety refresh.
+    fc.sent.length = 0;
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'unequip_item', slot: 'mainhand' }),
+    );
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self).toHaveProperty('equip');
+    expect(snap.self).toHaveProperty('inv');
+    expect(snap.self.equip.mainhand).toBeUndefined();
+    expect(snap.self.inv.some((s: any) => s.itemId === 'worn_sword')).toBe(true);
+
+    // and it round-trips: the client mirror clears the slot and shows it in bags.
+    (client as any).applySnapshot(snap);
+    expect(client.equipment.mainhand).toBeUndefined();
+    expect(client.inventory.some((s) => s.itemId === 'worn_sword')).toBe(true);
   });
 
   it('mirrors vendor buyback deltas to the client', () => {

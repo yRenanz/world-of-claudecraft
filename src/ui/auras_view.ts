@@ -138,6 +138,9 @@ export interface AuraSlotState {
   name: string;
   /** Raw seconds remaining, for the tooltip (read live by the pooled closure). */
   remaining: number;
+  /** Whether this aura is the player's own cancelable buff (mode 'buffs', not a debuff):
+   *  the buff bar offers right-click-cancel, a target's debuff strip is read-only. */
+  cancelable: boolean;
   /** The one-line effect-summary HTML for the tooltip (or '' when none), read live by the
    *  pooled closure. */
   effectHtml: string;
@@ -183,6 +186,7 @@ function makeSlotState(): AuraSlotState {
     stacksText: '',
     name: '',
     remaining: 0,
+    cancelable: false,
     effectHtml: '',
   };
 }
@@ -219,6 +223,10 @@ export function createAurasView(mode: AuraMode, deps: AurasDeps): AurasView {
         slot.stacksText = a.stacks && a.stacks > 1 ? deps.formatStacks(a.stacks) : '';
         slot.name = deps.auraName(a);
         slot.remaining = a.remaining;
+        // The buff bar (mode 'buffs', the player's own auras) offers right-click-cancel;
+        // a helpful buff is cancelable, a debuff never. The target debuff strip
+        // (mode 'debuffs') is read-only, so nothing there is cancelable.
+        slot.cancelable = mode === 'buffs' && !debuff;
         slot.effectHtml = deps.auraEffectHtml(a);
         count++;
       }

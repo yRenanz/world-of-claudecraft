@@ -94,7 +94,6 @@ import {
   OVERHEAD_EMOTES,
   type OverheadEmoteId,
 } from '../world_api';
-import { absorbBarView } from './absorb_bar';
 import { ActionBarPainter } from './action_bar_painter';
 import {
   ABILITY_ICON_PREFIX,
@@ -2465,10 +2464,25 @@ export class Hud {
   private readonly buffBarView = createAurasView('buffs', this.aurasViewDeps);
   private readonly debuffBarView = createAurasView('debuffs', this.aurasViewDeps);
   private readonly targetDebuffsView = createAurasView('debuffs', this.aurasViewDeps);
+  // The buff-bar painter alone gets attachCancel: right-clicking one of the local player's
+  // own helpful buffs cancels it (classic convention). The debuff / target painters reuse
+  // the shared deps (no cancel: a debuff or another entity's aura is never cancelable).
+  private readonly buffBarPainterDeps: AurasPainterDeps = {
+    ...this.aurasPainterDeps,
+    attachCancel: (el, cancelableAuraId) => {
+      el.addEventListener('contextmenu', (ev) => {
+        const auraId = cancelableAuraId();
+        if (auraId === null) return;
+        ev.preventDefault();
+        this.hideTooltip();
+        this.sim.cancelAura(auraId);
+      });
+    },
+  };
   private readonly buffBarPainter = new AurasPainter(
     this.writerFacet,
     this.buffBarEl,
-    this.aurasPainterDeps,
+    this.buffBarPainterDeps,
     document,
     // Cap the visible aura count on the LOW static preset (never the
     // governor).

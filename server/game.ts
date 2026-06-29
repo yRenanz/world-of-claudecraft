@@ -1540,6 +1540,9 @@ export class GameServer {
       case 'cast':
         if (typeof msg.ability === 'string') sim.castAbility(msg.ability, pid);
         break;
+      case 'cancel_aura':
+        if (typeof msg.aura === 'string') sim.cancelAura(msg.aura, pid);
+        break;
       case 'target':
         sim.targetEntity(typeof msg.id === 'number' ? msg.id : null, pid);
         break;

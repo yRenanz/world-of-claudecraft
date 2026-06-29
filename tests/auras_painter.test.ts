@@ -152,6 +152,7 @@ function slot(over: Partial<AuraSlotState> & { key: string }): AuraSlotState {
     stacksText: '',
     name: over.key,
     remaining: 0,
+    cancelable: false,
     effectHtml: '',
     ...over,
   };
@@ -178,6 +179,7 @@ describe('AurasPainter: keyed pool over the elided writers', () => {
       resolveIconUrl: (key) => iconUrl(key),
       renderTooltip: (name, remaining) => `${name}|${Math.ceil(remaining)}`,
       attachTooltip: tooltips.attachTooltip,
+      attachCancel: () => {},
     };
     painter = new AurasPainter(facet.writers, container as unknown as HTMLElement, deps, fakeDoc);
   });
@@ -361,6 +363,7 @@ describe('AurasPainter: static-preset visible-count cap', () => {
       resolveIconUrl: (key) => `url(${key})`,
       renderTooltip: (name, remaining) => `${name}|${Math.ceil(remaining)}`,
       attachTooltip: tooltips.attachTooltip,
+      attachCancel: () => {},
     };
     return new AurasPainter(
       facet.writers,
@@ -475,6 +478,7 @@ describe('AurasPainter: a wire-faithful buff_* stat-sap survives the low cap (vi
       resolveIconUrl: (key) => `url(${key})`,
       renderTooltip: (name, remaining) => `${name}|${Math.ceil(remaining)}`,
       attachTooltip: tips.attachTooltip,
+      attachCancel: () => {},
     };
     const painter = new AurasPainter(
       facet.writers,

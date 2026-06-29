@@ -753,6 +753,13 @@
   .buff.debuff {
     border-color: var(--color-debuff);
   }
+  /* The player's own cancelable buffs: right-click to drop, with a hover cue. */
+  .buff.cancelable {
+    cursor: context-menu;
+  }
+  .buff.cancelable:hover {
+    border-color: var(--color-gold, #d8b56b);
+  }
   .buff .dur {
     position: absolute;
     bottom: -13px;

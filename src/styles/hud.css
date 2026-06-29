@@ -726,6 +726,18 @@
     max-width: 320px;
     pointer-events: auto;
   }
+  /* Debuffs sit in their own row beneath the buff row (classic layout). */
+  #debuff-bar {
+    position: absolute;
+    right: 196px;
+    top: 50px;
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-width: 320px;
+    pointer-events: auto;
+  }
   .buff {
     width: 28px;
     height: 28px;

@@ -64,9 +64,9 @@ export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
 // `a.remaining < 99 ? ... : ''`).
 const DURATION_HIDE_THRESHOLD = 99;
 
-/** Which aura strip a view drives: every aura (the player buff bar) or debuffs only
- *  (the target frame). */
-export type AuraMode = 'all' | 'debuffs';
+/** Which aura strip a view drives: every aura, buffs only (the player buff row), or
+ *  debuffs only (the player debuff row and the target frame). */
+export type AuraMode = 'all' | 'buffs' | 'debuffs';
 
 /** The aura fields the core reads. A structural subset of sim `Aura` that both worlds
  *  mirror. `stacks` is optional (the wire omits it when 1). */
@@ -191,6 +191,7 @@ export function createAurasView(mode: AuraMode, deps: AurasDeps): AurasView {
       for (const a of entity.auras) {
         const debuff = isAuraDebuff(a);
         if (mode === 'debuffs' && !debuff) continue;
+        if (mode === 'buffs' && debuff) continue;
         // Grow the pool only when this frame needs a slot it has never held before.
         if (count >= slots.length) slots.push(makeSlotState());
         const slot = slots[count];

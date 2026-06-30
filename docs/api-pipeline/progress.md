@@ -216,18 +216,82 @@ defects). All applied (apply-all-findings rule):
 ## Phase 05: Onion compose + request context (compose.ts + context.ts)
 
 Deliverables:
-- [ ] compose(Mw[]) recursive dispatch with a double-next guard
-- [ ] Ctx type + buildContext (url, query, params, ip via requestIp(), reqId, body?, account?)
-- [ ] An AsyncLocalStorage carrier for reqId
-- [ ] An outermost wrapper contract: the top-level compose(ctx) call is wrapped to guarantee exactly one idempotent response on both the resolve and throw paths (raw node:http does not auto-respond)
+- [x] compose(Mw[]) recursive dispatch with a double-next guard
+- [x] Ctx type + buildContext (url, query, params, ip via requestIp(), reqId, body?, account?)
+- [x] An AsyncLocalStorage carrier for reqId
+- [x] An outermost wrapper contract: the top-level compose(ctx) call is wrapped to guarantee exactly one idempotent response on both the resolve and throw paths (raw node:http does not auto-respond)
 
 QA:
-- [ ] Fixes applied
-- [ ] Tests added
-- [ ] Dead code removed
-- [ ] Reviews clean
+- [x] Fixes applied
+- [x] Tests added
+- [x] Dead code removed
+- [x] Reviews clean
 
 Notes:
+- New modules (both server-only, NOT wired into the live server until Phase 9; no
+  `server/http/index.ts` barrel created, Phase 9 owns it):
+  - `server/http/compose.ts`: `compose(stack)` (the canonical Koa onion dispatch with a
+    `lastIndex`-cursor double-next guard that rejects with `'next() called multiple times'`,
+    the exact string the Phase 2 `nextGuard` uses), `runOnion(ctx, stack)` (the OUTERMOST
+    wrapper: runs the composed stack inside `runWithReqId(ctx.reqId, ...)`, then guarantees
+    exactly one response), and `respondOnce(res, status, headers?, body?)` (the
+    headersSent/writableEnded-guarded idempotent low-level sender, exported for reuse). It
+    imports `Ctx/Middleware/Next` from `./types` and `runWithReqId` from `./context`; it does
+    NOT redefine or re-export the frozen types, and there is no import cycle (context never
+    imports compose).
+  - `server/http/context.ts`: `buildContext(req, res, match)` producing the frozen `Ctx`
+    (`Ctx` has NO `route` field, so the match is read ONLY for `params`); reuses
+    `ratelimit.requestIp` for `ctx.ip` (never re-derives IP); `query` and the non-matched
+    `params` are built on `Object.create(null)`. Plus the reqId carrier:
+    `reqIdStorage` (AsyncLocalStorage<string>), `newReqId` (crypto.randomUUID, a server-side
+    id, NOT sim randomness), `runWithReqId`, `currentReqId`.
+  - Tests: `tests/server/http/compose.test.ts` (17) + `tests/server/http/context.test.ts`
+    (20). The Phase 2 `tests/server/helpers/fake_ctx.ts` was left UNTOUCHED (it already
+    returns a valid frozen Ctx with deterministic test defaults; a context test asserts
+    `buildContext` and `fakeCtx` produce the same own-key set rather than re-pointing the helper).
+- LOAD-BEARING: `compose()` neither responds nor catches. Raw node:http hangs the socket on an
+  uncaught throw, so `runOnion`'s one-response wrapper is mandatory. The fallbacks emit NO body
+  and NO internal detail (no stack/SQL/table/English): the catch arm uses `catch {` with no
+  binding so the thrown value is never read. The real RFC 9457 envelope is Phase 7; `withErrors`
+  is Phase 8 and sits INSIDE this wrapper later. Fallback statuses are named consts:
+  resolve-with-no-response = 404 (a distinct structural fallback), uncaught-throw = 500; both
+  carry `X-Request-Id` from `ctx.reqId` (the echo-on-every-response middleware is Phase 8/23).
+- Validation green: tsc clean; the two http files 37 tests pass; `npm run ci:changed` exit 0
+  (no warnings on the 4 files); build:env/build:server/build all exit 0; full `npm test` green;
+  ASCII-clean (no em/en dashes, no emojis). Reviewers (privacy-security-review, qa-checklist,
+  fresh coverage subagent): 0 BLOCKING, 0 SHOULD-FIX-correctness; all findings applied (apply-all
+  rule), see the QA section. Next: Phase 05 QA (phase-05-qa.md).
+
+QA (reviewers) verdict: PASS. 0 BLOCKING. Audited by privacy-security-review + qa-checklist + a
+fresh coverage subagent (each told to report COVERAGE, not filter). qa-checklist and coverage
+returned PASS with every acceptance criterion met by a regression-sensitive test; privacy returned
+2 SHOULD-FIX (forward-looking) + nits. All applied (apply-all-findings rule):
+- SHOULD-FIX (privacy, host-injection): `new URL(req.url, base)` adopts a CLIENT-supplied host on
+  an absolute-form target (`GET http://evil.com/api/foo`), seeding a foreign authority into the
+  frozen `ctx.url` that a later phase could trust for a redirect Location / same-origin check.
+  Fixed with a `buildUrl(target)` helper that rebuilds the URL from path + search ONLY, pinning the
+  authority to the placeholder. Pinned by a new test (absolute-form -> `ctx.url.host` stays localhost).
+- SHOULD-FIX (privacy, totality): `new URL` throws on a malformed target, and `buildContext` runs
+  OUTSIDE `runOnion`'s safety net, so a throw there would hang the socket once Phase 9 wires it.
+  `buildUrl` now catches and falls back to the root path, keeping `buildContext` total. Pinned by a
+  malformed-target (`http://`) test asserting no throw.
+- NIT (privacy, totality) + the qa/coverage partial-response observation: the catch-path
+  `respondOnce` was itself unguarded, and a middleware that committed headers but never ended would
+  hang the socket. Replaced both inline fallbacks with a `finalizeResponse(ctx, status)` helper that
+  (1) no-ops when already ended, (2) sends the bare fallback when nothing was committed, (3) `end()`s
+  a headers-committed-but-unended response to close the socket, and swallows a throw from an unusable
+  (destroyed-socket) response so `runOnion` never throws out of its own net. Two new tests assert the
+  socket is ended on both the throw and resolve partial paths.
+- NIT (qa/coverage, coverage): added an empty-stack `compose([])` test and a `respondOnce` Buffer-body
+  test; named the `'GET'`/`'/'` buildContext default literals (`DEFAULT_METHOD`/`DEFAULT_REQUEST_PATH`).
+- KEPT with rationale: the 404 no-response fallback (the spec deliberately calls it a distinct "bare
+  fallback", and both reviewers judged 404 defensible / 500-vs-404 a non-blocking discussion item);
+  the `(req.method ?? 'GET').toUpperCase() as Method` cast (the router is the method gate before Phase
+  9 wiring; node delivers methods uppercase; documented in a comment, no actionable improvement without
+  unfreezing `Method`).
+- Re-validation after the fixes + 5 added tests: tsc clean; the two http files 37 tests pass; full
+  `npm test` green; build:env/build:server/build all exit 0; Biome on the 4 changed files clean;
+  ASCII-clean. Next: Phase 05 QA (phase-05-qa.md).
 
 ## Phase 06: Typed schema validator (schema.ts)
 

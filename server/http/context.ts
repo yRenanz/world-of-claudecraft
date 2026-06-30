@@ -66,16 +66,25 @@ function parseQuery(searchParams: URLSearchParams): Record<string, string | stri
  * Parse req.url into a WHATWG URL whose authority is ALWAYS the fixed placeholder.
  * req.url is normally origin-form (/path?query) but a client may send absolute-form
  * (GET http://host/path), where `new URL(input, base)` ignores the base and adopts
- * the client's host. We rebuild from path + search ONLY, so a client can never inject
- * a foreign authority into ctx.url (which a later phase might trust for a redirect
- * Location or a same-origin check). It never throws: a target `new URL` cannot parse
- * falls back to the default path, keeping buildContext total (it runs before
+ * the client's host. We rebuild by ASSIGNING the parsed path + search onto a fresh
+ * placeholder-authority URL (never by re-parsing them as a string), so a client can
+ * never inject a foreign authority into ctx.url (which a later phase might trust for a
+ * redirect Location or a same-origin check). It never throws: a target `new URL` cannot
+ * parse falls back to the default path, keeping buildContext total (it runs before
  * runOnion's safety net once Phase 9 wires the dispatcher).
  */
 function buildUrl(target: string): URL {
   try {
     const parsed = new URL(target, PLACEHOLDER_ORIGIN);
-    return new URL(parsed.pathname + parsed.search, PLACEHOLDER_ORIGIN);
+    // ASSIGN path + search onto a fresh fixed-authority URL; do NOT re-parse
+    // `parsed.pathname + parsed.search` as a string. A normalized pathname can begin
+    // with '//' (the plain origin-form target '/..//evil.com' collapses to '//evil.com'),
+    // and `new URL('//evil.com', base)` would read that as a protocol-relative AUTHORITY
+    // and adopt the client host. The pathname/search setters leave the authority pinned.
+    const url = new URL(PLACEHOLDER_ORIGIN);
+    url.pathname = parsed.pathname;
+    url.search = parsed.search;
+    return url;
   } catch {
     return new URL(DEFAULT_REQUEST_PATH, PLACEHOLDER_ORIGIN);
   }

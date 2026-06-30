@@ -626,6 +626,9 @@ export const sv_SE: EnTranslations = {
       "unassigned": "{item} tilldelades inte och ar fritt for alla.",
       "leaderOnly": "Endast gruppledaren kan andra lootmetoden."
     },
+    "party": {
+      "promoteLeader": "Promote to Leader"
+    },
     "bags": {
       "filterGroupAria": "Filtrera väskor efter kategori",
       "filterAll": "Alla",

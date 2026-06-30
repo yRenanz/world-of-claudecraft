@@ -626,6 +626,9 @@ export const en_XA: EnTranslations = {
       "unassigned": "[{item} ŵáš ñóţ áššíĝñéð áñð íš ƒŕéé ƒóŕ áļļ.]",
       "leaderOnly": "[Óñļý ţĥé þáŕţý ļéáðéŕ çáñ çĥáñĝé ţĥé ļóóţ ɱéţĥóð.]"
     },
+    "party": {
+      "promoteLeader": "[Þŕóɱóţé ţó Ļéáðéŕ]"
+    },
     "bags": {
       "filterGroupAria": "[Ƒíļţéŕ ƀáĝš ƀý çáţéĝóŕý]",
       "filterAll": "[Áļļ]",

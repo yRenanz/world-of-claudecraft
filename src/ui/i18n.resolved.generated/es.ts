@@ -626,6 +626,9 @@ export const es: EnTranslations = {
       "unassigned": "{item} no fue asignado y queda libre para todos.",
       "leaderOnly": "Solo el lider del grupo puede cambiar el metodo de botin."
     },
+    "party": {
+      "promoteLeader": "Promote to Leader"
+    },
     "bags": {
       "filterGroupAria": "Filtrar bolsas por categoría",
       "filterAll": "Todos",

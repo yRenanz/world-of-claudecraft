@@ -626,6 +626,9 @@ export const da_DK: EnTranslations = {
       "unassigned": "{item} blev ikke tildelt og er frit for alle.",
       "leaderOnly": "Kun gruppelederen kan aendre lootmetoden."
     },
+    "party": {
+      "promoteLeader": "Promote to Leader"
+    },
     "bags": {
       "filterGroupAria": "Filtrér tasker efter kategori",
       "filterAll": "Alle",

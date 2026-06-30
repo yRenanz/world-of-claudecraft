@@ -626,6 +626,9 @@ export const ja_JP: EnTranslations = {
       "unassigned": "{item}は分配されず、誰でも入手できます。",
       "leaderOnly": "分配方式を変更できるのはパーティリーダーだけです。"
     },
+    "party": {
+      "promoteLeader": "パーティリーダーに指定"
+    },
     "bags": {
       "filterGroupAria": "バッグをカテゴリーで絞り込む",
       "filterAll": "すべて",

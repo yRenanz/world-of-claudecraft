@@ -626,6 +626,9 @@ export const pt_BR: EnTranslations = {
       "unassigned": "{item} nao foi atribuido e esta livre para todos.",
       "leaderOnly": "Somente o lider do grupo pode alterar o metodo de saque."
     },
+    "party": {
+      "promoteLeader": "Promote to Leader"
+    },
     "bags": {
       "filterGroupAria": "Filtrar bolsas por categoria",
       "filterAll": "Todos",

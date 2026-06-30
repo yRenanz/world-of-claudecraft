@@ -74,6 +74,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.enableAria': '분배 담당 사용',
   'hudChrome.masterLoot.looterLabel': '분배 담당자',
   'hudChrome.masterLoot.leaderOption': '파티장',
+  'hudChrome.party.promoteLeader': '파티장으로 지정',
   'hudChrome.masterLoot.thresholdLabel': '품질 기준',
   'hudChrome.masterLoot.thresholdUncommon': '고급 이상',
   'hudChrome.masterLoot.thresholdRare': '희귀 이상',

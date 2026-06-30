@@ -626,6 +626,9 @@ export const nl_NL: EnTranslations = {
       "unassigned": "{item} is niet toegewezen en is vrij voor iedereen.",
       "leaderOnly": "Alleen de groepsleider kan de buitmethode wijzigen."
     },
+    "party": {
+      "promoteLeader": "Promote to Leader"
+    },
     "bags": {
       "filterGroupAria": "Tassen filteren op categorie",
       "filterAll": "Alle",

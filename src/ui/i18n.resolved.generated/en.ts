@@ -626,6 +626,9 @@ export const en: EnTranslations = {
       "unassigned": "{item} was not assigned and is free for all.",
       "leaderOnly": "Only the party leader can change the loot method."
     },
+    "party": {
+      "promoteLeader": "Promote to Leader"
+    },
     "bags": {
       "filterGroupAria": "Filter bags by category",
       "filterAll": "All",

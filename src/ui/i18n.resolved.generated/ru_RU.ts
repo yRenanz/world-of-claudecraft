@@ -626,6 +626,9 @@ export const ru_RU: EnTranslations = {
       "unassigned": "Предмет {item} не был назначен и доступен всем.",
       "leaderOnly": "Только лидер группы может менять способ добычи."
     },
+    "party": {
+      "promoteLeader": "Назначить лидером"
+    },
     "bags": {
       "filterGroupAria": "Фильтровать сумки по категории",
       "filterAll": "Все",

@@ -2316,6 +2316,9 @@ export class GameServer {
       case 'pkick':
         if (typeof msg.id === 'number') sim.partyKick(msg.id, pid);
         break;
+      case 'ppromote':
+        if (typeof msg.id === 'number') sim.partyPromote(msg.id, pid);
+        break;
       case 'praid':
         sim.convertPartyToRaid(pid);
         break;

@@ -626,6 +626,9 @@ export const vi_VN: EnTranslations = {
       "unassigned": "{item} chua duoc gan va moi nguoi deu co the nhat.",
       "leaderOnly": "Chi truong nhom co the doi phuong thuc chien loi pham."
     },
+    "party": {
+      "promoteLeader": "Promote to Leader"
+    },
     "bags": {
       "filterGroupAria": "Lọc túi đồ theo danh mục",
       "filterAll": "Tất cả",

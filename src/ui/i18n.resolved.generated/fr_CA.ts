@@ -626,6 +626,9 @@ export const fr_CA: EnTranslations = {
       "unassigned": "{item} n a pas ete attribue et devient libre pour tous.",
       "leaderOnly": "Seul le chef de groupe peut changer le mode de butin."
     },
+    "party": {
+      "promoteLeader": "Promote to Leader"
+    },
     "bags": {
       "filterGroupAria": "Filtrer les sacs par catégorie",
       "filterAll": "Tous",

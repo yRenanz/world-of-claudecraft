@@ -75,6 +75,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.enableAria': 'Включить мастера добычи',
   'hudChrome.masterLoot.looterLabel': 'Мастер добычи',
   'hudChrome.masterLoot.leaderOption': 'Лидер группы',
+  'hudChrome.party.promoteLeader': 'Назначить лидером',
   'hudChrome.masterLoot.thresholdLabel': 'Порог качества',
   'hudChrome.masterLoot.thresholdUncommon': 'Необычное и выше',
   'hudChrome.masterLoot.thresholdRare': 'Редкое и выше',

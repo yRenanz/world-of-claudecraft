@@ -11,7 +11,7 @@ workstream), NOT a gameplay change, NOT a WS wire change.
 
 ## Current phase
 
-Phase 03 (surface inventory + content-type classification + characterization/golden corpus + knownDeviations) DONE (2026-06-30: tests/docs only, ZERO runtime behavior change; 106-row HEAD-anchored inventory + route-count freshness gate, 5-class /api content-type classification, 57-fixture golden corpus over the four dispatchers replayed through routeHttpRequest + the Phase 2 goldenMaster/normalizer, 12 seeded knownDeviations; tsc clean, 73 tests byte-stable, build:server unaffected; in-phase reviewers privacy-security-review CLEAN + qa-checklist READY). Next: Phase 03 QA (phase-03-qa.md). KEY CORRECTIONS this phase surfaced (see below): the Discord callback is HTML (200 text/html bounce), NOT a 302 redirect; REDIRECT maps to zero routes today. Phase 02 + QA DONE (frozen contracts + self-tested harness + clock seam; all 11 criteria PASS). Phase 01 + QA DONE.
+Phase 03 (surface inventory + content-type classification + characterization/golden corpus + knownDeviations) DONE + QA DONE (2026-06-30: tests/docs only, ZERO runtime behavior change; 106-row HEAD-anchored inventory + route-count freshness gate, 5-class /api content-type classification, golden corpus over the four dispatchers replayed through routeHttpRequest + the Phase 2 goldenMaster/normalizer, 12 seeded knownDeviations). Phase 03 QA verdict PASS-WITH-FOLLOWUPS (1 BLOCKING + 3 SHOULD-FIX + nits all fixed; no golden blessed a security defect): account/email/verify + email/unsubscribe were misclassified HTML but emit application/json, RECLASSIFIED to PROBLEM_JSON (HTML now maps to /api/auth/discord/callback ONLY); added content_type_consistency.ts cross-check (every golden's content-type vs its route class, wired through both characterization files); de-binarized surface_inventory.test.ts (raw NUL key delimiters escaped) + a method-aware freshness subset guard; new goldens for email/verify 400 + the wrong-method 404 baselines (wired into planned405BeforeAuth) + the per-route /internal/discord secret-unset 404. Corpus 57->67 fixtures, suite 73->84 tests byte-stable; tsc/biome/ci:changed/build:server green; full tests/server 196/196. Next: Phase 04 (table router, phase-04-router.md). KEY CORRECTIONS this phase surfaced (see below): the Discord callback is HTML (200 text/html bounce), NOT a 302 redirect; REDIRECT maps to zero routes today; the only /api HTML route is the Discord callback. Phase 02 + QA DONE (frozen contracts + self-tested harness + clock seam; all 11 criteria PASS). Phase 01 + QA DONE.
 
 ## Phase 2 frozen contracts (Phases 4 to 9 IMPORT these, never redefine)
 
@@ -84,7 +84,7 @@ The single home is `server/http/types.ts` (TYPE-ONLY, zero runtime emit). Verbat
     a stable machine `code`; clients localize by CODE, not by parsing `detail`).
   - `/oauth` POST JSON: RFC 6749 `{error, error_description}`.
   - `/admin`: `{success, data, error}`.
-  - HTML routes (email/unsubscribe, OAuth GET consent/device pages): `htmlError` HTML page.
+  - HTML routes (OAuth GET consent/device pages): `htmlError` HTML page. (NOTE: the `/api/account/email/verify` + `/api/email/unsubscribe` link-click endpoints LOOK like pages but answer application/json in every branch, so they are PROBLEM_JSON, not HTML; Phase 3 QA corrected an initial misclassification.)
   - Discord callback: text/html bounce page (200, client-side `location.replace`), NOT a 302
     redirect and NOT problem+json. Phase 3 characterization CORRECTED the SPEC's "302" assumption
     (the handler `bouncePage` writes `Content-Type: text/html`); it needs the HTML-error serializer,
@@ -103,8 +103,10 @@ The single home is `server/http/types.ts` (TYPE-ONLY, zero runtime emit). Verbat
 ### Non-JSON `/api` classification (a blanket rule WOULD break prod)
 The `/api` surface is NOT uniformly JSON. A global `415 application/json` + JSON-only
 `withBody` + blanket problem+json WOULD break: `POST /api/card` (binary `image/png` via
-`readBinaryBody`), `GET /api/email/unsubscribe` (HTML), `GET /api/auth/discord/callback`
-(text/html bounce, NOT a 302; Phase 3 corrected this). Therefore: classify every `/api` route by
+`readBinaryBody`) and `GET /api/auth/discord/callback` (text/html bounce, NOT a 302; Phase 3
+corrected this; it is the ONLY /api route that emits text/html). (`GET /api/email/unsubscribe`
+and `GET /api/account/email/verify` answer application/json, so they do NOT break the blanket;
+Phase 3 QA corrected an initial HTML misclassification of both.) Therefore: classify every `/api` route by
 response content-type; ship a
 `withRawBody`/binary middleware variant; exempt declared non-JSON routes from 415 + JSON
 withBody; roll out 415 in LOG-ONLY mode first until native (Capacitor) traffic is confirmed.
@@ -311,15 +313,16 @@ the X-ms constant; X is TBD, see open items.)
 - **P12 (characters BOLA):** `/api/me/characters`, `/api/characters` (GET/POST),
   `/api/characters/:id` (DELETE), `/rename`, `/takeover`, `/standing`, `/sheet`.
 - **P13 (account):** `/api/account/*` family (password/logout/email(+change/verify)/
-  deactivate/export/marketing/2fa(setup/enable/disable)/companion-token); `email-unsubscribe`
-  classified HTML.
+  deactivate/export/marketing/2fa(setup/enable/disable)/companion-token); `email/verify` +
+  `email-unsubscribe` classified PROBLEM_JSON (both answer application/json; Phase 3 QA
+  corrected an initial HTML misclassification).
 - **P14 (wallet):** `/api/wallet/link/challenge`, `/api/wallet/link` (POST/DELETE),
   `/api/wallet` (GET), `/api/woc/balance`, `/api/card` (withRawBody), `/api/referrals`.
 - **P15 (reports/telemetry):** `/api/reports` (new reports.create limiter), `/api/bug-reports`,
   `/api/perf-report` (keep 200-not-429), `/api/site-presence`.
 - **P16 (discord):** `POST /api/auth/discord/start`, `GET /api/auth/discord/callback` (HTML
-  redirect), `GET /api/discord`, `DELETE /api/discord`, `POST /api/discord/swag/claim`
-  (handleSwagClaim, newly dispatched).
+  bounce, NOT a 302; the only /api HTML route), `GET /api/discord`, `DELETE /api/discord`,
+  `POST /api/discord/swag/claim` (handleSwagClaim, newly dispatched).
 - **P17 (admin):** the ~19 `handleAdminApi` branches as RouteDefs; enum-segment routes
   (suspend|unsuspend|ban|unban) become `:param` + schema-validated enum; `{success,data,error}`
   + page/limit pagination frozen.
@@ -417,8 +420,10 @@ the X-ms constant; X is TBD, see open items.)
   re-inventory + a route-count freshness gate; the market/em-dash fixes anchor on function
   names and the literal strings.
 - **Non-JSON `/api` classification.** A blanket 415 + JSON-only `withBody` + blanket
-  problem+json would break `POST /api/card` (binary), `GET /api/email/unsubscribe` (HTML),
-  `GET /api/auth/discord/callback` (text/html bounce, not a 302). Classify by response content-type; ship a
+  problem+json would break `POST /api/card` (binary) and
+  `GET /api/auth/discord/callback` (text/html bounce, not a 302; the only /api HTML route).
+  (`GET /api/email/unsubscribe` + `GET /api/account/email/verify` answer application/json, so they do
+  not break the blanket; Phase 3 QA corrected an initial HTML misclassification.) Classify by response content-type; ship a
   `withRawBody` variant; exempt declared non-JSON routes; 415 log-only first until native
   (Capacitor) traffic confirmed. Design task that must PRECEDE the error-model phase.
 - **compose-no-auto-respond rule.** `compose()` returns a promise and does NOT send a

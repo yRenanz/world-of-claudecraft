@@ -1,0 +1,8 @@
+{
+  "body": "{\"error\":\"not_found\"}",
+  "headers": {
+    "content-length": 21,
+    "content-type": "application/json"
+  },
+  "status": 404
+}

@@ -1,0 +1,8 @@
+{
+  "body": "{\"error\":\"method not allowed\",\"ok\":false}",
+  "headers": {
+    "content-length": 41,
+    "content-type": "application/json"
+  },
+  "status": 405
+}

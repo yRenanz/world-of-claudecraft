@@ -1,0 +1,8 @@
+{
+  "body": "{\"error\":\"access_denied\",\"error_description\":\"log in to your World of ClaudeCraft account first\"}",
+  "headers": {
+    "content-length": 97,
+    "content-type": "application/json"
+  },
+  "status": 401
+}

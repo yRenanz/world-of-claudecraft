@@ -1,0 +1,320 @@
+// Phase 3 characterization goldens for the MAIN /api surface (the handleApi
+// route table in server/main.ts). Every case drives a real request through the
+// exported routeHttpRequest, which exercises the genuine CORS + prefix ladder and
+// the module-scope (pool-less) GameServer, then captures the deterministic
+// CONTRACT response (status + normalized body + contracted headers) into a golden
+// fixture under tests/server/fixtures/main/. These goldens record what the server
+// emits TODAY; they assert nothing about whether that behavior is correct, so a
+// later phase (7/22) that renames a code or relocalizes a string updates the
+// golden in the same change.
+//
+// Determinism rules this file obeys:
+//   - It NEVER captures a 500 produced by the pool-less db (a test artifact). Every
+//     captured case returns BEFORE touching Postgres, or returns an empty payload
+//     because the leaderboard cache swallows the db error. Db-dependent success
+//     paths (project-stats, arena ladder, populated leaderboards, the OAuth/Discord
+//     success bounces) are DEFERRED, see the trailing comment block.
+//   - The phase-2 normalizer masks the dynamic fields (challengeId/nonce) by key, so
+//     the native-attestation challenge golden is byte-stable across runs.
+//   - The GitHub releases proxy does a network fetch; it is pinned deterministic by
+//     stubbing global fetch to reject (the real graceful-degradation contract when
+//     GitHub is unreachable returns an empty feed), never by editing source.
+
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { type Dispatch, goldenMaster, makeReq } from '../helpers';
+
+// A failing-auth Postgres so the pg pool constructs but every query rejects fast
+// and identically. This is the "pool-less" db the guardrail describes: contract
+// paths return before it, and the leaderboard cache catches its rejection and
+// serves an empty (deterministic) payload.
+process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase3';
+
+// routeHttpRequest is synchronous fire-and-forget (void handleApi(...)), so the
+// dispatcher must poll res.writableEnded before the captured triple is readable.
+const MAX_POLL_TICKS = 5000;
+// Where this surface's goldens live: tests/server/fixtures/main/.
+const FIXTURE_DIR = `${__dirname}/../fixtures/main`;
+
+// Header names + sentinel values used by the contract cases (named, never inline).
+const HEADER_CONTENT_LENGTH = 'content-length';
+// Far above any player-card byte cap, so the pre-auth 413 reject fires before the db.
+const OVERSIZE_CONTENT_LENGTH = '999999999';
+const DEV_COMMANDS_ENV = 'ALLOW_DEV_COMMANDS';
+
+async function loadDispatch(): Promise<Dispatch> {
+  const main = await import('../../../server/main');
+  return async (req, res) => {
+    main.routeHttpRequest(req, res);
+    let ticks = 0;
+    while (!(res as unknown as { writableEnded: boolean }).writableEnded) {
+      if (ticks++ > MAX_POLL_TICKS) throw new Error('response never ended');
+      await new Promise((r) => setImmediate(r));
+    }
+  };
+}
+
+let dispatch: Dispatch;
+
+beforeAll(async () => {
+  dispatch = await loadDispatch();
+});
+
+// One golden per case: 'written' on the first ever run (fixture absent -> written),
+// 'match' on every run thereafter; a 'mismatch' fails the case.
+async function characterize(fixture: string, req: ReturnType<typeof makeReq>): Promise<void> {
+  const r = await goldenMaster({ dispatch, req, fixturePath: `${FIXTURE_DIR}/${fixture}.json` });
+  expect(r.status, r.status === 'mismatch' ? `${fixture}\n${r.actual}` : fixture).not.toBe(
+    'mismatch',
+  );
+}
+
+describe('main /api characterization: preflight + dispatcher fallthrough', () => {
+  it('OPTIONS /api/login returns the 204 preflight short-circuit (no body)', async () => {
+    await characterize('options_login_204', makeReq({ method: 'OPTIONS', url: '/api/login' }));
+  });
+
+  it('GET /api/site-presence is method-gated 405 ok:false (handler-level, not handleApi)', async () => {
+    await characterize(
+      'site_presence_get_405',
+      makeReq({ method: 'GET', url: '/api/site-presence' }),
+    );
+  });
+
+  it('GET an unknown /api endpoint falls through to 404 unknown endpoint', async () => {
+    await characterize(
+      'unknown_endpoint_404',
+      makeReq({ method: 'GET', url: '/api/this-route-does-not-exist' }),
+    );
+  });
+
+  it('GET /api/perf with the dev gate off is 404 unknown endpoint', async () => {
+    const saved = process.env[DEV_COMMANDS_ENV];
+    process.env[DEV_COMMANDS_ENV] = '0';
+    try {
+      await characterize('perf_devgate_off_404', makeReq({ method: 'GET', url: '/api/perf' }));
+    } finally {
+      if (saved === undefined) delete process.env[DEV_COMMANDS_ENV];
+      else process.env[DEV_COMMANDS_ENV] = saved;
+    }
+  });
+});
+
+describe('main /api characterization: public read contracts (no db / empty cache)', () => {
+  it('GET /api/status returns the in-memory realm + online snapshot', async () => {
+    await characterize('status_get', makeReq({ method: 'GET', url: '/api/status' }));
+  });
+
+  it('GET /api/realms (unauthenticated) returns the realm directory with empty counts', async () => {
+    await characterize('realms_get_noauth', makeReq({ method: 'GET', url: '/api/realms' }));
+  });
+
+  it('POST /api/native-attestation/challenge returns a masked challenge (id + nonce + ttl)', async () => {
+    await characterize(
+      'native_attestation_challenge_post',
+      makeReq({ method: 'POST', url: '/api/native-attestation/challenge', body: {} }),
+    );
+  });
+});
+
+describe('main /api characterization: GitHub releases proxy (network stubbed to empty)', () => {
+  beforeEach(() => {
+    // Pin the proxy deterministic: a rejected fetch exercises the real
+    // graceful-degradation contract (an unreachable GitHub yields an empty feed),
+    // never the live, non-deterministic release list.
+    vi.stubGlobal('fetch', () =>
+      Promise.reject(new Error('network disabled for characterization')),
+    );
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('GET /api/releases serves the empty feed when GitHub is unreachable', async () => {
+    await characterize('releases_get_empty', makeReq({ method: 'GET', url: '/api/releases' }));
+  });
+});
+
+describe('main /api characterization: leaderboard payload shapes (empty cache)', () => {
+  it('GET /api/leaderboard default paged board', async () => {
+    await characterize('leaderboard_default', makeReq({ method: 'GET', url: '/api/leaderboard' }));
+  });
+
+  it('GET /api/leaderboard?board=guilds guild board', async () => {
+    await characterize(
+      'leaderboard_guilds',
+      makeReq({ method: 'GET', url: '/api/leaderboard?board=guilds' }),
+    );
+  });
+
+  it('GET /api/leaderboard?scope=global global scope', async () => {
+    await characterize(
+      'leaderboard_scope_global',
+      makeReq({ method: 'GET', url: '/api/leaderboard?scope=global' }),
+    );
+  });
+
+  it('GET /api/leaderboard?scope=realm realm scope', async () => {
+    await characterize(
+      'leaderboard_scope_realm',
+      makeReq({ method: 'GET', url: '/api/leaderboard?scope=realm' }),
+    );
+  });
+
+  it('GET /api/leaderboard?limit=5 legacy single-page board', async () => {
+    await characterize(
+      'leaderboard_limit5',
+      makeReq({ method: 'GET', url: '/api/leaderboard?limit=5' }),
+    );
+  });
+});
+
+describe('main /api characterization: binary request class (player card)', () => {
+  it('POST /api/card over the size cap is a pre-auth 413 with Connection: close', async () => {
+    await characterize(
+      'card_too_large_413',
+      makeReq({
+        method: 'POST',
+        url: '/api/card',
+        headers: { [HEADER_CONTENT_LENGTH]: OVERSIZE_CONTENT_LENGTH },
+      }),
+    );
+  });
+});
+
+describe('main /api characterization: email unsubscribe (public, no token = no db)', () => {
+  it('GET /api/email/unsubscribe with no token returns ok:true before any db read', async () => {
+    await characterize(
+      'email_unsubscribe_no_token',
+      makeReq({ method: 'GET', url: '/api/email/unsubscribe' }),
+    );
+  });
+});
+
+describe('main /api characterization: Discord contract paths (unconfigured / no auth)', () => {
+  it('POST /api/auth/discord/start is 503 when Discord is unconfigured', async () => {
+    await characterize(
+      'discord_start_unconfigured_503',
+      makeReq({ method: 'POST', url: '/api/auth/discord/start', body: {} }),
+    );
+  });
+
+  it('GET /api/discord without a bearer token is 401 not authenticated', async () => {
+    await characterize(
+      'discord_status_get_noauth_401',
+      makeReq({ method: 'GET', url: '/api/discord' }),
+    );
+  });
+
+  it('DELETE /api/discord without a bearer token is 401 not authenticated', async () => {
+    await characterize(
+      'discord_unlink_delete_noauth_401',
+      makeReq({ method: 'DELETE', url: '/api/discord' }),
+    );
+  });
+
+  it('GET /api/auth/discord/callback unconfigured returns the 503 error bounce (no token)', async () => {
+    await characterize(
+      'discord_callback_error_bounce',
+      makeReq({ method: 'GET', url: '/api/auth/discord/callback?code=x&state=y' }),
+    );
+  });
+});
+
+describe('main /api characterization: bearer-auth denial contracts (no Authorization)', () => {
+  it('GET /api/characters (full session) without auth is 401', async () => {
+    await characterize(
+      'characters_get_noauth_401',
+      makeReq({ method: 'GET', url: '/api/characters' }),
+    );
+  });
+
+  it('GET /api/me/characters (read scope) without auth is 401', async () => {
+    await characterize(
+      'me_characters_get_noauth_401',
+      makeReq({ method: 'GET', url: '/api/me/characters' }),
+    );
+  });
+
+  it('GET /api/account without auth is 401', async () => {
+    await characterize('account_get_noauth_401', makeReq({ method: 'GET', url: '/api/account' }));
+  });
+
+  it('POST /api/account/logout without auth is 401', async () => {
+    await characterize(
+      'account_logout_post_noauth_401',
+      makeReq({ method: 'POST', url: '/api/account/logout', body: {} }),
+    );
+  });
+
+  it('GET /api/wallet without auth is 401', async () => {
+    await characterize('wallet_get_noauth_401', makeReq({ method: 'GET', url: '/api/wallet' }));
+  });
+
+  it('GET /api/referrals without auth is 401', async () => {
+    await characterize(
+      'referrals_get_noauth_401',
+      makeReq({ method: 'GET', url: '/api/referrals' }),
+    );
+  });
+
+  it('POST /api/reports without auth is 401 (auth resolves before the body)', async () => {
+    await characterize(
+      'reports_post_noauth_401',
+      makeReq({ method: 'POST', url: '/api/reports', body: {} }),
+    );
+  });
+
+  it('GET /api/search without auth is 401', async () => {
+    await characterize(
+      'search_get_noauth_401',
+      makeReq({ method: 'GET', url: '/api/search?q=ab' }),
+    );
+  });
+
+  it('GET /api/characters/:id/sheet (read scope, path param) without auth is 401', async () => {
+    await characterize(
+      'owner_sheet_get_noauth_401',
+      makeReq({ method: 'GET', url: '/api/characters/1/sheet' }),
+    );
+  });
+
+  it('GET /api/characters/:id/standing (full session, path param) without auth is 401', async () => {
+    await characterize(
+      'standing_get_noauth_401',
+      makeReq({ method: 'GET', url: '/api/characters/1/standing' }),
+    );
+  });
+});
+
+describe('main /api characterization: register + login validation (empty body, pre-db)', () => {
+  it('POST /api/register with an empty body is the 400 username-shape rejection', async () => {
+    await characterize(
+      'register_post_empty_400',
+      makeReq({ method: 'POST', url: '/api/register', body: {} }),
+    );
+  });
+
+  it('POST /api/login with an empty body is the 401 anti-enumeration rejection', async () => {
+    await characterize(
+      'login_post_empty_401',
+      makeReq({ method: 'POST', url: '/api/login', body: {} }),
+    );
+  });
+});
+
+afterAll(() => {
+  vi.unstubAllGlobals();
+});
+
+// DEFERRED /api routes (db- or network-dependent success paths; capturing them
+// here would either bless a pool-less 500 or record a non-deterministic body):
+//   - GET  /api/project-stats          getAccountsCount() hits the db -> pool-less 500.
+//   - GET  /api/arena/leaderboard      topArenaRatings() hits the db per request -> 500.
+//   - GET  /api/woc/balance            live Solana RPC fetch -> non-deterministic.
+//   - GET  /api/email/unsubscribe?token=<non-empty>   accountByUnsubscribeToken() -> db 500.
+//   - GET  /api/search?q=<term> WITH a valid bearer    searchCharacters() -> db.
+//   - the populated leaderboard / character / account success bodies (need seeded db rows).
+//   - GET  /api/auth/discord/callback SUCCESS bounce   embeds a real session token VERBATIM
+//     inside inlined <script> JSON the normalizer returns as-is (HTML), so it is both a
+//     determinism break and a privacy-coverage flag for the reviewer. Only the error bounce
+//     is captured here.

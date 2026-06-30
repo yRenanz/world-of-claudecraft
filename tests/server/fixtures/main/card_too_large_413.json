@@ -1,0 +1,9 @@
+{
+  "body": "{\"error\":\"image too large\"}",
+  "headers": {
+    "connection": "close",
+    "content-length": 27,
+    "content-type": "application/json"
+  },
+  "status": 413
+}

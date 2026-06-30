@@ -1,0 +1,8 @@
+{
+  "body": "{\"error\":\"username must be 3-24 chars (letters, digits, _)\"}",
+  "headers": {
+    "content-length": 60,
+    "content-type": "application/json"
+  },
+  "status": 400
+}

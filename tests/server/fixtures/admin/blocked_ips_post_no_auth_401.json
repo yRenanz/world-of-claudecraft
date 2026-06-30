@@ -1,0 +1,8 @@
+{
+  "body": "{\"data\":null,\"error\":\"admin authentication required\",\"success\":false}",
+  "headers": {
+    "content-length": 69,
+    "content-type": "application/json"
+  },
+  "status": 401
+}

@@ -1,0 +1,8 @@
+{
+  "body": "{\"challengeId\":\"<ID>\",\"expiresInMs\":300000,\"nonce\":\"<NONCE>\"}",
+  "headers": {
+    "content-length": 117,
+    "content-type": "application/json"
+  },
+  "status": 200
+}

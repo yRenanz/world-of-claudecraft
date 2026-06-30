@@ -1,0 +1,8 @@
+{
+  "body": "{\"error\":\"Discord integration is not configured\"}",
+  "headers": {
+    "content-length": 49,
+    "content-type": "application/json"
+  },
+  "status": 503
+}

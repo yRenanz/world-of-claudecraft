@@ -165,6 +165,10 @@ export const KNOWN_DEVIATIONS: readonly KnownDeviation[] = [
     reason:
       'The Phase 4 router centralizes method dispatch so a known path with an ' +
       'unsupported method returns 405 before auth, instead of today 404 or 401.',
+    goldenFixtures: [
+      'tests/server/fixtures/main/register_get_wrong_method_404.json',
+      'tests/server/fixtures/main/me_characters_post_wrong_method_404.json',
+    ],
   },
   {
     id: DEVIATION_ID.validationStatusRemap,

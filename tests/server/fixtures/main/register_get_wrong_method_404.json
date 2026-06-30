@@ -1,0 +1,8 @@
+{
+  "body": "{\"error\":\"unknown endpoint\"}",
+  "headers": {
+    "content-length": 28,
+    "content-type": "application/json"
+  },
+  "status": 404
+}

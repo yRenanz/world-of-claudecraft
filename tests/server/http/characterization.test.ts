@@ -22,6 +22,7 @@
 
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { type Dispatch, goldenMaster, makeReq } from '../helpers';
+import { goldenContentTypeMismatch } from './content_type_consistency';
 
 // A failing-auth Postgres so the pg pool constructs but every query rejects fast
 // and identically. This is the "pool-less" db the guardrail describes: contract
@@ -62,10 +63,14 @@ beforeAll(async () => {
 // One golden per case: 'written' on the first ever run (fixture absent -> written),
 // 'match' on every run thereafter; a 'mismatch' fails the case.
 async function characterize(fixture: string, req: ReturnType<typeof makeReq>): Promise<void> {
-  const r = await goldenMaster({ dispatch, req, fixturePath: `${FIXTURE_DIR}/${fixture}.json` });
+  const fixturePath = `${FIXTURE_DIR}/${fixture}.json`;
+  const r = await goldenMaster({ dispatch, req, fixturePath });
   expect(r.status, r.status === 'mismatch' ? `${fixture}\n${r.actual}` : fixture).not.toBe(
     'mismatch',
   );
+  // The captured golden's content-type must match its route's classified class.
+  const ctMismatch = goldenContentTypeMismatch(req.method ?? 'GET', req.url ?? '', fixturePath);
+  expect(ctMismatch, ctMismatch ?? fixture).toBeNull();
 }
 
 describe('main /api characterization: preflight + dispatcher fallthrough', () => {
@@ -181,11 +186,42 @@ describe('main /api characterization: binary request class (player card)', () =>
   });
 });
 
-describe('main /api characterization: email unsubscribe (public, no token = no db)', () => {
+describe('main /api characterization: email link endpoints (public, no token = no db)', () => {
   it('GET /api/email/unsubscribe with no token returns ok:true before any db read', async () => {
     await characterize(
       'email_unsubscribe_no_token',
       makeReq({ method: 'GET', url: '/api/email/unsubscribe' }),
+    );
+  });
+
+  // The verify endpoint short-circuits on an empty token with a 400 application/json
+  // body BEFORE consumeEmailChangeRequest (its only db call). This pins the route's
+  // real content-type (JSON, not HTML) so the classification cannot silently drift.
+  it('GET /api/account/email/verify with no token returns the 400 invalid-link JSON', async () => {
+    await characterize(
+      'email_verify_no_token_400',
+      makeReq({ method: 'GET', url: '/api/account/email/verify' }),
+    );
+  });
+});
+
+// Wrong-method-on-a-known-path baseline for the planned405BeforeAuth deviation:
+// today a known path requested with an unsupported method falls through to the
+// shared 404 "unknown endpoint" arm (no method-aware 405). Phase 4's table router
+// flips these to a uniform pre-auth 405; these goldens anchor today's 404 so that
+// change diffs against a real baseline rather than an unstated assumption.
+describe('main /api characterization: wrong-method fallthrough (planned 405 baseline)', () => {
+  it('GET /api/register (POST-only path, wrong method) is today a 404 unknown endpoint', async () => {
+    await characterize(
+      'register_get_wrong_method_404',
+      makeReq({ method: 'GET', url: '/api/register' }),
+    );
+  });
+
+  it('POST /api/me/characters (GET-only path, wrong method) is today a 404 unknown endpoint', async () => {
+    await characterize(
+      'me_characters_post_wrong_method_404',
+      makeReq({ method: 'POST', url: '/api/me/characters', body: {} }),
     );
   });
 });

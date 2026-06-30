@@ -26,6 +26,7 @@
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { type Dispatch, goldenMaster, makeReq } from '../helpers/index';
+import { goldenContentTypeMismatch } from './content_type_consistency';
 
 // db.ts reads DATABASE_URL at module scope (throws if unset); a dummy URL lets
 // the bare server/main import resolve. The pool is constructed but never
@@ -57,6 +58,21 @@ const FIXTURE_SUBDIR = {
 
 function fixture(subdir: string, name: string): string {
   return join(__dirname, '..', 'fixtures', subdir, `${name}.json`);
+}
+
+// One golden per case, plus the content-type consistency cross-check (the captured
+// golden's content-type must match its route's classified class). Replaces the
+// repeated goldenMaster + expect boilerplate at every call site below.
+async function characterize(
+  subdir: string,
+  name: string,
+  req: ReturnType<typeof makeReq>,
+): Promise<void> {
+  const fixturePath = fixture(subdir, name);
+  const r = await goldenMaster({ dispatch, req, fixturePath });
+  expect(r.status, r.status === 'mismatch' ? `${name}\n${r.actual}` : name).not.toBe('mismatch');
+  const ctMismatch = goldenContentTypeMismatch(req.method ?? 'GET', req.url ?? '', fixturePath);
+  expect(ctMismatch, ctMismatch ?? name).toBeNull();
 }
 
 // The two shared-secret gate env vars (named so the secret-gate contract is not
@@ -107,12 +123,11 @@ describe('characterization: admin handleAdminApi', () => {
   // auth-denied contract; the 403 "no admin access" path needs a real account
   // lookup (db) and is deferred.
   it('POST /admin/api/login (empty body) -> 401 invalid credentials, before db', async () => {
-    const r = await goldenMaster({
-      dispatch,
-      req: makeReq({ method: 'POST', url: '/admin/api/login', body: {} }),
-      fixturePath: fixture(FIXTURE_SUBDIR.admin, 'login_empty_body_401'),
-    });
-    expect(r.status).not.toBe('mismatch');
+    await characterize(
+      FIXTURE_SUBDIR.admin,
+      'login_empty_body_401',
+      makeReq({ method: 'POST', url: '/admin/api/login', body: {} }),
+    );
   });
 
   // The admin auth gate (adminAccountId) runs BEFORE any route match and returns
@@ -122,24 +137,18 @@ describe('characterization: admin handleAdminApi', () => {
   for (const path of ['/admin/api/overview', '/admin/api/online', '/admin/api/accounts']) {
     const name = `${path.split('/').pop()}_no_auth_401`;
     it(`GET ${path} (no bearer) -> 401 admin authentication required`, async () => {
-      const r = await goldenMaster({
-        dispatch,
-        req: makeReq({ method: 'GET', url: path }),
-        fixturePath: fixture(FIXTURE_SUBDIR.admin, name),
-      });
-      expect(r.status).not.toBe('mismatch');
+      await characterize(FIXTURE_SUBDIR.admin, name, makeReq({ method: 'GET', url: path }));
     });
   }
 
   // A non-GET real admin route with no bearer: the auth gate precedes the method
   // and route match, so a write route is gated identically to the reads.
   it('POST /admin/api/blocked-ips (no bearer) -> 401 (auth precedes method/route)', async () => {
-    const r = await goldenMaster({
-      dispatch,
-      req: makeReq({ method: 'POST', url: '/admin/api/blocked-ips', body: {} }),
-      fixturePath: fixture(FIXTURE_SUBDIR.admin, 'blocked_ips_post_no_auth_401'),
-    });
-    expect(r.status).not.toBe('mismatch');
+    await characterize(
+      FIXTURE_SUBDIR.admin,
+      'blocked_ips_post_no_auth_401',
+      makeReq({ method: 'POST', url: '/admin/api/blocked-ips', body: {} }),
+    );
   });
 
   // An unmatched admin path with no bearer answers 401, NOT the 404
@@ -147,12 +156,11 @@ describe('characterization: admin handleAdminApi', () => {
   // the 404 is unreachable without admin auth. We characterize what actually
   // happens (the 401) and document the ordering here.
   it('GET /admin/api/<unknown> (no bearer) -> 401 (auth precedes the 404 fallthrough)', async () => {
-    const r = await goldenMaster({
-      dispatch,
-      req: makeReq({ method: 'GET', url: '/admin/api/this-endpoint-does-not-exist' }),
-      fixturePath: fixture(FIXTURE_SUBDIR.admin, 'unknown_endpoint_no_auth_401'),
-    });
-    expect(r.status).not.toBe('mismatch');
+    await characterize(
+      FIXTURE_SUBDIR.admin,
+      'unknown_endpoint_no_auth_401',
+      makeReq({ method: 'GET', url: '/admin/api/this-endpoint-does-not-exist' }),
+    );
   });
 });
 
@@ -165,40 +173,37 @@ describe('characterization: oauth handleOAuth', () => {
   // is never called and renderAuthorize answers a 400 htmlError consent page
   // BEFORE the db. The page is fully static (no dynamic fields, no em dash).
   it('GET /oauth/authorize (no client_id) -> 400 html "Unknown application"', async () => {
-    const r = await goldenMaster({
-      dispatch,
-      req: makeReq({ method: 'GET', url: '/oauth/authorize' }),
-      fixturePath: fixture(FIXTURE_SUBDIR.oauth, 'authorize_get_no_client_400_html'),
-    });
-    expect(r.status).not.toBe('mismatch');
+    await characterize(
+      FIXTURE_SUBDIR.oauth,
+      'authorize_get_no_client_400_html',
+      makeReq({ method: 'GET', url: '/oauth/authorize' }),
+    );
   });
 
   // POST /oauth/token with an unsupported grant_type: tokenEndpoint dispatches on
   // grant_type and returns 400 unsupported_grant_type before any db lookup.
   it('POST /oauth/token (unsupported grant_type) -> 400 unsupported_grant_type', async () => {
-    const r = await goldenMaster({
-      dispatch,
-      req: makeReq({
+    await characterize(
+      FIXTURE_SUBDIR.oauth,
+      'token_unsupported_grant_400',
+      makeReq({
         method: 'POST',
         url: '/oauth/token',
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
         body: 'grant_type=client_credentials',
       }),
-      fixturePath: fixture(FIXTURE_SUBDIR.oauth, 'token_unsupported_grant_400'),
-    });
-    expect(r.status).not.toBe('mismatch');
+    );
   });
 
   // POST /oauth/revoke with no token: revokeEndpoint skips revokeReadToken (the
   // only db call) for an empty token and always answers 200 { ok: true }
   // (RFC 7009 section 2.2). Deterministic, before db.
   it('POST /oauth/revoke (no token) -> 200 { ok: true }, db skipped', async () => {
-    const r = await goldenMaster({
-      dispatch,
-      req: makeReq({ method: 'POST', url: '/oauth/revoke' }),
-      fixturePath: fixture(FIXTURE_SUBDIR.oauth, 'revoke_no_token_200'),
-    });
-    expect(r.status).not.toBe('mismatch');
+    await characterize(
+      FIXTURE_SUBDIR.oauth,
+      'revoke_no_token_200',
+      makeReq({ method: 'POST', url: '/oauth/revoke' }),
+    );
   });
 
   // POST /oauth/device_authorization with no client_id: the client lookup is
@@ -206,12 +211,11 @@ describe('characterization: oauth handleOAuth', () => {
   // before the db. (The SUCCESS path mints snake_case device_code/user_code/
   // verification_uri fields that are dynamic and unmasked, so it is deferred.)
   it('POST /oauth/device_authorization (no client_id) -> 400 invalid_client', async () => {
-    const r = await goldenMaster({
-      dispatch,
-      req: makeReq({ method: 'POST', url: '/oauth/device_authorization' }),
-      fixturePath: fixture(FIXTURE_SUBDIR.oauth, 'device_authorization_no_client_400'),
-    });
-    expect(r.status).not.toBe('mismatch');
+    await characterize(
+      FIXTURE_SUBDIR.oauth,
+      'device_authorization_no_client_400',
+      makeReq({ method: 'POST', url: '/oauth/device_authorization' }),
+    );
   });
 
   // POST /oauth/authorize with no session: fullSessionAccount returns null for a
@@ -219,33 +223,30 @@ describe('characterization: oauth handleOAuth', () => {
   // approval answers 401 access_denied. (The SUCCESS path embeds a dynamic auth
   // code + state in a redirect query string, so it is deferred.)
   it('POST /oauth/authorize (no session) -> 401 access_denied', async () => {
-    const r = await goldenMaster({
-      dispatch,
-      req: makeReq({ method: 'POST', url: '/oauth/authorize' }),
-      fixturePath: fixture(FIXTURE_SUBDIR.oauth, 'authorize_post_no_session_401'),
-    });
-    expect(r.status).not.toBe('mismatch');
+    await characterize(
+      FIXTURE_SUBDIR.oauth,
+      'authorize_post_no_session_401',
+      makeReq({ method: 'POST', url: '/oauth/authorize' }),
+    );
   });
 
   // POST /oauth/device with no session: approveDevice answers 401 access_denied
   // before the db, same gate as approveAuthorize.
   it('POST /oauth/device (no session) -> 401 access_denied', async () => {
-    const r = await goldenMaster({
-      dispatch,
-      req: makeReq({ method: 'POST', url: '/oauth/device' }),
-      fixturePath: fixture(FIXTURE_SUBDIR.oauth, 'device_post_no_session_401'),
-    });
-    expect(r.status).not.toBe('mismatch');
+    await characterize(
+      FIXTURE_SUBDIR.oauth,
+      'device_post_no_session_401',
+      makeReq({ method: 'POST', url: '/oauth/device' }),
+    );
   });
 
   // An unknown /oauth path falls through every arm to the 404 not_found tail.
   it('GET /oauth/<unknown> -> 404 not_found', async () => {
-    const r = await goldenMaster({
-      dispatch,
-      req: makeReq({ method: 'GET', url: '/oauth/no-such-endpoint' }),
-      fixturePath: fixture(FIXTURE_SUBDIR.oauth, 'unknown_404'),
-    });
-    expect(r.status).not.toBe('mismatch');
+    await characterize(
+      FIXTURE_SUBDIR.oauth,
+      'unknown_404',
+      makeReq({ method: 'GET', url: '/oauth/no-such-endpoint' }),
+    );
   });
 });
 
@@ -261,12 +262,11 @@ describe('characterization: internal handleInternalApi', () => {
   // route answers 404 unknown endpoint (forced unset for determinism).
   it('POST /internal/restart-countdown (secret unset) -> 404 unknown endpoint', async () => {
     await withEnv(SECRET_ENV.restartCountdown, undefined, async () => {
-      const r = await goldenMaster({
-        dispatch,
-        req: makeReq({ method: 'POST', url: '/internal/restart-countdown' }),
-        fixturePath: fixture(FIXTURE_SUBDIR.internal, 'restart_countdown_secret_unset_404'),
-      });
-      expect(r.status).not.toBe('mismatch');
+      await characterize(
+        FIXTURE_SUBDIR.internal,
+        'restart_countdown_secret_unset_404',
+        makeReq({ method: 'POST', url: '/internal/restart-countdown' }),
+      );
     });
   });
 
@@ -274,12 +274,11 @@ describe('characterization: internal handleInternalApi', () => {
   // answers 404 regardless of the env. Captured with the secret unset.
   it('GET /internal/restart-countdown (non-POST) -> 404 unknown endpoint', async () => {
     await withEnv(SECRET_ENV.restartCountdown, undefined, async () => {
-      const r = await goldenMaster({
-        dispatch,
-        req: makeReq({ method: 'GET', url: '/internal/restart-countdown' }),
-        fixturePath: fixture(FIXTURE_SUBDIR.internal, 'restart_countdown_get_404'),
-      });
-      expect(r.status).not.toBe('mismatch');
+      await characterize(
+        FIXTURE_SUBDIR.internal,
+        'restart_countdown_get_404',
+        makeReq({ method: 'GET', url: '/internal/restart-countdown' }),
+      );
     });
   });
 
@@ -288,12 +287,11 @@ describe('characterization: internal handleInternalApi', () => {
   // authenticated, before startRestartCountdown / the db.
   it('POST /internal/restart-countdown (secret set, no header) -> 401 not authenticated', async () => {
     await withEnv(SECRET_ENV.restartCountdown, GATE_ENABLED_VALUE, async () => {
-      const r = await goldenMaster({
-        dispatch,
-        req: makeReq({ method: 'POST', url: '/internal/restart-countdown' }),
-        fixturePath: fixture(FIXTURE_SUBDIR.internal, 'restart_countdown_wrong_secret_401'),
-      });
-      expect(r.status).not.toBe('mismatch');
+      await characterize(
+        FIXTURE_SUBDIR.internal,
+        'restart_countdown_wrong_secret_401',
+        makeReq({ method: 'POST', url: '/internal/restart-countdown' }),
+      );
     });
   });
 
@@ -312,32 +310,32 @@ describe('characterization: internal handleInternalApi', () => {
     { method: 'POST', path: '/internal/discord/members-meta', name: 'discord_members_meta' },
   ] as const;
 
-  // Representative feature-off case: with DISCORD_BOT_SECRET unset, the whole
-  // /internal/discord/* surface answers 404 unknown endpoint at the gate. The gate
-  // is shared, so this one route stands for all eight (the 401 cases below cover
-  // every route individually).
-  it('GET /internal/discord/flex (bot secret unset) -> 404 unknown endpoint', async () => {
-    await withEnv(SECRET_ENV.discordBot, undefined, async () => {
-      const r = await goldenMaster({
-        dispatch,
-        req: makeReq({ method: 'GET', url: '/internal/discord/flex' }),
-        fixturePath: fixture(FIXTURE_SUBDIR.internal, 'discord_flex_secret_unset_404'),
+  // Feature-off gate, captured PER ROUTE: with DISCORD_BOT_SECRET unset, the whole
+  // /internal/discord/* surface answers 404 unknown endpoint at the shared gate.
+  // Looping all eight (mirroring the 401 loop below) freezes each route's feature-off
+  // baseline, so a later phase that moves any one off the shared gate is caught.
+  for (const route of DISCORD_ROUTES) {
+    it(`${route.method} ${route.path} (bot secret unset) -> 404 unknown endpoint`, async () => {
+      await withEnv(SECRET_ENV.discordBot, undefined, async () => {
+        await characterize(
+          FIXTURE_SUBDIR.internal,
+          `${route.name}_secret_unset_404`,
+          makeReq({ method: route.method, url: route.path }),
+        );
       });
-      expect(r.status).not.toBe('mismatch');
     });
-  });
+  }
 
   // 401 not-authenticated gate for each of the eight routes: DISCORD_BOT_SECRET
   // set, the x-woc-discord-secret request header absent. The gate precedes the db.
   for (const route of DISCORD_ROUTES) {
     it(`${route.method} ${route.path} (bot secret set, no header) -> 401 not authenticated`, async () => {
       await withEnv(SECRET_ENV.discordBot, GATE_ENABLED_VALUE, async () => {
-        const r = await goldenMaster({
-          dispatch,
-          req: makeReq({ method: route.method, url: route.path }),
-          fixturePath: fixture(FIXTURE_SUBDIR.internal, `${route.name}_no_secret_401`),
-        });
-        expect(r.status).not.toBe('mismatch');
+        await characterize(
+          FIXTURE_SUBDIR.internal,
+          `${route.name}_no_secret_401`,
+          makeReq({ method: route.method, url: route.path }),
+        );
       });
     });
   }
@@ -345,12 +343,11 @@ describe('characterization: internal handleInternalApi', () => {
   // An unknown /internal path (neither restart-countdown nor /internal/discord/)
   // falls through to the 404 unknown endpoint tail, independent of either secret.
   it('GET /internal/<unknown> -> 404 unknown endpoint', async () => {
-    const r = await goldenMaster({
-      dispatch,
-      req: makeReq({ method: 'GET', url: '/internal/no-such-op' }),
-      fixturePath: fixture(FIXTURE_SUBDIR.internal, 'unknown_endpoint_404'),
-    });
-    expect(r.status).not.toBe('mismatch');
+    await characterize(
+      FIXTURE_SUBDIR.internal,
+      'unknown_endpoint_404',
+      makeReq({ method: 'GET', url: '/internal/no-such-op' }),
+    );
   });
 });
 

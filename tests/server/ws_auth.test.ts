@@ -8,6 +8,7 @@ import type * as http from 'node:http';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { WebSocket, WebSocketServer } from 'ws';
 import type { AccountModerationStatus, CharacterRow } from '../../server/db';
+import { isConnectionRefused as realIsConnectionRefused } from '../../server/ip_block';
 import { createWsAuth, type WsAuthDeps } from '../../server/ws_auth';
 import { bufferHandshakeMessages } from '../../server/ws_buffer';
 
@@ -166,15 +167,52 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     );
   });
 
-  it('8. closes 1008 on the IP gate and sends NO error frame', async () => {
-    const { ws, deps, req } = setup();
+  it('8. closes 1008 on the IP gate, wiring the gate inputs, and sends NO error frame', async () => {
+    const { ws, game, deps, req } = setup();
     deps.isConnectionRefused = vi.fn(() => true);
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), authRaw(), req);
+    // The gate decision is fed the server-resolved inputs verbatim: the per-IP
+    // block flag and live session count BOTH keyed by the request IP, the admin
+    // exemption, and the configured hard limit. A regression that swaps an arg,
+    // drops the admin exemption, or keys the count off the wrong IP would still
+    // reject here without this exact-shape assertion.
+    expect(deps.isConnectionRefused).toHaveBeenCalledWith({
+      blocked: false,
+      isAdmin: false,
+      ipSessions: 0,
+      hardLimit: 20,
+    });
+    expect(game.isIpBlocked).toHaveBeenCalledWith('1.2.3.4');
+    expect(game.countIpSessions).toHaveBeenCalledWith('1.2.3.4');
     // This asymmetry is load-bearing: the hard per-IP limit closes with a code
     // and reason but never writes a {t:'error'} frame first.
     expect(ws.close).toHaveBeenCalledWith(1008, 'Too many connections from your network');
     expect(ws.send).not.toHaveBeenCalled();
+  });
+
+  it('8b. refuses via the REAL gate predicate when live IP sessions reach the hard limit', async () => {
+    const { ws, game, deps, req } = setup();
+    // Drive the actual ip_block decision end to end, not a stub, so the gate's
+    // real ipSessions >= hardLimit comparison is exercised through the wiring.
+    deps.isConnectionRefused = realIsConnectionRefused;
+    game.countIpSessions = vi.fn((_ip: string) => 20); // exactly at maxWsPerIpHard (20)
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+    expect(ws.close).toHaveBeenCalledWith(1008, 'Too many connections from your network');
+    expect(game.join).not.toHaveBeenCalled();
+  });
+
+  it('8c. the REAL gate predicate exempts an admin even past the hard limit', async () => {
+    const { ws, game, deps, req } = setup();
+    deps.isConnectionRefused = realIsConnectionRefused;
+    deps.isAdminAccount = vi.fn(async () => true);
+    game.countIpSessions = vi.fn((_ip: string) => 999); // far past the limit
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+    // isAdmin short-circuits the gate, so the join proceeds and no 1008 fires.
+    expect(game.join).toHaveBeenCalledTimes(1);
+    expect(ws.close).not.toHaveBeenCalledWith(1008, 'Too many connections from your network');
   });
 
   it('9. forwards a game.join error frame', async () => {
@@ -183,6 +221,23 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), authRaw(), req);
     expectSendThenClose(ws, errorFrame('character already in world'));
+  });
+
+  it('10. resolves moderation BEFORE loading the character (order is load-bearing)', async () => {
+    const { ws, deps, req } = setup();
+    // Both checks would fail: a locked (banned) account AND a missing character.
+    // The banned message must win, proving moderation is resolved before the
+    // character lookup, so a banned account is rejected without any character
+    // row being read. A reordering that moved the character load earlier would
+    // surface 'no such character' here and fail this test.
+    deps.moderationStatusForAccount = vi.fn(async () =>
+      modStatus({ locked: true, message: 'You are banned.' }),
+    );
+    deps.getCharacter = vi.fn(async () => null);
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+    expectSendThenClose(ws, errorFrame('You are banned.'));
+    expect(deps.getCharacter).not.toHaveBeenCalled();
   });
 });
 
@@ -212,8 +267,10 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
         clientSeed: '',
       }),
     );
-    // No {t:'error'} frame on the happy path.
+    // No {t:'error'} frame on the happy path, and the socket stays OPEN: a
+    // regression that left a stray close() on the success path would be caught.
     expect(ws.send).not.toHaveBeenCalled();
+    expect(ws.close).not.toHaveBeenCalled();
 
     // The permanent message handler is attached and routes frames to the game.
     expect(ws.listenerCount('message')).toBeGreaterThanOrEqual(1);
@@ -251,6 +308,52 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
     expect(ws.listenerCount('error')).toBeGreaterThanOrEqual(1);
     ws.emit('error', new Error('connection reset'));
     expect(game.leave).toHaveBeenCalledWith(session, 'connection error');
+  });
+
+  it('prefers the account-level chat mute over the chat-level mute in the join meta', async () => {
+    const { ws, game, deps, req } = setup();
+    deps.moderationStatusForAccount = vi.fn(async () =>
+      modStatus({ chatMutedUntil: '2099-01-01T00:00:00Z' }),
+    );
+    deps.chatMuteStatusForAccount = vi.fn(async () => ({
+      mutedUntil: '2000-01-01T00:00:00Z',
+      reason: 'spam',
+    }));
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+    // mutedUntil = status.chatMutedUntil ?? chatMute.mutedUntil: the account-level
+    // value wins when present; reason still rides from the chat-mute status.
+    expect(game.join).toHaveBeenCalledWith(
+      ws,
+      1,
+      7,
+      'Aldric',
+      'warrior',
+      null,
+      false,
+      expect.objectContaining({ mutedUntil: '2099-01-01T00:00:00Z', reason: 'spam' }),
+    );
+  });
+
+  it('falls back to the chat-level mute when the account has no mute', async () => {
+    const { ws, game, deps, req } = setup();
+    deps.chatMuteStatusForAccount = vi.fn(async () => ({
+      mutedUntil: '2050-06-06T00:00:00Z',
+      reason: 'language',
+    }));
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+    // status.chatMutedUntil is null (default), so the chat-level mute is used.
+    expect(game.join).toHaveBeenCalledWith(
+      ws,
+      1,
+      7,
+      'Aldric',
+      'warrior',
+      null,
+      false,
+      expect.objectContaining({ mutedUntil: '2050-06-06T00:00:00Z' }),
+    );
   });
 });
 

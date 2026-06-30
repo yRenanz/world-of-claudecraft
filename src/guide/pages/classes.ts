@@ -105,9 +105,17 @@ function classCard(c: GuideClassInfo): string {
   const data = m
     ? ` data-roles="${esc(c.roles.join(' '))}" data-resource="${esc(c.resource)}" data-style="${esc(m.style)}" data-complexity="${esc(m.complexity)}" data-first="${m.goodFirst}"`
     : ` data-roles="${esc(c.roles.join(' '))}" data-resource="${esc(c.resource)}"`;
+  // Show the actual class figure (the pre-rendered character still) as the card image, the
+  // same subject the detail page turntable spins; fall back to the procedural class crest only
+  // if a still is somehow absent (the guide.test asset guard makes that a build failure).
+  const figure = c.still
+    ? `<div class="guide-class-card-portrait">
+        <img class="guide-class-card-still" src="${esc(c.still)}" alt="${esc(t('guide.viewer.posterAlt', { name: className(c.id) }))}" width="88" height="88" loading="lazy" decoding="async" />
+      </div>`
+    : crestImg(classCrest(c.id, 128), 64, 'guide-class-crest');
   return `
     <a class="guide-class-card" href="${esc(hrefFor(`classes/${c.id}`))}" style="--class-color:${esc(c.color)}"${data}>
-      ${crestImg(classCrest(c.id, 128), 64, 'guide-class-crest')}
+      ${figure}
       <span class="guide-class-card-name">${esc(className(c.id))}</span>
       <span class="guide-badges">${roleBadges(c.roles)}</span>
       <span class="guide-class-card-hook">${esc(classLore(c.id))}</span>

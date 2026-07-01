@@ -34,7 +34,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
-// The 20 facet interfaces the W1 split produced (src/world_api/<facet>.ts). Imported
+// The 21 facet interfaces the W1 split produced (src/world_api/<facet>.ts). Imported
 // type-only to pin each facet's runtime member array to its interface key-set below.
 import type { IWorldChat } from '../src/world_api/chat';
 import type { IWorldCombat } from '../src/world_api/combat';
@@ -49,6 +49,7 @@ import type { IWorldLoot } from '../src/world_api/loot';
 import type { IWorldMarket } from '../src/world_api/market';
 import type { IWorldParty } from '../src/world_api/party';
 import type { IWorldPet } from '../src/world_api/pet';
+import type { IWorldProfessions } from '../src/world_api/professions';
 import type { IWorldProgressionXp } from '../src/world_api/progression_xp';
 import type { IWorldQuests } from '../src/world_api/quests';
 import type { IWorldSocialGraph } from '../src/world_api/social_graph';
@@ -208,6 +209,7 @@ export const IWORLD_MEMBERS = [
   { name: 'delveMarks', kind: 'data' },
   { name: 'companionUpgrades', kind: 'data' },
   { name: 'delveDaily', kind: 'data' },
+  { name: 'professionsState', kind: 'data' },
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
   { name: 'leaderboard', kind: 'method' }, // async
   { name: 'guildLeaderboard', kind: 'method' }, // async
@@ -444,6 +446,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'playerId',
       'prestige',
       'prestigeRank',
+      'professionsState',
       'questLog',
       'questState',
       'questsDone',
@@ -520,6 +523,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'player',
       'playerId',
       'prestigeRank',
+      'professionsState',
       'questLog',
       'questsDone',
       'realm',
@@ -683,7 +687,7 @@ describe('membership, not equality: world extras do not fail the gate', () => {
   });
 });
 
-// --- W1: aggregate == disjoint union of the 20 facet member sets --------------------
+// --- W1: aggregate == disjoint union of the 21 facet member sets --------------------
 // After the facet split (W1), `interface IWorld extends` 20 domain facet interfaces
 // (src/world_api/<facet>.ts; the 19 owner-backed facets plus IWorldTelemetry). This
 // block proves the split dropped nothing and duplicated nothing:
@@ -946,6 +950,13 @@ type _ExhaustTelemetry = AssertNever<
   Exclude<keyof IWorldTelemetry, (typeof FACET_TELEMETRY)[number]>
 >;
 
+const FACET_PROFESSIONS = [
+  'professionsState',
+] as const satisfies readonly (keyof IWorldProfessions)[];
+type _ExhaustProfessions = AssertNever<
+  Exclude<keyof IWorldProfessions, (typeof FACET_PROFESSIONS)[number]>
+>;
+
 // The 20-facet partition, keyed by facet for legible failure messages.
 const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   entityRoster: FACET_ENTITY_ROSTER,
@@ -968,11 +979,12 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   dungeons: FACET_DUNGEONS,
   delves: FACET_DELVES,
   telemetry: FACET_TELEMETRY,
+  professions: FACET_PROFESSIONS,
 };
 
-describe('W1: aggregate IWorld member set equals the disjoint union of the 20 facets', () => {
-  it('pins the facet count at 20', () => {
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(20);
+describe('W1: aggregate IWorld member set equals the disjoint union of the 21 facets', () => {
+  it('pins the facet count at 21', () => {
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(21);
   });
 
   it('each facet array is non-empty and internally duplicate-free', () => {
@@ -982,7 +994,7 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 20 fa
     }
   });
 
-  it('the 20 facet arrays are pairwise disjoint (no member filed in two facets)', () => {
+  it('the 21 facet arrays are pairwise disjoint (no member filed in two facets)', () => {
     const entries = Object.entries(FACET_MEMBER_ARRAYS);
     const overlaps: string[] = [];
     for (let i = 0; i < entries.length; i++) {
@@ -998,10 +1010,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 20 fa
     expect(overlaps, `members filed in more than one facet:\n${overlaps.join('\n')}`).toEqual([]);
   });
 
-  it('the union of the 20 facets equals the pinned 148-member IWORLD_MEMBERS set', () => {
+  it('the union of the 21 facets equals the pinned 149-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(148);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(148);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(149);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(149);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

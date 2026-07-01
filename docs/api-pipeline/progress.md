@@ -22,10 +22,10 @@ Mark a row's Status as "In progress" or "Done" and fill Started / Completed
 | Phase 04 QA | Done | 2026-06-30 | 2026-06-30 |
 | Phase 05 | Done | 2026-06-30 | 2026-06-30 |
 | Phase 05 QA | Done | 2026-06-30 | 2026-06-30 |
-| Phase 06 | Not started |  |  |
-| Phase 06 QA | Not started |  |  |
-| Phase 07 | Not started |  |  |
-| Phase 07 QA | Not started |  |  |
+| Phase 06 | Done | 2026-06-30 | 2026-06-30 |
+| Phase 06 QA | Done | 2026-06-30 | 2026-06-30 |
+| Phase 07 | Done | 2026-06-30 | 2026-06-30 |
+| Phase 07 QA | Done | 2026-06-30 | 2026-06-30 |
 | Phase 08 | Not started |  |  |
 | Phase 08 QA | Not started |  |  |
 | Phase 09 | Not started |  |  |
@@ -461,7 +461,32 @@ owns the REST code-parity guard); build:server exit 0; Biome clean on the 5 chan
 exit 0; ASCII-clean (no em/en dash, emoji, .only, debugger). Deferrals: withErrors middleware -> P8;
 client userFacingApiError extension + apiError.* catalog + per-surface code-parity Vitest -> P22; the
 real Retry-After VALUE sourcing from the limiter -> P19; the em-dash rate-limit string fix -> P13; the
-structured logger + /metrics -> P23. Next: Phase 07 QA (phase-07-qa.md).
+structured logger + /metrics -> P23.
+
+Phase 07 QA gate (phase-07-qa.md, dedicated adversarial pass): PASS, 0 BLOCKING, 0 SHOULD-FIX. A
+1 Explore context load + 4 parallel auditors (correctness, test-coverage, dead-code/cleanup,
+privacy-security-review) + a per-finding adversarial verify stage. The correctness auditor returned
+ZERO findings: every acceptance criterion re-verified against the real code (as-const + deep-frozen
+catalog, domain.reason keys, param-key declarations, the append-only snapshot, userFacingApiError
+vocabulary reused 1:1, the exhaustive toAppError table incl. the HttpError pass-through for
+401/403/413/429, per-surface not per-prefix selection, all seven frozen serializer shapes, stable
+`code` i18n, server-only three-host parity, and the 500-no-leak proof). Out-of-scope check CONFIRMED
+clean: the four Phase 7 commits touched only server/http/, tests/server/http/, and the two doc files.
+The 10 findings surfaced were ALL NICE-TO-HAVE. Applied 5 in-scope hardening nits (commits 4d5a0882
++ 8877faeb): a direct escapeHtml escaping test (escapeHtml exported for it), the detailFor
+status-reason fallback assertion, a WWW-Authenticate propagation assertion on the serialized mapError
+result, hoisted CT_JSON/CT_HTML content-type constants, and narrowed DETAILS/OAUTH_ERROR to
+`Partial<Record<ErrorCode, string>>` so a renamed/mistyped key is a compile error (no runtime change).
+Deferred 5 forward-looking notes to their scoped phases: the 37 harvested "orphan" codes (reserved
+for P22 emit-wiring, AIP-193), normalizeSurface's export consumer (P8 withErrors), the redirect
+surface status collapse and instance=ctx.path echo (P8+/P12 route wiring), and defaultOnUnexpected's
+console.error (P23 redacting logger). Post-fix: 97 tests across the 3 files (was 91, +6);
+tests/server/http 330 pass (was 324); full gate green (npm test 617 files / 6597 pass / 11 skip; tsc,
+build:env, build:server, build all exit 0; S3 27/3; ci:changed exit 0, changed files clean;
+ASCII-clean). Note (commit hygiene, not a Phase 7 defect): commit 03dc2632 swept a stray root-level
+PROFESSIONS_REVIEW.md in with the schema.ts credential-compare rename; it is unrelated to the API
+pipeline and left untouched here. Next: Phase 08 (Core middleware set + metric/log hook seam + thin
+rateLimit adapter, phase-08-middleware.md).
 
 ## Phase 08: Core middleware set + metric/log hook seam + thin rateLimit adapter
 

@@ -157,6 +157,7 @@ import { handleSitePresenceHeartbeat } from './site_presence';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
 import { verifyTurnstile } from './turnstile';
 import {
+  configureWalletRuntime,
   handleWalletChallenge,
   handleWalletGet,
   handleWalletLink,
@@ -1528,6 +1529,16 @@ configureAccountRuntime({
       (s) => s.characterId != null && characterIds.includes(s.characterId),
     ),
   disconnectAccount: (id, reason) => game.disconnectAccount(id, reason),
+});
+
+// Inject the one main.ts-local singleton the ported wallet handlers
+// (server/wallet.ts) need but cannot import without a cycle: the live
+// authoritative Sim level the /api/card publish reads for an online character.
+// This is the exact (characterId) => game.liveLevelForCharacter(characterId) the
+// legacy /api/card arm passed to handleCardUpload; the legacy wallet/card/referral
+// arms stay intact as the flag-off rollback path.
+configureWalletRuntime({
+  liveLevelForCharacter: (characterId) => game.liveLevelForCharacter(characterId),
 });
 
 // The in-house dispatcher that fronts the legacy handleApi ladder via a per-path

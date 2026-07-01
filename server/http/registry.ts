@@ -26,6 +26,7 @@ import { routes as accountRoutes } from '../account';
 import { routes as authRoutes } from '../auth_routes';
 import { routes as characterRoutes } from '../characters';
 import { routes as leaderboardRoutes } from '../leaderboard';
+import { routes as walletRoutes } from '../wallet';
 import { type CompiledPattern, compilePattern } from './path_pattern';
 import { createRouter, type MatchResult } from './router';
 import type { OwnerScope, RouteDef } from './types';
@@ -60,13 +61,17 @@ export interface ApiRegistry {
  * adds the owner-gated character surface (server/characters.ts: the character list
  * pair, create, and the account-owned :id subroutes behind requireOwnedCharacter).
  * Phase 13 adds the account-portal surface (server/account.ts: the /api/account/*
- * family, the companion-token method trio, and /api/email/unsubscribe).
+ * family, the companion-token method trio, and /api/email/unsubscribe). Phase 14
+ * adds the wallet / card / referral surface (server/wallet.ts: the wallet-link
+ * family, GET /api/wallet, the public GET /api/woc/balance, the binary POST
+ * /api/card, and GET /api/referrals).
  */
 export const apiRoutes: readonly RouteDef[] = [
   ...leaderboardRoutes,
   ...authRoutes,
   ...characterRoutes,
   ...accountRoutes,
+  ...walletRoutes,
 ];
 
 /**

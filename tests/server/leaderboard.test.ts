@@ -39,9 +39,11 @@ import {
   readPublicSheet,
   readRealms,
   readSearch,
+  resetLeaderboardDbForTests,
   resetLeaderboardRuntimeForTests,
   routes,
   SEARCH_RESULT_LIMIT,
+  setLeaderboardDbForTests,
 } from '../../server/leaderboard';
 import {
   PUBLIC_READ_MAX_PER_MINUTE,
@@ -127,6 +129,7 @@ function handlerFor(path: string) {
 
 afterEach(() => {
   resetLeaderboardRuntimeForTests();
+  resetLeaderboardDbForTests();
   resetPublicReadRateLimits();
   vi.unstubAllGlobals();
 });
@@ -332,6 +335,28 @@ describe('readPublicSheet (FakeCharactersDb, resolved by name)', () => {
     expect(body.guild).toBe('Wolfpack');
     expect(body.rank).toEqual({ scope: 'realm', rank: 3, total: 100 });
   });
+
+  it('404s when the name resolves but the row read returns null (delete race)', async () => {
+    const db = new FakeCharactersDb();
+    db.seed(characterRow(21, 'Ghost'));
+    // The name resolves to a target, but the row read returns null (deleted between
+    // the two reads): the second 404 branch, after getCharacterById.
+    vi.spyOn(db, 'getCharacterById').mockResolvedValue(null);
+    const out = await readPublicSheet(db, 'Ghost', sheetDeps);
+    expect(out).toEqual({ status: 404, body: { error: 'character not found' } });
+  });
+
+  it('returns a 200 sheet with a null rank when the character has no lifetime-XP standing', async () => {
+    const db = new FakeCharactersDb();
+    db.seed(characterRow(22, 'Unranked'));
+    db.seedGuildName(22, 'Nomads');
+    // No seedStanding: lifetimeXpRankForCharacter -> null -> toSheetRank(null) -> null.
+    const out = await readPublicSheet(db, 'Unranked', sheetDeps);
+    expect(out.status).toBe(200);
+    const body = out.body as Record<string, unknown>;
+    expect(body.guild).toBe('Nomads');
+    expect(body.rank).toBeNull();
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -433,6 +458,37 @@ describe('leaderboard handler (through the injected cache-fronted runtime)', () 
     await handlerFor('/api/leaderboard')(ctx);
     expect(scopes).toEqual(['global']);
     expect((captured(ctx.res).body as Record<string, unknown>).scope).toBe('global');
+  });
+});
+
+describe('arena leaderboard handler (through the injected db reads)', () => {
+  it('decodes ?format and serves { format, leaders } from the db read', async () => {
+    setLeaderboardDbForTests({
+      topArenaRatings: async (_limit, format) => [arenaRow(`Champ-${format}`)],
+    });
+    const ctx = fakeCtx({
+      method: 'GET',
+      url: '/api/arena/leaderboard',
+      query: { format: '2v2' },
+    });
+    await handlerFor('/api/arena/leaderboard')(ctx);
+    const { status, body } = captured(ctx.res);
+    expect(status).toBe(200);
+    const b = body as { format: string; leaders: { name: string }[] };
+    expect(b.format).toBe('2v2');
+    expect(b.leaders.map((r) => r.name)).toEqual(['Champ-2v2']);
+  });
+});
+
+describe('project-stats handler (through the injected db reads)', () => {
+  it('serves accounts_created from the db, players_online from the runtime, and the realm', async () => {
+    configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 9 }));
+    setLeaderboardDbForTests({ getAccountsCount: async () => 123 });
+    const ctx = fakeCtx({ method: 'GET', url: '/api/project-stats' });
+    await handlerFor('/api/project-stats')(ctx);
+    const { status, body } = captured(ctx.res);
+    expect(status).toBe(200);
+    expect(body).toEqual({ accounts_created: 123, players_online: 9, realm: REALM_NAME });
   });
 });
 

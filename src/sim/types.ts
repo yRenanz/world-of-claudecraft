@@ -371,9 +371,29 @@ export interface OtherItemDef extends BaseItemDef {
 
 export type ItemDef = ArmorItemDef | WeaponItemDef | OtherItemDef;
 
+// Per-instance item payload (#1165). Additive and OPTIONAL: most items stay plain
+// {itemId, count} with no instance payload (fungible, market-listable). A slot
+// carrying `instance` is non-fungible (signed, has rolled stats, or is
+// character-bound) and is kept in its own slot entry, never merged with a plain
+// stack of the same itemId. Inert in the World Market for now (blocked at list
+// time, see market.ts marketList); #1146 wires real market handling for
+// instanced items later.
+export interface ItemInstancePayload {
+  /** Player name that signed/crafted this specific copy, if any. */
+  signer?: string;
+  /** Remaining charges for a per-effect-limited item, keyed by effect id. */
+  charges?: Record<string, number>;
+  /** Rolled quality/stat values baked into this specific copy at creation time. */
+  rolled?: { quality?: string; stats?: Record<string, number> };
+  /** Player id (Entity id) this specific copy is bound to. */
+  boundTo?: number;
+}
+
 export interface InvSlot {
   itemId: string;
   count: number;
+  /** Additive, optional per-instance payload (#1165). Absent for ordinary fungible stacks. */
+  instance?: ItemInstancePayload;
 }
 
 export interface LootSlot extends InvSlot {

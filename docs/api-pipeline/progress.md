@@ -631,12 +631,13 @@ New surface shipped (all under server/http/ + tests/server/http/):
 ZERO routes migrated (registry empty, every /api path delegates), so behavior is byte-for-byte identical to today (proven by parity + the Phase 3 goldens staying green). No WS wire, no src/sim, no DDL/JSONB, no new player-facing English.
 
 QA:
-- [ ] Fixes applied
-- [ ] Tests added
-- [ ] Dead code removed
-- [ ] Reviews clean
+- [x] Fixes applied
+- [x] Tests added
+- [x] Dead code removed
+- [x] Reviews clean
 
 Notes:
+- Phase 9 QA gate (phase-09-qa.md) PASS: 0 BLOCKING, 0 SHOULD-FIX, 2 NICE-TO-HAVE, both applied. Five-dimension audit (correctness, test-coverage, dead-code, privacy-security-review, qa-checklist) all clean, each substantive finding adversarially verified. Nits fixed as two stacked commits: (a) `refactor(http)` single-source the `DispatchMode` union in config.ts (was re-typed inline in dispatch.ts + main.ts x2 while only the default value was single-sourced); (b) `docs(http)` correct the `server/http/index.ts` barrel header (claimed a consumer, main.ts/tests, that imports the modules directly, not the barrel). No new tests required: the parity corpus already covers ALL 34 db-free MAIN /api fixtures (+ 4 dedicated CORS cases), and the completeness gate carries a non-vacuous synthetic-dropped-route negative control. FORWARD-LOOKING (Phase 10+, NOT a Phase 9 defect): once the registry is populated, a synchronous throw from `resolve()`/`buildContext()` would escape `routeHttpRequest`'s `void apiEntry(req,res)` call (outside any try/catch, unlike legacy `handleApi`'s body-wide catch); impossible with the empty registry (`match` over empty tables cannot throw, `buildContext` is never reached), so a migration-phase note, not a fix here.
 - Validation GREEN: tsc clean; the 4 new suites 39 tests; full `tests/server/` 529; full pre-merge gate `npm test` 631 files / 6693 pass / 11 skip, build:env + build:server + build all exit 0; ci:changed clean; ASCII-clean.
 - In-phase reviewers (the two the phase doc requires): privacy-security-review PASS (0 BLOCKING / 0 SHOULD-FIX, 2 INFO no-action: delegate cannot drop auth, no un-authed leak, CORS byte-identical extraction, clean flag-off rollback, prod-guarded test setter, no secret leak, 500-no-leak, exactly-one-response, WS untouched); qa-checklist READY (0 BLOCKING / 0 SHOULD-FIX, 2 NITs). Per the standing apply-all rule: NIT (a) applied (exported DEFAULT_DISPATCH from config.ts so main.ts no longer re-types the 'legacy' literal); NIT (b) recorded as a Phase 10 handoff (a migrated route must still return 405 under a wrong method once its legacy arm is removed; the completeness never-double-serves clause forces the arm removal). Not dispatched (no matching surface): migration-safety, cross-platform-sync, architecture-reviewer, release-malware-audit.
 - Orchestration: 1 Explore (context) + a 2-wave hand-spawned fan-out (the phase doc said NOT a Workflow): Wave 1 = Agent A (registry + barrel) parallel with the lead doing the delicate dispatch.ts + main.ts swap + CORS wrapper; Wave 2 = Agent C (parity) + Agent D (completeness) against the landed code. Every agent's suite was re-run by the lead (not trusted from self-report).

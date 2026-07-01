@@ -16,6 +16,7 @@ import type { PlacedAsset, WorldContent } from '../sim/types';
 import { WATER_LEVEL } from '../sim/world';
 import { assetById } from './asset_catalog.generated';
 import type { ZoneContent } from './model';
+import { userAssetPath } from './user_assets';
 
 export const CUSTOM_MAP_VERSION = MAP_DOC_VERSION;
 
@@ -116,15 +117,16 @@ export function customMapToWorldContent(map: CustomMap): WorldContent {
   return world;
 }
 
-// Resolve editor placements (catalogue id) into render-ready PlacedAssets (GLB
-// path). Placements with an unknown id are skipped; colliding placements get a
-// scale-proportional footprint radius (see src/sim/map_doc.ts collideRadiusFor).
+// Resolve editor placements (catalogue id, or an uploaded 'user/<sha256>' id)
+// into render-ready PlacedAssets (GLB path). Placements with an unknown id are
+// skipped; colliding placements get a scale-proportional footprint radius (see
+// src/sim/map_doc.ts collideRadiusFor).
 export function placementsToRenderAssets(placements: readonly AssetPlacement[]): PlacedAsset[] {
   const out: PlacedAsset[] = [];
   for (const p of placements) {
-    const asset = assetById(p.assetId);
-    if (!asset) continue;
-    const placed: PlacedAsset = { path: asset.path, x: p.x, z: p.z, rotY: p.rotY, scale: p.scale };
+    const path = userAssetPath(p.assetId) ?? assetById(p.assetId)?.path;
+    if (!path) continue;
+    const placed: PlacedAsset = { path, x: p.x, z: p.z, rotY: p.rotY, scale: p.scale };
     if (p.collide) placed.collideRadius = collideRadiusFor(p.scale);
     out.push(placed);
   }

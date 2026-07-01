@@ -7,8 +7,17 @@ import type { AssetPlacement } from './custom_map';
 import type { EditorEntity, EntityKind } from './model';
 import type { Camera, Vec2, Viewport } from './view';
 
-// 2D overlay colours per biome id (0=vale, 1=marsh, 2=peaks).
-const BIOME_PAINT_COLOR = ['rgba(90,170,80,0.35)', 'rgba(120,95,55,0.4)', 'rgba(150,155,165,0.4)'];
+// 2D overlay colours per biome id, matching world.ts BIOME_BY_ID order
+// (0=vale, 1=marsh, 2=peaks, 3=beach, 4=desert, 5=volcano, 6=cave).
+const BIOME_PAINT_COLOR = [
+  'rgba(90,170,80,0.35)',
+  'rgba(120,95,55,0.4)',
+  'rgba(150,155,165,0.4)',
+  'rgba(216,194,122,0.4)',
+  'rgba(207,144,64,0.4)',
+  'rgba(176,64,48,0.4)',
+  'rgba(74,74,85,0.45)',
+];
 
 type Roads = readonly (readonly Vec2[])[];
 
@@ -39,6 +48,7 @@ export interface DrawState {
   biomePaint: BiomePaint | null;
   region: { minX: number; minZ: number; maxX: number; maxZ: number } | null;
   brush: BrushCursor | null;
+  spawn: Vec2 | null;
 }
 
 export function draw(
@@ -84,7 +94,21 @@ export function draw(
     ctx.fillRect(a.sx, a.sy, b.sx - a.sx, b.sy - a.sy);
     ctx.restore();
   }
+  if (state.spawn) drawSpawn(ctx, cam, vp, state.spawn);
   if (state.brush) drawBrush(ctx, cam, vp, state.brush);
+  ctx.restore();
+}
+
+// The playtest spawn point: a cyan ring + dot so it reads apart from markers.
+function drawSpawn(ctx: CanvasRenderingContext2D, cam: Camera, vp: Viewport, spawn: Vec2): void {
+  const c = cam.worldToScreen(spawn, vp);
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(c.sx, c.sy, Math.max(5, 1.6 * cam.pxPerYard), 0, Math.PI * 2);
+  ctx.strokeStyle = '#3fd0ff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  drawDot(ctx, c, 3, '#3fd0ff');
   ctx.restore();
 }
 
@@ -101,7 +125,7 @@ function drawBiomePaint(
   for (let row = 0; row < bp.rows; row++) {
     for (let col = 0; col < bp.cols; col++) {
       const id = bp.ids[row * bp.cols + col];
-      if (id !== 0 && id !== 1 && id !== 2) continue;
+      if (id < 0 || id >= BIOME_PAINT_COLOR.length) continue;
       const wx = bp.originX + col * bp.cell;
       const wz = bp.originZ + row * bp.cell;
       const s = cam.worldToScreen({ x: wx, z: wz }, vp);

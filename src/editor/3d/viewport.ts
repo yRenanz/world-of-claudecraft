@@ -1,21 +1,36 @@
 // The 3D in-world editor viewport. Reuses the real game Renderer over a frozen Sim
-// built from the editor's CustomMap, drives a free editor camera, and re-meshes the
-// terrain live on edits. This is the DEFAULT editor mode: you fly over and sculpt
-// the actual rendered world. Editor-only (dev tooling); imports the heavy Renderer.
+// built from the editor's CustomMap, drives a free editor camera, and applies edits
+// through the Renderer's live editing APIs: chunk-local terrain rebuilds during a
+// brush stroke (rebuildTerrain(region)) with a macro-normal rebake at stroke end,
+// the shader brush ring (setEditorBrush/clearEditorBrush), live water re-seating
+// (rebuildWater), and the PlacedAssetsView instancer for placements
+// (add/update/remove/select/footprints/reSeat). This is the DEFAULT editor mode.
+// Editor-only (dev tooling); imports the heavy Renderer.
+//
+// Ownership: the APP owns the document and the ACTIVE WorldContent
+// (setActiveWorldContent); this viewport only reads terrain via the active
+// content and pushes render updates.
 
-import type * as THREE from 'three';
+import * as THREE from 'three';
 import { assetsReady } from '../../render/assets/preload';
-import { buildPlacedAssets } from '../../render/placed_assets';
 import { Renderer } from '../../render/renderer';
-import { setActiveWorldContent } from '../../sim/data';
 import { Sim } from '../../sim/sim';
+import type { WorldContent } from '../../sim/types';
 import { DT } from '../../sim/types';
 import { terrainHeight } from '../../sim/world';
 import { type CustomMap, customMapToWorldContent, placementsToRenderAssets } from '../custom_map';
 import { EditorCamera } from './editor_camera';
 
+export interface EditRegion {
+  minX: number;
+  minZ: number;
+  maxX: number;
+  maxZ: number;
+}
+
 export interface Editor3DHooks {
-  // The active tool wants left-drag for editing (so the viewport must not orbit).
+  // The active tool wants left-click/drag for editing (so the viewport must not
+  // orbit on the left button). Right-drag always orbits; middle/shift-drag pans.
   toolActive(): boolean;
   // Pointer began/continued/ended an edit over the terrain surface (world x/z).
   onEditStart(world: { x: number; z: number }, ev: PointerEvent): void;
@@ -23,7 +38,14 @@ export interface Editor3DHooks {
   onEditEnd(ev: PointerEvent): void;
   // The cursor moved over the surface (for the brush gizmo); null when off-terrain.
   onHover(world: { x: number; z: number } | null): void;
+  // A left-click that did not turn into a drag while no edit tool was active
+  // (Select mode picking). Client coords + the terrain point under the cursor.
+  onTap(clientX: number, clientY: number, world: { x: number; z: number } | null): void;
 }
+
+const SPAWN_RING_COLOR = 0x3fd0ff;
+const SPAWN_RING_SEGMENTS = 40;
+const TAP_SLOP_PX = 5;
 
 export class Editor3DViewport {
   private canvas!: HTMLCanvasElement;
@@ -31,24 +53,36 @@ export class Editor3DViewport {
   private readonly cam = new EditorCamera();
   private sim: Sim | null = null;
   private renderer: Renderer | null = null;
-  // Editor-owned group for live placements (the Renderer ctor builds placements
-  // once; this lets us re-instance them as the user places/sculpts).
-  private placedGroup: THREE.Group | null = null;
   private raf = 0;
   private lastT = 0;
   private disposed = false;
   private seed = 20061;
+  private map: CustomMap;
+
+  private spawnRing: THREE.Mesh | null = null;
+  private spawnPoint: { x: number; z: number } | null = null;
+  private readonly spawnMat = new THREE.MeshBasicMaterial({
+    color: SPAWN_RING_COLOR,
+    transparent: true,
+    opacity: 0.9,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+  });
+  private readonly picker = new THREE.Raycaster();
 
   // Interaction state.
   private dragMode: 'none' | 'orbit' | 'pan' | 'edit' = 'none';
   private lastPointer = { x: 0, y: 0 };
+  private downPointer = { x: 0, y: 0 };
+  private dragDist = 0;
   private readonly keys = new Set<string>();
 
   constructor(
     private readonly parent: HTMLElement,
-    private map: CustomMap,
+    map: CustomMap,
     private readonly hooks: Editor3DHooks,
   ) {
+    this.map = map;
     this.createSurfaces();
   }
 
@@ -60,22 +94,26 @@ export class Editor3DViewport {
     this.parent.append(this.canvas, this.nameplates);
   }
 
+  /**
+   * Boot the engine over the ACTIVE world content (the app has already called
+   * setActiveWorldContent with a content built from this.map).
+   */
   async start(): Promise<void> {
     if (!this.canvas.isConnected) this.createSurfaces();
     this.seed = this.map.meta.seed;
     const world = customMapToWorldContent(this.map);
-    setActiveWorldContent(world);
     await assetsReady();
     if (this.disposed) return;
-    // The viewport owns live placements (rebuildPlacements), so strip them from the
-    // Sim's world or the Renderer ctor would build a second, frozen copy.
+    // The live PlacedAssetsView owns placements, so strip them from the Sim's
+    // world or the Renderer ctor would build a second, frozen copy.
     this.sim = new Sim({
       seed: this.seed,
       playerClass: 'warrior',
       world: { ...world, placements: undefined },
     });
     this.renderer = new Renderer(this.sim, this.canvas, this.nameplates);
-    this.rebuildPlacements();
+    this.renderer.placedAssets.rebuildAll(placementsToRenderAssets(this.map.placements), true);
+    this.setSpawnMarker(this.map.playerStart ?? null);
     // Frame the world hub to start.
     const hub = this.map.content.zones[0]?.hub ?? { x: 0, z: 0 };
     this.cam.target.set(hub.x, terrainHeight(hub.x, hub.z, this.seed), hub.z);
@@ -84,34 +122,159 @@ export class Editor3DViewport {
     this.loop();
   }
 
+  get ready(): boolean {
+    return this.renderer !== null;
+  }
+
   // The renderer's surface raycast for the current cursor (client coords).
+  // surfacePoint expects canvas-origin coordinates (the game canvas fills the
+  // window; the editor canvas is offset by the top bar + tool rail), so convert.
   surfaceAt(clientX: number, clientY: number): { x: number; z: number } | null {
-    const p = this.renderer?.surfacePoint(clientX, clientY);
+    if (!this.renderer) return null;
+    const r = this.canvas.getBoundingClientRect();
+    const p = this.renderer.surfacePoint(clientX - r.left, clientY - r.top);
     return p ? { x: p.x, z: p.z } : null;
   }
 
-  // Re-mesh terrain after a sculpt/paint edit, then re-seat placements on the new
-  // surface so they do not float/sink.
-  rebuildTerrain(): void {
-    if (!this.renderer) return;
-    setActiveWorldContent(customMapToWorldContent(this.map));
-    this.renderer.rebuildTerrain();
-    this.rebuildPlacements();
+  /** True while a pointer drag is navigating (fly keys are live), so the app
+   *  suppresses single-key tool shortcuts. */
+  isNavigating(): boolean {
+    return this.dragMode === 'orbit' || this.dragMode === 'pan';
   }
 
-  // Re-instance the editor's placed GLB assets (after place/move). Cheap relative
-  // to a terrain rebuild; seats each asset on the current terrain height.
-  rebuildPlacements(): void {
+  // ---- live edit application -----------------------------------------------
+
+  /** Chunk-local terrain re-mesh over the edited region (cheap; per drag sample). */
+  rebuildTerrainRegion(region: EditRegion): void {
+    this.renderer?.rebuildTerrain(region);
+  }
+
+  /** Stroke-end work: macro-normal rebake + re-seat placements and the spawn ring. */
+  finishTerrainStroke(region: EditRegion): void {
     if (!this.renderer) return;
-    if (this.placedGroup) {
-      this.renderer.scene.remove(this.placedGroup);
-      // Do NOT dispose: placed assets are clones sharing cached GLB geometry.
-      this.placedGroup = null;
+    this.renderer.rebakeTerrainNormals(region);
+    this.renderer.placedAssets.reSeat();
+    this.refreshSpawnRing();
+  }
+
+  /** Full terrain rebuild (map load / clear-all / undo of a large batch). */
+  rebuildTerrainFull(): void {
+    if (!this.renderer) return;
+    this.renderer.rebuildTerrain();
+    this.renderer.rebuildWater();
+    this.renderer.placedAssets.reSeat();
+    this.refreshSpawnRing();
+  }
+
+  /** Re-seat the water surface at the ACTIVE waterLevel(). */
+  rebuildWater(): void {
+    this.renderer?.rebuildWater();
+  }
+
+  /** Project the brush ring at world (x, z); pass per pointer-move. */
+  setBrush(x: number, z: number, radius: number, color?: number): void {
+    this.renderer?.setEditorBrush(x, z, radius, color);
+  }
+
+  clearBrush(): void {
+    this.renderer?.clearEditorBrush();
+  }
+
+  // Placement passthroughs, keyed by the document index (the app keeps document
+  // order and view slots in lockstep; structural changes use rebuildPlacements).
+  placementAdded(index: number): void {
+    const assets = placementsToRenderAssets([this.map.placements[index]]);
+    if (assets.length === 1) this.renderer?.placedAssets.addPlacement(index, assets[0]);
+  }
+
+  placementUpdated(
+    index: number,
+    change: { x?: number; z?: number; rotY?: number; scale?: number },
+  ): void {
+    this.renderer?.placedAssets.updatePlacement(index, change);
+  }
+
+  /** Full re-instance (removal / mid-list insert / paste / undo). */
+  rebuildPlacements(): void {
+    this.renderer?.placedAssets.rebuildAll(placementsToRenderAssets(this.map.placements));
+  }
+
+  setSelectedPlacement(index: number | null): void {
+    this.renderer?.placedAssets.setSelected(index);
+  }
+
+  showFootprints(on: boolean): void {
+    this.renderer?.placedAssets.showFootprints(on);
+  }
+
+  /**
+   * Which placement a click lands on: raycast the placed-assets group and take
+   * the nearest placement anchor to the hit; fall back to the terrain point.
+   * Returns the DOCUMENT index or null.
+   */
+  pickPlacement(clientX: number, clientY: number): number | null {
+    if (!this.renderer) return null;
+    const rect = this.canvas.getBoundingClientRect();
+    const ndc = new THREE.Vector2(
+      ((clientX - rect.left) / Math.max(1, rect.width)) * 2 - 1,
+      -((clientY - rect.top) / Math.max(1, rect.height)) * 2 + 1,
+    );
+    this.picker.setFromCamera(ndc, this.renderer.camera);
+    const hits = this.picker.intersectObjects(this.renderer.placedAssets.group.children, true);
+    let probe: { x: number; z: number } | null = null;
+    let slack = 1.5;
+    if (hits.length > 0 && hits[0].point) {
+      probe = { x: hits[0].point.x, z: hits[0].point.z };
+      slack = 4;
+    } else {
+      probe = this.surfaceAt(clientX, clientY);
     }
-    const assets = placementsToRenderAssets(this.map.placements);
-    if (assets.length === 0) return;
-    this.placedGroup = buildPlacedAssets(assets, this.seed);
-    this.renderer.scene.add(this.placedGroup);
+    if (!probe) return null;
+    let best = -1;
+    let bestD2 = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < this.map.placements.length; i++) {
+      const p = this.map.placements[i];
+      const dx = probe.x - p.x;
+      const dz = probe.z - p.z;
+      const d2 = dx * dx + dz * dz;
+      if (d2 < bestD2) {
+        bestD2 = d2;
+        best = i;
+      }
+    }
+    if (best < 0) return null;
+    const maxD = Math.max(slack, (this.map.placements[best].scale || 1) * 2);
+    return bestD2 <= maxD * maxD ? best : null;
+  }
+
+  // ---- spawn marker ----------------------------------------------------------
+
+  setSpawnMarker(point: { x: number; z: number } | null): void {
+    this.spawnPoint = point ? { x: point.x, z: point.z } : null;
+    this.refreshSpawnRing();
+  }
+
+  private refreshSpawnRing(): void {
+    if (!this.renderer) return;
+    if (this.spawnRing) {
+      this.renderer.scene.remove(this.spawnRing);
+      this.spawnRing.geometry.dispose();
+      this.spawnRing = null;
+    }
+    if (!this.spawnPoint) return;
+    const { x, z } = this.spawnPoint;
+    const radius = 1.6;
+    const geo = new THREE.RingGeometry(radius - 0.22, radius, SPAWN_RING_SEGMENTS);
+    geo.rotateX(-Math.PI / 2);
+    const pos = geo.attributes.position as THREE.BufferAttribute;
+    for (let i = 0; i < pos.count; i++) {
+      pos.setY(i, terrainHeight(x + pos.getX(i), z + pos.getZ(i), this.seed) + 0.1);
+    }
+    geo.computeBoundingSphere();
+    this.spawnRing = new THREE.Mesh(geo, this.spawnMat);
+    this.spawnRing.position.set(x, 0, z);
+    this.spawnRing.renderOrder = 2;
+    this.renderer.scene.add(this.spawnRing);
   }
 
   // Swap to a different document (load/new/import) without leaking: rebuild the
@@ -150,6 +313,7 @@ export class Editor3DViewport {
     }
     this.renderer = null;
     this.sim = null;
+    this.spawnRing = null;
     this.canvas?.remove();
     this.nameplates?.remove();
   }
@@ -179,6 +343,9 @@ export class Editor3DViewport {
   };
 
   private applyKeys(dt: number): void {
+    // Fly only while a navigation drag is held: the single-key tool shortcuts
+    // (W water, S spawn, E erase, ...) own these keys when the pointer is up.
+    if (!this.isNavigating()) return;
     const f = (this.keys.has('w') ? 1 : 0) - (this.keys.has('s') ? 1 : 0);
     const r = (this.keys.has('d') ? 1 : 0) - (this.keys.has('a') ? 1 : 0);
     const u = (this.keys.has('e') ? 1 : 0) - (this.keys.has('q') ? 1 : 0);
@@ -190,6 +357,7 @@ export class Editor3DViewport {
   private attachEvents(): void {
     this.canvas.addEventListener('pointerdown', this.onPointerDown);
     this.canvas.addEventListener('pointermove', this.onPointerMove);
+    this.canvas.addEventListener('pointerleave', this.onPointerLeave);
     window.addEventListener('pointerup', this.onPointerUp);
     this.canvas.addEventListener('wheel', this.onWheel, { passive: false });
     this.canvas.addEventListener('contextmenu', this.onContext);
@@ -200,6 +368,7 @@ export class Editor3DViewport {
   private detachEvents(): void {
     this.canvas.removeEventListener('pointerdown', this.onPointerDown);
     this.canvas.removeEventListener('pointermove', this.onPointerMove);
+    this.canvas.removeEventListener('pointerleave', this.onPointerLeave);
     window.removeEventListener('pointerup', this.onPointerUp);
     this.canvas.removeEventListener('wheel', this.onWheel);
     this.canvas.removeEventListener('contextmenu', this.onContext);
@@ -211,6 +380,8 @@ export class Editor3DViewport {
 
   private onPointerDown = (ev: PointerEvent): void => {
     this.lastPointer = { x: ev.clientX, y: ev.clientY };
+    this.downPointer = { x: ev.clientX, y: ev.clientY };
+    this.dragDist = 0;
     const wantsEdit = ev.button === 0 && this.hooks.toolActive();
     if (wantsEdit) {
       const w = this.surfaceAt(ev.clientX, ev.clientY);
@@ -221,7 +392,7 @@ export class Editor3DViewport {
         return;
       }
     }
-    // Middle or shift+drag pans; otherwise orbit.
+    // Middle or shift+drag pans; otherwise orbit (left-drag in Select, right-drag always).
     this.dragMode = ev.button === 1 || ev.shiftKey ? 'pan' : 'orbit';
     this.canvas.setPointerCapture(ev.pointerId);
   };
@@ -230,6 +401,7 @@ export class Editor3DViewport {
     const dx = ev.clientX - this.lastPointer.x;
     const dy = ev.clientY - this.lastPointer.y;
     this.lastPointer = { x: ev.clientX, y: ev.clientY };
+    this.dragDist += Math.abs(dx) + Math.abs(dy);
     if (this.dragMode === 'orbit') this.cam.orbit(dx, dy);
     else if (this.dragMode === 'pan') this.cam.pan(dx, dy);
     else if (this.dragMode === 'edit') {
@@ -240,8 +412,17 @@ export class Editor3DViewport {
     }
   };
 
+  private onPointerLeave = (): void => {
+    if (this.dragMode === 'none') this.hooks.onHover(null);
+  };
+
   private onPointerUp = (ev: PointerEvent): void => {
-    if (this.dragMode === 'edit') this.hooks.onEditEnd(ev);
+    if (this.dragMode === 'edit') {
+      this.hooks.onEditEnd(ev);
+    } else if (this.dragMode === 'orbit' && ev.button === 0 && this.dragDist <= TAP_SLOP_PX) {
+      // A left tap with no edit tool armed: a Select-mode pick.
+      this.hooks.onTap(ev.clientX, ev.clientY, this.surfaceAt(ev.clientX, ev.clientY));
+    }
     this.dragMode = 'none';
   };
 

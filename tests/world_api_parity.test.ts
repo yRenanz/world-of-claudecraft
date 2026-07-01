@@ -90,8 +90,7 @@ export const IWORLD_MEMBERS = [
   { name: 'restedXp', kind: 'data' },
   { name: 'craftSkills', kind: 'data' },
   { name: 'gatheringProficiency', kind: 'data' },
-  { name: 'known', kind: 'data' },
-  { name: 'questLog', kind: 'data' },
+  { name: 'known', kind: 'data' },  { name: 'questLog', kind: 'data' },
   { name: 'questsDone', kind: 'data' },
   // --- commands + read-returning methods ---
   { name: 'questState', kind: 'method' }, // read-returning (1/6)
@@ -907,8 +906,7 @@ const FACET_PROGRESSION_XP = [
   'restedXp',
   'craftSkills',
   'gatheringProficiency',
-  'leaderboard',
-  'guildLeaderboard',
+  'leaderboard',  'guildLeaderboard',
   'devLeaderboard',
   'prestige',
 ] as const satisfies readonly (keyof IWorldProgressionXp)[];

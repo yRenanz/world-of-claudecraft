@@ -677,6 +677,9 @@ export class Renderer {
   camera: THREE.PerspectiveCamera;
   webgl: THREE.WebGLRenderer;
   views = new Map<number, EntityView>();
+  // view groups that own a budgeted point light: exempt from the hidden-view
+  // matrix gate (see the gate pass in sync and the note at registration)
+  private lightOwnerGroups = new WeakSet<THREE.Object3D>();
   nameplateLayer: HTMLDivElement;
   // Travel-form speed-illusion overlay (presentation only; see travel_speed_fx*).
   private travelSpeedFx: TravelSpeedFxPainter;
@@ -915,6 +918,14 @@ export class Renderer {
   ) {
     this.nameplateLayer = nameplateLayer;
     this.travelSpeedFx = new TravelSpeedFxPainter(nameplateLayer);
+    // The scene root sits at identity forever, but with the default
+    // matrixAutoUpdate the root recomposes each frame, which flags
+    // matrixWorldNeedsUpdate and FORCE-cascades a matrixWorld multiply through
+    // every node in the graph (three r165 updateMatrixWorld), defeating both
+    // the static-subtree freeze and the hidden-rig gate below. Freeze the root:
+    // children with auto-update still recompose themselves normally.
+    this.scene.updateMatrix();
+    this.scene.matrixAutoUpdate = false;
     // No default-framebuffer MSAA on any tier: high/ultra get AA from the
     // composer's MSAA HalfFloat target, low is meant to run without AA — and
     // requesting it here would hit software GL (the autodetect can only run
@@ -3241,6 +3252,11 @@ export class Renderer {
         this.viewLights.push(light);
       }
       this.lightRankDirty = true;
+      // A light-owning view is exempt from the hidden-view matrix gate below:
+      // the light-budget rebuild caches light.getWorldPosition, and r165's
+      // updateWorldMatrix does NOT heal through a matrixWorldAutoUpdate=false
+      // ancestor, so a gated group would rank the light at a stale position.
+      this.lightOwnerGroups.add(group);
     }
     this.views.set(e.id, {
       group,
@@ -4172,6 +4188,19 @@ export class Renderer {
     }
     this.lastVisibleRigCount = visibleRigCount;
 
+    // Hidden views skip their whole matrix subtree: three recomposes even
+    // invisible hierarchies, and a distance-culled or off-screen rig is 30-60
+    // nodes of dead per-frame compose+multiply. Re-showing flips the gate back
+    // on, and the next scene update revisits the subtree and recomposes it
+    // from the live position/rotation properties, so nothing renders stale.
+    // (pick() skips hidden views, so a frozen matrix never ghosts a hitbox.
+    // CAUTION: getWorldPosition on a node inside a GATED subtree does not heal
+    // the chain in r165, hence the light-owner exemption; any new world-space
+    // read of a view child must use group.position or exempt the view too.)
+    for (const [, v] of this.views) {
+      v.group.matrixWorldAutoUpdate = v.group.visible || this.lightOwnerGroups.has(v.group);
+    }
+
     // selection ring
     const target = p.targetId !== null ? sim.entities.get(p.targetId) : null;
     if (target) {
@@ -4812,9 +4841,15 @@ export class Renderer {
       let o: THREE.Object3D | null = hit.object;
       while (o) {
         if (o.userData.entityId !== undefined && o.userData.entityId !== this.sim.playerId) {
-          const e = this.sim.entities.get(o.userData.entityId as number);
+          const id = o.userData.entityId as number;
+          // a hidden view is not clickable: the player cannot see it, and its
+          // matrixWorld is frozen while hidden (the rig gate in sync), so a hit
+          // against it would be a ghost hitbox at the hide-time position
+          const hitView = this.views.get(id);
+          if (hitView && !hitView.group.visible) break;
+          const e = this.sim.entities.get(id);
           if (e?.kind === 'object' && !e.lootable) return null;
-          return o.userData.entityId as number;
+          return id;
         }
         o = o.parent;
       }

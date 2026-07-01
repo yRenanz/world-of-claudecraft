@@ -18,8 +18,8 @@ type SimInternals = {
   players: Map<number, PlayerMeta>;
 };
 
-function setup() {
-  const sim = new Sim({ seed: 11, playerClass: 'warrior', noPlayer: true });
+function setup(seed = 11) {
+  const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
   const internals = sim as unknown as SimInternals;
   const a = sim.addPlayer('warrior', 'Alpha');
   const b = sim.addPlayer('warrior', 'Bravo');
@@ -121,5 +121,33 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     mob.dead = false;
     sim.harvestCorpse(mob.id, a);
     expect(mob.harvestClaimedBy).toBeNull();
+  });
+});
+
+// #1145: a rare-or-better corpse-harvested monster material is stamped with the
+// harvester's own name; below that rarity floor the grant stays a plain
+// fungible stack, same behavior as before this issue. Seeds below are
+// pre-verified against this exact setup() shape (two players, seeded before
+// the harvest's one rng draw) to land on each side of the rarity floor.
+describe('signed materials (#1145)', () => {
+  it('a rare-or-better harvest stamps the item with the harvester name (seed 6)', () => {
+    const { sim, internals, a, mob } = setup(6);
+    sim.harvestCorpse(mob.id, a);
+    const meta = internals.players.get(a)!;
+    const slot = meta.inventory.find((s) => s.itemId === 'boar_hide');
+    expect(slot).toBeDefined();
+    expect(slot?.instance?.signer).toBe('Alpha');
+    // Still exactly one copy granted, same as an unsigned harvest.
+    expect(sim.countItem('boar_hide', a)).toBe(1);
+  });
+
+  it('a below-rare harvest grants a plain, unsigned fungible item (seed 1)', () => {
+    const { sim, internals, a, mob } = setup(1);
+    sim.harvestCorpse(mob.id, a);
+    const meta = internals.players.get(a)!;
+    const slot = meta.inventory.find((s) => s.itemId === 'boar_hide');
+    expect(slot).toBeDefined();
+    expect(slot?.instance).toBeUndefined();
+    expect(sim.countItem('boar_hide', a)).toBe(1);
   });
 });

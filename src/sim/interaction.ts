@@ -36,7 +36,13 @@ import {
   lootSlotVisibleTo,
   pruneCorpseLoot,
 } from './loot/loot_roll';
-import { harvestItemFor, isHarvestableCorpse, resolveCorpseHarvest } from './professions/gathering';
+import {
+  harvestItemFor,
+  isHarvestableCorpse,
+  isSignableMaterialRarity,
+  resolveCorpseHarvest,
+  rollCorpseMaterialRarity,
+} from './professions/gathering';
 import type { SimContext } from './sim_context';
 import { dist2d, type Entity, INTERACT_RANGE, OBJECT_RESPAWN } from './types';
 
@@ -117,7 +123,16 @@ export function harvestCorpse(ctx: SimContext, mobId: number, pid?: number): voi
   }
   mob.harvestClaimedBy = claim.claimedBy;
   const itemId = harvestItemFor(componentTags);
-  if (itemId) ctx.addItem(itemId, 1, meta.entityId);
+  if (!itemId) return;
+  // #1145: a rare-or-better monster material is stamped with the harvester's
+  // name (a non-fungible instance slot); anything below that rarity stays a
+  // plain fungible grant, same as before this issue.
+  const rarity = rollCorpseMaterialRarity(ctx.rng);
+  if (isSignableMaterialRarity(rarity)) {
+    ctx.addItemInstance(itemId, { signer: meta.name }, meta.entityId);
+  } else {
+    ctx.addItem(itemId, 1, meta.entityId);
+  }
 }
 
 export function pickUpObject(ctx: SimContext, objId: number, pid?: number): void {

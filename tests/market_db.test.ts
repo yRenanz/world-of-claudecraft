@@ -2,12 +2,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const dbMock = vi.hoisted(() => {
   process.env.DATABASE_URL ??= 'postgres://test/test';
-  return { query: vi.fn() };
+  const clientQuery = vi.fn();
+  return {
+    query: vi.fn(),
+    clientQuery,
+    connect: vi.fn(async () => ({ query: clientQuery, release: vi.fn() })),
+  };
 });
 
 vi.mock('pg', () => ({
   Pool: vi.fn(function Pool() {
-    return { query: dbMock.query };
+    return { query: dbMock.query, connect: dbMock.connect };
   }),
 }));
 
@@ -16,6 +21,8 @@ import { REALM } from '../server/realm';
 
 beforeEach(() => {
   dbMock.query.mockReset();
+  dbMock.clientQuery.mockReset();
+  dbMock.connect.mockClear();
 });
 
 describe('market state realm scoping', () => {
@@ -52,34 +59,50 @@ describe('market state realm scoping', () => {
     expect(dbMock.query.mock.calls[0][1][0]).toBe(`market:${REALM}`);
   });
 
-  it('migrates the legacy shared "market" row into the realm key on first boot', async () => {
+  it('migrates the legacy shared "market" row into the realm key on first boot, then deletes it', async () => {
     const legacy = { listings: [{ id: 3 }], collections: [], nextListingId: 4 };
-    // realm-scoped key absent, legacy bare key present
-    dbMock.query
-      .mockResolvedValueOnce({ rows: [] }) // SELECT market:<realm>
-      .mockResolvedValueOnce({ rows: [{ data: legacy }] }) // SELECT market
-      .mockResolvedValueOnce({ rowCount: 1, rows: [] }); // INSERT market:<realm>
+    // realm-scoped key absent
+    dbMock.query.mockResolvedValueOnce({ rows: [] }); // SELECT market:<realm>
+    // the migration itself runs on a dedicated transactional client
+    dbMock.clientQuery
+      .mockResolvedValueOnce({}) // BEGIN
+      .mockResolvedValueOnce({ rows: [{ data: legacy }] }) // SELECT ... FOR UPDATE market
+      .mockResolvedValueOnce({ rowCount: 1, rows: [] }) // INSERT market:<realm>
+      .mockResolvedValueOnce({}) // DELETE market
+      .mockResolvedValueOnce({}); // COMMIT
 
     const loaded = await loadMarketState();
 
     expect(loaded).toEqual(legacy);
+    expect(dbMock.connect).toHaveBeenCalledTimes(1);
+    // the claiming read targeted the bare shared key, row-locked
+    const selectCall = dbMock.clientQuery.mock.calls[1];
+    expect(selectCall[0]).toContain('FOR UPDATE');
+    expect(selectCall[1][0]).toBe('market');
     // the legacy listings are copied into this realm's key so they are not stranded
-    const writeCall = dbMock.query.mock.calls[2];
+    const writeCall = dbMock.clientQuery.mock.calls[2];
     expect(writeCall[0]).toContain('INTO world_state');
     expect(writeCall[1][0]).toBe(`market:${REALM}`);
     expect(writeCall[1][1]).toBe(JSON.stringify(legacy));
-    // the legacy read targeted the bare shared key
-    expect(dbMock.query.mock.calls[1][1][0]).toBe('market');
+    // the legacy row is deleted so a later-added realm can never re-adopt (and
+    // duplicate) the same listings
+    const deleteCall = dbMock.clientQuery.mock.calls[3];
+    expect(deleteCall[0]).toContain('DELETE FROM world_state');
+    expect(deleteCall[1][0]).toBe('market');
   });
 
   it('returns null and writes nothing when neither key exists', async () => {
-    dbMock.query
-      .mockResolvedValueOnce({ rows: [] }) // SELECT market:<realm>
-      .mockResolvedValueOnce({ rows: [] }); // SELECT market
+    dbMock.query.mockResolvedValueOnce({ rows: [] }); // SELECT market:<realm>
+    dbMock.clientQuery
+      .mockResolvedValueOnce({}) // BEGIN
+      .mockResolvedValueOnce({ rows: [] }) // SELECT ... FOR UPDATE market
+      .mockResolvedValueOnce({}); // COMMIT
 
     const loaded = await loadMarketState();
 
     expect(loaded).toBeNull();
-    expect(dbMock.query).toHaveBeenCalledTimes(2); // no write-back
+    expect(dbMock.query).toHaveBeenCalledTimes(1); // no write-back on the pool
+    // no INSERT/DELETE issued when there is nothing to migrate: just BEGIN, SELECT, COMMIT
+    expect(dbMock.clientQuery).toHaveBeenCalledTimes(3);
   });
 });

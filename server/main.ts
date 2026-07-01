@@ -1481,6 +1481,7 @@ configureLeaderboardRuntime({
   perfProfile: () => game.perfProfile(),
   getLeaderboard,
   getGuildLeaderboard,
+  getDevLeaderboard: () => topContributors(),
   getReleases,
   githubRepo: GITHUB_REPO,
   releasesMaxLimit: RELEASES_SIZE,

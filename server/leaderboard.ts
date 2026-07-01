@@ -27,11 +27,16 @@ import type * as http from 'node:http';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
+  paginateDevLeaderboard,
   paginateGuildLeaderboard,
   paginateLeaderboard,
 } from '../src/sim/leaderboard_page';
 import type { ArenaFormat } from '../src/sim/types';
-import type { GuildLeaderboardEntry, LeaderboardEntry } from '../src/world_api';
+import type {
+  DevLeaderboardEntry,
+  GuildLeaderboardEntry,
+  LeaderboardEntry,
+} from '../src/world_api';
 import { characterSheet, type SheetRank } from './character_sheet';
 import {
   type ArenaLeaderRow,
@@ -70,6 +75,8 @@ const LEADERBOARD_SCOPE_DEFAULT = 'realm';
 const LEADERBOARD_SCOPE_GLOBAL = 'global';
 /** The ?board value that selects the guild high-score fork. */
 const LEADERBOARD_GUILD_BOARD = 'guilds';
+/** The ?board value that selects the open-source contributor (developer) board. */
+const LEADERBOARD_DEV_BOARD = 'devs';
 /** Upper bound for the legacy ?limit=N single-page board (mirrors LEADERBOARD_MAX). */
 export const LEADERBOARD_LEGACY_LIMIT_MAX = LEADERBOARD_MAX;
 /** How many arena ranks the public ladder returns (mirrors the legacy fixed arg). */
@@ -117,6 +124,8 @@ export interface LeaderboardRuntime {
   getLeaderboard(scope: LeaderboardScope): Promise<LeaderboardEntry[]>;
   /** Cache-fronted guild leaderboard read (main.ts getGuildLeaderboard). */
   getGuildLeaderboard(scope: LeaderboardScope): Promise<GuildLeaderboardEntry[]>;
+  /** Cache-fronted contributor (developer) leaderboard read (main.ts topContributors). */
+  getDevLeaderboard(): Promise<DevLeaderboardEntry[]>;
   /** Cache-fronted GitHub releases proxy read (main.ts getReleases). */
   getReleases(): Promise<ReleaseEntry[]>;
   /** The repo slug the releases feed reports (main.ts GITHUB_REPO). */
@@ -248,6 +257,18 @@ export function buildGuildBoard(
 ): unknown {
   const slice = paginateGuildLeaderboard(entries as GuildLeaderboardEntry[], page, pageSize);
   return { realm, scope, board: 'guilds', metric: 'guildLifetimeXp', ...slice };
+}
+
+/** The contributor (developer) board body: the dev-metric slice, its own golden case. */
+export function buildDevBoard(
+  realm: string,
+  scope: LeaderboardScope,
+  entries: readonly DevLeaderboardEntry[],
+  page: number,
+  pageSize: number,
+): unknown {
+  const slice = paginateDevLeaderboard(entries as DevLeaderboardEntry[], page, pageSize);
+  return { realm, scope, board: 'devs', metric: 'landedCommits', ...slice };
 }
 
 // ---------------------------------------------------------------------------
@@ -416,6 +437,17 @@ async function leaderboardHandler(ctx: Ctx): Promise<void> {
     const page = decodePage(firstQueryValue(ctx.query.page));
     const pageSize = decodePageSize(firstQueryValue(ctx.query.pageSize));
     json(ctx.res, 200, buildGuildBoard(REALM, scope, entries, page, pageSize));
+    return;
+  }
+  // The developer (open-source contributor) fork, byte-identical to the legacy
+  // handleApi ?board=devs arm in main.ts (added by the release/v0.18.0 merge). The
+  // contributor snapshot is realm-agnostic but the body still carries scope for
+  // parity. decodePage/decodePageSize match the legacy Number(...) || default decode.
+  if (firstQueryValue(ctx.query.board) === LEADERBOARD_DEV_BOARD) {
+    const entries = await rt.getDevLeaderboard();
+    const page = decodePage(firstQueryValue(ctx.query.page));
+    const pageSize = decodePageSize(firstQueryValue(ctx.query.pageSize));
+    json(ctx.res, 200, buildDevBoard(REALM, scope, entries, page, pageSize));
     return;
   }
   const entries = await rt.getLeaderboard(scope);

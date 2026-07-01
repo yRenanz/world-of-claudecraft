@@ -20,6 +20,7 @@ import type { SheetRank } from '../../server/character_sheet';
 import type { ArenaLeaderRow, CharacterRow, CharacterSearchRow } from '../../server/db';
 import {
   ARENA_LEADERBOARD_LIMIT,
+  buildDevBoard,
   buildGuildBoard,
   buildLegacyLimitBoard,
   buildStandardBoard,
@@ -51,7 +52,11 @@ import {
   resetPublicReadRateLimits,
 } from '../../server/ratelimit';
 import { LEADERBOARD_PAGE_SIZE } from '../../src/sim/leaderboard_page';
-import type { GuildLeaderboardEntry, LeaderboardEntry } from '../../src/world_api';
+import type {
+  DevLeaderboardEntry,
+  GuildLeaderboardEntry,
+  LeaderboardEntry,
+} from '../../src/world_api';
 import { FakeCharactersDb, FakeLeaderboardDb, type FakeRes, fakeCtx, makeReq } from './helpers';
 
 // ---------------------------------------------------------------------------
@@ -80,6 +85,10 @@ function guildRow(rank: number): GuildLeaderboardEntry {
   } as unknown as GuildLeaderboardEntry;
 }
 
+function devRow(rank: number): DevLeaderboardEntry {
+  return { rank, login: `dev${rank}`, mergedPrs: 100 - rank, devTier: 5 };
+}
+
 function arenaRow(name: string): ArenaLeaderRow {
   return { name, class: 'mage', level: 60, rating: 1800, wins: 20, losses: 5 };
 }
@@ -105,6 +114,7 @@ function fakeRuntime(overrides: Partial<LeaderboardRuntime> = {}): LeaderboardRu
     perfProfile: () => ({ ticks: 0 }),
     getLeaderboard: async () => [],
     getGuildLeaderboard: async () => [],
+    getDevLeaderboard: async () => [],
     getReleases: async () => [],
     githubRepo: 'levy-street/world-of-claudecraft',
     releasesMaxLimit: 20,
@@ -232,6 +242,17 @@ describe('response builders (convention B deferred: leaders key preserved)', () 
     expect(body.metric).toBe('guildLifetimeXp');
     expect(Array.isArray(body.leaders)).toBe(true);
     expect(body.total).toBe(1);
+  });
+
+  it('buildDevBoard tags board=devs and the contributor metric (matches the legacy arm)', () => {
+    const body = buildDevBoard(REALM_NAME, 'realm', [devRow(1), devRow(2)], 0, 50) as Record<
+      string,
+      unknown
+    >;
+    expect(body.board).toBe('devs');
+    expect(body.metric).toBe('landedCommits');
+    expect(Array.isArray(body.leaders)).toBe(true);
+    expect(body.total).toBe(2);
   });
 });
 
@@ -430,6 +451,19 @@ describe('leaderboard handler (through the injected cache-fronted runtime)', () 
     expect(b.board).toBe('guilds');
     expect(b.metric).toBe('guildLifetimeXp');
     expect(b.total).toBe(2);
+  });
+
+  it('serves the developer fork when board=devs (mirrors the legacy ?board=devs arm)', async () => {
+    configureLeaderboardRuntime(
+      fakeRuntime({ getDevLeaderboard: async () => [devRow(1), devRow(2), devRow(3)] }),
+    );
+    const ctx = fakeCtx({ method: 'GET', url: '/api/leaderboard', query: { board: 'devs' } });
+    await handlerFor('/api/leaderboard')(ctx);
+    const b = captured(ctx.res).body as Record<string, unknown>;
+    expect(b.board).toBe('devs');
+    expect(b.metric).toBe('landedCommits');
+    expect(b.total).toBe(3);
+    expect(Array.isArray(b.leaders)).toBe(true);
   });
 
   it('serves the legacy single-page board when ?limit is present', async () => {

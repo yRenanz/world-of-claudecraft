@@ -121,6 +121,11 @@ const API_REQUEST_CORPUS: readonly ApiRequestSpec[] = [
   // --- leaderboard payload shapes, empty cache (characterization block 4) ------
   { name: 'leaderboard_default', method: 'GET', url: '/api/leaderboard' },
   { name: 'leaderboard_guilds', method: 'GET', url: '/api/leaderboard?board=guilds' },
+  // ?board=devs (open-source contributor board, added by the release/v0.18.0 merge):
+  // fetch is disabled in this harness so topContributors yields an empty snapshot on
+  // BOTH passes, proving the migrated leaderboardHandler devs fork is byte-identical
+  // to the legacy handleApi arm.
+  { name: 'leaderboard_devs', method: 'GET', url: '/api/leaderboard?board=devs' },
   { name: 'leaderboard_scope_global', method: 'GET', url: '/api/leaderboard?scope=global' },
   { name: 'leaderboard_scope_realm', method: 'GET', url: '/api/leaderboard?scope=realm' },
   { name: 'leaderboard_limit5', method: 'GET', url: '/api/leaderboard?limit=5' },

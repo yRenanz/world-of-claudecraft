@@ -46,11 +46,11 @@ Status values: `not-started` -> `in-progress (<who>)` -> `done-on-track (<branch
   missing string STOPS and appends a request row here for the operator, never invents a name.
 
 ## OPERATOR RULING - parity goldens under rename (2026-07-02, Phase 4)
-V1 and W1 independently proved the goldens' per-checkpoint  digests fold event TEXT
+V1 and W1 independently proved the goldens' per-checkpoint `events` digests fold event TEXT
 (display names embedded), so ANY display rename shifts them while every state hash, RNG
 draw-order fingerprint, draw count and nextId stays byte-identical. Operator extended the
 C1/C2 golden exception to ALL rename slices: re-mint with UPDATE_PARITY=1, then
- MUST pass before commit; the four
+`node ip-refactor/golden_token_inspector.mjs <worktree>` MUST pass before commit; the four
 hardcoded old names in tests/parity/coverage.test.ts update to their new names (authorized
 gate-text edit). Integrator re-mints on the merged tree in Phase 5; Z1 inspector-verifies the
 final goldens. Map amendment #2 in the same ruling: Quaking Blow / Armor Shear / Oath of Iron

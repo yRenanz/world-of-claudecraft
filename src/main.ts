@@ -47,7 +47,7 @@ import { startPerfReporter } from './game/perf_reporter';
 import {
   type GameSettings,
   normalizeClickMoveButton,
-  type SETTING_RANGES,
+  SETTING_RANGES,
   Settings,
 } from './game/settings';
 import { sfx } from './game/sfx';
@@ -195,6 +195,7 @@ const HOMEPAGE_MUSIC_MUTED_KEY = 'woc_homepage_music_muted';
 const HOMEPAGE_MUSIC_VOLUME = 0.225;
 const GRAPHICS_PRESET_HIGH = 3;
 const GRAPHICS_PRESET_ULTRA = 4;
+const LANDING_GRAPHICS_AUTO = 'auto';
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.querySelector(sel) as T;
 document.body.classList.toggle('native-app', NATIVE_APP);
@@ -7049,9 +7050,40 @@ function wireStartScreens(): void {
   const contrastToggle = document.getElementById(
     'landing-contrast-toggle',
   ) as HTMLButtonElement | null;
+  const graphicsSelect = document.getElementById(
+    'landing-graphics-select',
+  ) as HTMLSelectElement | null;
+  const normalizedLandingGraphicsChoice = (raw: string | null): string => {
+    if (raw === LANDING_GRAPHICS_AUTO) return raw;
+    const preset = Number(raw);
+    if (
+      Number.isInteger(preset) &&
+      preset >= SETTING_RANGES.graphicsPreset.min &&
+      preset <= SETTING_RANGES.graphicsPreset.max
+    ) {
+      return String(preset);
+    }
+    return LANDING_GRAPHICS_AUTO;
+  };
+  const applyLandingGraphicsChoice = (choice: string): void => {
+    if (choice === LANDING_GRAPHICS_AUTO) {
+      landingSettings.set('graphicsPreset', SETTING_RANGES.graphicsPreset.def);
+      landingSettings.set('graphicsDefaultApplied', false);
+      return;
+    }
+    landingSettings.set('graphicsPreset', Number(choice));
+    landingSettings.set('graphicsDefaultApplied', true);
+  };
+  const syncLandingGraphicsSelect = (): void => {
+    if (!graphicsSelect) return;
+    graphicsSelect.value = landingSettings.get('graphicsDefaultApplied')
+      ? String(landingSettings.get('graphicsPreset'))
+      : LANDING_GRAPHICS_AUTO;
+  };
   const syncContrastToggle = (on: boolean): void => {
     if (contrastToggle) contrastToggle.setAttribute('aria-pressed', String(on));
   };
+  syncLandingGraphicsSelect();
   syncContrastToggle(landingSettings.get('landingHighContrast'));
   applyLandingBackdrop(landingSettings.get('landingHighContrast'));
 
@@ -7080,6 +7112,11 @@ function wireStartScreens(): void {
     landingSettings.set('landingHighContrast', next);
     syncContrastToggle(next);
     applyLandingBackdrop(next);
+  });
+  graphicsSelect?.addEventListener('change', () => {
+    const choice = normalizedLandingGraphicsChoice(graphicsSelect.value);
+    applyLandingGraphicsChoice(choice);
+    syncLandingGraphicsSelect();
   });
 
   // Initialize 3D character preview once assets are ready

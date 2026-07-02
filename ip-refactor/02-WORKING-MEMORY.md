@@ -13,7 +13,7 @@
 ## Status board (execution order: gate -> map -> tracks -> finale)
 | ID | Title | Track | Mode | Status | Branch @ commit |
 |----|-------|-------|------|--------|-----------------|
-| G0 | De-IP gate + verbatim-name scanner | Spine | plain | not-started | — |
+| G0 | De-IP gate + verbatim-name scanner | Spine | plain | done-on-track (2026-07-02; scanner RED by design: 142 baseline violations; all behavior gates green) | feature/ip-pivot @ G0 commit |
 | G1 | Generate + lock the NAME-MAP | Spine | ULTRACODE | not-started (BLOCKS all tracks) | — |
 | V1 | Ability / spell rename | Vocab | plain | not-started | — |
 | V2 | Talent + spec/tree rename | Vocab | plain | not-started | — |
@@ -37,9 +37,98 @@ Status values: `not-started` -> `in-progress (<who>)` -> `done-on-track (<branch
 > G0 seeds this from the RED baseline (the names `tests/ip_scrub.test.ts` currently flags). Each
 > track ticks the entries it clears. Z1 requires the whole list ticked (scanner fully green).
 
-| denylist entry | owning slice | cleared? |
-|---|---|---|
-| (G0 seeds the full list: Heroic Strike, Mortal Strike, Fireball, ... = V1; talent names = V2; Murloc/Bristleback/Drakonid = C1; Voidwalker/Felguard/... = C2; Shadowmeld/Lightwell = W1; Mortal Strike/War Stomp mob auras = W2) | — | — |
+Seeded by G0 on 2026-07-02 from the RED baseline: **142 violations** across the armed
+denylist (`npx vitest run tests/ip_scrub.test.ts`). Counts are baseline occurrence counts over
+BOTH English layers (sim content `.name` fields + the resolved-en table's name/title fields).
+Rows are per (denylist entry x owning slice), disambiguated by the FIELD each hit lands in:
+ability-name fields are V1's, talent/spec-tree fields are V2's, mob mechanic/aura `.name`
+fields (`mobs.<id>.mortalStrike/petSpell/stomp/purgeOnHit.name`) are W2's - so a shared name
+(Mortal Strike, Fireball, Judgement, ...) appears once per owner and each track ticks only its
+own row. A track's row is cleared when the scanner reports zero hits for that entry in that
+track's fields.
+
+**v0.19.0 additions screening (G0, 2026-07-02):** `git diff release/v0.18.0..release/v0.19.0
+-- src/sim/content/ src/ui/i18n.catalog/` is EMPTY (that release changed CI tooling only), so
+there are ZERO "v0.19.0 additions - need NAME-MAP rows". Nothing extra for G1.
+
+The NAME-MAP is still PROPOSED/DRAFT, so this seed = the hardcoded verbatim-WoW list + the
+map's sample rows. G1's LOCK finalizes the `old`-column source; any row it adds/flips arms or
+disarms in the scanner automatically (the scanner re-parses the map at each run), so THE
+BASELINE COUNT WILL GROW at G1 lock (verbatim ability names like Battle Shout, Hamstring,
+Overpower, Frost Nova, Arcane Intellect, Holy Light, Arcane Shot, Frost Shock, Faerie Fire,
+... are in the tree today but unarmed until their map rows exist).
+
+| denylist entry | owning slice | baseline hits | cleared? |
+|---|---|---|---|
+| Heroic Strike (ability-name fields) | V1 | 2 | [ ] |
+| Mortal Strike (ability-name fields) | V1 | 2 | [ ] |
+| Sinister Strike (ability-name fields) | V1 | 2 | [ ] |
+| Sunder Armor (ability-name fields) | V1 | 2 | [ ] |
+| Thunder Clap (ability-name fields) | V1 | 2 | [ ] |
+| Bloodthirst (ability-name fields) | V1 | 2 | [ ] |
+| Shield Slam (ability-name fields) | V1 | 2 | [ ] |
+| Fireball (ability-name fields) | V1 | 2 | [ ] |
+| Frostbolt (ability-name fields) | V1 | 2 | [ ] |
+| Pyroblast | V1 | 2 | [ ] |
+| Arcane Missiles (ability-name fields) | V1 | 2 | [ ] |
+| Polymorph (ability-name fields) | V1 | 2 | [ ] |
+| Ice Barrier (ability-name fields) | V1 | 2 | [ ] |
+| Eviscerate (ability-name fields) | V1 | 2 | [ ] |
+| Slice and Dice | V1 | 2 | [ ] |
+| Judgement (ability-name fields) | V1 | 2 | [ ] |
+| Hammer of Justice | V1 | 2 | [ ] |
+| Lay on Hands (ability-name fields) | V1 | 2 | [ ] |
+| Consecration | V1 | 2 | [ ] |
+| Mind Blast (ability-name fields) | V1 | 2 | [ ] |
+| Arcane (tree, whole-value) | V2 | 1 | [ ] |
+| Fire (tree, whole-value) | V2 | 1 | [ ] |
+| Frost (tree, whole-value) | V2 | 1 | [ ] |
+| Holy (tree, whole-value) | V2 | 2 | [ ] |
+| Blessing of Sanctuary | V2 | 1 | [ ] |
+| Ardent Defender | V2 | 1 | [ ] |
+| Improved Fireball | V2 | 1 | [ ] |
+| Heroic Strike (talent-name fields) | V2 | 1 | [ ] |
+| Mortal Strike (talent-name fields) | V2 | 1 | [ ] |
+| Sinister Strike (talent-name fields) | V2 | 1 | [ ] |
+| Sunder Armor (talent-name fields) | V2 | 1 | [ ] |
+| Thunder Clap (talent-name fields) | V2 | 2 | [ ] |
+| Bloodthirst (talent-name fields) | V2 | 1 | [ ] |
+| Shield Slam (talent-name fields) | V2 | 1 | [ ] |
+| Fireball (talent-name fields) | V2 | 1 | [ ] |
+| Frostbolt (talent-name fields) | V2 | 1 | [ ] |
+| Arcane Missiles (talent-name fields) | V2 | 1 | [ ] |
+| Polymorph (talent-name fields) | V2 | 1 | [ ] |
+| Ice Barrier (talent-name fields) | V2 | 1 | [ ] |
+| Eviscerate (talent-name fields) | V2 | 1 | [ ] |
+| Judgement (talent-name fields) | V2 | 2 | [ ] |
+| Lay on Hands (talent-name fields) | V2 | 1 | [ ] |
+| Murloc | C1 | 2 | [ ] |
+| murloc (prose, word-boundary) | C1 | 6 | [ ] |
+| Slimy Murloc Scale | C1 | 2 | [ ] |
+| candle-headed (prose) | C1 | 2 | [ ] |
+| Tallow Candle | C1 | 2 | [ ] |
+| Tallow Candle (prose) | C1 | 0 (belt-and-braces) | [ ] |
+| Bristleback | C1 | 4 | [ ] |
+| Bristleback Maul | C1 | 2 | [ ] |
+| Bristleback Hides | C1 | 2 | [ ] |
+| bristleback (prose, word-boundary) | C1 | 0 (belt-and-braces) | [ ] |
+| Drakonid | C1 | 2 | [ ] |
+| Sanctum Drakonid | C1 | 2 | [ ] |
+| Mogger | C1 | 13 | [ ] |
+| Imp | C2 | 4 | [ ] |
+| Voidwalker | C2 | 4 | [ ] |
+| Succubus | C2 | 4 | [ ] |
+| Felhunter | C2 | 4 | [ ] |
+| Felguard | C2 | 4 | [ ] |
+| Infernal | C2 | 4 | [ ] |
+| Doomguard | C2 | 4 | [ ] |
+| Shadowmeld | W1 | 2 | [ ] |
+| Shadowmeld Tunic | W1 | 2 | [ ] |
+| Lightwell | W1 | 2 | [ ] |
+| Mortal Strike (mob `mortalStrike.name` aura field) | W2 | 1 | [ ] |
+| War Stomp (mob `stomp.name` aura field) | W2 | 1 | [ ] |
+| Devour Magic (mob `purgeOnHit.name` aura field) | W2 | 1 | [ ] |
+| Mind Blast (mob `petSpell.name` aura field) | W2 | 1 | [ ] |
 
 ## Generated-artifact touch log (the ONLY parallel conflict surface)
 > Every rename slice regenerates these. The integrator resolves conflicts by RE-RUNNING the
@@ -66,3 +155,15 @@ Status values: `not-started` -> `in-progress (<who>)` -> `done-on-track (<branch
   override (V2).
 - **S3 co-location:** W2 (mob mechanic names) and C1 (quest prose) update `src/ui/sim_i18n.ts` in
   the SAME slice as the emit-literal edit, then run the S3 guard.
+- **Residuals OUTSIDE the scanner's net (G0 coverage review, 2026-07-02) — Z1's doc pass must
+  sweep these by hand:** the resolved table's `guide` section carries player-visible prose
+  mentioning "murloc" and "imp" (`i18n.resolved.generated/en.ts` guide entries), and UI strings
+  carry a verbatim "Righteous Fury" and a lowercase "judgement" (stat/tooltip copy). The scanner
+  prose-scan is deliberately scoped to quest/greeting + entity fields (per the G0 brief), so
+  these will NOT redden `ip_scrub`; scanner-green does not equal zero-residual for them. These
+  regenerate from source via `i18n:gen`, so the V-track renames may clear some automatically —
+  Z1 verifies by hand either way. Owner: T1/Z1.
+- **The C2 pet denylist arms all 7 roster names** (incl. the generic-fantasy Imp / Succubus /
+  Infernal) because the operator decision is to re-theme the WHOLE set. If that decision changes
+  at NAME-MAP lock, those three are hardcoded in the scanner and need a deliberate edit there,
+  not just a map flip (documented in the test header).

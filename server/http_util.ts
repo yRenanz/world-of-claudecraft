@@ -41,7 +41,16 @@ export function readBody(req: http.IncomingMessage, maxBytes = 64 * 1024): Promi
     req.on('end', () => {
       if (aborted) return;
       try {
-        resolve(data ? JSON.parse(data) : {});
+        // Every route reads properties off the body, so only a JSON object is
+        // a valid request body: a literal null, an array, or a primitive is
+        // rejected here (400 at the route) instead of crashing a handler on
+        // property access (a `null` body would otherwise 500).
+        const parsed: unknown = data ? JSON.parse(data) : {};
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+          reject(new Error('bad json'));
+          return;
+        }
+        resolve(parsed);
       } catch {
         reject(new Error('bad json'));
       }

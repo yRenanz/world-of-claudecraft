@@ -7,7 +7,7 @@
 // src/sim/map_doc.ts, the ONE shared validator the editor's import path also
 // uses; the server never stores a byte the sanitizer did not produce.
 
-import { randomBytes } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
 import { MAX_NAME_LENGTH, type MapDoc, sanitizeMapDoc } from '../src/sim/map_doc';
 import { offensiveName } from './auth';
 import { isUniqueViolation } from './http_util';
@@ -78,10 +78,12 @@ export interface MapsDb {
   /**
    * Copy a source map (must still be public or owned by accountId at insert
    * time) into a new private map with parent/version lineage, atomically.
-   * Throws a unique violation on a slug clash.
+   * The copied doc's meta.id is rewritten to newDocId so the fork never
+   * shares the source document's identity. Throws a unique violation on a
+   * slug clash.
    */
   insertForkCapped(
-    input: { sourceId: number; accountId: number; name: string; slug: string },
+    input: { sourceId: number; accountId: number; name: string; slug: string; newDocId: string },
     cap: number,
   ): Promise<MapRecord | 'cap_reached' | 'source_unavailable'>;
   getMap(id: number): Promise<MapRecord | null>;
@@ -236,11 +238,14 @@ export class MapsService {
     const resolved = this.resolveName(rawName, source.name);
     if ('error' in resolved) return { ok: false, error: resolved.error };
     const base = mapSlugBase(resolved.name);
+    // A fork is a NEW document: mint a fresh identity so the copy never keeps
+    // the source's meta.id (the editor client keys server-links by meta.id).
+    const newDocId = randomUUID();
     for (let attempt = 0; attempt < MAX_SLUG_ATTEMPTS; attempt++) {
       const slug = this.slugCandidate(base, attempt);
       try {
         const forked = await this.db.insertForkCapped(
-          { sourceId, accountId, name: resolved.name, slug },
+          { sourceId, accountId, name: resolved.name, slug, newDocId },
           MAX_MAPS_PER_ACCOUNT,
         );
         if (forked === 'cap_reached') return { ok: false, error: 'map_limit_reached' };

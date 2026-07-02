@@ -66,7 +66,7 @@ class FakeMapsDb implements MapsDb {
   }
 
   async insertForkCapped(
-    input: { sourceId: number; accountId: number; name: string; slug: string },
+    input: { sourceId: number; accountId: number; name: string; slug: string; newDocId: string },
     cap: number,
   ): Promise<MapRecord | 'cap_reached' | 'source_unavailable'> {
     if (this.countFor(input.accountId) >= cap) return 'cap_reached';
@@ -78,6 +78,7 @@ class FakeMapsDb implements MapsDb {
     const doc = structuredClone(source.doc);
     doc.meta.name = input.name;
     doc.meta.parentId = String(source.id);
+    doc.meta.id = input.newDocId; // mirrors the jsonb_set meta.id rewrite in maps_db.ts
     const now = new Date().toISOString();
     const map: MapRecord = {
       id: this.nextId++,
@@ -127,6 +128,8 @@ class FakeMapsDb implements MapsDb {
     if (name !== null) map.name = name;
     map.doc = structuredClone(doc);
     map.doc.meta.name = map.name; // mirrors the jsonb_set name sync in maps_db.ts
+    // mirrors the jsonb_set parentId sync: JSONB lineage always matches the column
+    map.doc.meta.parentId = map.parentMapId === null ? '' : String(map.parentMapId);
     map.version += 1;
     map.updatedAt = new Date().toISOString();
     return structuredClone(map);
@@ -321,6 +324,23 @@ describe('MapsService.saveMap (optimistic concurrency)', () => {
     expect(db.rows.get(map.id)?.version).toBe(1);
   });
 
+  it('overwrites client-spoofed meta.parentId from the row lineage on save', async () => {
+    // An original work: rawDoc() carries parentId 'spoofed', the row has none.
+    const original = await createOk(1, 'Original Work');
+    const saved = await service.saveMap(1, original.id, rawDoc(), 1);
+    expect(saved.ok).toBe(true);
+    if (!saved.ok) return;
+    expect(saved.map.doc.meta.parentId).toBe('');
+    // A fork: the stored lineage always matches the parent_map_id column.
+    const fork = await service.forkMap(1, original.id);
+    expect(fork.ok).toBe(true);
+    if (!fork.ok) return;
+    const forkSaved = await service.saveMap(1, fork.map.id, rawDoc(), 1);
+    expect(forkSaved.ok).toBe(true);
+    if (!forkSaved.ok) return;
+    expect(forkSaved.map.doc.meta.parentId).toBe(String(original.id));
+  });
+
   it('renames when a name is supplied and validates it', async () => {
     const map = await createOk(1, 'Old Name');
     const renamed = await service.saveMap(1, map.id, rawDoc(), 1, 'New Name');
@@ -347,6 +367,25 @@ describe('MapsService.forkMap (lineage)', () => {
     expect(fork.map.status).toBe('private');
     expect(fork.map.doc.meta.parentId).toBe(String(source.id));
     expect(fork.map.slug).not.toBe(source.slug);
+  });
+
+  it('mints a fresh doc meta.id for the fork (never the source document identity)', async () => {
+    const source = await createOk(1, 'Identity Source');
+    const sourceDocId = db.rows.get(source.id)?.doc.meta.id ?? '';
+    const fork = await service.forkMap(1, source.id);
+    expect(fork.ok).toBe(true);
+    if (!fork.ok) return;
+    // The editor client keys its local server-links by meta.id: a fork that
+    // kept the source's id would repoint the original map's link.
+    expect(fork.map.doc.meta.id).not.toBe(sourceDocId);
+    expect(fork.map.doc.meta.id.length).toBeGreaterThan(0);
+    // Two forks of the same source get distinct identities too.
+    const second = await service.forkMap(1, source.id);
+    expect(second.ok).toBe(true);
+    if (!second.ok) return;
+    expect(second.map.doc.meta.id).not.toBe(fork.map.doc.meta.id);
+    // The source row is untouched.
+    expect(db.rows.get(source.id)?.doc.meta.id).toBe(sourceDocId);
   });
 
   it('forks a PUBLIC map of another account and records the forked version', async () => {

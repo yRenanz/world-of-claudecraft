@@ -118,10 +118,13 @@ export class PgMapsDb implements MapsDb {
   // INSERT ... SELECT so the copied document, the parent id, and the
   // forked-from version are all read from the source row atomically; the WHERE
   // re-checks accessibility so a fork can never copy a just-unpublished
-  // private map. The stored doc's meta.name/meta.parentId are rewritten in SQL
-  // so the JSONB always matches the row's lineage columns.
+  // private map. The stored doc's meta.name/meta.parentId/meta.id are
+  // rewritten in SQL so the JSONB always matches the row's lineage columns and
+  // the fork gets its own document identity (the editor client keys its local
+  // server-links by meta.id; inheriting the source's id would silently repoint
+  // the original map's link and cross-write the wrong row on later saves).
   async insertForkCapped(
-    input: { sourceId: number; accountId: number; name: string; slug: string },
+    input: { sourceId: number; accountId: number; name: string; slug: string; newDocId: string },
     cap: number,
   ): Promise<MapRecord | 'cap_reached' | 'source_unavailable'> {
     const client = await this.pool.connect();
@@ -142,18 +145,25 @@ export class PgMapsDb implements MapsDb {
         await client.query('ROLLBACK');
         return 'cap_reached';
       }
+      // The jsonb_set chains here and in updateMapIfVersion rely on doc.meta
+      // already being an object: jsonb_set only creates the FINAL path element,
+      // so a missing meta would silently no-op the rewrite. Every stored doc is
+      // sanitizeMapDoc output, whose sanitizeMeta always emits a meta object.
       const res = await client.query(
         `INSERT INTO maps (account_id, name, slug, doc, version, parent_map_id, forked_from_version, status)
          SELECT $1, $2, $3,
                 jsonb_set(
-                  jsonb_set(s.doc, '{meta,name}', to_jsonb($2::text)),
-                  '{meta,parentId}', to_jsonb(s.id::text)
+                  jsonb_set(
+                    jsonb_set(s.doc, '{meta,name}', to_jsonb($2::text)),
+                    '{meta,parentId}', to_jsonb(s.id::text)
+                  ),
+                  '{meta,id}', to_jsonb($5::text)
                 ),
                 1, s.id, s.version, 'private'
            FROM maps s
           WHERE s.id = $4 AND (s.status = 'public' OR s.account_id = $1)
          RETURNING ${MAP_COLS}`,
-        [input.accountId, input.name, input.slug, input.sourceId],
+        [input.accountId, input.name, input.slug, input.sourceId, input.newDocId],
       );
       if ((res.rowCount ?? 0) === 0) {
         await client.query('ROLLBACK');
@@ -197,7 +207,9 @@ export class PgMapsDb implements MapsDb {
   // Optimistic concurrency: the WHERE pins owner AND expected version, so a
   // stale editor tab can never clobber a newer save. The stored doc's
   // meta.name is kept in lockstep with the name column (old value when the
-  // save does not rename).
+  // save does not rename), and meta.parentId is overwritten from the row's
+  // parent_map_id column (empty string when null) so the JSONB lineage can
+  // never be spoofed by a client-supplied document.
   async updateMapIfVersion(
     id: number,
     accountId: number,
@@ -207,7 +219,10 @@ export class PgMapsDb implements MapsDb {
   ): Promise<MapRecord | null> {
     const res = await this.pool.query(
       `UPDATE maps
-          SET doc = jsonb_set($4::jsonb, '{meta,name}', to_jsonb(COALESCE($5::text, maps.name))),
+          SET doc = jsonb_set(
+                jsonb_set($4::jsonb, '{meta,name}', to_jsonb(COALESCE($5::text, maps.name))),
+                '{meta,parentId}', to_jsonb(COALESCE(maps.parent_map_id::text, ''))
+              ),
               name = COALESCE($5::text, maps.name),
               version = version + 1,
               updated_at = now()

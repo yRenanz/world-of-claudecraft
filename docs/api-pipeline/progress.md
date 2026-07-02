@@ -53,7 +53,7 @@ Mark a row's Status as "In progress" or "Done" and fill Started / Completed
 | Phase 18b QA | Done | 2026-07-02 | 2026-07-02 |
 | Phase 19 | Done | 2026-07-02 | 2026-07-02 |
 | Phase 19 QA | Done | 2026-07-02 | 2026-07-02 |
-| Phase 20 | Not started |  |  |
+| Phase 20 | Done | 2026-07-02 | 2026-07-02 |
 | Phase 20 QA | Not started |  |  |
 | Phase 21 | Not started |  |  |
 | Phase 21 QA | Not started |  |  |
@@ -1052,17 +1052,18 @@ Notes:
 ## Phase 20: World Market realm-scope fix + partitioned backfill (separate persistence PR)
 
 Deliverables:
-- [ ] Realm-scope the world_state 'market' key at BOTH write sites in lockstep (the saveCharacterAndMarketState escrow txn AND saveWorldState) plus the read (loadMarketState); anchor on function names, not the stale lines
-- [ ] A backfill PARTITIONING the existing global blob by each seller character's realm, idempotent under the advisory lock, with a boot-ordering gate before the first new-key write
-- [ ] A dry-run + escrow-sum/row-count verification and a documented data-rollback
+- [x] Realm-scope the world_state 'market' key at BOTH write sites in lockstep (the saveCharacterAndMarketState escrow txn AND saveWorldState) plus the read (loadMarketState); anchor on function names, not the stale lines
+- [x] A backfill PARTITIONING the existing global blob by each seller character's realm, idempotent under the advisory lock, with a boot-ordering gate before the first new-key write
+- [x] A dry-run + escrow-sum/row-count verification and a documented data-rollback
 
 QA:
-- [ ] Fixes applied
-- [ ] Tests added
-- [ ] Dead code removed
-- [ ] Reviews clean
+- [x] Fixes applied
+- [x] Tests added
+- [x] Dead code removed
+- [x] Reviews clean
 
 Notes:
+STALE PREMISE CORRECTED: the realm scoping itself PRE-LANDED via hotfix e5124811c (arrived with the release/v0.19.0 merge): marketStateKey(realm) = 'market:<realm>' was already live at both writers and the read, with a LAZY whole-blob migration inside loadMarketState that claimed the ENTIRE legacy blob for the first booting realm and DELETED the bare row (violating this phase's retain-the-legacy-row stopping rule, and mis-homing cross-realm sellers). Phase 20 therefore kept the landed keys (keeping the test-pinned name marketStateKey, NOT the packet's marketKey; MARKET_KEY_PREFIX added as the single-source constant) and REPLACED the lazy migration with the packet's mechanism. Shipped: NEW server/market_backfill.ts (a *_db-style module, injected client, never imports db.ts; db.ts imports and re-exports its constants), whose runMarketBackfill runs inside ensureSchema's pg_advisory_xact_lock transaction: marker probe ('market_backfill_done') -> no-op on every later boot; legacy SELECT ... FOR UPDATE (serializes against a not-yet-upgraded lazy claim); seller resolution via realm-UNFILTERED characters queries (numeric keys by id with an int4-range guard, name-form keys by name, a multi-realm name stays unresolved); partitionMarketSave routes unresolved/house keys to the backfilling realm and COUNTS them (never drops); verifyPartitionConservation (listing/collection counts, escrow copper, item counts) throws BEFORE any write; partitions upsert in sorted realm order, merging via mergeMarketSaves (id remap clamped above a corrupt max id) when a realm row pre-exists; the legacy row is RETAINED forever (saveWorldState hard-rejects any write to it). Boot-ordering gate: openMarketWriteGate() runs only after ensureSchema COMMITs; saveMarketState / the saveCharacterAndMarketState escrow txn / any market:<realm> saveWorldState throw 'market write blocked' before it. loadMarketState is a pure read: realm row, else (marker present) null, else a defensive legacy READ. MARKET_BACKFILL_DRY_RUN=1 logs the per-realm plan and halts boot deliberately without writing. Tests (6 suites, 44 green): tests/server/market_backfill.test.ts (20), rewritten tests/market_db.test.ts + tests/save_character_and_market.test.ts gate/read pins, tests/schema_wiring.test.ts boot wiring + gate-after-COMMIT + dry-run-halt pins, NEW tests/server/market_realm_isolation.test.ts (two realms on one DATABASE_URL no longer clobber; old behavior documented in a comment) + tests/character_state_backcompat.test.ts (serializeCharacter ?? defaults round-trip). Docs: docs/api-pipeline/phase-20-rollback-runbook.md (dry-run-then-apply, rollback SQL, the mixed-fleet post-backfill-writes-are-LOST caveat + maintenance-window mitigation, fail-closed boot) + server/CLAUDE.md persistence pointer. Reviews (apply-all): migration-safety 0 BLOCKING / 1 SHOULD-FIX (runbook honesty, applied) / 2 NIT (merge clamp + dead-fallback note, applied); privacy-security-review 0/0/1 NIT (int4-range guard, applied); qa-checklist READY 0/0/3 NIT (three coverage tests, applied). Validation: tsc 0; full npm test 716 files / 8046 pass / 11 skip; build:env + build:server + build green; ci:changed clean; dash/emoji scan clean. Also cleaned 14 pre-existing em dashes in touched-file comments (db.ts + save_character_and_market.test.ts). OUTSIDE the dispatch-flag rollback story: persistence is not reverted by API_DISPATCH (rollback is the documented data runbook).
 
 ## Phase 21: Security headers top-level wrapper + Content-Type/Origin enforcement
 

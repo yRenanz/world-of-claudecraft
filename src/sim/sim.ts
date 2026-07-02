@@ -3259,9 +3259,9 @@ export class Sim {
           ? PVP_FEAR_DR_RESET
           : category === 'lockout'
             ? PVP_STUN_DR_RESET
-          : isStunDrCategory(category)
-            ? PVP_STUN_DR_RESET
-            : PVP_ROOT_DR_RESET;
+            : isStunDrCategory(category)
+              ? PVP_STUN_DR_RESET
+              : PVP_ROOT_DR_RESET;
     if (category === 'polymorph') {
       target.ccDr.set(category, { stage: stage + 1, resetAt: this.time + reset });
       return PVP_POLYMORPH_DR_DURATIONS[Math.min(stage, PVP_POLYMORPH_DR_DURATIONS.length - 1)];

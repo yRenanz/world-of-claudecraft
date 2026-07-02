@@ -201,7 +201,12 @@ const scene2 = await page.evaluate(async () => {
   };
 });
 console.log('scene2 interrupt+lockout:', JSON.stringify(scene2));
-if (!scene2.wasCasting || !scene2.interrupted || scene2.lockoutSchool !== 'fire' || !scene2.refused) {
+if (
+  !scene2.wasCasting ||
+  !scene2.interrupted ||
+  scene2.lockoutSchool !== 'fire' ||
+  !scene2.refused
+) {
   fails.push(`scene2: interrupt/lockout wrong (${JSON.stringify(scene2)})`);
 }
 // shoot immediately so the red "You are silenced!" refusal from the lockout

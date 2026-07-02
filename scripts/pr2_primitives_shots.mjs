@@ -139,7 +139,9 @@ await page.evaluate(() => {
     damageEventsSince(start, abilityId) {
       return sim.events
         .slice(start)
-        .filter((ev) => ev.type === 'damage' && ev.sourceId === sim.player.id && ev.ability === abilityId);
+        .filter(
+          (ev) => ev.type === 'damage' && ev.sourceId === sim.player.id && ev.ability === abilityId,
+        );
     },
   };
 });
@@ -175,11 +177,7 @@ const scene1 = await page.evaluate(() => {
   };
 });
 console.log('scene1 vs-rooted triple damage:', JSON.stringify(scene1));
-if (
-  scene1.fail ||
-  !scene1.exactTriple ||
-  !scene1.rootVisible
-) {
+if (scene1.fail || !scene1.exactTriple || !scene1.rootVisible) {
   fails.push(`scene1: vs-rooted damage wrong (${JSON.stringify(scene1)})`);
 }
 await sleep(250);

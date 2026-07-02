@@ -178,7 +178,6 @@ describe('ground-targeted casting (thematic per-class spells)', () => {
     expect(mob.hp).toBeLessThan(hp0);
   });
 
-
   it('a completed ground-targeted channel clears castAim (always cleared on resolve)', () => {
     const sim = castGroundSpell('warlock', 'rain_of_fire', { x: 16, z: 0 });
     const me = sim.entities.get(sim.playerId);

@@ -3,8 +3,8 @@
 // polymorphed into a baby llama" griefing path can never regress.
 import { describe, expect, it } from 'vitest';
 import { runEffects } from '../src/sim/combat/effect_dispatch';
-import { Sim } from '../src/sim/sim';
 import type { PlayerMeta, ResolvedAbility } from '../src/sim/sim';
+import { Sim } from '../src/sim/sim';
 import type { AbilityDef, Entity, Vec3 } from '../src/sim/types';
 import { dist2d } from '../src/sim/types';
 

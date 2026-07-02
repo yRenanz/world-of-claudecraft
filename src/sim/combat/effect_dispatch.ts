@@ -272,7 +272,11 @@ export function runEffects(
         const interruptedDef =
           ctx.resolvedAbility(target.castingAbility, target.id)?.def ??
           ABILITIES[target.castingAbility];
-        if (!interruptedDef || interruptedDef.school === 'physical' || interruptedDef.uninterruptible)
+        if (
+          !interruptedDef ||
+          interruptedDef.school === 'physical' ||
+          interruptedDef.uninterruptible
+        )
           break;
         const school = interruptedDef.school;
         const remaining = ctx.diminishedCrowdControlDuration(p, target, 'lockout', eff.lockout);

@@ -154,6 +154,11 @@ export const de_DE: EnTranslations = {
     "spectate": {
       "banner": "{name} wird beobachtet"
     },
+    "death": {
+      "resurrectAtCorpse": "Resurrect at Corpse",
+      "resurrectAtHealer": "The Pale Keeper (Keeper's Toll)",
+      "spiritHealerAlive": "The Pale Keeper watches over the dead. You are still among the living."
+    },
     "emotes": {
       "wave": "Winken",
       "laugh": "Lachen",
@@ -282,7 +287,10 @@ export const de_DE: EnTranslations = {
       "targetAnnounce": "Ziel: {name}",
       "partyLabel": "Eure Gruppe",
       "partyGroup": "Gruppe {n}",
-      "durationUnitSeconds": "s"
+      "durationUnitSeconds": "s",
+      "durationUnitMinutes": "m",
+      "durationUnitHours": "h",
+      "durationUnitDays": "d"
     },
     "character": {
       "modelPreview": "Charaktermodell-Vorschau"
@@ -396,6 +404,7 @@ export const de_DE: EnTranslations = {
       "uiScale": "UI-Skalierung",
       "playerFrameScale": "Player Frame Scale",
       "targetFrameScale": "Target Frame Scale",
+      "aurasOnPlayerFrame": "Buffs on the Player Frame",
       "highContrastBackground": "Hintergrund mit hohem Kontrast",
       "startAttackOnAbility": "Auto-Angriff bei Fähigkeitseinsatz",
       "walkByAutoloot": "Walk-by Autoloot",
@@ -751,7 +760,13 @@ export const de_DE: EnTranslations = {
       "sortName": "Name",
       "searchPlaceholder": "Gegenstände durchsuchen",
       "searchAria": "Taschengegenstände nach Namen durchsuchen",
-      "noMatch": "Keine Gegenstände entsprechen Euren Filtern."
+      "noMatch": "Keine Gegenstände entsprechen Euren Filtern.",
+      "capacity": "{used}/{total}",
+      "capacityAria": "Bag slots used: {used} of {total}",
+      "backpack": "Backpack",
+      "bagSocketAria": "{name}: {slots}",
+      "socketEmpty": "Empty bag slot",
+      "unequipHint": "Click to remove this bag"
     },
     "raidConvert": {
       "toPartyDone": "Euer Schlachtzug wurde wieder in eine Gruppe umgewandelt.",
@@ -794,6 +809,7 @@ export const de_DE: EnTranslations = {
         "spi": "Verringert Willenskraft um {value}",
         "allStats": "Verringert alle Attribute um {value}"
       },
+      "allStatsPctReduce": "Reduces all attributes by {pct}%",
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "armorFlat": "Verringert Rüstung um {value}",
@@ -1144,6 +1160,10 @@ export const de_DE: EnTranslations = {
           "note": "Pilgrims gather at the temple moongate under the mid-month moon."
         }
       }
+    },
+    "social": {
+      "lastSeen": "Last seen: {when}",
+      "lastSeenNever": "never"
     }
   },
   "apiError": {
@@ -2881,6 +2901,7 @@ export const de_DE: EnTranslations = {
       "unknownTier": "Unbekannte Tiefgang-Stufe.",
       "levelRequired": "Du musst Stufe {level} sein, um {name} zu betreten.",
       "levelRequiredTier": "Du musst Stufe {level} sein, um {name} auf {tier} zu betreten.",
+      "partyTooLarge": "{name} is meant for solo or duo delves. Parties of {max} or more may not enter.",
       "instancesBusy": "Alle Instanzen von {name} sind belegt. Versuche es bald erneut.",
       "runFailed": "Lauf von {name} gescheitert.",
       "complete": "{name} abgeschlossen.",
@@ -2890,6 +2911,14 @@ export const de_DE: EnTranslations = {
       "doorAlreadyOpen": "Die Tür ist bereits offen.",
       "companionRankUp": "{name} erreicht Rang {rank}.",
       "bossChest": "Der Boss fällt. Eine gebannte Reliquiartruhe erhebt sich auf dem Podest. Knacke ihr Schloss, um deine Beute zu beanspruchen.",
+      "drownedLitanyReliquaryRise": "Sister Nhalia falls silent. The Drowned Reliquary rises from the blackwater. Approach it to begin the rite.",
+      "riteSequenceReady": "The shrines fall dark. Repeat the sequence.",
+      "riteSequencePlaying": "The shrines replay the rite. Wait.",
+      "riteCorrect": "A soft chime answers your touch.",
+      "riteWrong": "A harsh bell crack. Black water splashes at your feet.",
+      "riteReliquaryOpen": "The Drowned Reliquary opens.",
+      "riteReliquaryLocked": "Complete the shrine rite to open the reliquary.",
+      "riteReliquaryEmpty": "The reliquary is empty.",
       "surfaceStairs": "Eine Treppe zur Oberfläche öffnet sich. Drücke F an der Treppe, um zu gehen.",
       "moduleEnter": "{name}: {objective}",
       "objectiveClearRoom": "Den Raum räumen.",
@@ -2897,6 +2926,13 @@ export const de_DE: EnTranslations = {
       "tombstoneHint": "Ein Grabstein-Durchgang öffnet sich nach Norden, wenn der Raum geräumt ist.",
       "tombstoneOpen": "Ein versiegelter Grabstein-Durchgang schiebt sich knirschend nach Norden auf. Geh hinein, um fortzufahren.",
       "tombstoneInto": "Du schreitest durch den Grabstein nach {name}.",
+      "bellRopeShock": "The bell rope snaps taut. Drowned Cantors reel from the shock.",
+      "eggSacBurst": "The egg-sac bursts. Spiderlings skitter free across the baptistry rim.",
+      "baptistryEggs": "The baptistry falls quiet. Spider egg-sacs cling wetly to the rim.",
+      "baptistrySpidersSealed": "You should try to destroy the spider sacs.",
+      "puzzleSealed": "You need to open the seal by applying pressure somewhere in the room.",
+      "ropesSealed": "You should try pulling the bell ropes.",
+      "baptistryWave": "Something stirs in the black baptistry water.",
       "chestEmpty": "Die Truhe ist leer.",
       "notInDelve": "Du bist in keinem Tiefgang.",
       "cannotInteract": "Damit kannst du nicht interagieren.",
@@ -2915,9 +2951,12 @@ export const de_DE: EnTranslations = {
       "passageSealed": "Der Durchgang ist versiegelt.",
       "moveCloserPassage": "Geh näher an den Durchgang heran.",
       "moveCloserChest": "Geh näher an die Truhe heran.",
+      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "Es ist nichts mehr zum Mitnehmen da.",
       "wayOutNotOpen": "Der Ausweg ist noch nicht offen.",
-      "moveCloserStairs": "Geh näher an die Treppe heran."
+      "moveCloserStairs": "Geh näher an die Treppe heran.",
+      "nhaliaCantorShield": "Cantors, hold the note!",
+      "nhaliaBlackwaterMark": "{name} marks {player} with Blackwater!"
     },
     "lockpick": {
       "lockYields": "Das Schloss gibt nach! {tier} Beute.",
@@ -2980,6 +3019,26 @@ export const de_DE: EnTranslations = {
       "abandoned": "Du ziehst die Dietriche wieder heraus. Das Schloss wartet."
     }
   },
+  "delveRiteUi": {
+    "title": "The Drowned Reliquary Rite",
+    "blurb": "The shrines will light in order. Repeat the sequence by activating each shrine in turn. A wrong touch fails the attempt and replays the sequence, a flawless attempt earns the richest spoils, and running out of tries opens the reliquary on its meanest. Choose how the rite tests you.",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "guideWatch": "After you choose, the four shrines light up one at a time. Memorize the order.",
+    "guideRepeat": "When the shrines fall dark, walk to each shrine and press F (Interact) in that same order.",
+    "guideStakes": "A wrong shrine splashes you with blackwater and costs a try. Complete the sequence to open the reliquary.",
+    "showsTimes": "Sequence shown {count} times",
+    "showsOnce": "Sequence shown once",
+    "symbols": "{count} symbols",
+    "tries": "{count} tries",
+    "reward": {
+      "easy": "Modest spoils",
+      "medium": "Rich spoils",
+      "hard": "Premium spoils"
+    },
+    "closeAria": "Close"
+  },
   "delveUi": {
     "board": {
       "title": "Tiefgang-Tafel",
@@ -2989,6 +3048,7 @@ export const de_DE: EnTranslations = {
       "openDelveAria": "Tiefgang-Tafel bei {name} öffnen",
       "marks": "Tiefgang-Marken: {count}",
       "minLevel": "Erfordert Stufe {level}",
+      "partyTooLarge": "Solo or duo only ({max} players max)",
       "tier": {
         "normal": "Normal",
         "heroic": "Heroisch"
@@ -2996,6 +3056,7 @@ export const de_DE: EnTranslations = {
       "companion": {
         "pick": "Wähle einen Gefährten",
         "tessa": "Akolythin Tessa",
+        "edda": "Edda Reedhand",
         "rank": "Rang {rank}",
         "boon": "Heilt die Gruppe zwischen den Kämpfen. Rang 3 belebt einen gefallenen Verbündeten einmal pro Lauf wieder.",
         "upgrade": "Auf Rang {rank} verbessern ({marks} Marken)",
@@ -3021,7 +3082,11 @@ export const de_DE: EnTranslations = {
       "complete": "Abgeschlossen",
       "marks": "Tiefgang-Marken: {count}",
       "exitHintOpen": "Geh in den Grabstein-Durchgang (Norden)",
-      "exitHintLocked": "Räume die Gegner, um den Durchgang nach Norden zu öffnen"
+      "exitHintLocked": "Räume die Gegner, um den Durchgang nach Norden zu öffnen",
+      "riteChoose": "Approach the Drowned Reliquary and press F to begin the rite",
+      "ritePlayback": "Watch the shrines: memorize the order they light up",
+      "riteInput": "Press F at each shrine in the order they lit ({current}/{total})",
+      "riteOpen": "The reliquary is open: press F on it to claim your spoils"
     },
     "objective": {
       "kill_boss": "{boss} erschlagen",
@@ -3042,27 +3107,54 @@ export const de_DE: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "Das Reliquiar unten hat sich erneut verschoben. Nach Mitternacht hören wir Gesänge durch den Boden, und Akolythin Tessa schwört, die Bestattungsverzeichnisse änderten ihre eigene Tinte. Wenn du mutig genug bist, {playerName}, nimm eine Kerze und steig hinab. Vertraue nicht jeder Stimme, die du dort unten hörst. Manche kannten deinen Namen, bevor du geboren wurdest."
+      },
+      "halvenMarsh": {
+        "greeting": "The trail led north to the marsh, {playerName}. Another reliquary sings under the black water, and the drowned dead answer the bells. Acolyte Edda knows these reeds better than I do, stay close to her lantern. Choose your tier, and I will hold the rope until you return."
       }
     },
     "intro": {
       "normal": "Das Treppenhaus ist kalt und dunkel. Zerbrochene Heiligensteine säumen den Abstieg, und ein leiser Glockenton hängt in der feuchten Luft. Akolythin Tessa flüstert: \"Das Reliquiar sollte nicht so weit offen sein. Bleib dicht bei mir, {playerName}.\"",
-      "heroic": "Die Türen ächzen hinter dir zu. Namen kratzen über den Stein wie Fingernägel. Tessas Kerze brennt blau. \"Sie rufen jetzt nicht die Toten, {playerName}. Sie antworten auf etwas.\""
+      "heroic": "Die Türen ächzen hinter dir zu. Namen kratzen über den Stein wie Fingernägel. Tessas Kerze brennt blau. \"Sie rufen jetzt nicht die Toten, {playerName}. Sie antworten auf etwas.\"",
+      "litanyNormal": "Reed-choked stairs drop beneath Fenbridge. Edda Reedhand lifts her lantern. \"The marsh remembers every name they drowned, {playerName}. Stay in the light.\"",
+      "litanyHeroic": "Blackwater laps the causeway stones. Edda's flame gutters green. \"They are singing again below, {playerName}. Do not answer the choir.\""
     },
     "module": {
       "reliquary_sunken_ossuary": "Wasser sickert durch die Grabregale und führt alte Asche in silberschwarzen Rinnsalen mit sich.",
       "reliquary_bell_niche": "Dutzende Handglocken hängen schweigend da, jede mit Leichentuch umwickelt.",
       "reliquary_saintless_hall": "Statuen, deren Gesichter mit sorgfältigem Hass weggemeißelt wurden.",
-      "reliquary_finale": "Die vergrabene Glocke läutet einmal unter deinen Stiefeln."
+      "reliquary_finale": "Die vergrabene Glocke läutet einmal unter deinen Stiefeln.",
+      "litany_sluice": "Moss-choked sluice gates drip blackwater into the old choir crypt.",
+      "litany_ledger": "Ledger islands rise from flooded channels, ink bleeding into the marsh.",
+      "litany_ring": "A reliquary ring loops around a sealed central font of black water.",
+      "litany_baptistry": "A sinkhole baptistry yawns beneath cracked saint-stones and egg-sacs.",
+      "litany_choir_loft": "Fanning choir lofts echo with rope-hung bells that never quite stop.",
+      "litany_causeway": "A Y-split causeway forks over waist-deep fen water.",
+      "litany_apse": "The drowned apse opens onto Sister Nhalia's altar island."
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "Das versunkene Beinhaus",
       "reliquary_bell_niche": "Die Glockennische",
       "reliquary_saintless_hall": "Die heiligenlose Halle",
-      "reliquary_finale": "Die glockenvergrabene Kammer"
+      "reliquary_finale": "Die glockenvergrabene Kammer",
+      "litany_sluice": "The Crescent Sluice",
+      "litany_ledger": "The Island Ledger",
+      "litany_ring": "The Ring Reliquary",
+      "litany_baptistry": "The Sinkhole Baptistry",
+      "litany_choir_loft": "The Reedsong Gallery",
+      "litany_causeway": "The Y-Split Causeway",
+      "litany_apse": "The Drowned Apse"
+    },
+    "object": {
+      "sluice_valve": "Sluice Valve",
+      "grave_tablet": "Grave Tablet",
+      "corpse_candle": "Corpse-Candle",
+      "bell_rope": "Bell Rope"
     },
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
+        "run_start": "I have my candle and my ledger, {playerName}. Lead on.",
+        "ally_revive": "Up now. Tonight's ledger does not carry your name.",
         "combat_start": "Achte auf deinen Stand, {playerName}. Die Toten sind hier ruhelos.",
         "low_hp": "Atme. Ich habe noch Gebete für dich übrig.",
         "trap_spotted": "Halt: etwas im Boden erinnert sich an Schritte.",
@@ -3074,6 +3166,20 @@ export const de_DE: EnTranslations = {
           "3": "Reliquiar-Akolythin",
           "4": "Grabruf-Zeugin",
           "5": "Kapellenwächterin"
+        }
+      },
+      "edda": {
+        "run_start": "Keep to the plank-line, {playerName}. The silt takes the proud-footed.",
+        "ally_revive": "Up, now. The marsh does not get you today.",
+        "combat_start": "Mind the blackwater, {playerName}. The marsh listens.",
+        "low_hp": "Steady. My lantern is not out yet.",
+        "trap_spotted": "Wait. The reeds are wrong here.",
+        "boss_pull": "That canticle knows your name, {playerName}. Do not sing back.",
+        "completion": "The fen can swallow its secrets for one more night.",
+        "rank": {
+          "1": "Lantern-Bearer",
+          "2": "Reed-Watcher",
+          "3": "Fenbridge Acolyte"
         }
       }
     },
@@ -3117,7 +3223,10 @@ export const de_DE: EnTranslations = {
       "flooded_paths": "Überflutete Pfade",
       "grave_tax": "Gräbertribut",
       "unstable_roof": "Instabiles Dach",
-      "cult_remnants": "Kultüberreste"
+      "cult_remnants": "Kultüberreste",
+      "high_water": "High Water",
+      "lively_choir": "Lively Choir",
+      "belligerent_dead": "Belligerent Dead"
     },
     "blessing": {
       "chapel_candle": "Kapellenkerze: sicherer Lauf, eine Tiefgang-Marke weniger beim Abschluss."
@@ -4244,7 +4353,8 @@ export const de_DE: EnTranslations = {
       "drink": "Getränk",
       "tool": "Werkzeug",
       "potion": "Trank",
-      "elixir": "Elixier"
+      "elixir": "Elixier",
+      "bag": "Bag"
     },
     "stats": {
       "armor": "Rüstung",
@@ -4286,7 +4396,8 @@ export const de_DE: EnTranslations = {
       "useManaPotion": "Benutzen: Stellt sofort {amount} Mana wieder her. Im Kampf nutzbar. 1 Min. Abklingzeit.",
       "clickUseInstant": "Zum sofortigen Benutzen im Kampf klicken",
       "clickUse": "Zum Benutzen klicken",
-      "clickBuyback": "Zum Rückkaufen klicken"
+      "clickBuyback": "Zum Rückkaufen klicken",
+      "bagSlots": "{slots} Slot Bag"
     },
     "bags": {
       "title": "Taschen",
@@ -5588,6 +5699,21 @@ export const de_DE: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Krone des Monarchen"
       },
+      "linen_pouch": {
+        "name": "Leinenbeutel"
+      },
+      "travelers_knapsack": {
+        "name": "Rucksack des Reisenden"
+      },
+      "wolfhide_satchel": {
+        "name": "Wolfsledertasche"
+      },
+      "gravewoven_bag": {
+        "name": "Grabgewebte Tasche"
+      },
+      "mistcallers_duffel": {
+        "name": "Seesack des Nebelrufers"
+      },
       "copper_mining_pick": {
         "name": "Kupfer-Grabpickel"
       },
@@ -5978,6 +6104,69 @@ export const de_DE: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Varrics Schattenkapuze"
       },
+      "siltguard_helm": {
+        "name": "Siltguard Helm"
+      },
+      "bulwark_rusted_pauldrons": {
+        "name": "Bulwark-Rusted Pauldrons"
+      },
+      "nhalias_bell_maul": {
+        "name": "Nhalia's Bell-Maul"
+      },
+      "reedstalker_jerkin": {
+        "name": "Reedstalker Jerkin"
+      },
+      "mirejaw_fang_knife": {
+        "name": "Mirejaw Fang-Knife"
+      },
+      "widow_silk_hood": {
+        "name": "Widow-Silk Hood"
+      },
+      "cantors_drowned_sash": {
+        "name": "Cantor's Drowned Sash"
+      },
+      "corpse_candle_focus": {
+        "name": "Corpse-Candle Focus"
+      },
+      "nhalias_litany_rod": {
+        "name": "Nhalia's Litany Rod"
+      },
+      "blackwater_vanguard_chest": {
+        "name": "Blackwater Vanguard Chestguard"
+      },
+      "siltstep_leggings": {
+        "name": "Siltstep Leggings"
+      },
+      "sunken_reliquary_hood": {
+        "name": "Sunken Reliquary Hood"
+      },
+      "litany_legs": {
+        "name": "Silt-Walker Greaves"
+      },
+      "litany_shoulder": {
+        "name": "Blackwater Drift Mantle"
+      },
+      "litany_gloves_rog": {
+        "name": "Reed-Bound Handwraps"
+      },
+      "litany_plate_chest": {
+        "name": "Sump-Warden Cuirass"
+      },
+      "litany_leather_chest": {
+        "name": "Silt-Deep Vestment"
+      },
+      "litany_cloth_chest": {
+        "name": "Choir-Drowned Raiment"
+      },
+      "litany_helm": {
+        "name": "Reliquant's Drowned Cowl"
+      },
+      "sister_nhalia_choir_plate": {
+        "name": "Sister Nhalia's Choir-Forged Plate"
+      },
+      "drowned_choir_fang": {
+        "name": "Drowned Choir-Fang"
+      },
       "the_codfather": {
         "name": "Der Kabeljaupate"
       },
@@ -6313,6 +6502,39 @@ export const de_DE: EnTranslations = {
       "acolyte_tessa": {
         "name": "Akolythin Tessa"
       },
+      "drowned_cantor": {
+        "name": "Drowned Cantor"
+      },
+      "reedbound_acolyte": {
+        "name": "Reedbound Acolyte"
+      },
+      "deepfen_spearjaw": {
+        "name": "Deepfen Spearjaw"
+      },
+      "mirefen_widowling": {
+        "name": "Mirefen Widowling"
+      },
+      "spider_egg_sac": {
+        "name": "Spider Egg-Sac"
+      },
+      "grave_silt_bulwark": {
+        "name": "Grave-Silt Bulwark"
+      },
+      "sump_troll_devourer": {
+        "name": "Sump Troll Devourer"
+      },
+      "choir_thrall": {
+        "name": "Bog Thrall"
+      },
+      "sister_nhalia_drowned_canticle": {
+        "name": "Sister Nhalia, the Drowned Canticle"
+      },
+      "edda_reedhand": {
+        "name": "Edda Reedhand"
+      },
+      "tolling_bell": {
+        "name": "Tolling Bell"
+      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, der Erwachende Gipfel"
       },
@@ -6538,6 +6760,16 @@ export const de_DE: EnTranslations = {
         "name": "Bruder Halven",
         "title": "Reliquiarhüter",
         "greeting": "Das Reliquiar unten hat sich erneut verschoben."
+      },
+      "brother_halven_marsh": {
+        "name": "Brother Halven",
+        "title": "Reliquary Keeper",
+        "greeting": "The trail led north. Another reliquary, another rite. Choose your tier, and I'll hold the rope until you return."
+      },
+      "spirit_healer": {
+        "name": "The Pale Keeper",
+        "title": "Warden of the Dead",
+        "greeting": "Rest now, spirit. I can return you to your body, but the crossing back leaves you weak."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -7533,6 +7765,11 @@ export const de_DE: EnTranslations = {
         "name": "Das Eingestürzte Reliquiar",
         "enterText": "Du steigst hinab in das eingestürzte Reliquiar.",
         "leaveText": "Du kletterst zurück zu Bruder Halven bei der Reliquiarruine."
+      },
+      "drowned_litany": {
+        "name": "The Drowned Litany",
+        "enterText": "You descend into the drowned shrine at the marsh's edge.",
+        "leaveText": "You climb back to Brother Halven at the marsh's edge."
       }
     },
     "letters": {
@@ -7603,6 +7840,11 @@ export const de_DE: EnTranslations = {
     "delveLockedChestInteract": "Drücke F, um das Schloss zu knacken",
     "delveRewardChestInteract": "Drücke F, um Beute zu beanspruchen",
     "delveSurfaceExitInteract": "Drücke F, um hinaufzuklettern",
+    "delveReliquaryInteract": "Drowned Reliquary: Press F to begin the rite",
+    "delveRiteShrineBellInteract": "Bell Shrine: Press F to ring it",
+    "delveRiteShrineCandleInteract": "Candle Shrine: Press F to touch it",
+    "delveRiteShrineReedInteract": "Reed Shrine: Press F to touch it",
+    "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it",
     "mailboxName": "Mailbox"
   }
 };

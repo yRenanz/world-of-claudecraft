@@ -27,11 +27,20 @@ export { FISHING_RARE_ID, FISHING_TABLES };
 
 import {
   BROTHER_HALVEN,
+  BROTHER_HALVEN_MARSH,
   COLLAPSED_RELIQUARY_DELVE,
   COLLAPSED_RELIQUARY_MODULES,
   DELVE_MOBS,
+  DROWNED_LITANY_DELVE,
+  DROWNED_LITANY_MODULES,
 } from './content/delves';
 import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
+import {
+  type GraveyardDef,
+  OVERWORLD_GRAVEYARDS,
+  SPIRIT_HEALER,
+  SPIRIT_HEALER_NPC_ID,
+} from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import {
   TEMPLE_CAMPS,
@@ -160,7 +169,16 @@ export const NPCS: Record<string, NpcDef> = {
   ...ZONE3_NPCS,
   ...TEMPLE_NPCS,
   brother_halven: BROTHER_HALVEN,
+  brother_halven_marsh: BROTHER_HALVEN_MARSH,
+  // The Spirit Healer template (dynamic: true, so the ctor's surface-placement
+  // loop skips it). Kept in NPCS so the online client and world_entity_i18n can
+  // resolve its name; spirit.ts spawns a copy at every graveyard.
+  [SPIRIT_HEALER_NPC_ID]: SPIRIT_HEALER,
 };
+
+// Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
+// whole death-loop data surface from this one merge module.
+export { type GraveyardDef, OVERWORLD_GRAVEYARDS, SPIRIT_HEALER, SPIRIT_HEALER_NPC_ID };
 
 export const QUESTS: Record<string, QuestDef> = {
   ...ZONE1_QUESTS,
@@ -447,10 +465,12 @@ export function delveAt(x: number): DelveDef | null {
 
 export const DELVES: Record<string, DelveDef> = {
   [COLLAPSED_RELIQUARY_DELVE.id]: COLLAPSED_RELIQUARY_DELVE,
+  [DROWNED_LITANY_DELVE.id]: DROWNED_LITANY_DELVE,
 };
 export const DELVE_LIST: DelveDef[] = Object.values(DELVES).sort((a, b) => a.index - b.index);
 export const DELVE_MODULES: Record<string, DelveModuleDef> = {
   ...COLLAPSED_RELIQUARY_MODULES,
+  ...DROWNED_LITANY_MODULES,
 };
 
 function delveModuleFootprint(moduleId: string): number {

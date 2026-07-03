@@ -27,7 +27,7 @@
 // DOM/Three/render/ui/game/net, no Math.random/Date.now), enforced by
 // tests/architecture.test.ts.
 
-import { ITEMS, MOBS } from '../data';
+import { ITEMS, isDelvePos, MOBS } from '../data';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -605,23 +605,36 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
   const billableCost = (): number =>
     res.cost > 0 && !togglingOff && consumeNextCastFree(ctx, p) ? 0 : res.cost;
   if (ability.id === 'conjure_water') {
-    spendResource(p, billableCost());
     // higher ranks conjure better water (falls back if the item isn't defined)
     const tiered = `conjured_water${res.rank}`;
-    ctx.addItem(res.rank > 1 && ITEMS[tiered] ? tiered : 'conjured_water', 2, p.id);
+    const waterId = res.rank > 1 && ITEMS[tiered] ? tiered : 'conjured_water';
+    if (!ctx.canAddItem(waterId, 2, p.id)) {
+      ctx.error(p.id, 'Your bags are full.');
+      return;
+    }
+    spendResource(p, billableCost());
+    ctx.addItem(waterId, 2, p.id);
     return;
   }
   if (ability.id === 'conjure_food') {
-    spendResource(p, billableCost());
     // higher ranks conjure heartier fare (falls back if the item isn't defined)
     const tiered = `conjured_bread${res.rank}`;
-    ctx.addItem(res.rank > 1 && ITEMS[tiered] ? tiered : 'conjured_bread', 2, p.id);
+    const foodId = res.rank > 1 && ITEMS[tiered] ? tiered : 'conjured_bread';
+    if (!ctx.canAddItem(foodId, 2, p.id)) {
+      ctx.error(p.id, 'Your bags are full.');
+      return;
+    }
+    spendResource(p, billableCost());
+    ctx.addItem(foodId, 2, p.id);
     return;
   }
   if (ability.id === 'revive_pet') {
     const pet = ctx.petOf(p.id, true);
     if (!pet) {
-      ctx.error(p.id, 'You have no pet.');
+      ctx.error(
+        p.id,
+        isDelvePos(p.pos.x) ? 'Pets are not allowed inside the delves.' : 'You have no pet.',
+      );
       return;
     }
     if (!pet.dead) {

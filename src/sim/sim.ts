@@ -9,6 +9,8 @@ import type {
   LockpickView,
   PlayerProfessionsView,
 } from '../world_api';
+import * as bagsMod from './bags';
+import { addStacked, BAG_SOCKETS, bagCapacity, canAddItem, migrationBagsFor } from './bags';
 import { lineOfSightClear, resolveMovement, resolvePosition } from './colliders';
 import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
 import {
@@ -128,7 +130,6 @@ import {
   dropEntityFromRoster,
   type GroundAoE,
   rebucketEntity,
-  releasePlayerSpirit,
   releaseSpiritInDelve as releaseSpiritInDelveImpl,
   runDespawnDecay,
   tickGroundAoEs,
@@ -212,6 +213,15 @@ import { persistedResource } from './serialize_resource';
 import { createSimContext, type SimContext, type SimContextHost } from './sim_context';
 import * as chatMod from './social/chat';
 import * as tradeMod from './social/trade';
+import {
+  applyResurrectionSickness,
+  GHOST_RUN_MULT,
+  RESURRECTION_SICKNESS_ID,
+  releasePlayerSpirit,
+  resurrectAtCorpse,
+  resurrectAtSpiritHealer,
+  spawnOverworldSpiritHealers,
+} from './spirit';
 import {
   emptyWorldBossDaily,
   rollWorldBossLoot as rollWorldBossLootImpl,
@@ -324,10 +334,12 @@ import {
   type MoveInput,
   normAngle,
   type OverheadEmoteId,
+  PARTY_MEMBER_AURA_CAP,
   type PetMode,
   type PlayerClass,
   type QuestProgress,
   type QuestState,
+  type RiteIntensity,
   RUN_SPEED,
   type SimConfig,
   type SimEvent,
@@ -693,6 +705,9 @@ export interface PlayerMeta {
   // it every frame. Runtime-only signal, never serialized/persisted.
   wireRev: number;
   inventory: InvSlot[];
+  // The 4 equippable bag sockets (itemId of a kind:'bag' item, or null). The
+  // 16-slot backpack is implicit; capacity math lives in bags.ts. Persisted.
+  bags: (string | null)[];
   vendorBuyback: InvSlot[];
   copper: number;
   equipment: PlayerEquipment;
@@ -825,6 +840,9 @@ export interface CharacterState {
   facing: number;
   equipment: PlayerEquipment;
   inventory: InvSlot[];
+  // Equipped bag sockets. Optional so pre-bag saves load cleanly (defaults to
+  // 4 empty sockets; an over-capacity legacy inventory is tolerated).
+  bags?: (string | null)[];
   vendorBuyback?: InvSlot[];
   questLog: { questId: string; counts: number[]; state: 'active' | 'ready' | 'done' }[];
   questsDone: string[];
@@ -850,6 +868,14 @@ export interface CharacterState {
   // longer wipes cooldowns and lets a player bypass them by relogging.
   cooldowns?: SavedCooldowns;
   pet?: PetState | null;
+  // WoW-style ghost state (JSONB; optional so pre-ghost saves load alive). A player who
+  // logs out as a released spirit resumes as a ghost at the graveyard with the corpse
+  // still marked, rather than free-resurrecting on relog. See src/sim/spirit.ts.
+  ghost?: boolean;
+  corpsePos?: { x: number; z: number } | null;
+  // The Keeper's Toll (Resurrection Sickness) remaining seconds (JSONB; optional/null when
+  // none). Persisted so the penalty cannot be shed by logging out and back in.
+  resSickness?: number | null;
   skin?: number; // appearance index (JSONB; optional so pre-skin saves load as 0)
   skinCatalog?: SkinCatalog;
   // Pending skin-select event rank (JSONB; optional so older saves load as null).
@@ -1158,6 +1184,11 @@ export class Sim {
       }
     }
 
+    // Spirit Healers (the angels): one hovering at every overworld graveyard.
+    // Per-instance dungeon/raid healers spawn on claim (instances/dungeons.ts).
+    // createNpc draws no rng, so world-gen determinism is preserved.
+    spawnOverworldSpiritHealers(this.ctx);
+
     for (const delve of DELVE_LIST) {
       for (let i = 0; i < DELVE_SLOT_COUNT; i++) {
         const origin = delveOrigin(delve.index, i);
@@ -1181,7 +1212,9 @@ export class Sim {
           raiseDeadChannel: null,
           restlessPending: [],
           badAirTimer: 0,
+          blackwaterTimer: 0,
           companionBarks: [],
+          companionReviveUsed: false,
           exitPortalOpen: false,
           bountiful: false,
           rewardChestId: null,
@@ -1355,6 +1388,7 @@ export class Sim {
       moveInput: emptyMoveInput(),
       wireRev: 0,
       inventory: [],
+      bags: Array<string | null>(BAG_SOCKETS).fill(null),
       vendorBuyback: [],
       copper: 0,
       equipment: { mainhand: classDef.startWeapon, chest: classDef.startChest },
@@ -1421,6 +1455,23 @@ export class Sim {
       meta.copper = s.copper;
       meta.equipment = { ...s.equipment };
       meta.inventory = s.inventory.map(cloneInvSlot);
+      if (s.bags === undefined) {
+        // PRE-BAG save: the character earned this space under the infinite
+        // inventory, so grant + equip bags that cover it (lowest quality tier
+        // that suffices; see migrationBagsFor). Runs once: the next save writes
+        // the bags field, so a re-login never double-grants. A hoard past the
+        // 72-slot ceiling keeps the tolerated overflow.
+        const grantedBags = migrationBagsFor(meta.inventory.length);
+        for (let i = 0; i < grantedBags.length; i++) meta.bags[i] = grantedBags[i];
+        if (grantedBags.length > 0) {
+          this.notice(player.id, 'Your belongings have been packed into new bags.');
+        }
+      } else {
+        for (let i = 0; i < BAG_SOCKETS; i++) {
+          const id = s.bags[i];
+          meta.bags[i] = id && ITEMS[id]?.kind === 'bag' ? id : null;
+        }
+      }
       meta.vendorBuyback = (s.vendorBuyback ?? []).map(cloneInvSlot);
       for (const q of s.questLog) {
         if (q.state !== 'done')
@@ -1510,6 +1561,25 @@ export class Sim {
     // the shared potion cooldown paints the action bar as READY (no swipe) while the
     // use-gate (which reads potionCooldownUntil) still rejects the quaff.
     player.potionCdRemaining = Math.max(0, player.potionCooldownUntil - this.time);
+    // Restore The Keeper's Toll (Resurrection Sickness) with its SAVED remaining, so the
+    // penalty cannot be shed by relogging. Applied after recalc so the aura re-reduces
+    // maxHp; hp is then clamped down to the reduced max (the ghost block below resets a
+    // ghost's greyed bar to that reduced max).
+    if (savedState?.resSickness && savedState.resSickness > 0) {
+      applyResurrectionSickness(this.ctx, player, savedState.resSickness);
+      player.hp = Math.min(player.hp, player.maxHp);
+    }
+    // Resume a ghost: a player who logged out as a released spirit comes back as a
+    // ghost at the graveyard (corpse still marked), not freely resurrected. dead stays
+    // unset for a non-ghost logout (the pre-existing revive-on-relog behavior).
+    if (savedState?.ghost) {
+      player.dead = true;
+      player.ghost = true;
+      player.corpsePos = savedState.corpsePos
+        ? this.groundPos(savedState.corpsePos.x, savedState.corpsePos.z)
+        : null;
+      player.hp = player.maxHp;
+    }
     if (savedState?.pet) this.restorePet(player, savedState.pet);
     // One-time Ravenpost welcome (doubles as the service announcement for
     // characters saved before mail existed). Flipped before the send so a
@@ -1641,8 +1711,14 @@ export class Sim {
       ),
       pos: { x: e.pos.x, z: e.pos.z },
       facing: e.facing,
+      // Ghost state, so a logged-out spirit resumes its corpse run on relog.
+      ghost: e.ghost,
+      corpsePos: e.corpsePos ? { x: e.corpsePos.x, z: e.corpsePos.z } : null,
+      // The Keeper's Toll persists across logout (it cannot be shed by relogging).
+      resSickness: e.auras.find((a) => a.id === RESURRECTION_SICKNESS_ID)?.remaining ?? null,
       equipment: { ...meta.equipment },
       inventory: meta.inventory.map(cloneInvSlot),
+      bags: [...meta.bags],
       vendorBuyback: meta.vendorBuyback.map(cloneInvSlot),
       questLog: [...meta.questLog.values()].map((q) => ({
         questId: q.questId,
@@ -1839,6 +1915,12 @@ export class Sim {
   }
   get inventory(): InvSlot[] {
     return this.primary.inventory;
+  }
+  get bags(): (string | null)[] {
+    return this.primary.bags;
+  }
+  get bagCapacity(): number {
+    return bagCapacity(this.primary.bags);
   }
   get vendorBuyback(): InvSlot[] {
     return this.primary.vendorBuyback;
@@ -2272,6 +2354,8 @@ export class Sim {
       // healingThreat/countItem are bound elsewhere in this host (C4a/C2/C3/Q1) - deduped.
       spendResource: sim.spendResource.bind(sim),
       removeItem: sim.removeItem.bind(sim),
+      // B1 bags capacity pre-check (stays on Sim next to the inventory hub).
+      canAddItem: sim.canAddItem.bind(sim),
       removeFungibleItem: sim.removeFungibleItem.bind(sim),
       partyOf: sim.partyOf.bind(sim),
       partyInvite: (targetPid: number, pid?: number) => sim.party.partyInvite(targetPid, pid),
@@ -2679,6 +2763,13 @@ export class Sim {
         updateRegen(this.ctx, p, meta);
         updateRested(p, meta);
         drainGatheringGrants(meta);
+      } else if (p.ghost) {
+        // A released spirit only runs (boosted speed via moveSpeedMult); it does not
+        // fight, cast, or regen. It CAN walk into a dungeon/raid door to re-enter its
+        // instance and resurrect at the entrance (the corpse run under the instance
+        // death model), or resurrect at its corpse / an overworld Spirit Healer.
+        this.updatePlayerMovement(p, meta);
+        this.updateDoorTriggers(p);
       }
       updateTimers(p);
       updateComboExpiry(this.ctx, p);
@@ -2807,6 +2898,9 @@ export class Sim {
     return partyLootCandidatesForMobImpl(this.ctx, mob);
   }
   moveSpeedMult(e: Entity): number {
+    // A released spirit runs at a fixed boosted speed and is immune to snares (a ghost
+    // cannot be slowed): short-circuit the aura scan with the ghost-run multiplier.
+    if (e.ghost) return GHOST_RUN_MULT;
     let slow = 1,
       speed = 1;
     for (const a of e.auras) {
@@ -3338,7 +3432,12 @@ export class Sim {
   }
 
   private hasLineOfSight(source: Entity, target: Entity): boolean {
-    return lineOfSightClear(this.cfg.seed, source.pos, target.pos);
+    const run =
+      this.delveRunForMob(source.id) ??
+      this.delveRunForMob(target.id) ??
+      this.delveRunForPlayer(source.id) ??
+      this.delveRunForPlayer(target.id);
+    return lineOfSightClear(this.cfg.seed, source.pos, target.pos, 0.05, run?.modules);
   }
 
   private lineOfSightBlocked(source: Entity, target: Entity, ability: AbilityDef): boolean {
@@ -4632,16 +4731,17 @@ export class Sim {
     return n;
   }
 
+  // Grants are stack-aware (bags.ts addStacked, which never merges into an
+  // instanced slot, #1165) but NEVER capacity-capped here: a grant that reaches
+  // this hub always lands, so an async award (loot roll, master loot, delve
+  // rewards) can't destroy items. Capacity is enforced by canAddItem pre-checks
+  // at the command boundaries instead.
   addItem(itemId: string, count: number, pid?: number): void {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta } = r;
     const def = ITEMS[itemId];
-    // Never merge into (or split off of) an instanced slot: instanced copies keep
-    // their own signer/charges/rolled/boundTo payload, each in its own slot (#1165).
-    const existing = meta.inventory.find((s) => s.itemId === itemId && !s.instance);
-    if (existing) existing.count += count;
-    else meta.inventory.push({ itemId, count });
+    addStacked(meta.inventory, itemId, count);
     this.emit({
       type: 'loot',
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
@@ -4702,6 +4802,24 @@ export class Sim {
       if (s.count <= 0) meta.inventory.splice(i, 1);
     }
     this.ctx.onInventoryChangedForQuests(meta);
+  }
+
+  // True when `count` copies of the item fit the player's pooled bag budget
+  // (existing stacks top up first). The capacity gate every blocking command
+  // path (buy, loot, pickup, fish, conjure, collect, trade, turn-in) pre-checks.
+  canAddItem(itemId: string, count: number, pid?: number): boolean {
+    const r = this.resolve(pid);
+    if (!r) return false;
+    const { meta } = r;
+    return canAddItem(meta.inventory, bagCapacity(meta.bags), itemId, count);
+  }
+
+  equipBag(itemId: string, socket?: number, pid?: number): void {
+    bagsMod.equipBag(this.ctx, itemId, socket, pid);
+  }
+
+  unequipBag(socket: number, pid?: number): void {
+    bagsMod.unequipBag(this.ctx, socket, pid);
   }
 
   discardItem(itemId: string, count = 1, pid?: number): void {
@@ -4776,6 +4894,9 @@ export class Sim {
 
   private completeFishing(p: Entity, meta: PlayerMeta): void {
     if (this.shouldCatchCodfather(p, meta)) {
+      // Deliberately NOT capacity-gated: this once-ever quest catch is guarded
+      // to a single copy by shouldCatchCodfather, and losing it to full bags
+      // could soft-lock the quest chain. Force-add (over-capacity tolerated).
       this.addItem(THE_CODFATHER_ITEM_ID, 1, meta.entityId);
       return;
     }
@@ -4795,6 +4916,12 @@ export class Sim {
     }
     if (caught === null) {
       this.emit({ type: 'log', text: 'No fish are biting.', color: '#999', pid: p.id });
+      return;
+    }
+    // Capacity gate AFTER the table roll so the rng draw order never depends
+    // on bag state; a catch with no room to land simply gets away.
+    if (!this.canAddItem(caught, 1, meta.entityId)) {
+      this.error(meta.entityId, 'Your bags are full.');
       return;
     }
     if (caught === FISHING_RARE_ID) {
@@ -4994,6 +5121,17 @@ export class Sim {
   // keeps the public IWorld surface (`sim.releaseSpirit`) resolving unchanged.
   releaseSpirit(pid?: number): void {
     releasePlayerSpirit(this.ctx, pid);
+  }
+
+  // Ghost resurrection (src/sim/spirit.ts): run the spirit back to its corpse to
+  // resurrect penalty-free, or accept a Spirit Healer's resurrection (with
+  // Resurrection Sickness). Thin delegates so the IWorld surface resolves unchanged.
+  resurrectAtCorpse(pid?: number): void {
+    resurrectAtCorpse(this.ctx, pid);
+  }
+
+  resurrectAtSpiritHealer(pid?: number): void {
+    resurrectAtSpiritHealer(this.ctx, pid);
   }
 
   // chatAllowed / handleDevChat / whisperMessageForName / resolveWhisperTarget
@@ -5788,6 +5926,14 @@ export class Sim {
                 dead: e.dead ? 1 : 0,
                 inCombat: e.inCombat ? 1 : 0,
                 group: party.raidGroups.get(mPid) ?? 1,
+                // The mini aura strip under the member's party row: first N in
+                // aura order (buffs and debuffs alike), id + kind + sap flag
+                // only, no countdown (see PartyMemberAura in world_api/party.ts).
+                auras: e.auras.slice(0, PARTY_MEMBER_AURA_CAP).map((a) => ({
+                  id: a.id,
+                  kind: a.kind,
+                  ...(a.value < 0 ? { neg: 1 as const } : {}),
+                })),
               },
             ]
           : [];
@@ -5929,10 +6075,17 @@ export class Sim {
     return runsMod.delveRunForMob(this.ctx, mobId);
   }
 
+  // Party membership alone is NOT "in this delve run": a party member who never
+  // walked through the door (e.g. AFK back in town) must not be swept into
+  // module-advance / eject / reward teleports meant for players who are actually
+  // inside. Every caller of this is delve-scoped, so gate on physical presence.
   private partyMembersForKey(key: string): number[] {
     const out: number[] = [];
     for (const meta of this.players.values()) {
-      if (this.instanceKeyFor(meta.entityId) === key) out.push(meta.entityId);
+      if (this.instanceKeyFor(meta.entityId) !== key) continue;
+      const e = this.entities.get(meta.entityId);
+      if (!e || !isDelvePos(e.pos.x)) continue;
+      out.push(meta.entityId);
     }
     return out;
   }
@@ -6130,6 +6283,7 @@ export class Sim {
     mob.wanderTimer = DELVE_COMPANION_HEAL_INTERVAL;
     this.addEntity(mob);
     run.companion = { companionId, entityId: mob.id };
+    this.maybeCompanionBark(run, pid, 'run_start');
   }
 
   private despawnDelveCompanion(run: DelveRun): void {
@@ -6141,7 +6295,9 @@ export class Sim {
   private maybeCompanionBark(run: DelveRun, pid: number, barkId: string): void {
     if (!run.companion || run.companionBarks.includes(barkId)) return;
     run.companionBarks.push(barkId);
-    this.emit({ type: 'companionBark', barkId, pid });
+    // Carry the speaker on the event so the HUD does not have to resolve it
+    // from mutable companionState (which can be momentarily null online).
+    this.emit({ type: 'companionBark', barkId, companionId: run.companion.companionId, pid });
   }
 
   delveInteract(objectId: number, pid?: number): void {
@@ -6175,6 +6331,11 @@ export class Sim {
   /** Claim item loot from an opened delve chest (shown on the loot overlay). */
   collectDelveChestLoot(chestId: number, pid?: number): void {
     runsMod.collectDelveChestLoot(this.ctx, chestId, pid);
+  }
+
+  /** The Drowned Litany finale: lock in the chosen rite difficulty (offline). */
+  delveRiteChoose(intensity: RiteIntensity, pid?: number): void {
+    runsMod.delveRiteChoose(this.ctx, intensity, pid);
   }
 
   /** Read-only projection of the active lockpick attempt for IWorld (offline). */

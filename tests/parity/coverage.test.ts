@@ -255,6 +255,34 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(r.objectState[r.surfaceExitId].open).toBe(true);
   });
 
+  it('drowned_litany: heroic affix rolls, Bell Shock lands, the driver draws, the rite starts', () => {
+    const rec = run('drowned_litany');
+    const ev = rec.allEvents as Ev[];
+    // Heroic entry rolled a ruin affix off the run seed.
+    expect((rec.notes.affixes as string[]).length).toBeGreaterThan(0);
+    // The bell-rope pull shocked the live cantor mid-combat.
+    expect(
+      ev.some(
+        (e) =>
+          e.type === 'log' &&
+          typeof e.text === 'string' &&
+          e.text.includes('The bell rope snaps taut'),
+      ),
+    ).toBe(true);
+    // The Sister Nhalia driver drew on the shared stream: a Blackwater Mark was
+    // placed and a Tolling Bells volley was live at the sampling instant.
+    expect(rec.notes.marksSeen as number).toBeGreaterThan(0);
+    expect(rec.notes.bellsLive as number).toBeGreaterThan(0);
+    // Cantor phase fired, and after the boss died the rite choose started playback.
+    expect(
+      ev.some(
+        (e) => e.type === 'log' && typeof e.text === 'string' && e.text.includes('Cantors, hold'),
+      ),
+    ).toBe(true);
+    expect(ev.some((e) => e.type === 'delveRiteChoosePrompt')).toBe(true);
+    expect(ev.some((e) => e.type === 'delveRitePulse')).toBe(true);
+  });
+
   it('party_loot: a need/greed loot roll prompt fires', () => {
     const rec = run('party_loot');
     expect((rec.allEvents as Ev[]).some((e) => e.type === 'lootRoll')).toBe(true);
@@ -285,7 +313,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(evs.some((e) => e.type === 'loot' && /Everyone passed/.test(String(e.text)))).toBe(true);
   });
 
-  it('entity_roster: both despawn branches drop, delayed drain runs, graveyard release at full hp', () => {
+  it('entity_roster: despawn branches drop, delayed drain runs, ghost release + healer resurrect', () => {
     const rec = run('entity_roster');
     const ents = entities(rec);
     const ghostId = rec.notes.ghostId as number;
@@ -296,10 +324,12 @@ describe('coverage: each scenario fires its subsystem', () => {
     // delayed drain: 3 scheduled -> 1 fired, 1 guard-dropped, 1 (future) still pending.
     expect((rec.sim as any).delayedEvents.length).toBe(1);
     expect((rec.allEvents as Ev[]).some((e) => e.type === 'respawn')).toBe(true);
-    // outdoor release-spirit: alive again at full hp.
+    // release rose as a ghost, then the Spirit Healer resurrected the player with
+    // Resurrection Sickness (level 10).
     const p = (rec.sim as any).player;
     expect(p.dead).toBe(false);
-    expect(p.hp).toBe(p.maxHp);
+    expect(p.ghost).toBe(false);
+    expect(p.auras.some((a: { id: string }) => a.id === 'resurrection_sickness')).toBe(true);
   });
 
   it('delve_death: second in-run death fails the delve and ejects the player', () => {

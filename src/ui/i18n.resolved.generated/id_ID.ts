@@ -836,6 +836,16 @@ export const id_ID: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "mobTooltip": {
+      "levelFamily": "Level {level} {family}",
+      "familyDemon": "Demon",
+      "hostile": "Hostile",
+      "friendly": "Friendly"
+    },
+    "targetFrame": {
+      "unlock": "Move target frame",
+      "lock": "Lock target frame"
+    },
     "itemTooltip": {
       "requiresLevel": "Membutuhkan Level {level}"
     },
@@ -3488,7 +3498,9 @@ export const id_ID: EnTranslations = {
   "questUi": {
     "tracker": {
       "title": "Misi",
-      "complete": "Selesai"
+      "complete": "Selesai",
+      "showOnMap": "Show {name} on the map",
+      "hideFromMap": "Hide {name} from the map"
     },
     "log": {
       "title": "Catatan Misi",

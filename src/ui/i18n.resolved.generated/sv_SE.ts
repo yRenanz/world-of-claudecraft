@@ -836,6 +836,16 @@ export const sv_SE: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "mobTooltip": {
+      "levelFamily": "Level {level} {family}",
+      "familyDemon": "Demon",
+      "hostile": "Hostile",
+      "friendly": "Friendly"
+    },
+    "targetFrame": {
+      "unlock": "Move target frame",
+      "lock": "Lock target frame"
+    },
     "itemTooltip": {
       "requiresLevel": "Kräver nivå {level}"
     },
@@ -3488,7 +3498,9 @@ export const sv_SE: EnTranslations = {
   "questUi": {
     "tracker": {
       "title": "Uppdrag",
-      "complete": "Slutfört"
+      "complete": "Slutfört",
+      "showOnMap": "Show {name} on the map",
+      "hideFromMap": "Hide {name} from the map"
     },
     "log": {
       "title": "Uppdragslogg",

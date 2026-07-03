@@ -836,6 +836,16 @@ export const fr_CA: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "mobTooltip": {
+      "levelFamily": "Level {level} {family}",
+      "familyDemon": "Demon",
+      "hostile": "Hostile",
+      "friendly": "Friendly"
+    },
+    "targetFrame": {
+      "unlock": "Move target frame",
+      "lock": "Lock target frame"
+    },
     "itemTooltip": {
       "requiresLevel": "Niveau requis : {level}"
     },
@@ -3488,7 +3498,9 @@ export const fr_CA: EnTranslations = {
   "questUi": {
     "tracker": {
       "title": "Quêtes",
-      "complete": "Terminée"
+      "complete": "Terminée",
+      "showOnMap": "Afficher {name} sur la carte",
+      "hideFromMap": "Masquer {name} sur la carte"
     },
     "log": {
       "title": "Journal de quêtes",

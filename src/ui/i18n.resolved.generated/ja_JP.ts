@@ -836,6 +836,16 @@ export const ja_JP: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "mobTooltip": {
+      "levelFamily": "レベル{level} {family}",
+      "familyDemon": "デーモン",
+      "hostile": "敵対",
+      "friendly": "味方"
+    },
+    "targetFrame": {
+      "unlock": "ターゲットフレームを移動",
+      "lock": "ターゲットフレームを固定"
+    },
     "itemTooltip": {
       "requiresLevel": "必要レベル {level}"
     },
@@ -3488,7 +3498,9 @@ export const ja_JP: EnTranslations = {
   "questUi": {
     "tracker": {
       "title": "クエスト",
-      "complete": "完了"
+      "complete": "完了",
+      "showOnMap": "{name}をマップに表示",
+      "hideFromMap": "{name}をマップから隠す"
     },
     "log": {
       "title": "クエストログ",

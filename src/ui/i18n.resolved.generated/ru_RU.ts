@@ -836,6 +836,16 @@ export const ru_RU: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "mobTooltip": {
+      "levelFamily": "Уровень {level} {family}",
+      "familyDemon": "Демон",
+      "hostile": "Враждебный",
+      "friendly": "Дружественный"
+    },
+    "targetFrame": {
+      "unlock": "Переместить рамку цели",
+      "lock": "Закрепить рамку цели"
+    },
     "itemTooltip": {
       "requiresLevel": "Требуется уровень {level}"
     },
@@ -3488,7 +3498,9 @@ export const ru_RU: EnTranslations = {
   "questUi": {
     "tracker": {
       "title": "Задания",
-      "complete": "Готово"
+      "complete": "Готово",
+      "showOnMap": "Показать {name} на карте",
+      "hideFromMap": "Скрыть {name} с карты"
     },
     "log": {
       "title": "Журнал заданий",

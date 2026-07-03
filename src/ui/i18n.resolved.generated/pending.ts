@@ -35,6 +35,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.dailyRewards.taskMultiplier",
     "hudChrome.dailyRewards.totalPlayer",
     "hudChrome.dailyRewards.totalPlayers",
+    "hudChrome.targetFrame.lock",
+    "hudChrome.targetFrame.unlock",
     "wallet.extensionHelp"
   ],
   "es_ES": [
@@ -63,6 +65,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.dailyRewards.taskMultiplier",
     "hudChrome.dailyRewards.totalPlayer",
     "hudChrome.dailyRewards.totalPlayers",
+    "hudChrome.targetFrame.lock",
+    "hudChrome.targetFrame.unlock",
     "wallet.extensionHelp"
   ],
   "fr_FR": [
@@ -91,6 +95,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.dailyRewards.taskMultiplier",
     "hudChrome.dailyRewards.totalPlayer",
     "hudChrome.dailyRewards.totalPlayers",
+    "hudChrome.mobTooltip.familyDemon",
+    "hudChrome.mobTooltip.friendly",
+    "hudChrome.mobTooltip.hostile",
+    "hudChrome.mobTooltip.levelFamily",
+    "hudChrome.targetFrame.lock",
+    "hudChrome.targetFrame.unlock",
     "wallet.extensionHelp"
   ],
   "fr_CA": [
@@ -119,6 +129,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.dailyRewards.taskMultiplier",
     "hudChrome.dailyRewards.totalPlayer",
     "hudChrome.dailyRewards.totalPlayers",
+    "hudChrome.mobTooltip.familyDemon",
+    "hudChrome.mobTooltip.friendly",
+    "hudChrome.mobTooltip.hostile",
+    "hudChrome.mobTooltip.levelFamily",
+    "hudChrome.targetFrame.lock",
+    "hudChrome.targetFrame.unlock",
     "wallet.extensionHelp"
   ],
   "en_CA": [],
@@ -148,6 +164,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.dailyRewards.taskMultiplier",
     "hudChrome.dailyRewards.totalPlayer",
     "hudChrome.dailyRewards.totalPlayers",
+    "hudChrome.mobTooltip.familyDemon",
+    "hudChrome.mobTooltip.friendly",
+    "hudChrome.mobTooltip.hostile",
+    "hudChrome.mobTooltip.levelFamily",
+    "hudChrome.targetFrame.lock",
+    "hudChrome.targetFrame.unlock",
     "wallet.extensionHelp"
   ],
   "de_DE": [
@@ -176,6 +198,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.dailyRewards.taskMultiplier",
     "hudChrome.dailyRewards.totalPlayer",
     "hudChrome.dailyRewards.totalPlayers",
+    "hudChrome.mobTooltip.familyDemon",
+    "hudChrome.mobTooltip.friendly",
+    "hudChrome.mobTooltip.hostile",
+    "hudChrome.mobTooltip.levelFamily",
+    "hudChrome.targetFrame.lock",
+    "hudChrome.targetFrame.unlock",
     "wallet.extensionHelp"
   ],
   "zh_CN": [
@@ -220,6 +248,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.dailyRewards.taskMultiplier",
     "hudChrome.dailyRewards.totalPlayer",
     "hudChrome.dailyRewards.totalPlayers",
+    "hudChrome.mobTooltip.familyDemon",
+    "hudChrome.mobTooltip.friendly",
+    "hudChrome.mobTooltip.hostile",
+    "hudChrome.mobTooltip.levelFamily",
+    "hudChrome.targetFrame.lock",
+    "hudChrome.targetFrame.unlock",
     "wallet.extensionHelp"
   ],
   "ru_RU": [
@@ -252,6 +286,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.dailyRewards.taskMultiplier",
     "hudChrome.dailyRewards.totalPlayer",
     "hudChrome.dailyRewards.totalPlayers",
+    "hudChrome.mobTooltip.familyDemon",
+    "hudChrome.mobTooltip.friendly",
+    "hudChrome.mobTooltip.hostile",
+    "hudChrome.mobTooltip.levelFamily",
+    "hudChrome.targetFrame.lock",
+    "hudChrome.targetFrame.unlock",
+    "questUi.tracker.hideFromMap",
+    "questUi.tracker.showOnMap",
     "wallet.extensionHelp"
   ],
   "pl_PL": [
@@ -280,6 +322,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.dailyRewards.taskMultiplier",
     "hudChrome.dailyRewards.totalPlayer",
     "hudChrome.dailyRewards.totalPlayers",
+    "hudChrome.mobTooltip.familyDemon",
+    "hudChrome.mobTooltip.friendly",
+    "hudChrome.mobTooltip.hostile",
+    "hudChrome.mobTooltip.levelFamily",
+    "hudChrome.targetFrame.lock",
+    "hudChrome.targetFrame.unlock",
+    "questUi.tracker.hideFromMap",
+    "questUi.tracker.showOnMap",
     "wallet.extensionHelp"
   ],
   "id_ID": [
@@ -308,6 +358,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.dailyRewards.taskMultiplier",
     "hudChrome.dailyRewards.totalPlayer",
     "hudChrome.dailyRewards.totalPlayers",
+    "hudChrome.mobTooltip.familyDemon",
+    "hudChrome.mobTooltip.friendly",
+    "hudChrome.mobTooltip.hostile",
+    "hudChrome.mobTooltip.levelFamily",
+    "hudChrome.targetFrame.lock",
+    "hudChrome.targetFrame.unlock",
+    "questUi.tracker.hideFromMap",
+    "questUi.tracker.showOnMap",
     "wallet.extensionHelp"
   ],
   "tr_TR": [
@@ -336,6 +394,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.dailyRewards.taskMultiplier",
     "hudChrome.dailyRewards.totalPlayer",
     "hudChrome.dailyRewards.totalPlayers",
+    "hudChrome.mobTooltip.familyDemon",
+    "hudChrome.mobTooltip.friendly",
+    "hudChrome.mobTooltip.hostile",
+    "hudChrome.mobTooltip.levelFamily",
+    "hudChrome.targetFrame.lock",
+    "hudChrome.targetFrame.unlock",
+    "questUi.tracker.hideFromMap",
+    "questUi.tracker.showOnMap",
     "wallet.extensionHelp"
   ],
   "sv_SE": [
@@ -364,6 +430,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.dailyRewards.taskMultiplier",
     "hudChrome.dailyRewards.totalPlayer",
     "hudChrome.dailyRewards.totalPlayers",
+    "hudChrome.mobTooltip.familyDemon",
+    "hudChrome.mobTooltip.friendly",
+    "hudChrome.mobTooltip.hostile",
+    "hudChrome.mobTooltip.levelFamily",
+    "hudChrome.targetFrame.lock",
+    "hudChrome.targetFrame.unlock",
+    "questUi.tracker.hideFromMap",
+    "questUi.tracker.showOnMap",
     "wallet.extensionHelp"
   ],
   "vi_VN": [
@@ -392,6 +466,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.dailyRewards.taskMultiplier",
     "hudChrome.dailyRewards.totalPlayer",
     "hudChrome.dailyRewards.totalPlayers",
+    "hudChrome.mobTooltip.familyDemon",
+    "hudChrome.mobTooltip.friendly",
+    "hudChrome.mobTooltip.hostile",
+    "hudChrome.mobTooltip.levelFamily",
+    "hudChrome.targetFrame.lock",
+    "hudChrome.targetFrame.unlock",
+    "questUi.tracker.hideFromMap",
+    "questUi.tracker.showOnMap",
     "wallet.extensionHelp"
   ],
   "da_DK": [
@@ -420,6 +502,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.dailyRewards.taskMultiplier",
     "hudChrome.dailyRewards.totalPlayer",
     "hudChrome.dailyRewards.totalPlayers",
+    "hudChrome.mobTooltip.familyDemon",
+    "hudChrome.mobTooltip.friendly",
+    "hudChrome.mobTooltip.hostile",
+    "hudChrome.mobTooltip.levelFamily",
+    "hudChrome.targetFrame.lock",
+    "hudChrome.targetFrame.unlock",
+    "questUi.tracker.hideFromMap",
+    "questUi.tracker.showOnMap",
     "wallet.extensionHelp"
   ]
 };

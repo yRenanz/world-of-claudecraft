@@ -19,6 +19,14 @@ import type { ErrorCode } from './error_codes';
 import type { Issue } from './schema';
 import type { Ctx, EnvelopeKind } from './types';
 
+/**
+ * The X-Request-Id response header name, single-sourced here (this module is the
+ * LIVE error-path emitter via baseHeaders, and a runtime leaf: compose.ts and
+ * middleware/request_id.ts consume it through the compose.ts re-export, which the
+ * compose -> context -> errors import chain rules out in reverse).
+ */
+export const REQUEST_ID_HEADER = 'X-Request-Id';
+
 /** A throwable carrying an HTTP status, a stable machine code, and optional params/headers. */
 export class HttpError extends Error {
   constructor(
@@ -308,7 +316,7 @@ export function escapeHtml(text: string): string {
 
 /** X-Request-Id (runOnion fallback convention) plus the AppError headers on every response. */
 function baseHeaders(app: AppError, ctx: Ctx): Record<string, string> {
-  return { 'X-Request-Id': ctx.reqId, ...(app.headers ?? {}) };
+  return { [REQUEST_ID_HEADER]: ctx.reqId, ...(app.headers ?? {}) };
 }
 
 function serializeProblem(app: AppError, ctx: Ctx): SerializedError {

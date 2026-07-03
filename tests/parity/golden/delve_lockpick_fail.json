@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "23e43980",
+      "state": "1dc5326b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -32,6 +32,7 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -40,6 +41,7 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -104,7 +106,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 401,
-      "state": "e4871d6d",
+      "state": "7ceea1e0",
       "events": "d05e7b58",
       "rng": {
         "draws": 3,
@@ -115,7 +117,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 401,
-      "state": "9b865f9d",
+      "state": "e84a5990",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -126,7 +128,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 401,
-      "state": "18b062d7",
+      "state": "e467cda6",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -137,7 +139,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 401,
-      "state": "a0360df1",
+      "state": "866ed4cc",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -148,7 +150,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 401,
-      "state": "dedad3bf",
+      "state": "122dfe3e",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -159,7 +161,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 401,
-      "state": "d04ab76d",
+      "state": "0848cfe0",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -170,7 +172,7 @@
       "tick": 69,
       "time": 3.45,
       "nextId": 402,
-      "state": "b855ac57",
+      "state": "a128d226",
       "events": "41e38ae0",
       "rng": {
         "draws": 3,
@@ -190,6 +192,7 @@
             "kills": 1,
             "xpGained": 198
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -199,6 +202,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 11398,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -300,7 +304,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 402,
-      "state": "94c44913",
+      "state": "f36bc1ca",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -311,7 +315,7 @@
       "tick": 71,
       "time": 3.55,
       "nextId": 402,
-      "state": "d8e3eee7",
+      "state": "f17417f6",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -331,6 +335,7 @@
             "kills": 1,
             "xpGained": 198
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -340,6 +345,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 11398,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}

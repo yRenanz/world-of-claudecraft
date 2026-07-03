@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "23e43980",
+      "state": "1dc5326b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -32,6 +32,7 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -40,6 +41,7 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -104,7 +106,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 403,
-      "state": "40e304df",
+      "state": "1b80e488",
       "events": "db9d0459",
       "rng": {
         "draws": 4,
@@ -115,7 +117,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 403,
-      "state": "c2e234dc",
+      "state": "73ab9d3d",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -126,7 +128,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 403,
-      "state": "597cbab9",
+      "state": "dbff51b6",
       "events": "d9b47c94",
       "rng": {
         "draws": 5,
@@ -137,7 +139,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 405,
-      "state": "c8a0f760",
+      "state": "4f44e1e5",
       "events": "6338ba30",
       "rng": {
         "draws": 8,
@@ -158,6 +160,7 @@
             "kills": 1,
             "xpGained": 898
           },
+          "craftSkills": {},
           "delveClears": {
             "collapsed_reliquary:normal": 1
           },
@@ -178,6 +181,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 12098,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -378,7 +382,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 405,
-      "state": "4710f42d",
+      "state": "ba5a6dca",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -389,7 +393,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 405,
-      "state": "4710f42d",
+      "state": "ba5a6dca",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -410,6 +414,7 @@
             "kills": 1,
             "xpGained": 898
           },
+          "craftSkills": {},
           "delveClears": {
             "collapsed_reliquary:normal": 1
           },
@@ -430,6 +435,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 12098,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}

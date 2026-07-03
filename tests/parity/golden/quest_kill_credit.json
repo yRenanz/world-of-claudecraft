@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "d4492b11",
+      "state": "104984ca",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -32,6 +32,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -40,6 +41,7 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -102,7 +104,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "c63187c0",
+      "state": "5ca7b59b",
       "events": "d8fe6d87",
       "rng": {
         "draws": 0,
@@ -118,6 +120,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -127,6 +130,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 27600,
+          "nodeHarvestReadyAt": {},
           "questLog": [
             [
               "q_wolves",
@@ -201,7 +205,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 398,
-      "state": "881d5080",
+      "state": "f34e926b",
       "events": "68debff8",
       "rng": {
         "draws": 32,
@@ -221,6 +225,7 @@
             "kills": 8,
             "questProgress": 8
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -230,6 +235,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 27600,
+          "nodeHarvestReadyAt": {},
           "questLog": [
             [
               "q_wolves",
@@ -305,7 +311,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 398,
-      "state": "edf7a2e9",
+      "state": "d22af85a",
       "events": "d91c55b7",
       "rng": {
         "draws": 32,
@@ -328,6 +334,7 @@
             "questsCompleted": 1,
             "xpGained": 250
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -337,6 +344,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 27850,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_wolves"
           ],
@@ -404,7 +412,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 398,
-      "state": "549d6055",
+      "state": "abbc0eee",
       "events": "741638a5",
       "rng": {
         "draws": 32,
@@ -427,6 +435,7 @@
             "questsCompleted": 1,
             "xpGained": 250
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -436,6 +445,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 27850,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_wolves"
           ],

@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 391,
-      "state": "72ab49df",
+      "state": "e164ca7f",
       "events": "d8f7a12d",
       "rng": {
         "draws": 0,
@@ -46,6 +46,7 @@
           "companionUpgrades": {},
           "copper": 100,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -60,6 +61,7 @@
               "itemId": "wolf_fang"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -74,6 +76,7 @@
           "companionUpgrades": {},
           "copper": 50,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 390,
@@ -88,6 +91,7 @@
               "itemId": "baked_bread"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -198,7 +202,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 391,
-      "state": "6978f9fd",
+      "state": "034e537f",
       "events": "2e3c28cb",
       "rng": {
         "draws": 0,
@@ -214,6 +218,7 @@
           "companionUpgrades": {},
           "copper": 80,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -232,6 +237,7 @@
               "itemId": "baked_bread"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -246,6 +252,7 @@
           "companionUpgrades": {},
           "copper": 70,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 390,
@@ -264,6 +271,7 @@
               "itemId": "wolf_fang"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -374,7 +382,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 391,
-      "state": "6978f9fd",
+      "state": "034e537f",
       "events": "a1930032",
       "rng": {
         "draws": 0,
@@ -390,6 +398,7 @@
           "companionUpgrades": {},
           "copper": 80,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -408,6 +417,7 @@
               "itemId": "baked_bread"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -422,6 +432,7 @@
           "companionUpgrades": {},
           "copper": 70,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 390,
@@ -440,6 +451,7 @@
               "itemId": "wolf_fang"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -550,7 +562,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 391,
-      "state": "6978f9fd",
+      "state": "034e537f",
       "events": "bda3fb58",
       "rng": {
         "draws": 0,
@@ -566,6 +578,7 @@
           "companionUpgrades": {},
           "copper": 80,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -584,6 +597,7 @@
               "itemId": "baked_bread"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -598,6 +612,7 @@
           "companionUpgrades": {},
           "copper": 70,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 390,
@@ -616,6 +631,7 @@
               "itemId": "wolf_fang"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -726,7 +742,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 391,
-      "state": "e9bfe48c",
+      "state": "7689bf96",
       "events": "2b21e03b",
       "rng": {
         "draws": 0,
@@ -742,6 +758,7 @@
           "companionUpgrades": {},
           "copper": 80,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -760,6 +777,7 @@
               "itemId": "baked_bread"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -774,6 +792,7 @@
           "companionUpgrades": {},
           "copper": 70,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 390,
@@ -792,6 +811,7 @@
               "itemId": "wolf_fang"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -902,7 +922,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 391,
-      "state": "e9bfe48c",
+      "state": "7689bf96",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -918,6 +938,7 @@
           "companionUpgrades": {},
           "copper": 80,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -936,6 +957,7 @@
               "itemId": "baked_bread"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -950,6 +972,7 @@
           "companionUpgrades": {},
           "copper": 70,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 390,
@@ -968,6 +991,7 @@
               "itemId": "wolf_fang"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}

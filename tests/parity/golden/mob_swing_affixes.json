@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "d4492b11",
+      "state": "104984ca",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -33,6 +33,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -41,6 +42,7 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -103,7 +105,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 396,
-      "state": "37956ce1",
+      "state": "879d069e",
       "events": "cbad9b0e",
       "rng": {
         "draws": 54,
@@ -114,7 +116,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 396,
-      "state": "ad2d2676",
+      "state": "181588e7",
       "events": "0155f151",
       "rng": {
         "draws": 95,
@@ -125,7 +127,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 396,
-      "state": "ed83b9a5",
+      "state": "c1a158ca",
       "events": "cc11abbc",
       "rng": {
         "draws": 224,
@@ -136,7 +138,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 396,
-      "state": "32f30567",
+      "state": "8dab0ec0",
       "events": "741638a5",
       "rng": {
         "draws": 224,
@@ -154,6 +156,7 @@
           "counters": {
             "damageTaken": 1497
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -163,6 +166,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 92800,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -560,7 +564,7 @@
       "tick": 64,
       "time": 3.2,
       "nextId": 396,
-      "state": "47584b7c",
+      "state": "27ab7751",
       "events": "741638a5",
       "rng": {
         "draws": 244,
@@ -578,6 +582,7 @@
           "counters": {
             "damageTaken": 1497
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -587,6 +592,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 92800,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}

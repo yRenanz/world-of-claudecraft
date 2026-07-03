@@ -32,7 +32,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 391,
-      "state": "3089c3ff",
+      "state": "78ae09e4",
       "events": "17704495",
       "rng": {
         "draws": 4,
@@ -49,6 +49,7 @@
           "counters": {
             "damageTaken": 56
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -57,6 +58,7 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -164,7 +166,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 392,
-      "state": "e078c2c7",
+      "state": "3590a7bc",
       "events": "dd7c5476",
       "rng": {
         "draws": 8,
@@ -181,6 +183,7 @@
           "counters": {
             "damageTaken": 194
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -189,6 +192,7 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -350,7 +354,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 393,
-      "state": "90bcbfa8",
+      "state": "4c6ab455",
       "events": "556479b4",
       "rng": {
         "draws": 13,
@@ -367,6 +371,7 @@
           "counters": {
             "damageTaken": 309
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -375,6 +380,7 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -591,7 +597,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 394,
-      "state": "a91af0d4",
+      "state": "72fd6f89",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -608,6 +614,7 @@
           "counters": {
             "damageTaken": 309
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -616,6 +623,7 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -879,7 +887,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 395,
-      "state": "2fc3ef22",
+      "state": "00436f8b",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -896,6 +904,7 @@
           "counters": {
             "damageTaken": 309
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -904,6 +913,7 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1208,7 +1218,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 396,
-      "state": "ac0c8421",
+      "state": "61d3ee5a",
       "events": "514349f0",
       "rng": {
         "draws": 16,
@@ -1225,6 +1235,7 @@
           "counters": {
             "damageTaken": 309
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -1233,6 +1244,7 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1581,7 +1593,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 396,
-      "state": "b8f3dd24",
+      "state": "a5312899",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -1598,6 +1610,7 @@
           "counters": {
             "damageTaken": 309
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -1606,6 +1619,7 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1955,7 +1969,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 396,
-      "state": "b8f3dd24",
+      "state": "a5312899",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -1972,6 +1986,7 @@
           "counters": {
             "damageTaken": 309
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -1980,6 +1995,7 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}

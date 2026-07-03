@@ -35,7 +35,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "45f65602",
+      "state": "e874726b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -51,6 +51,7 @@
           "companionUpgrades": {},
           "copper": 1000,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -59,6 +60,7 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -121,7 +123,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "dd2a2468",
+      "state": "2bfdce87",
       "events": "7bf95546",
       "rng": {
         "draws": 0,
@@ -137,6 +139,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -159,6 +162,7 @@
               "itemId": "minor_healing_potion"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -221,7 +225,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "4e06aa18",
+      "state": "e5041bf5",
       "events": "f3f760b9",
       "rng": {
         "draws": 0,
@@ -237,6 +241,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -264,6 +269,7 @@
               "itemId": "roadwardens_helm"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -326,7 +332,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "10456170",
+      "state": "02803c3d",
       "events": "458e51dd",
       "rng": {
         "draws": 0,
@@ -342,6 +348,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -369,6 +376,7 @@
               "itemId": "cryptbone_helm"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -431,7 +439,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "1e3e4276",
+      "state": "9ee9e6b1",
       "events": "2490dbf8",
       "rng": {
         "draws": 0,
@@ -447,6 +455,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -477,6 +486,7 @@
               "itemId": "roadwardens_helm"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -539,7 +549,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "eca0b99d",
+      "state": "42ff57a8",
       "events": "fed0e7d1",
       "rng": {
         "draws": 0,
@@ -555,6 +565,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -585,6 +596,7 @@
               "itemId": "roadwardens_helm"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -660,7 +672,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "afedc5c8",
+      "state": "a502cd1b",
       "events": "70823a2c",
       "rng": {
         "draws": 0,
@@ -676,6 +688,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -702,6 +715,7 @@
               "itemId": "roadwardens_helm"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -777,7 +791,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "6b3fbfbd",
+      "state": "3b23bac0",
       "events": "41e1197e",
       "rng": {
         "draws": 0,
@@ -793,6 +807,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -819,6 +834,7 @@
               "itemId": "roadwardens_helm"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -906,7 +922,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "df530c29",
+      "state": "a2d081ec",
       "events": "059e38cc",
       "rng": {
         "draws": 0,
@@ -922,6 +938,7 @@
           "companionUpgrades": {},
           "copper": 710,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -952,6 +969,7 @@
               "itemId": "wolf_fang"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1039,7 +1057,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "e9e0b604",
+      "state": "41ec4ed3",
       "events": "960bfa6c",
       "rng": {
         "draws": 0,
@@ -1055,6 +1073,7 @@
           "companionUpgrades": {},
           "copper": 714,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -1085,6 +1104,7 @@
               "itemId": "wolf_fang"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1178,7 +1198,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "ac77d963",
+      "state": "04428216",
       "events": "f32f2351",
       "rng": {
         "draws": 0,
@@ -1194,6 +1214,7 @@
           "companionUpgrades": {},
           "copper": 724,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -1220,6 +1241,7 @@
               "itemId": "roadwardens_helm"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1317,7 +1339,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "88dde53f",
+      "state": "f85c7026",
       "events": "a5f485e1",
       "rng": {
         "draws": 0,
@@ -1333,6 +1355,7 @@
           "companionUpgrades": {},
           "copper": 720,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -1363,6 +1386,7 @@
               "itemId": "wolf_fang"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1460,7 +1484,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "88dde53f",
+      "state": "f85c7026",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1476,6 +1500,7 @@
           "companionUpgrades": {},
           "copper": 720,
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -1506,6 +1531,7 @@
               "itemId": "wolf_fang"
             }
           ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}

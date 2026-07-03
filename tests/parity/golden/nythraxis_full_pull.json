@@ -34,7 +34,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 399,
-      "state": "dbdfdd7c",
+      "state": "0e26afd3",
       "events": "55115cfb",
       "rng": {
         "draws": 4,
@@ -51,6 +51,7 @@
           "counters": {
             "damageTaken": 369
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -60,6 +61,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -76,6 +78,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 390,
@@ -85,6 +88,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -98,6 +102,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 391,
@@ -107,6 +112,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -120,6 +126,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 392,
@@ -129,6 +136,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -142,6 +150,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 393,
@@ -151,6 +160,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -456,7 +466,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 399,
-      "state": "d8afae91",
+      "state": "108225e0",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -467,7 +477,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 399,
-      "state": "e07a222e",
+      "state": "e5134321",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -478,7 +488,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 399,
-      "state": "e9d0f31e",
+      "state": "29a65f51",
       "events": "039953e8",
       "rng": {
         "draws": 5,
@@ -489,7 +499,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 399,
-      "state": "97d931a8",
+      "state": "8f07a4b7",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -500,7 +510,7 @@
       "tick": 42,
       "time": 2.1,
       "nextId": 401,
-      "state": "99c3acfe",
+      "state": "5f48f1b1",
       "events": "4d86f7cf",
       "rng": {
         "draws": 11,
@@ -517,6 +527,7 @@
           "counters": {
             "damageTaken": 715
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -526,6 +537,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -542,6 +554,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 390,
@@ -551,6 +564,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -564,6 +578,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 391,
@@ -573,6 +588,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -586,6 +602,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 392,
@@ -595,6 +612,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -608,6 +626,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 393,
@@ -617,6 +636,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1029,7 +1049,7 @@
       "tick": 43,
       "time": 2.15,
       "nextId": 402,
-      "state": "882da789",
+      "state": "624a9308",
       "events": "8024e9a5",
       "rng": {
         "draws": 15,
@@ -1046,6 +1066,7 @@
           "counters": {
             "damageTaken": 715
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -1055,6 +1076,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -1071,6 +1093,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 390,
@@ -1080,6 +1103,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1093,6 +1117,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 391,
@@ -1102,6 +1127,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1115,6 +1141,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 392,
@@ -1124,6 +1151,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1137,6 +1165,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 393,
@@ -1146,6 +1175,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1829,7 +1859,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 402,
-      "state": "48394d91",
+      "state": "5764e2e0",
       "events": "741638a5",
       "rng": {
         "draws": 37,
@@ -1840,7 +1870,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 402,
-      "state": "bbffd32c",
+      "state": "29f2b983",
       "events": "741638a5",
       "rng": {
         "draws": 76,
@@ -1851,7 +1881,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 402,
-      "state": "3e38d71f",
+      "state": "e232bd12",
       "events": "741638a5",
       "rng": {
         "draws": 113,
@@ -1862,7 +1892,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 402,
-      "state": "8f594b04",
+      "state": "f036a00b",
       "events": "1e095a5a",
       "rng": {
         "draws": 166,
@@ -1873,7 +1903,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 402,
-      "state": "7bd8836f",
+      "state": "c2fadea2",
       "events": "3dd8954c",
       "rng": {
         "draws": 228,
@@ -1884,7 +1914,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 402,
-      "state": "7b9919ba",
+      "state": "9e3cc5d5",
       "events": "741638a5",
       "rng": {
         "draws": 287,
@@ -1895,7 +1925,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 402,
-      "state": "b87a5a96",
+      "state": "0e9bcab9",
       "events": "741638a5",
       "rng": {
         "draws": 341,
@@ -1906,7 +1936,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 402,
-      "state": "45a6dfab",
+      "state": "c2cbbe96",
       "events": "741638a5",
       "rng": {
         "draws": 391,
@@ -1917,7 +1947,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 402,
-      "state": "b9142c19",
+      "state": "e2941218",
       "events": "86492e36",
       "rng": {
         "draws": 452,
@@ -1928,7 +1958,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 402,
-      "state": "3d33abf6",
+      "state": "fca05a99",
       "events": "ff9fcc35",
       "rng": {
         "draws": 517,
@@ -1939,7 +1969,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 402,
-      "state": "79083f40",
+      "state": "18747b1f",
       "events": "741638a5",
       "rng": {
         "draws": 558,
@@ -1950,7 +1980,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 402,
-      "state": "b42f04c5",
+      "state": "87ba36ac",
       "events": "741638a5",
       "rng": {
         "draws": 613,
@@ -1961,7 +1991,7 @@
       "tick": 170,
       "time": 8.5,
       "nextId": 402,
-      "state": "562e4b31",
+      "state": "4063a800",
       "events": "3ca06530",
       "rng": {
         "draws": 684,
@@ -1972,7 +2002,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 402,
-      "state": "3149c15e",
+      "state": "e79e2f91",
       "events": "d5c33d24",
       "rng": {
         "draws": 781,
@@ -1983,7 +2013,7 @@
       "tick": 190,
       "time": 9.5,
       "nextId": 402,
-      "state": "9b9a2861",
+      "state": "2b865230",
       "events": "47540794",
       "rng": {
         "draws": 856,
@@ -1994,7 +2024,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 402,
-      "state": "8e5e3e68",
+      "state": "d5ffcf77",
       "events": "741638a5",
       "rng": {
         "draws": 922,
@@ -2005,7 +2035,7 @@
       "tick": 203,
       "time": 10.15,
       "nextId": 402,
-      "state": "c42e117b",
+      "state": "af383e66",
       "events": "741638a5",
       "rng": {
         "draws": 938,
@@ -2022,6 +2052,7 @@
           "counters": {
             "damageTaken": 3107
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -2031,6 +2062,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -2047,6 +2079,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 390,
@@ -2056,6 +2089,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2069,6 +2103,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 391,
@@ -2078,6 +2113,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2091,6 +2127,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 392,
@@ -2100,6 +2137,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2113,6 +2151,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 393,
@@ -2122,6 +2161,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2766,7 +2806,7 @@
       "tick": 204,
       "time": 10.2,
       "nextId": 402,
-      "state": "f888ebe3",
+      "state": "f28b229e",
       "events": "5cea2cdc",
       "rng": {
         "draws": 942,
@@ -2783,6 +2823,7 @@
           "counters": {
             "damageTaken": 3107
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -2792,6 +2833,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -2808,6 +2850,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 390,
@@ -2817,6 +2860,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2830,6 +2874,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 391,
@@ -2839,6 +2884,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2852,6 +2898,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 392,
@@ -2861,6 +2908,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2874,6 +2922,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 393,
@@ -2883,6 +2932,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167200,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -3538,7 +3588,7 @@
       "tick": 210,
       "time": 10.5,
       "nextId": 402,
-      "state": "3794addf",
+      "state": "a5dfe1d2",
       "events": "741638a5",
       "rng": {
         "draws": 959,
@@ -3549,7 +3599,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 402,
-      "state": "9b151319",
+      "state": "bab5a718",
       "events": "468735c2",
       "rng": {
         "draws": 1005,
@@ -3560,7 +3610,7 @@
       "tick": 230,
       "time": 11.5,
       "nextId": 402,
-      "state": "dfc0e7be",
+      "state": "b1b31471",
       "events": "741638a5",
       "rng": {
         "draws": 1055,
@@ -3571,7 +3621,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 402,
-      "state": "8e05ce6e",
+      "state": "8f53fa61",
       "events": "c980c9a9",
       "rng": {
         "draws": 1101,
@@ -3582,7 +3632,7 @@
       "tick": 250,
       "time": 12.5,
       "nextId": 402,
-      "state": "77ab2236",
+      "state": "2f82bbd9",
       "events": "741638a5",
       "rng": {
         "draws": 1139,
@@ -3593,7 +3643,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 402,
-      "state": "6e3a1a94",
+      "state": "a5fbcfdb",
       "events": "741638a5",
       "rng": {
         "draws": 1190,
@@ -3604,7 +3654,7 @@
       "tick": 270,
       "time": 13.5,
       "nextId": 402,
-      "state": "0bbbb0de",
+      "state": "d47aee11",
       "events": "0c5fe52e",
       "rng": {
         "draws": 1230,
@@ -3615,7 +3665,7 @@
       "tick": 280,
       "time": 14,
       "nextId": 402,
-      "state": "38dad8a3",
+      "state": "6628865e",
       "events": "741638a5",
       "rng": {
         "draws": 1288,
@@ -3626,7 +3676,7 @@
       "tick": 290,
       "time": 14.5,
       "nextId": 402,
-      "state": "e075eed2",
+      "state": "fc26371d",
       "events": "f181591e",
       "rng": {
         "draws": 1345,
@@ -3637,7 +3687,7 @@
       "tick": 300,
       "time": 15,
       "nextId": 402,
-      "state": "97d2579e",
+      "state": "c3a61cd1",
       "events": "741638a5",
       "rng": {
         "draws": 1387,
@@ -3648,7 +3698,7 @@
       "tick": 310,
       "time": 15.5,
       "nextId": 402,
-      "state": "9ef9b921",
+      "state": "a9ffd3f0",
       "events": "dea068c9",
       "rng": {
         "draws": 1447,
@@ -3659,7 +3709,7 @@
       "tick": 320,
       "time": 16,
       "nextId": 402,
-      "state": "8b731ccf",
+      "state": "fde6cf82",
       "events": "741638a5",
       "rng": {
         "draws": 1505,
@@ -3670,7 +3720,7 @@
       "tick": 330,
       "time": 16.5,
       "nextId": 402,
-      "state": "f52d087f",
+      "state": "5b2e4b72",
       "events": "4fbc2fbc",
       "rng": {
         "draws": 1538,
@@ -3681,7 +3731,7 @@
       "tick": 340,
       "time": 17,
       "nextId": 402,
-      "state": "c24400aa",
+      "state": "26413ac5",
       "events": "603c98bc",
       "rng": {
         "draws": 1583,
@@ -3692,7 +3742,7 @@
       "tick": 350,
       "time": 17.5,
       "nextId": 402,
-      "state": "ac8a0aef",
+      "state": "7bd96522",
       "events": "741638a5",
       "rng": {
         "draws": 1623,
@@ -3703,7 +3753,7 @@
       "tick": 360,
       "time": 18,
       "nextId": 402,
-      "state": "751967b7",
+      "state": "8b3d98ba",
       "events": "92223f93",
       "rng": {
         "draws": 1677,
@@ -3714,7 +3764,7 @@
       "tick": 370,
       "time": 18.5,
       "nextId": 402,
-      "state": "5fd95536",
+      "state": "eadce781",
       "events": "17d92e64",
       "rng": {
         "draws": 1732,
@@ -3725,7 +3775,7 @@
       "tick": 380,
       "time": 19,
       "nextId": 402,
-      "state": "4901909e",
+      "state": "f59746d9",
       "events": "741638a5",
       "rng": {
         "draws": 1798,
@@ -3736,7 +3786,7 @@
       "tick": 386,
       "time": 19.3,
       "nextId": 402,
-      "state": "4dfc3eb1",
+      "state": "c54a04d0",
       "events": "461410ba",
       "rng": {
         "draws": 1825,
@@ -3756,6 +3806,7 @@
             "kills": 2,
             "xpGained": 166
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -3765,6 +3816,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167366,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -3783,6 +3835,7 @@
           "counters": {
             "xpGained": 166
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 390,
@@ -3792,6 +3845,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167366,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -3808,6 +3862,7 @@
             "damageTaken": 140,
             "xpGained": 166
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 391,
@@ -3817,6 +3872,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167366,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -3833,6 +3889,7 @@
             "damageTaken": 140,
             "xpGained": 166
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 392,
@@ -3842,6 +3899,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167366,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -3858,6 +3916,7 @@
             "damageTaken": 140,
             "xpGained": 166
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 393,
@@ -3867,6 +3926,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167366,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -4490,7 +4550,7 @@
       "tick": 390,
       "time": 19.5,
       "nextId": 402,
-      "state": "b9621fbb",
+      "state": "9b44b556",
       "events": "596991d4",
       "rng": {
         "draws": 1856,
@@ -4501,7 +4561,7 @@
       "tick": 400,
       "time": 20,
       "nextId": 402,
-      "state": "51957e5a",
+      "state": "976c9bad",
       "events": "342b5477",
       "rng": {
         "draws": 1908,
@@ -4512,7 +4572,7 @@
       "tick": 410,
       "time": 20.5,
       "nextId": 402,
-      "state": "e63db0d0",
+      "state": "b3873aff",
       "events": "342b5477",
       "rng": {
         "draws": 1947,
@@ -4523,7 +4583,7 @@
       "tick": 420,
       "time": 21,
       "nextId": 402,
-      "state": "05edae4d",
+      "state": "69312da4",
       "events": "342b5477",
       "rng": {
         "draws": 2001,
@@ -4534,7 +4594,7 @@
       "tick": 430,
       "time": 21.5,
       "nextId": 402,
-      "state": "7aeac2dd",
+      "state": "48025a74",
       "events": "342b5477",
       "rng": {
         "draws": 2050,
@@ -4545,7 +4605,7 @@
       "tick": 440,
       "time": 22,
       "nextId": 402,
-      "state": "bc510494",
+      "state": "691985bb",
       "events": "342b5477",
       "rng": {
         "draws": 2112,
@@ -4556,7 +4616,7 @@
       "tick": 450,
       "time": 22.5,
       "nextId": 402,
-      "state": "8d11608a",
+      "state": "86265e9d",
       "events": "342b5477",
       "rng": {
         "draws": 2158,
@@ -4567,7 +4627,7 @@
       "tick": 460,
       "time": 23,
       "nextId": 402,
-      "state": "f148c7d7",
+      "state": "bddcf3aa",
       "events": "342b5477",
       "rng": {
         "draws": 2195,
@@ -4578,7 +4638,7 @@
       "tick": 470,
       "time": 23.5,
       "nextId": 402,
-      "state": "5bbdb500",
+      "state": "96e4366f",
       "events": "342b5477",
       "rng": {
         "draws": 2241,
@@ -4589,7 +4649,7 @@
       "tick": 480,
       "time": 24,
       "nextId": 402,
-      "state": "a9681ee5",
+      "state": "7a72f9ac",
       "events": "342b5477",
       "rng": {
         "draws": 2283,
@@ -4600,7 +4660,7 @@
       "tick": 490,
       "time": 24.5,
       "nextId": 402,
-      "state": "be15c720",
+      "state": "0931d70f",
       "events": "04a7ee00",
       "rng": {
         "draws": 2331,
@@ -4611,7 +4671,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 402,
-      "state": "ac23d858",
+      "state": "09f0f9f7",
       "events": "741638a5",
       "rng": {
         "draws": 2383,
@@ -4622,7 +4682,7 @@
       "tick": 506,
       "time": 25.3,
       "nextId": 402,
-      "state": "a84f08d3",
+      "state": "70e96b1e",
       "events": "741638a5",
       "rng": {
         "draws": 2418,
@@ -4642,6 +4702,7 @@
             "kills": 2,
             "xpGained": 166
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -4651,6 +4712,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167366,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -4669,6 +4731,7 @@
           "counters": {
             "xpGained": 166
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 390,
@@ -4678,6 +4741,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167366,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -4694,6 +4758,7 @@
             "damageTaken": 140,
             "xpGained": 166
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 391,
@@ -4703,6 +4768,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167366,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -4719,6 +4785,7 @@
             "damageTaken": 140,
             "xpGained": 166
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 392,
@@ -4728,6 +4795,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167366,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -4744,6 +4812,7 @@
             "damageTaken": 140,
             "xpGained": 166
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 393,
@@ -4753,6 +4822,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167366,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -5387,7 +5457,7 @@
       "tick": 510,
       "time": 25.5,
       "nextId": 402,
-      "state": "95521f92",
+      "state": "573e7855",
       "events": "741638a5",
       "rng": {
         "draws": 2433,
@@ -5398,7 +5468,7 @@
       "tick": 520,
       "time": 26,
       "nextId": 402,
-      "state": "5d931c2e",
+      "state": "7fbcb859",
       "events": "741638a5",
       "rng": {
         "draws": 2479,
@@ -5409,7 +5479,7 @@
       "tick": 530,
       "time": 26.5,
       "nextId": 402,
-      "state": "5baf80c0",
+      "state": "f12e282f",
       "events": "741638a5",
       "rng": {
         "draws": 2536,
@@ -5420,7 +5490,7 @@
       "tick": 540,
       "time": 27,
       "nextId": 402,
-      "state": "a825acb0",
+      "state": "b13e0cdf",
       "events": "741638a5",
       "rng": {
         "draws": 2573,
@@ -5431,7 +5501,7 @@
       "tick": 550,
       "time": 27.5,
       "nextId": 402,
-      "state": "e869f916",
+      "state": "959fbbb1",
       "events": "741638a5",
       "rng": {
         "draws": 2625,
@@ -5442,7 +5512,7 @@
       "tick": 560,
       "time": 28,
       "nextId": 402,
-      "state": "61b83072",
+      "state": "9b9b64b5",
       "events": "741638a5",
       "rng": {
         "draws": 2658,
@@ -5453,7 +5523,7 @@
       "tick": 570,
       "time": 28.5,
       "nextId": 402,
-      "state": "e834a596",
+      "state": "05145131",
       "events": "741638a5",
       "rng": {
         "draws": 2704,
@@ -5464,7 +5534,7 @@
       "tick": 580,
       "time": 29,
       "nextId": 402,
-      "state": "4860a974",
+      "state": "fbfcb11b",
       "events": "741638a5",
       "rng": {
         "draws": 2763,
@@ -5475,7 +5545,7 @@
       "tick": 590,
       "time": 29.5,
       "nextId": 402,
-      "state": "d94a8f3a",
+      "state": "69aa5d0d",
       "events": "bb4d1606",
       "rng": {
         "draws": 2817,
@@ -5486,7 +5556,7 @@
       "tick": 600,
       "time": 30,
       "nextId": 402,
-      "state": "a83fa458",
+      "state": "4a65ddf7",
       "events": "eea19fcb",
       "rng": {
         "draws": 2860,
@@ -5497,7 +5567,7 @@
       "tick": 610,
       "time": 30.5,
       "nextId": 402,
-      "state": "b89c92c6",
+      "state": "6c76c0a1",
       "events": "741638a5",
       "rng": {
         "draws": 2905,
@@ -5508,7 +5578,7 @@
       "tick": 620,
       "time": 31,
       "nextId": 402,
-      "state": "c1596584",
+      "state": "c714c52b",
       "events": "741638a5",
       "rng": {
         "draws": 2956,
@@ -5519,7 +5589,7 @@
       "tick": 627,
       "time": 31.35,
       "nextId": 402,
-      "state": "02fe6be2",
+      "state": "a64b8ca5",
       "events": "e77e7089",
       "rng": {
         "draws": 2990,
@@ -5539,6 +5609,7 @@
             "kills": 2,
             "xpGained": 166
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -5548,6 +5619,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167366,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -5566,6 +5638,7 @@
           "counters": {
             "xpGained": 166
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 390,
@@ -5575,6 +5648,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167366,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -5591,6 +5665,7 @@
             "damageTaken": 140,
             "xpGained": 166
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 391,
@@ -5600,6 +5675,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167366,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -5616,6 +5692,7 @@
             "damageTaken": 140,
             "xpGained": 166
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 392,
@@ -5625,6 +5702,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167366,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -5641,6 +5719,7 @@
             "damageTaken": 140,
             "xpGained": 166
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 393,
@@ -5650,6 +5729,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167366,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -6286,7 +6366,7 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 402,
-      "state": "ef6c2343",
+      "state": "cd11ad28",
       "events": "da1da39a",
       "rng": {
         "draws": 3001,
@@ -6306,6 +6386,7 @@
             "kills": 3,
             "xpGained": 249
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -6315,6 +6396,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167449,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -6339,6 +6421,7 @@
           "counters": {
             "xpGained": 249
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 390,
@@ -6348,6 +6431,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167449,
+          "nodeHarvestReadyAt": {},
           "raidLockouts": [
             [
               "nythraxis_boss_arena",
@@ -6370,6 +6454,7 @@
             "damageTaken": 140,
             "xpGained": 249
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 391,
@@ -6379,6 +6464,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167449,
+          "nodeHarvestReadyAt": {},
           "raidLockouts": [
             [
               "nythraxis_boss_arena",
@@ -6401,6 +6487,7 @@
             "damageTaken": 140,
             "xpGained": 249
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 392,
@@ -6410,6 +6497,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167449,
+          "nodeHarvestReadyAt": {},
           "raidLockouts": [
             [
               "nythraxis_boss_arena",
@@ -6432,6 +6520,7 @@
             "damageTaken": 140,
             "xpGained": 249
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 393,
@@ -6441,6 +6530,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167449,
+          "nodeHarvestReadyAt": {},
           "raidLockouts": [
             [
               "nythraxis_boss_arena",
@@ -7100,7 +7190,7 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 402,
-      "state": "206b3206",
+      "state": "79e5665f",
       "events": "741638a5",
       "rng": {
         "draws": 3009,
@@ -7111,7 +7201,7 @@
       "tick": 640,
       "time": 32,
       "nextId": 402,
-      "state": "e6336945",
+      "state": "4d7f66ee",
       "events": "741638a5",
       "rng": {
         "draws": 3055,
@@ -7122,7 +7212,7 @@
       "tick": 650,
       "time": 32.5,
       "nextId": 402,
-      "state": "9a97a301",
+      "state": "0b683a72",
       "events": "741638a5",
       "rng": {
         "draws": 3091,
@@ -7133,7 +7223,7 @@
       "tick": 660,
       "time": 33,
       "nextId": 402,
-      "state": "1ec516c2",
+      "state": "bcc9bfa3",
       "events": "741638a5",
       "rng": {
         "draws": 3144,
@@ -7144,7 +7234,7 @@
       "tick": 670,
       "time": 33.5,
       "nextId": 402,
-      "state": "dda32970",
+      "state": "8d18b035",
       "events": "741638a5",
       "rng": {
         "draws": 3207,
@@ -7155,7 +7245,7 @@
       "tick": 680,
       "time": 34,
       "nextId": 402,
-      "state": "d2bf2017",
+      "state": "fbe2b654",
       "events": "741638a5",
       "rng": {
         "draws": 3263,
@@ -7166,7 +7256,7 @@
       "tick": 688,
       "time": 34.4,
       "nextId": 402,
-      "state": "2c48c394",
+      "state": "876e8641",
       "events": "17666c9a",
       "rng": {
         "draws": 3302,
@@ -7186,6 +7276,7 @@
             "kills": 3,
             "xpGained": 249
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -7195,6 +7286,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167449,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -7219,6 +7311,7 @@
           "counters": {
             "xpGained": 249
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 390,
@@ -7228,6 +7321,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167449,
+          "nodeHarvestReadyAt": {},
           "raidLockouts": [
             [
               "nythraxis_boss_arena",
@@ -7250,6 +7344,7 @@
             "damageTaken": 140,
             "xpGained": 249
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 391,
@@ -7259,6 +7354,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167449,
+          "nodeHarvestReadyAt": {},
           "raidLockouts": [
             [
               "nythraxis_boss_arena",
@@ -7281,6 +7377,7 @@
             "damageTaken": 140,
             "xpGained": 249
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 392,
@@ -7290,6 +7387,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167449,
+          "nodeHarvestReadyAt": {},
           "raidLockouts": [
             [
               "nythraxis_boss_arena",
@@ -7312,6 +7410,7 @@
             "damageTaken": 140,
             "xpGained": 249
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 393,
@@ -7321,6 +7420,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 167449,
+          "nodeHarvestReadyAt": {},
           "raidLockouts": [
             [
               "nythraxis_boss_arena",

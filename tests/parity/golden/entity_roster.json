@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "d4492b11",
+      "state": "104984ca",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -32,6 +32,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -40,6 +41,7 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -102,7 +104,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 392,
-      "state": "f8b0ad4d",
+      "state": "2d8ee216",
       "events": "61b9fbea",
       "rng": {
         "draws": 4,
@@ -113,7 +115,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 392,
-      "state": "bac3333b",
+      "state": "4e42c140",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -124,7 +126,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 392,
-      "state": "45b8db97",
+      "state": "d5b02064",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -140,6 +142,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -149,6 +152,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 27600,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -211,7 +215,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 392,
-      "state": "ae8b29af",
+      "state": "142c5e2c",
       "events": "61b9fbea",
       "rng": {
         "draws": 4,
@@ -227,6 +231,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -236,6 +241,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 27600,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -298,7 +304,7 @@
       "tick": 6,
       "time": 0.3,
       "nextId": 392,
-      "state": "8fa0baaa",
+      "state": "f3906fc7",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -309,7 +315,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 392,
-      "state": "e9a71213",
+      "state": "670740a8",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -325,6 +331,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -334,6 +341,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 27600,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}

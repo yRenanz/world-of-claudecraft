@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "fc97f545",
+      "state": "e2b109d6",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -31,6 +31,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -39,6 +40,7 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -102,7 +104,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 391,
-      "state": "831b1c69",
+      "state": "8492462a",
       "events": "97cb4b90",
       "rng": {
         "draws": 3,
@@ -113,7 +115,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 391,
-      "state": "cdf0638a",
+      "state": "18aec92b",
       "events": "083f7181",
       "rng": {
         "draws": 3,
@@ -124,7 +126,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 391,
-      "state": "5daf3b1e",
+      "state": "8cec8877",
       "events": "a7c7771b",
       "rng": {
         "draws": 73,
@@ -135,7 +137,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 391,
-      "state": "4c94205e",
+      "state": "1dd31eb7",
       "events": "a7c7771b",
       "rng": {
         "draws": 162,
@@ -146,7 +148,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 391,
-      "state": "086792fa",
+      "state": "4bacd3db",
       "events": "68be82c9",
       "rng": {
         "draws": 254,
@@ -157,7 +159,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 391,
-      "state": "c201c9b7",
+      "state": "42a1a5b4",
       "events": "a7c7771b",
       "rng": {
         "draws": 367,
@@ -168,7 +170,7 @@
       "tick": 128,
       "time": 6.4,
       "nextId": 391,
-      "state": "4142b133",
+      "state": "c2dea708",
       "events": "741638a5",
       "rng": {
         "draws": 411,
@@ -184,6 +186,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 389,
@@ -193,6 +196,7 @@
           },
           "gatheringProficiency": {},
           "lifetimeXp": 27600,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}

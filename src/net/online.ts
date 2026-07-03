@@ -64,6 +64,7 @@ import {
   type MarketInfo,
   type OverheadEmoteId,
   type PartyInfo,
+  type PlayerProfessionsView,
   type PresenceStatus,
   type RaidLockout,
   type SocialInfo,
@@ -905,6 +906,10 @@ export class ClientWorld implements IWorld {
   // delveShopOffers can resolve the shop lock badge client-side.
   delveClears: Record<string, number> = {};
   delveDaily: DelveDailyInfo = { date: '', firstClearXp: [], markClears: 0 };
+  // Stub read surface for #1164: professions skill tracking + recipes land in
+  // later issues (#1119/#1120). Always empty until then; not wired on the
+  // snapshot yet, see src/sim/professions/CLAUDE.md for the settled key names.
+  professionsState: PlayerProfessionsView = { skills: [] };
   // --- IWorldParty: raid-target marker mirror, from the self-wire `marks` (markerFor
   // reads it, no send). ---
   markers: Record<number, number> = {}; // entityId -> markerId, mirrored from the self-wire

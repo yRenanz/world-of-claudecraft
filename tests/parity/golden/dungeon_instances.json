@@ -31,7 +31,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 408,
-      "state": "81a6a581",
+      "state": "be1be655",
       "events": "c725ae13",
       "rng": {
         "draws": 35,
@@ -43,6 +43,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -66,6 +72,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -813,7 +825,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 408,
-      "state": "250e2df6",
+      "state": "39588d36",
       "events": "b1cf5878",
       "rng": {
         "draws": 49,
@@ -825,6 +837,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -851,6 +869,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -1577,7 +1601,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 408,
-      "state": "1f05f27d",
+      "state": "bcccb3e5",
       "events": "e41eb304",
       "rng": {
         "draws": 49,
@@ -1588,7 +1612,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 408,
-      "state": "ad8900f3",
+      "state": "35f6a953",
       "events": "741638a5",
       "rng": {
         "draws": 49,
@@ -1599,7 +1623,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 408,
-      "state": "05d22e3f",
+      "state": "1e8e025f",
       "events": "741638a5",
       "rng": {
         "draws": 49,
@@ -1610,7 +1634,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 408,
-      "state": "b6a54d6a",
+      "state": "9ce75422",
       "events": "8d321c38",
       "rng": {
         "draws": 49,
@@ -1621,7 +1645,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 408,
-      "state": "1a57e91a",
+      "state": "797bd212",
       "events": "741638a5",
       "rng": {
         "draws": 49,
@@ -1633,6 +1657,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -1659,6 +1689,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -1788,7 +1824,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 408,
-      "state": "1a57e91a",
+      "state": "797bd212",
       "events": "741638a5",
       "rng": {
         "draws": 49,
@@ -1800,6 +1836,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -1826,6 +1868,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {

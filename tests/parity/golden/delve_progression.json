@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 393,
-      "state": "b58fb2fe",
+      "state": "f8e01035",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -29,6 +29,12 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -105,7 +111,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 414,
-      "state": "be72c36a",
+      "state": "a0837461",
       "events": "1c6b947f",
       "rng": {
         "draws": 1,
@@ -116,7 +122,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 414,
-      "state": "f94160a0",
+      "state": "e77144cf",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -129,6 +135,12 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -204,7 +216,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 414,
-      "state": "9c7ed4de",
+      "state": "026f1a85",
       "events": "6895da0f",
       "rng": {
         "draws": 3,
@@ -217,6 +229,12 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {
             "companion_tessa": 2
@@ -299,7 +317,7 @@
       "tick": 9,
       "time": 0.45,
       "nextId": 414,
-      "state": "1f156f84",
+      "state": "484119ab",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -312,6 +330,12 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {
             "companion_tessa": 2

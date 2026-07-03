@@ -748,7 +748,13 @@ export const pt_BR: EnTranslations = {
       "sortName": "Nome",
       "searchPlaceholder": "Pesquisar itens",
       "searchAria": "Pesquisar itens da bolsa por nome",
-      "noMatch": "Nenhum item corresponde aos seus filtros."
+      "noMatch": "Nenhum item corresponde aos seus filtros.",
+      "capacity": "{used}/{total}",
+      "capacityAria": "Bag slots used: {used} of {total}",
+      "backpack": "Backpack",
+      "bagSocketAria": "{name}: {slots}",
+      "socketEmpty": "Empty bag slot",
+      "unequipHint": "Click to remove this bag"
     },
     "raidConvert": {
       "toPartyDone": "Sua raide foi convertida de volta em um grupo.",
@@ -4150,7 +4156,8 @@ export const pt_BR: EnTranslations = {
       "drink": "Bebida",
       "tool": "Ferramenta",
       "potion": "Poção",
-      "elixir": "Elixir"
+      "elixir": "Elixir",
+      "bag": "Bag"
     },
     "stats": {
       "armor": "Armadura",
@@ -4192,7 +4199,8 @@ export const pt_BR: EnTranslations = {
       "useManaPotion": "Uso: restaura instantaneamente {amount} de mana. Pode ser usada em combate. Recarga de 1 min.",
       "clickUseInstant": "Clique para usar instantaneamente em combate",
       "clickUse": "Clique para usar",
-      "clickBuyback": "Clique para recomprar"
+      "clickBuyback": "Clique para recomprar",
+      "bagSlots": "{slots} Slot Bag"
     },
     "bags": {
       "title": "Bolsas",
@@ -5493,6 +5501,21 @@ export const pt_BR: EnTranslations = {
       },
       "monarch_crown_helm": {
         "name": "Coroa do Monarca"
+      },
+      "linen_pouch": {
+        "name": "Bolsa de linho"
+      },
+      "travelers_knapsack": {
+        "name": "Mochila do viajante"
+      },
+      "wolfhide_satchel": {
+        "name": "Sacola de pele de lobo"
+      },
+      "gravewoven_bag": {
+        "name": "Bolsa tecida-tumular"
+      },
+      "mistcallers_duffel": {
+        "name": "Mala do Chamador da Névoa"
       },
       "copper_mining_pick": {
         "name": "Picareta de Cobre"

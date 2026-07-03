@@ -35,7 +35,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 399,
-      "state": "9c1cd777",
+      "state": "efe5d013",
       "events": "63e55e94",
       "rng": {
         "draws": 2,
@@ -46,7 +46,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 399,
-      "state": "7faf941d",
+      "state": "b24b5779",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -57,7 +57,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 399,
-      "state": "48b3e5a7",
+      "state": "a5015c43",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -68,7 +68,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 399,
-      "state": "ddac164b",
+      "state": "c7a835b7",
       "events": "da482e88",
       "rng": {
         "draws": 2,
@@ -79,7 +79,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 399,
-      "state": "68abab48",
+      "state": "17ce7454",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -90,7 +90,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 399,
-      "state": "938c23d5",
+      "state": "cdf36931",
       "events": "9bcb1f56",
       "rng": {
         "draws": 2,
@@ -101,7 +101,7 @@
       "tick": 32,
       "time": 1.6,
       "nextId": 399,
-      "state": "78cc2a31",
+      "state": "5055dd8d",
       "events": "9b71f512",
       "rng": {
         "draws": 4,
@@ -113,6 +113,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -137,6 +143,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -161,6 +173,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -185,6 +203,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {},
@@ -209,6 +233,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {},
@@ -233,6 +263,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {},
@@ -637,7 +673,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 399,
-      "state": "9b160cdb",
+      "state": "9aebe087",
       "events": "a72a10ef",
       "rng": {
         "draws": 4,
@@ -648,7 +684,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 399,
-      "state": "283daf29",
+      "state": "7b0b89c5",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -659,7 +695,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 399,
-      "state": "c93ea229",
+      "state": "df3cc4c5",
       "events": "741638a5",
       "rng": {
         "draws": 36,
@@ -670,7 +706,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 399,
-      "state": "d425d88e",
+      "state": "f15c79aa",
       "events": "741638a5",
       "rng": {
         "draws": 50,
@@ -681,7 +717,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 399,
-      "state": "ff740072",
+      "state": "0d86de6e",
       "events": "741638a5",
       "rng": {
         "draws": 66,
@@ -692,7 +728,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 399,
-      "state": "9d02b255",
+      "state": "177e93b1",
       "events": "741638a5",
       "rng": {
         "draws": 80,
@@ -703,7 +739,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 399,
-      "state": "7ce16bb4",
+      "state": "89156f40",
       "events": "741638a5",
       "rng": {
         "draws": 101,
@@ -714,7 +750,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 399,
-      "state": "094fc423",
+      "state": "109bb86f",
       "events": "741638a5",
       "rng": {
         "draws": 127,
@@ -725,7 +761,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 399,
-      "state": "c5a4499a",
+      "state": "65a3b1b6",
       "events": "741638a5",
       "rng": {
         "draws": 152,
@@ -736,7 +772,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 399,
-      "state": "953d7ef3",
+      "state": "e8d68b3f",
       "events": "741638a5",
       "rng": {
         "draws": 174,
@@ -747,7 +783,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 399,
-      "state": "934d5219",
+      "state": "437eee75",
       "events": "741638a5",
       "rng": {
         "draws": 203,
@@ -758,7 +794,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 399,
-      "state": "1057f4be",
+      "state": "2b1fb55a",
       "events": "741638a5",
       "rng": {
         "draws": 230,
@@ -769,7 +805,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 399,
-      "state": "2e0e4898",
+      "state": "ba6b4b64",
       "events": "741638a5",
       "rng": {
         "draws": 253,
@@ -780,7 +816,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 399,
-      "state": "0b6427eb",
+      "state": "a31ae9d7",
       "events": "741638a5",
       "rng": {
         "draws": 276,
@@ -791,7 +827,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 399,
-      "state": "cc19e622",
+      "state": "c1667d1e",
       "events": "741638a5",
       "rng": {
         "draws": 304,
@@ -802,7 +838,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 399,
-      "state": "6c023258",
+      "state": "a0b11e24",
       "events": "741638a5",
       "rng": {
         "draws": 328,
@@ -813,7 +849,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 399,
-      "state": "8e91561d",
+      "state": "44f84979",
       "events": "741638a5",
       "rng": {
         "draws": 360,
@@ -824,7 +860,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 399,
-      "state": "ffe0cab6",
+      "state": "29d69832",
       "events": "741638a5",
       "rng": {
         "draws": 387,
@@ -835,7 +871,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 399,
-      "state": "bce59f75",
+      "state": "aeb85451",
       "events": "741638a5",
       "rng": {
         "draws": 407,
@@ -846,7 +882,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 399,
-      "state": "59f30bca",
+      "state": "3c7734e6",
       "events": "741638a5",
       "rng": {
         "draws": 434,
@@ -857,7 +893,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 400,
-      "state": "9c51e75b",
+      "state": "f3e17707",
       "events": "53ba2dd0",
       "rng": {
         "draws": 444,
@@ -869,6 +905,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -893,6 +935,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -917,6 +965,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -941,6 +995,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {},
@@ -965,6 +1025,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {},
@@ -989,6 +1055,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {},
@@ -1393,7 +1465,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 401,
-      "state": "a0b511cf",
+      "state": "8f85154b",
       "events": "90004389",
       "rng": {
         "draws": 445,
@@ -1405,6 +1477,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -1429,6 +1507,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -1453,6 +1537,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -1477,6 +1567,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {},
@@ -1501,6 +1597,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {},
@@ -1525,6 +1627,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {},
@@ -1998,7 +2106,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 403,
-      "state": "94c45933",
+      "state": "a631e043",
       "events": "d2a36979",
       "rng": {
         "draws": 447,
@@ -2010,6 +2118,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -2034,6 +2148,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -2060,6 +2180,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -2084,6 +2210,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {},
@@ -2108,6 +2240,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {},
@@ -2132,6 +2270,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {},
@@ -2713,7 +2857,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 404,
-      "state": "2aacd4f7",
+      "state": "79c1c88b",
       "events": "1678dd49",
       "rng": {
         "draws": 452,
@@ -2725,6 +2869,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -2749,6 +2899,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -2775,6 +2931,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
@@ -2801,6 +2963,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {},
@@ -2825,6 +2993,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {},
@@ -2849,6 +3023,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {},
@@ -3503,7 +3683,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 405,
-      "state": "8897d839",
+      "state": "b8ea26b1",
       "events": "bbdf1795",
       "rng": {
         "draws": 453,
@@ -3515,6 +3695,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -3539,6 +3725,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -3565,6 +3757,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
@@ -3591,6 +3789,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {
@@ -3617,6 +3821,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {},
@@ -3641,6 +3851,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {},
@@ -4371,7 +4587,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 406,
-      "state": "406b0f2b",
+      "state": "8eaba03b",
       "events": "96f803df",
       "rng": {
         "draws": 453,
@@ -4383,6 +4599,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -4407,6 +4629,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -4433,6 +4661,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
@@ -4459,6 +4693,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {
@@ -4485,6 +4725,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {},
@@ -4509,6 +4755,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {},
@@ -5293,7 +5545,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 406,
-      "state": "406b0f2b",
+      "state": "8eaba03b",
       "events": "741638a5",
       "rng": {
         "draws": 453,
@@ -5305,6 +5557,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -5329,6 +5587,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
@@ -5355,6 +5619,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
@@ -5381,6 +5651,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {
@@ -5407,6 +5683,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {},
@@ -5431,6 +5713,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {},

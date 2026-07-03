@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 393,
-      "state": "6ecafbf3",
+      "state": "42efb754",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -28,6 +28,12 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -106,7 +112,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 396,
-      "state": "95dad28b",
+      "state": "405327a4",
       "events": "f073ec51",
       "rng": {
         "draws": 6,
@@ -117,7 +123,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 396,
-      "state": "420bddcf",
+      "state": "a5e35320",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -128,7 +134,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 396,
-      "state": "64a7bcfd",
+      "state": "59ac773e",
       "events": "dee33f3a",
       "rng": {
         "draws": 96,
@@ -139,7 +145,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 396,
-      "state": "7490ba49",
+      "state": "19709692",
       "events": "741638a5",
       "rng": {
         "draws": 195,
@@ -150,7 +156,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 396,
-      "state": "03c24923",
+      "state": "094d0f1c",
       "events": "a70f9f6d",
       "rng": {
         "draws": 294,
@@ -161,7 +167,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 396,
-      "state": "864949bb",
+      "state": "ba63fe74",
       "events": "741638a5",
       "rng": {
         "draws": 398,
@@ -172,7 +178,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 396,
-      "state": "864949bb",
+      "state": "ba63fe74",
       "events": "741638a5",
       "rng": {
         "draws": 398,
@@ -185,6 +191,12 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},

@@ -748,7 +748,13 @@ export const da_DK: EnTranslations = {
       "sortName": "Navn",
       "searchPlaceholder": "Søg genstande",
       "searchAria": "Søg i taskegenstande efter navn",
-      "noMatch": "Ingen genstande matcher dine filtre."
+      "noMatch": "Ingen genstande matcher dine filtre.",
+      "capacity": "{used}/{total}",
+      "capacityAria": "Bag slots used: {used} of {total}",
+      "backpack": "Backpack",
+      "bagSocketAria": "{name}: {slots}",
+      "socketEmpty": "Empty bag slot",
+      "unequipHint": "Click to remove this bag"
     },
     "raidConvert": {
       "toPartyDone": "Dit raid er konverteret tilbage til en gruppe.",
@@ -4150,7 +4156,8 @@ export const da_DK: EnTranslations = {
       "drink": "Drikke",
       "tool": "Værktøj",
       "potion": "Eliksir",
-      "elixir": "Eliksir"
+      "elixir": "Eliksir",
+      "bag": "Bag"
     },
     "stats": {
       "armor": "Rustning",
@@ -4192,7 +4199,8 @@ export const da_DK: EnTranslations = {
       "useManaPotion": "Brug: Genopretter øjeblikkeligt {amount} mana. Brugbar i kamp. 1 min afkøling.",
       "clickUseInstant": "Klik for at bruge øjeblikkeligt i kamp",
       "clickUse": "Klik for at bruge",
-      "clickBuyback": "Klik for at købe tilbage"
+      "clickBuyback": "Klik for at købe tilbage",
+      "bagSlots": "{slots} Slot Bag"
     },
     "bags": {
       "title": "Tasker",
@@ -5493,6 +5501,21 @@ export const da_DK: EnTranslations = {
       },
       "monarch_crown_helm": {
         "name": "Monarkens Krone"
+      },
+      "linen_pouch": {
+        "name": "Lærredspung"
+      },
+      "travelers_knapsack": {
+        "name": "Rejsendes rygsæk"
+      },
+      "wolfhide_satchel": {
+        "name": "Ulveskindstaske"
+      },
+      "gravewoven_bag": {
+        "name": "Gravvævet taske"
+      },
+      "mistcallers_duffel": {
+        "name": "Tågekalderens køjesæk"
       },
       "copper_mining_pick": {
         "name": "Kobberminehakke"

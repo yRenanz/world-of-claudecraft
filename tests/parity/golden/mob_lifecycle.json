@@ -10,8 +10,8 @@
     "corpse-tick -> respawnMob: a slain wild mob respawns at spawnPos (rng.range(2,8) wanderTimer) and despawnSummonedAdds drops its summoned add",
     "corpse-tick gate: a dungeon mob (spawnPos.x > DUNGEON_X_THRESHOLD) stays dead, no respawn"
   ],
-  "draws": 17,
-  "drawDigest": "3cecae28",
+  "draws": 20,
+  "drawDigest": "e612091c",
   "frames": [
     {
       "tick": 0,
@@ -31,11 +31,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 397,
-      "state": "8d3b1adf",
+      "state": "3899d81c",
       "events": "a1c62b4c",
       "rng": {
-        "draws": 4,
-        "digest": "907f1cab"
+        "draws": 5,
+        "digest": "ca7bbe9c"
       },
       "label": "pack-frenzy",
       "players": [
@@ -43,6 +43,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -354,11 +360,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 398,
-      "state": "6f642dfb",
+      "state": "dcab9ee6",
       "events": "a6d59392",
       "rng": {
-        "draws": 7,
-        "digest": "537ecccb"
+        "draws": 8,
+        "digest": "cac7cfb2"
       },
       "label": "throes-arm",
       "players": [
@@ -366,6 +372,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -691,13 +703,7 @@
           },
           "level": 10,
           "loot": {
-            "copper": 56,
-            "items": [
-              {
-                "count": 1,
-                "itemId": "tangled_weed"
-              }
-            ]
+            "copper": 28
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
@@ -736,11 +742,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 398,
-      "state": "51cecc28",
-      "events": "c847b159",
+      "state": "d86613a8",
+      "events": "52d390e2",
       "rng": {
-        "draws": 8,
-        "digest": "cac7cfb2"
+        "draws": 9,
+        "digest": "88aac2f9"
       },
       "label": "throes-detonate",
       "players": [
@@ -748,11 +754,17 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 2281,
-            "damageTaken": 19,
+            "damageTaken": 18,
             "kills": 2,
             "xpGained": 198
           },
@@ -785,7 +797,7 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999981,
+          "hp": 999982,
           "id": 392,
           "inCombat": true,
           "kind": "player",
@@ -803,7 +815,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 1.266667,
+          "resource": 1.2,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1075,13 +1087,7 @@
           },
           "level": 10,
           "loot": {
-            "copper": 56,
-            "items": [
-              {
-                "count": 1,
-                "itemId": "tangled_weed"
-              }
-            ]
+            "copper": 28
           },
           "lootFfaTimer": 58.45,
           "lootRecipientIds": [
@@ -1120,11 +1126,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 400,
-      "state": "f36424f5",
+      "state": "4e51d2dc",
       "events": "4840109a",
       "rng": {
-        "draws": 13,
-        "digest": "00413b0e"
+        "draws": 15,
+        "digest": "ca70052b"
       },
       "label": "respawn",
       "players": [
@@ -1132,11 +1138,17 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 3365,
-            "damageTaken": 19,
+            "damageTaken": 18,
             "kills": 3,
             "xpGained": 282
           },
@@ -1169,7 +1181,7 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999981,
+          "hp": 999982,
           "id": 392,
           "inCombat": true,
           "kind": "player",
@@ -1187,7 +1199,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 1.266667,
+          "resource": 1.2,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1459,13 +1471,7 @@
           },
           "level": 10,
           "loot": {
-            "copper": 56,
-            "items": [
-              {
-                "count": 1,
-                "itemId": "tangled_weed"
-              }
-            ]
+            "copper": 28
           },
           "lootFfaTimer": 58.45,
           "lootRecipientIds": [
@@ -1534,7 +1540,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 5.661193,
+          "wanderTimer": 3.932005,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1547,11 +1553,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "cb32a6bf",
+      "state": "8da36c7e",
       "events": "bbd1286a",
       "rng": {
-        "draws": 17,
-        "digest": "3cecae28"
+        "draws": 20,
+        "digest": "e612091c"
       },
       "label": "dungeon-stays-dead",
       "players": [
@@ -1559,11 +1565,17 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 4449,
-            "damageTaken": 19,
+            "damageTaken": 18,
             "kills": 4,
             "xpGained": 366
           },
@@ -1596,7 +1608,7 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999981,
+          "hp": 999982,
           "id": 392,
           "inCombat": true,
           "kind": "player",
@@ -1614,7 +1626,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 1.266667,
+          "resource": 1.2,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1886,13 +1898,7 @@
           },
           "level": 10,
           "loot": {
-            "copper": 56,
-            "items": [
-              {
-                "count": 1,
-                "itemId": "tangled_weed"
-              }
-            ]
+            "copper": 28
           },
           "lootFfaTimer": 58.45,
           "lootRecipientIds": [
@@ -1961,7 +1967,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 5.661193,
+          "wanderTimer": 3.932005,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1989,7 +1995,13 @@
           },
           "level": 5,
           "loot": {
-            "copper": 7
+            "copper": 8,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "wolf_fang"
+              }
+            ]
           },
           "lootFfaTimer": 59.95,
           "lootRecipientIds": [
@@ -2029,11 +2041,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "cb32a6bf",
+      "state": "8da36c7e",
       "events": "741638a5",
       "rng": {
-        "draws": 17,
-        "digest": "3cecae28"
+        "draws": 20,
+        "digest": "e612091c"
       },
       "label": "final",
       "players": [
@@ -2041,11 +2053,17 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 4449,
-            "damageTaken": 19,
+            "damageTaken": 18,
             "kills": 4,
             "xpGained": 366
           },
@@ -2078,7 +2096,7 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999981,
+          "hp": 999982,
           "id": 392,
           "inCombat": true,
           "kind": "player",
@@ -2096,7 +2114,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 1.266667,
+          "resource": 1.2,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -2368,13 +2386,7 @@
           },
           "level": 10,
           "loot": {
-            "copper": 56,
-            "items": [
-              {
-                "count": 1,
-                "itemId": "tangled_weed"
-              }
-            ]
+            "copper": 28
           },
           "lootFfaTimer": 58.45,
           "lootRecipientIds": [
@@ -2443,7 +2455,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 5.661193,
+          "wanderTimer": 3.932005,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -2471,7 +2483,13 @@
           },
           "level": 5,
           "loot": {
-            "copper": 7
+            "copper": 8,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "wolf_fang"
+              }
+            ]
           },
           "lootFfaTimer": 59.95,
           "lootRecipientIds": [

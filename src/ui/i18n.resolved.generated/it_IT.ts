@@ -748,7 +748,13 @@ export const it_IT: EnTranslations = {
       "sortName": "Nome",
       "searchPlaceholder": "Cerca oggetti",
       "searchAria": "Cerca gli oggetti della borsa per nome",
-      "noMatch": "Nessun oggetto corrisponde ai tuoi filtri."
+      "noMatch": "Nessun oggetto corrisponde ai tuoi filtri.",
+      "capacity": "{used}/{total}",
+      "capacityAria": "Bag slots used: {used} of {total}",
+      "backpack": "Backpack",
+      "bagSocketAria": "{name}: {slots}",
+      "socketEmpty": "Empty bag slot",
+      "unequipHint": "Click to remove this bag"
     },
     "raidConvert": {
       "toPartyDone": "La tua incursione è tornata a essere un gruppo.",
@@ -4150,7 +4156,8 @@ export const it_IT: EnTranslations = {
       "drink": "Bevanda",
       "tool": "Strumento",
       "potion": "Pozione",
-      "elixir": "Elisir"
+      "elixir": "Elisir",
+      "bag": "Bag"
     },
     "stats": {
       "armor": "Armatura",
@@ -4192,7 +4199,8 @@ export const it_IT: EnTranslations = {
       "useManaPotion": "Uso: ripristina istantaneamente {amount} mana. Usabile in combattimento. Recupero 1 min.",
       "clickUseInstant": "Clicca per usare subito in combattimento",
       "clickUse": "Clicca per usare",
-      "clickBuyback": "Clicca per ricomprare"
+      "clickBuyback": "Clicca per ricomprare",
+      "bagSlots": "{slots} Slot Bag"
     },
     "bags": {
       "title": "Borse",
@@ -5493,6 +5501,21 @@ export const it_IT: EnTranslations = {
       },
       "monarch_crown_helm": {
         "name": "Corona del Monarca"
+      },
+      "linen_pouch": {
+        "name": "Borsello di lino"
+      },
+      "travelers_knapsack": {
+        "name": "Zaino del viaggiatore"
+      },
+      "wolfhide_satchel": {
+        "name": "Bisaccia di pelle di lupo"
+      },
+      "gravewoven_bag": {
+        "name": "Borsa sepolcrale"
+      },
+      "mistcallers_duffel": {
+        "name": "Sacca del Chiamanebbia"
       },
       "copper_mining_pick": {
         "name": "Piccone di Rame"

@@ -1831,6 +1831,7 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // 29th unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
   'arena',
+  'bags',
   'buyback',
   'cds',
   'cosmetics',
@@ -1869,6 +1870,7 @@ const ALL_DELTA_KEYS = [
 // keep their name; tal fans out to several members and is asserted directly).
 const TERSE_TO_IWORLD: Record<string, string> = {
   arena: 'arenaInfo',
+  bags: 'bags',
   buyback: 'vendorBuyback',
   cds: 'cooldowns',
   cosmetics: 'accountCosmetics',
@@ -2133,9 +2135,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 28 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(28);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(28);
+  it('ALL_DELTA_KEYS contains exactly 29 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(29);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(29);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2147,7 +2149,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(28);
+    expect(scraped.size).toBe(29);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

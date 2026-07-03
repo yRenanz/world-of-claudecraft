@@ -748,7 +748,13 @@ export const nl_NL: EnTranslations = {
       "sortName": "Naam",
       "searchPlaceholder": "Items zoeken",
       "searchAria": "Tasitems zoeken op naam",
-      "noMatch": "Geen items komen overeen met je filters."
+      "noMatch": "Geen items komen overeen met je filters.",
+      "capacity": "{used}/{total}",
+      "capacityAria": "Bag slots used: {used} of {total}",
+      "backpack": "Backpack",
+      "bagSocketAria": "{name}: {slots}",
+      "socketEmpty": "Empty bag slot",
+      "unequipHint": "Click to remove this bag"
     },
     "raidConvert": {
       "toPartyDone": "Je raid is terug omgezet naar een groep.",
@@ -4150,7 +4156,8 @@ export const nl_NL: EnTranslations = {
       "drink": "Drank",
       "tool": "Gereedschap",
       "potion": "Toverdrank",
-      "elixir": "Elixer"
+      "elixir": "Elixer",
+      "bag": "Bag"
     },
     "stats": {
       "armor": "Pantser",
@@ -4192,7 +4199,8 @@ export const nl_NL: EnTranslations = {
       "useManaPotion": "Gebruik: Herstelt direct {amount} mana. Bruikbaar in gevecht. 1 min afkoeltijd.",
       "clickUseInstant": "Klik om direct te gebruiken in gevecht",
       "clickUse": "Klik om te gebruiken",
-      "clickBuyback": "Klik om terug te kopen"
+      "clickBuyback": "Klik om terug te kopen",
+      "bagSlots": "{slots} Slot Bag"
     },
     "bags": {
       "title": "Tassen",
@@ -5493,6 +5501,21 @@ export const nl_NL: EnTranslations = {
       },
       "monarch_crown_helm": {
         "name": "Monarchenkroon"
+      },
+      "linen_pouch": {
+        "name": "Linnen buidel"
+      },
+      "travelers_knapsack": {
+        "name": "Reizigersknapzak"
+      },
+      "wolfhide_satchel": {
+        "name": "Wolfshuiden tas"
+      },
+      "gravewoven_bag": {
+        "name": "Grafgeweven tas"
+      },
+      "mistcallers_duffel": {
+        "name": "Plunjezak van de Mistroeper"
       },
       "copper_mining_pick": {
         "name": "Koperen Mijnpik"

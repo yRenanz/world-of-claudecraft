@@ -291,6 +291,8 @@ export const COMMAND_NAMES = [
   'lockpick_abort',
   'collect_delve_chest_loot',
   'telemetry',
+  'equip_bag',
+  'unequip_bag',
   'mail_send',
   'mail_take',
   'mail_delete',

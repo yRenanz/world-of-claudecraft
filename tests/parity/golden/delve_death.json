@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 393,
-      "state": "e54bdd93",
+      "state": "2a766a22",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -28,6 +28,12 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -106,7 +112,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 402,
-      "state": "6bbd40ee",
+      "state": "06ddbe35",
       "events": "7bea9fdc",
       "rng": {
         "draws": 1,
@@ -119,6 +125,12 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -197,7 +209,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 402,
-      "state": "b96cbcad",
+      "state": "f1039aec",
       "events": "7f76a43e",
       "rng": {
         "draws": 1,
@@ -210,6 +222,12 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -289,7 +307,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 402,
-      "state": "b96cbcad",
+      "state": "f1039aec",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -302,6 +320,12 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},

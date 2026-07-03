@@ -748,7 +748,13 @@ export const fr_FR: EnTranslations = {
       "sortName": "Nom",
       "searchPlaceholder": "Rechercher des objets",
       "searchAria": "Rechercher les objets du sac par nom",
-      "noMatch": "Aucun objet ne correspond à vos filtres."
+      "noMatch": "Aucun objet ne correspond à vos filtres.",
+      "capacity": "{used}/{total}",
+      "capacityAria": "Bag slots used: {used} of {total}",
+      "backpack": "Backpack",
+      "bagSocketAria": "{name}: {slots}",
+      "socketEmpty": "Empty bag slot",
+      "unequipHint": "Click to remove this bag"
     },
     "raidConvert": {
       "toPartyDone": "Votre raid a été reconverti en groupe.",
@@ -4150,7 +4156,8 @@ export const fr_FR: EnTranslations = {
       "drink": "Boisson",
       "tool": "Outil",
       "potion": "Potion",
-      "elixir": "Élixir"
+      "elixir": "Élixir",
+      "bag": "Bag"
     },
     "stats": {
       "armor": "Armure",
@@ -4192,7 +4199,8 @@ export const fr_FR: EnTranslations = {
       "useManaPotion": "Utiliser : rend instantanément {amount} mana. Utilisable en combat. Recharge de 1 min.",
       "clickUseInstant": "Cliquer pour utiliser instantanément en combat",
       "clickUse": "Cliquer pour utiliser",
-      "clickBuyback": "Cliquer pour racheter"
+      "clickBuyback": "Cliquer pour racheter",
+      "bagSlots": "{slots} Slot Bag"
     },
     "bags": {
       "title": "Sacs",
@@ -5493,6 +5501,21 @@ export const fr_FR: EnTranslations = {
       },
       "monarch_crown_helm": {
         "name": "Couronne du Monarque"
+      },
+      "linen_pouch": {
+        "name": "Pochette en lin"
+      },
+      "travelers_knapsack": {
+        "name": "Sac à dos du voyageur"
+      },
+      "wolfhide_satchel": {
+        "name": "Sacoche en peau de loup"
+      },
+      "gravewoven_bag": {
+        "name": "Sac sépulcral"
+      },
+      "mistcallers_duffel": {
+        "name": "Fourre-tout de l'Appelle-brume"
       },
       "copper_mining_pick": {
         "name": "Pic de Minage en Cuivre"

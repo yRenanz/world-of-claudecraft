@@ -29,6 +29,17 @@ const DAILY_REWARD_CONFIG_TTL_MS = Number(
   process.env.WOC_DAILY_REWARD_CONFIG_TTL_MS ?? DEFAULT_CONFIG_TTL_MS,
 );
 
+// Lenient coerce-and-clamp decode defaults for the daily-rewards paginated reads
+// (Number(param) || DEFAULT). These are the fallback page/limit when a query param
+// is absent or non-numeric; the coercion shape is UNCHANGED, only the literal is
+// named. Exported so their values are pinned by tests/server/tunables.test.ts.
+export const DAILY_DEFAULT_PAGE = 0; // page index (count, zero-based)
+export const DAILY_PLAYER_LEADERBOARD_PAGE_SIZE = 20; // rows per player leaderboard page (count)
+export const DAILY_HISTORY_LIMIT = 30; // player payout-history rows (count)
+export const DAILY_OPS_PENDING_PAYOUTS_LIMIT = 20; // ops pending-payouts rows (count)
+export const DAILY_OPS_PAYOUT_HISTORY_LIMIT = 100; // ops payout-history rows (count)
+export const DAILY_OPS_LEADERBOARD_PAGE_SIZE = 50; // rows per ops leaderboard page (count)
+
 export const DAILY_REWARD_SPLITS = [
   0.2, 0.15, 0.12, 0.1, 0.09, 0.08, 0.075, 0.07, 0.065, 0.05,
 ] as const;
@@ -759,8 +770,8 @@ export async function handleDailyRewardApi(
       200,
       await dailyRewardService.leaderboardPage(
         day,
-        Number(url.searchParams.get('page')) || 0,
-        Number(url.searchParams.get('pageSize')) || 20,
+        Number(url.searchParams.get('page')) || DAILY_DEFAULT_PAGE,
+        Number(url.searchParams.get('pageSize')) || DAILY_PLAYER_LEADERBOARD_PAGE_SIZE,
         accountId,
       ),
     );
@@ -774,7 +785,9 @@ export async function handleDailyRewardApi(
     return json(
       res,
       200,
-      await dailyRewardService.history(Number(url.searchParams.get('limit')) || 30),
+      await dailyRewardService.history(
+        Number(url.searchParams.get('limit')) || DAILY_HISTORY_LIMIT,
+      ),
     );
   }
   return json(res, 404, { error: 'unknown endpoint' });
@@ -792,14 +805,14 @@ export async function handleDailyRewardInternalApi(
   }
   if (req.method === 'POST' && url.pathname === '/internal/daily-rewards/pending-payouts') {
     const data = await dailyRewardService.pendingPayouts(
-      Number(url.searchParams.get('limit')) || 20,
+      Number(url.searchParams.get('limit')) || DAILY_OPS_PENDING_PAYOUTS_LIMIT,
     );
     json(res, 200, { success: true, data, error: null });
     return true;
   }
   if (req.method === 'POST' && url.pathname === '/internal/daily-rewards/payout-history') {
     const data = await dailyRewardService.payoutHistory(
-      Number(url.searchParams.get('limit')) || 100,
+      Number(url.searchParams.get('limit')) || DAILY_OPS_PAYOUT_HISTORY_LIMIT,
     );
     json(res, 200, { success: true, data, error: null });
     return true;
@@ -809,8 +822,8 @@ export async function handleDailyRewardInternalApi(
     const { day } = requestedDay ? { day: requestedDay } : await dailyRewardClock();
     const data = await dailyRewardService.leaderboardPage(
       day,
-      Number(url.searchParams.get('page')) || 0,
-      Number(url.searchParams.get('pageSize')) || 50,
+      Number(url.searchParams.get('page')) || DAILY_DEFAULT_PAGE,
+      Number(url.searchParams.get('pageSize')) || DAILY_OPS_LEADERBOARD_PAGE_SIZE,
     );
     json(res, 200, { success: true, data, error: null });
     return true;

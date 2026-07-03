@@ -201,7 +201,17 @@ export function requestIp(req: http.IncomingMessage): string {
   return chain[0] ?? remote;
 }
 
-export function rateLimited(req: http.IncomingMessage, maxPerMinute = 20): RateLimitOutcome {
+// The default per-IP budget (attempts per minute) for the game auth endpoints:
+// login, register, and the desktop-login handoff all inherit it. Admin login
+// passes a stricter 10 (ADMIN_LOGIN_MAX_PER_MINUTE in server/admin.ts); this is
+// the lenient default every other rateLimited() caller uses. Kept >= the
+// STRICTEST_RATE_LIMIT above by construction (20 >= 10).
+export const AUTH_MAX_PER_MINUTE = 20;
+
+export function rateLimited(
+  req: http.IncomingMessage,
+  maxPerMinute = AUTH_MAX_PER_MINUTE,
+): RateLimitOutcome {
   const ip = requestIp(req);
   const now = clockNow();
   const windowStart = now - WINDOW_MS;

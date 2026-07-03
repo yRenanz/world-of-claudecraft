@@ -84,9 +84,10 @@ import { resolveReportTarget } from './report_target';
 import { handleSitePresenceHeartbeat } from './site_presence';
 
 // A downscaled screenshot data URL dominates a bug-report payload, so it gets a
-// roomier cap than the 64 KB JSON default (matching the legacy /api/bug-reports
-// arm). Named here so it cannot drift; folded into loadConfig in Phase 24.
-const BUG_REPORT_MAX_BODY_BYTES = 1024 * 1024;
+// roomier cap (1 MiB) than the 64 KB JSON default (matching the legacy
+// /api/bug-reports arm). Owned here as the single source of truth: server/main.ts
+// imports it for the legacy arm's readBody cap so the two can never drift.
+export const BUG_REPORT_MAX_BODY_BYTES = 1024 * 1024;
 
 // ---------------------------------------------------------------------------
 // Runtime injection. registry.ts spreads the static `routes` array at module load,

@@ -3,8 +3,10 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { newToken } from './auth';
 import { requestIp } from './ratelimit';
 
-const DESKTOP_LOGIN_TTL_MS = 5 * 60 * 1000;
-const DESKTOP_LOGIN_CODE_BYTES = 20;
+// How long a minted desktop-login handoff code stays valid (5 minutes). Exported
+// as the single source of truth so its value is pinned by tests/server/tunables.test.ts.
+export const DESKTOP_LOGIN_TTL_MS = 5 * 60 * 1000;
+const DESKTOP_LOGIN_CODE_BYTES = 20; // single-use code entropy, in bytes (160 bits)
 
 interface DesktopLoginCode {
   accountId: number;

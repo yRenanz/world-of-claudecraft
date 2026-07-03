@@ -51,7 +51,12 @@ export const DATABASE_URL =
     );
   })();
 
-export const pool = new Pool({ connectionString: DATABASE_URL, max: 10 });
+// Max Postgres clients this realm process keeps in its pool (count). Shared
+// across the HTTP request path and the game loop; deliberately no idle/connection
+// timeout override, so those keep pg's own defaults.
+export const DB_POOL_MAX_CLIENTS = 10;
+
+export const pool = new Pool({ connectionString: DATABASE_URL, max: DB_POOL_MAX_CLIENTS });
 
 const REALM_SQL_DEFAULT = REALM.replace(/'/g, "''");
 const LIFETIME_XP_EXPR = "((state->>'lifetimeXp')::bigint)";

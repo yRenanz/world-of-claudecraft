@@ -14,7 +14,7 @@ const BASE = process.env.WOC_E2E_BASE ?? 'http://127.0.0.1:8787';
 const checks = [];
 const check = (name, cond) => {
   checks.push({ name, ok: !!cond });
-  console.log(`${cond ? '✅' : '❌'} ${name}`);
+  console.log(`${cond ? 'PASS' : 'FAIL'} ${name}`);
 };
 
 async function api(path, { method = 'GET', token, body } = {}) {
@@ -192,4 +192,4 @@ check(
 const passed = checks.filter((c) => c.ok).length;
 console.log(`\n${passed}/${checks.length} checks passed`);
 if (passed !== checks.length) process.exit(1);
-console.log('✅ player-card e2e passed against', BASE);
+console.log('PASS player-card e2e passed against', BASE);

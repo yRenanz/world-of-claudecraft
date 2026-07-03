@@ -23,7 +23,7 @@ export interface ProfessionNodeRecord {
   id: string;
   professionId: string;
   zoneId: string;
-  respawnMs: number;
+  respawnSeconds: number;
   skillReq: number;
   lootTable: readonly { itemId: string; weight: number }[];
 }
@@ -58,7 +58,7 @@ export interface ProfessionRecipeRecord {
 export interface ProfessionCraftRecord {
   recipeId: string;
   professionId: string;
-  durationMs: number;
+  craftSeconds: number;
 }
 
 // A player's current standing in one profession.

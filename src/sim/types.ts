@@ -177,6 +177,9 @@ export type AuraKind =
   | 'cost_tax'
   | 'heal_absorb'
   | 'critvuln'
+  | 'next_cast_instant'
+  | 'next_cast_free'
+  | 'next_attack_crit'
   | 'buff_spi'
   // 2v2 Fiesta power-up buffs: `buff_scale` value = body-size multiplier (also
   // boosts max-hp when >1); `buff_jump` value = jump-height multiplier.
@@ -207,6 +210,7 @@ export type CrowdControlDrCategory =
   | 'root'
   | 'polymorph'
   | 'fear'
+  | 'lockout'
   | 'openerStun'
   | 'controlledStun'
   | 'randomStun';
@@ -394,6 +398,22 @@ export interface InvSlot {
   count: number;
   /** Additive, optional per-instance payload (#1165). Absent for ordinary fungible stacks. */
   instance?: ItemInstancePayload;
+}
+
+// A shallow `{ ...slot }` aliases `instance` (and its mutable `charges`/`rolled.stats`
+// maps) between the live slot and a serialized/loaded copy: decrementing a charge on
+// one would silently mutate the other. Deep-clone at every save/load boundary instead.
+export function cloneInvSlot<T extends InvSlot>(slot: T): T {
+  if (!slot.instance) return { ...slot };
+  const src = slot.instance;
+  const instance: ItemInstancePayload = { ...src };
+  if (src.charges) instance.charges = { ...src.charges };
+  if (src.rolled)
+    instance.rolled = {
+      ...src.rolled,
+      ...(src.rolled.stats && { stats: { ...src.rolled.stats } }),
+    };
+  return { ...slot, instance };
 }
 
 export interface LootSlot extends InvSlot {
@@ -1019,7 +1039,8 @@ export type AbilityEffect =
       requiresBehind?: boolean;
       weaponMult?: number;
     } // instant special attack (sinister strike, overpower, backstab)
-  | { type: 'directDamage'; min: number; max: number }
+  | { type: 'directDamage'; min: number; max: number; vsRootedMult?: number }
+  | { type: 'interrupt'; lockout: number }
   | { type: 'heal'; min: number; max: number } // friendly target (or self)
   | { type: 'hot'; total: number; duration: number; interval: number } // renew, rejuvenation
   | { type: 'absorb'; amount: number; duration: number } // power word: shield
@@ -1084,6 +1105,11 @@ export interface AbilityDef {
   class: PlayerClass;
   cost: number; // rage/mana/energy (rank 1; ranks may override)
   castTime: number; // 0 = instant
+  // A cast/channel with this flag survives the player's own movement (the
+  // move-input cancel skips it); talents can also grant it per-ability.
+  castWhileMoving?: boolean;
+  // A cast/channel with this flag cannot be stopped by interrupt effects.
+  uninterruptible?: boolean;
   channel?: { duration: number; ticks: number }; // arcane missiles
   cooldown: number; // seconds, 0 = none (GCD only)
   range: number; // yards; 0 = melee range
@@ -1097,6 +1123,10 @@ export interface AbilityDef {
   scalesWith?: 'ranged';
   requiresTarget: boolean;
   targetType?: 'enemy' | 'friendly'; // friendly = self or allied player (defaults to enemy)
+  // Ground-targeted ability: instead of an entity target, the cast is aimed at a
+  // world point (the client proposes it, the server clamps it to `range`). Its area
+  // effects (aoeDamage / groundAoE) center on that point. Implies requiresTarget:false.
+  targetMode?: 'position';
   onNextSwing?: boolean; // heroic strike style: no GCD, queues on swing
   offGcd?: boolean;
   awardsCombo?: number; // rogue builders
@@ -1392,12 +1422,17 @@ export interface Entity {
   castingAbility: string | null;
   castRemaining: number;
   castTotal: number;
+  // Ground-targeted casting: the world point a `targetMode: 'position'` ability is
+  // aimed at, captured (server-clamped to range) when the cast begins and read by
+  // its area effects when it resolves. null for normal entity/self casts.
+  castAim: Vec3 | null;
   channeling: boolean;
   channelTickTimer: number;
   channelTickEvery: number;
   gcdRemaining: number;
   cooldowns: Map<string, number>;
   queuedOnSwing: string | null; // heroic strike
+  queuedOnSwingFree?: boolean; // next_cast_free consumed at queue time
   fiveSecondRule: number; // time since last mana spend
   comboPoints: number;
   comboTargetId: number | null;
@@ -1709,6 +1744,19 @@ export type SimEvent = { pid?: number } & (
       targetId: number;
       school: string;
       fx: 'projectile' | 'beam' | 'tick' | 'nova';
+    }
+  // visual-only cue anchored to a WORLD POINT rather than an entity: a
+  // ground-targeted spell's impact (the burst/nova lands where it was aimed, not
+  // on the caster). The renderer drapes it onto the terrain at (x, z).
+  | {
+      type: 'spellfxAt';
+      x: number;
+      z: number;
+      school: string;
+      fx: 'burst' | 'nova';
+      // blast radius in yards; when set the renderer flashes a terrain-draped
+      // AoE ring of this size under the burst so the impact area reads clearly
+      radius?: number;
     }
   // entityId (when set) anchors the log to that entity so the server only
   // delivers it to nearby players; anchorless logs broadcast server-wide

@@ -191,6 +191,7 @@ const CALLBACK_KEYS = [
   // G2 social plumbing (hasPendingSocialInvite already listed above; deduped).
   'setPlayerLevel',
   'notice',
+  'spawnDevBot',
   // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
   'startFishing',
   'unlockMechChromaFromItem',
@@ -424,6 +425,7 @@ function makeFakeHost() {
     // G2 social plumbing (hasPendingSocialInvite already stubbed above; deduped).
     setPlayerLevel: vi.fn(),
     notice: vi.fn(),
+    spawnDevBot: vi.fn(),
     // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
     startFishing: vi.fn(),
     unlockMechChromaFromItem: vi.fn(),

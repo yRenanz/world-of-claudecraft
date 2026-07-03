@@ -22,7 +22,7 @@ game data itself.
 
 ## IWorld facet
 The read-surface facet (`IWorldProfessions`) lives at `src/world_api/professions.ts`,
-alongside the other 20 facets under `src/world_api/` (see the FACET MAP in
+alongside the other 21 facets under `src/world_api/` (see the FACET MAP in
 `src/world_api.ts`). It is a stub as of #1164: `professionsState` returns an
 empty `PlayerProfessionsView` on both `Sim` and `ClientWorld` until #1119/#1120
 land the real mechanics. Extend `IWorldProfessions` first, then implement in

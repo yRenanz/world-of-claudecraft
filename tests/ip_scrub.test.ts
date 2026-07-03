@@ -54,6 +54,12 @@ interface DenyEntry {
   text: string;
   // Whole-value match on spec/tree name fields only (NAME-MAP `kind: tree`).
   treeOnly: boolean;
+  // Map-derived SINGLE-WORD entry (a generic combat verb the operator renamed -
+  // Charge/Vigor/Frenzy/Maul/Silence/...): whole-value match on any name field,
+  // never a substring token (operator Z1 ruling, 2026-07-02). Distinctive
+  // HARDCODED coinages (Imp/Murloc/Drakonid/...) keep substring matching so
+  // "Imp Minion" / "Slimy Murloc Scale" still trip.
+  singleWord: boolean;
 }
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -107,6 +113,10 @@ const PROSE_SCAN: { entry: string; re: RegExp }[] = [
   { entry: 'bristleback (prose)', re: /\bbristlebacks?\b/i },
   { entry: 'candle-headed (prose)', re: /\bcandle-headed\b/i },
   { entry: 'Tallow Candle (prose)', re: /\btallow candles?\b/i },
+  // Amendment #4 (2026-07-02): the Blizzard-coined 'Shadow Flame' effect, now
+  // reworded to 'searing shadow'. Guards ability/talent description prose +
+  // encounter/delve dialogue against its reintroduction.
+  { entry: 'Shadow Flame (prose)', re: /\bshadow ?flame\b/i },
 ];
 
 // Flags that ARM a NAME-MAP row for the scanner. `generic-keep?` rows are
@@ -143,7 +153,7 @@ function parseNameMapDenylist(markdown: string): DenyEntry[] {
       if (part.includes('"') || part.includes('(') || part.includes('_') || part.includes('`')) {
         continue;
       }
-      entries.push({ text: part, treeOnly: kind === 'tree' });
+      entries.push({ text: part, treeOnly: kind === 'tree', singleWord: !part.includes(' ') });
     }
   }
   return entries;
@@ -173,20 +183,43 @@ function buildDenylist(): DenyEntry[] {
     const key = `${e.text.toLowerCase()}${e.treeOnly ? '|tree' : ''}`;
     if (!byKey.has(key)) byKey.set(key, e);
   };
-  for (const text of HARDCODED_VERBATIM) add({ text, treeOnly: false });
+  for (const text of HARDCODED_VERBATIM) add({ text, treeOnly: false, singleWord: false });
   for (const e of parseNameMapDenylist(nameMapMarkdown)) add(e);
   return [...byKey.values()];
 }
 
 const DENYLIST = buildDenylist();
 
+const NAME_ENTRIES = DENYLIST.filter((e) => !e.treeOnly);
+// Only multi-word / HARDCODED entries get a substring (word-boundary) regex;
+// map-derived single words match whole-value (built inline in scanNameValue).
 const NAME_ENTRY_RE = new Map<string, RegExp>(
-  DENYLIST.filter((e) => !e.treeOnly).map((e) => [
+  NAME_ENTRIES.filter((e) => !e.singleWord).map((e) => [
     e.text,
     new RegExp(`\\b${escapeRegExp(e.text)}\\b`, 'i'),
   ]),
 );
 const TREE_ENTRIES = DENYLIST.filter((e) => e.treeOnly);
+
+// Operator-ruled intentional KEEPS of an armed display string (NAME-MAP
+// Amendment #4 + the Z1 single-word ruling, 2026-07-02). The same string is
+// renamed for one entity but deliberately kept for this specific field, exactly
+// like the Mogger parody. A single-word whole-value rule cannot express these
+// (the kept value EQUALS the armed word), so they are explicit per-field
+// exemptions. `fieldIncludes` matches both the sim-side and resolved-table field
+// paths (e.g. 'aug_toughness' hits augments.* AND i18n.en.fiesta.augment.*).
+const KEEP_EXEMPTIONS: { entry: string; value: string; fieldIncludes: string }[] = [
+  { entry: 'Weapon Mastery', value: 'Weapon Mastery', fieldIncludes: 'arms_tactical_mastery' },
+  { entry: 'Weapon Mastery', value: 'Weapon Mastery', fieldIncludes: 'combat_weapon_mastery' },
+  { entry: 'Toughness', value: 'Toughness', fieldIncludes: 'aug_toughness' },
+  { entry: 'Stormcaller', value: 'Stormcaller', fieldIncludes: 'holderTiers.stormcaller' },
+  { entry: 'Berserker', value: 'Berserker', fieldIncludes: 'pow_berserker' },
+];
+function isKeptException(field: string, value: string, entry: string): boolean {
+  return KEEP_EXEMPTIONS.some(
+    (x) => x.entry === entry && x.value === value && field.includes(x.fieldIncludes),
+  );
+}
 
 // Whole-name match of every armed denylist entry against ONE display-name
 // value. `isSpecField` additionally arms the whole-value tree-name entries.
@@ -197,8 +230,13 @@ function scanNameValue(
   isSpecField: boolean,
   out: Violation[],
 ): void {
-  for (const [entry, re] of NAME_ENTRY_RE) {
-    if (re.test(value)) out.push({ denylistEntry: entry, field, id, value });
+  for (const e of NAME_ENTRIES) {
+    const hit = e.singleWord
+      ? value.trim().toLowerCase() === e.text.toLowerCase()
+      : NAME_ENTRY_RE.get(e.text)!.test(value);
+    if (hit && !isKeptException(field, value, e.text)) {
+      out.push({ denylistEntry: e.text, field, id, value });
+    }
   }
   if (isSpecField) {
     for (const e of TREE_ENTRIES) {
@@ -215,6 +253,26 @@ function scanProseValue(field: string, id: string, value: string, out: Violation
     if (re.test(value)) out.push({ denylistEntry: entry, field, id, value });
   }
 }
+
+// Amendment #4: recursively PROSE-scan every `description` / `masteryDescription`
+// string in a content tree (abilities, talents). Tooltip prose gets the small
+// PROSE_SCAN set only - NEVER the name denylist, or generic armed verbs
+// (Charge/Execute/Cleave) that live in tooltips legitimately would trip.
+function scanDescriptions(node: unknown, prefix: string, out: Violation[]): void {
+  if (!node || typeof node !== 'object') return;
+  for (const [k, v] of Object.entries(node as Record<string, unknown>)) {
+    if ((k === 'description' || k === 'masteryDescription') && typeof v === 'string') {
+      scanProseValue(`${prefix}.${k}`, prefix, v, out);
+    } else if (v && typeof v === 'object') {
+      scanDescriptions(v, `${prefix}.${k}`, out);
+    }
+  }
+}
+
+// Amendment #4: scripted boss/delve dialogue lives inline in encounter functions
+// (not exported data), so prose-scan the string literals of these source files.
+const DIALOGUE_SOURCES = ['src/sim/encounters/nythraxis.ts', 'src/sim/delves/runs.ts'];
+const STRING_LITERAL_RE = /(['"`])((?:\\.|(?!\1).)*)\1/g;
 
 // Recursively scan the WHOLE resolved English table: every string under a
 // `name` or `title` key is a display name (this covers entities.<kind>.<id>
@@ -333,6 +391,10 @@ function collectViolations(): Violation[] {
   for (const zone of ZONES) {
     scanNameValue(`zones.${zone.id}.name`, zone.id, zone.name, false, out);
     scanNameValue(`zones.${zone.id}.hub.name`, zone.id, zone.hub.name, false, out);
+    // Amendment #4: POI / map-point labels (short place names -> name-scan).
+    (zone.pois ?? []).forEach((poi, i) => {
+      scanNameValue(`zones.${zone.id}.pois.${i}.label`, zone.id, poi.label, false, out);
+    });
   }
 
   // The explicit C1 prose fields (quest/greeting prose ONLY - see PROSE_SCAN).
@@ -345,6 +407,19 @@ function collectViolations(): Violation[] {
   }
   for (const [id, npc] of Object.entries(NPCS)) {
     scanProseValue(`npcs.${id}.greeting`, id, npc.greeting, out);
+  }
+
+  // Amendment #4: ability/talent tooltip DESCRIPTION prose (PROSE_SCAN set).
+  scanDescriptions(ABILITIES, 'abilities', out);
+  scanDescriptions(TALENTS, 'talents', out);
+
+  // Amendment #4: scripted encounter/delve DIALOGUE (prose-scan the string
+  // literals of the source files, since the lines are inline, not exported).
+  for (const rel of DIALOGUE_SOURCES) {
+    const src = readFileSync(path.join(root, rel), 'utf8');
+    for (const m of src.matchAll(STRING_LITERAL_RE)) {
+      scanProseValue(`dialogue:${rel}`, rel, m[2], out);
+    }
   }
 
   // The resolved English i18n table, so a stale or hand-drifted resolved
@@ -373,6 +448,21 @@ describe('ip_scrub - verbatim-WoW denylist scanner (G0)', () => {
     // ~150 abilities + ~134 items + mobs + npcs + quests + more; a hard floor
     // well below reality but far above zero catches a broken walk.
     expect(nameFields).toBeGreaterThan(300);
+  });
+
+  it('teeth: the Amendment #4 category scans (POI labels, descriptions, dialogue) are non-vacuous', () => {
+    const poiCount = ZONES.reduce((n, z) => n + (z.pois?.length ?? 0), 0);
+    // ~28 map POIs across the zones today; a hard floor far above zero.
+    expect(poiCount, 'POI labels vanished from ZONES - POI scan would be a no-op').toBeGreaterThan(15);
+    const descCount = Object.values(ABILITIES).filter(
+      (a) => typeof (a as { description?: unknown }).description === 'string',
+    ).length;
+    expect(descCount, 'ability descriptions vanished - description scan would be a no-op').toBeGreaterThan(50);
+    for (const rel of DIALOGUE_SOURCES) {
+      const src = readFileSync(path.join(root, rel), 'utf8');
+      const literals = [...src.matchAll(STRING_LITERAL_RE)].length;
+      expect(literals, `dialogue source ${rel} unreadable/empty - dialogue scan would be a no-op`).toBeGreaterThan(5);
+    }
   });
 
   it('never arms a generic-keep? name (operator-controlled via the NAME-MAP flag)', () => {

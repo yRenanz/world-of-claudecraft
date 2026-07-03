@@ -1135,3 +1135,25 @@ faction. Considered and declined, like Mogger/Riptide. Ids unchanged; no scanner
 | `shadowburn` description | Shadow Flame | searing shadow | ability-desc | rename |
 
 - classes.ts:2691 + i18n.catalog/abilities.ts (byte-identical English copies): "blasts the target with Shadow Flame" -> "blasts the target with searing shadow". Ability NAME already renamed (`shadowburn` -> Duskfire, V1). Locale values re-fill at Z1.
+
+### Scanner ruling (Z1 single-word policy, operator-approved 2026-07-02)
+The G0 scanner (`tests/ip_scrub.test.ts`) is updated in the same change so it reflects real
+coverage with zero residual:
+- **Whole-value single-word matching.** Map-derived SINGLE-WORD armed entries (generic combat
+  verbs: Charge / Vigor / Frenzy / Maul / Silence / Slam / Pounce / Benediction / Reckoning /
+  Precision / Cleave) match only when the WHOLE field value equals them, never as a substring
+  token. So locked NEW names (Grim Vigor, Latent Charge, Blackblood Vigor, Cold Reckoning) and
+  original mob/item/quest names (Blood Frenzy, Ground Slam, Static Charge, Withered Benediction,
+  Brutok's Maul, Drowned Moon Maul, Silence the Call/Choir, Deathstalker Cleave, Miring/Savage
+  Pounce, Ravenous/Mirejaw Frenzy, Vile Precision) no longer false-trip. Distinctive HARDCODED
+  coinages (Imp / Murloc / Drakonid / Felguard / ...) keep substring matching.
+- **Five per-id KEEP exemptions** (Mogger-style: the same string is renamed elsewhere but kept
+  here by decision): Weapon Mastery (warrior `arms_tactical_mastery`, rogue
+  `combat_weapon_mastery`), Toughness (`aug_toughness`), Stormcaller (wallet
+  `holderTiers.stormcaller`), Berserker (fiesta `pow_berserker`).
+- **New scan surfaces:** POI/map-point labels (`zones.*.pois.*.label`, name-scan); ability/talent
+  tooltip descriptions + encounter/delve dialogue (prose-scan against the PROSE_SCAN set, now
+  incl. Shadow Flame). Non-vacuity teeth-tested.
+- **Three WoW-adjacent mob names KEPT** by operator (generic/original, whole-value clears them):
+  Static Charge, Blood Frenzy, Deathstalker Cleave (mob `deathstalker_voss`).
+The scanner is GREEN after this change - the whole IP scrub is verified complete.

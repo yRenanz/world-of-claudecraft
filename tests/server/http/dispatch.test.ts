@@ -11,6 +11,7 @@
 
 import type * as http from 'node:http';
 import { describe, expect, it, vi } from 'vitest';
+import { currentReqId } from '../../../server/http/context';
 import {
   type ApiDelegate,
   type ApiDispatcher,
@@ -335,5 +336,68 @@ describe('selectApiEntry', () => {
     expect(spyLegacy).toHaveBeenCalledTimes(1);
     expect(spyLegacy).toHaveBeenCalledWith(req, res);
     expect(spyNew).not.toHaveBeenCalled();
+  });
+});
+
+describe('delegate reqId scope: every delegate path binds a fresh ambient reqId', () => {
+  // The onion path gets its reqId ALS scope from runOnion; these pin the OTHER
+  // three arms (unmatched delegate, HEAD delegate, legacy-mode entry) so a swept
+  // logger line inside a legacy handler still carries a reqId for correlation.
+  // The binding is observability-only: the response bytes are untouched (the
+  // req/res identity pins above stay in force).
+
+  it('binds an ambient reqId around an unmatched-path delegate and holds it across an await', async () => {
+    let during: string | undefined;
+    let afterAwait: string | undefined;
+    let resolveDone: () => void = () => {};
+    const done = new Promise<void>((resolve) => {
+      resolveDone = resolve;
+    });
+    const dispatcher = createApiDispatcher({
+      registry: registryReturning({ kind: 'notFound' }),
+      delegate: async () => {
+        during = currentReqId();
+        await new Promise((r) => setTimeout(r, 0));
+        afterAwait = currentReqId();
+        resolveDone();
+      },
+    });
+    const res = new FakeRes();
+    dispatcher(
+      makeReq({ method: 'GET', url: '/api/legacy/thing' }),
+      res as unknown as http.ServerResponse,
+    );
+    await done;
+    expect(during).toBeTruthy();
+    expect(afterAwait).toBe(during);
+  });
+
+  it('binds an ambient reqId around a HEAD-match delegate', () => {
+    let during: string | undefined;
+    const route = fakeRoute(async () => {});
+    const dispatcher = createApiDispatcher({
+      registry: registryReturning({ kind: 'matched', route, params: { id: '42' }, head: true }),
+      delegate: () => {
+        during = currentReqId();
+      },
+    });
+    const res = new FakeRes();
+    dispatcher(
+      makeReq({ method: 'HEAD', url: '/api/things/42' }),
+      res as unknown as http.ServerResponse,
+    );
+    expect(during).toBeTruthy();
+  });
+
+  it("binds a FRESH ambient reqId per request on the 'legacy' entry (production default)", () => {
+    const ids: Array<string | undefined> = [];
+    const entry = selectApiEntry('legacy', vi.fn() as unknown as ApiDispatcher, () => {
+      ids.push(currentReqId());
+    });
+    entry(makeReq(), new FakeRes() as unknown as http.ServerResponse);
+    entry(makeReq(), new FakeRes() as unknown as http.ServerResponse);
+    expect(ids[0]).toBeTruthy();
+    expect(ids[1]).toBeTruthy();
+    expect(ids[0]).not.toBe(ids[1]);
   });
 });

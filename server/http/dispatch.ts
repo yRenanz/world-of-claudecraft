@@ -19,7 +19,7 @@
 import type * as http from 'node:http';
 import { runOnion } from './compose';
 import type { DispatchMode } from './config';
-import { buildContext } from './context';
+import { buildContext, newReqId, runWithReqId } from './context';
 import { logger } from './logger';
 import { withContentType } from './middleware/content_type';
 import { type MetricSink, noopMetricSink, withMetrics } from './middleware/metric_sink';
@@ -36,6 +36,22 @@ export type ApiDelegate = (
 
 /** The dispatcher call shape: fire-and-forget, mirroring the legacy handleApi call site. */
 export type ApiDispatcher = (req: http.IncomingMessage, res: http.ServerResponse) => void;
+
+/**
+ * Invoke the legacy delegate under a FRESH ambient reqId scope. The onion path
+ * gets its scope from runOnion; the delegate paths (un-migrated, HEAD, and the
+ * 'legacy' entry) would otherwise run outside any runWithReqId, so a swept
+ * logger line inside a legacy handler would carry no reqId. The binding is
+ * observability-only: it never touches req/res, so the delegate's response
+ * bytes (and the parity harness) are unaffected.
+ */
+function delegateWithReqId(
+  delegate: ApiDelegate,
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+): void {
+  runWithReqId(newReqId(), () => void delegate(req, res));
+}
 
 /** Everything the dispatcher needs, injected so it stays pure and unit-testable. */
 export interface ApiDispatcherDeps {
@@ -60,8 +76,9 @@ export function createApiDispatcher(deps: ApiDispatcherDeps): ApiDispatcher {
     const match = deps.registry.resolve(method, path);
     if (match.kind !== 'matched') {
       // Un-migrated path (this phase: EVERY path): delegate to the legacy ladder
-      // UNCHANGED. The delegate owns its own response; we never touch req/res.
-      void deps.delegate(req, res);
+      // UNCHANGED. The delegate owns its own response; we never touch req/res
+      // (the reqId wrapper only binds ambient logging context).
+      delegateWithReqId(deps.delegate, req, res);
       return;
     }
     if (match.head) {
@@ -71,7 +88,7 @@ export function createApiDispatcher(deps: ApiDispatcherDeps): ApiDispatcher {
       // (through Phase 24) a HEAD match delegates too, keeping the migration
       // byte-identical old-vs-new. Serving HEAD as GET is a deliberate behavior
       // change deferred to the Phase 25 flag flip / ladder deletion.
-      void deps.delegate(req, res);
+      delegateWithReqId(deps.delegate, req, res);
       return;
     }
     // A registry-owned route: run the Phase 5 onion. runOnion guarantees exactly
@@ -147,5 +164,5 @@ export function selectApiEntry(
   newDispatcher: ApiDispatcher,
   legacy: ApiDelegate,
 ): ApiDispatcher {
-  return mode === 'new' ? newDispatcher : (req, res) => void legacy(req, res);
+  return mode === 'new' ? newDispatcher : (req, res) => delegateWithReqId(legacy, req, res);
 }

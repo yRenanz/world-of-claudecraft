@@ -818,6 +818,10 @@ export class Hud {
   // Bind the tab-strip wheel-to-horizontal-scroll listener exactly once (renderChatTabs
   // rebuilds the strip's children but the bar element itself persists).
   private chatTabsWheelBound = false;
+  // The control that opened the shared #ctx-menu (the chat "+" button), so the
+  // outside-click closer can defer to that opener's own toggle click. Cleared on
+  // every close path (closeContextMenu + item activation).
+  private ctxMenuOpener: HTMLElement | null = null;
   private errorEl = $('#error-msg');
   private bannerEl = $('#banner');
   // The WoW-style quest-progress flash (quest_progress_banner.ts): yellow
@@ -1265,6 +1269,20 @@ export class Hud {
       document.body.classList.remove('mobile-more-open');
       document.getElementById('mobile-controls')?.classList.remove('expanded');
       document.getElementById('mobile-more')?.classList.remove('active');
+    });
+    // Dismiss the shared #ctx-menu (right-click menus and the chat "+" channel
+    // picker) on any pointerdown outside it. A pointerdown inside the menu is left
+    // to the item's own click; a pointerdown on the opener is left to that opener's
+    // toggle (so a second click on + closes rather than reopens). Escape still
+    // closes it through the unified closeAll dispatcher.
+    document.addEventListener('pointerdown', (ev) => {
+      const menu = $('#ctx-menu');
+      if (menu.style.display !== 'block') return;
+      const target = ev.target as Node | null;
+      if (!target) return;
+      if (menu.contains(target)) return;
+      if (this.ctxMenuOpener?.contains(target)) return;
+      this.closeContextMenu();
     });
     // classic-style minimap clock: real local time under the minimap; click it to
     // flip between 12-hour (AM/PM) and 24-hour display. Real-time clocks are a
@@ -2363,8 +2381,14 @@ export class Hud {
     add.setAttribute('aria-label', t('hud.core.chatChannels.add'));
     add.title = t('hud.core.chatChannels.add');
     add.addEventListener('click', () => {
+      // Toggle: a second click on + closes the picker it opened.
+      const menu = $('#ctx-menu');
+      if (menu.style.display === 'block' && this.ctxMenuOpener === add) {
+        this.closeContextMenu();
+        return;
+      }
       const r = add.getBoundingClientRect();
-      this.openChatChannelMenu(r.left, r.bottom);
+      this.openChatChannelMenu(r.left, r.bottom, add);
     });
     bar.append(add);
     this.updateActiveTabStyles();
@@ -2439,8 +2463,9 @@ export class Hud {
   // toggle off; the rest add a tab. Whisper is offered alongside the channels as
   // a filter-only tab that gathers every whisper in one place. Reuses the shared
   // #ctx-menu, so it inherits its outside-click / Escape close behaviour.
-  private openChatChannelMenu(x: number, y: number): void {
+  private openChatChannelMenu(x: number, y: number, opener: HTMLElement | null = null): void {
     const el = $('#ctx-menu');
+    this.ctxMenuOpener = opener;
     let html = `<div class="ctx-title">${esc(t('hud.core.chatChannels.addTitle'))}</div>`;
     // A trailing check mark flags already-open tabs, exactly as the channel list
     // did before this whisper tab was added. Built from its char code so no literal
@@ -11665,7 +11690,7 @@ export class Hud {
       const activate = () => {
         const act = item.dataset.act;
         if (!act) return;
-        el.style.display = 'none';
+        this.closeContextMenu();
         onActivate(act);
       };
       item.addEventListener('click', activate);
@@ -11810,6 +11835,7 @@ export class Hud {
 
   closeContextMenu(): void {
     $('#ctx-menu').style.display = 'none';
+    this.ctxMenuOpener = null;
   }
 
   // -------------------------------------------------------------------------

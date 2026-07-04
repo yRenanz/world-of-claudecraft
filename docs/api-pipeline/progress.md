@@ -1998,3 +1998,39 @@ the scanner at the sparse sim dicts and extending the release-tier copied-Englis
 H3b to simDICT), and the empty-yield harvest success path (unmapped tags consume the
 claim with zero player feedback; upstream design call between an emit and not consuming
 the claim).
+
+## Phase 26: closeout comment cleanup (de-phase + de-stale + oauth copy) DONE (2026-07-04)
+
+The shipped pipeline code no longer carries development-process "Phase N of
+docs/api-pipeline/" framing: 123 files reworded (641 grep hits plus a case-insensitive
+sweep's lowercase/hyphenated stragglers), every phase number replaced by the mechanism it
+stood for per the phase-26 Master Key. Executed as a 9-bucket parallel fan-out plus a
+hand-edited Part B; one usage-limit interruption mid-fan-out was resumed from the workflow
+cache with the partial drafts verified and adopted. Landed as six commits: ef0405a18
+(spine + middleware + server/http/CLAUDE.md), 4d7a7929d (domain files), 76e26254c (tests
++ labels + the known_deviations prose), 185bcd0d6 (the Part B stale-comment corrections:
+dispatch.ts "registry EMPTY today", types.ts "later phase" loader/reqId docs, registry.ts
+timeline changelog rewritten as a count-free surface description, index.ts consolidation
+narrative, server_timeouts.ts "nothing sets these"), 34cbb4560 (the oauth em-dash sweep:
+seven comments plus the player-facing device string, now "Device approved. You can return
+to your device.", which also unblocks the deferred GET /oauth/device characterization
+golden), and 669d07fad (the apiError catalog/matcher comments).
+
+Deliberate keeps, so a literal re-run of the phase-26 acceptance grep is NOT a miss:
+the known_deviations.ts `introducedInPhase` field, its values, and DEVIATION_PHASE_MIN/MAX
+stay byte-identical (runtime data pinned by known_deviations.test.ts; renaming it out of
+phase vocabulary is a separate test-touching task), and five live doc pointers survive in
+code on purpose (server/http/CLAUDE.md to the state.md deletion exit criteria;
+market_backfill.ts to phase-20-rollback-runbook.md; wallet.ts, leaderboard.ts, and
+discord.ts to progress.md follow-up/deferral records). The five src/ui/i18n.locales
+overlays keep their one "(..., Phase 22)" comment each (overlay files are not hand-edited;
+maintainer call if they should go through the i18n regen pipeline). Test DATABASE_URL
+placeholder values (wocc_phaseNN_*) and the 18b code identifiers in tests are program-read
+values, out of a comment sweep's scope.
+
+Validation: tsc 0; the four guard suites 251/251; tests/server + api_error_code_parity +
+schema_wiring 1677 passed with ZERO fixture edits; localization_fixes + i18n_completeness
+green; npm run gate PASS all 9 steps; ci:changed 0. Reviews apply-all: two fresh coverage
+reviewers (server diff, tests+ui diff) CLEAN with one nit (a "top-level" misdescription of
+the Content-Type gate in wallet.ts, fixed pre-commit); qa-checklist READY, 0 blocking,
+0 should-fix. NEXT: phase-27-flip-precondition.md.

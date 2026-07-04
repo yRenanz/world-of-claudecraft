@@ -51,10 +51,16 @@ surface migrated, no un-carved-out surface, load-bearing counts hold: admin 38 R
 release-merge set 34) and the deletion-exit-criteria index is honest. It surfaced THREE closeout
 polish items, none a correctness or safety blocker, each now a follow-up phase (see README
 "Closeout phases (post-25)" and the phase-26/27/28 files):
-- Phase 26 (cleanup): the shipped code carries development-process "Phase N of docs/api-pipeline/"
-  framing in about 122 files and a handful of stale "registry EMPTY today / loader is a later
-  phase / nothing sets these" comments that now misdescribe the wired pipeline; plus a deferred
-  oauth em-dash copy sweep including a player-facing string at server/oauth.ts:490.
+- Phase 26 (cleanup) DONE (2026-07-04): the shipped code no longer carries dev-phase framing.
+  123 files reworded to the mechanism names (commits ef0405a18 / 4d7a7929d / 76e26254c), the
+  stale "registry EMPTY today / loader is a later phase / nothing sets these" comments corrected
+  to the wired pipeline (185bcd0d6), and the oauth em-dash sweep landed including the
+  player-facing device string (34cbb4560; the deferred GET /oauth/device characterization golden
+  is now capturable). Deliberate keeps recorded in progress.md Phase 26: the known_deviations.ts
+  introducedInPhase field/values + DEVIATION_PHASE_MIN/MAX (pinned runtime data), five live doc
+  pointers in code (rollback runbook, this file's exit criteria, three progress.md records), and
+  the five i18n overlay comments (overlays are never hand-edited). Zero behavior change; gate
+  PASS; qa-checklist READY 0/0.
 - Phase 27: the Phase 25 flag flip to 'new' crossed the Phase 21 QA pre-flip watch-item (bound the
   two log-only mismatch sinks before flipping) without clearing it on the record; resolve by
   bounding the sinks or recording a conscious acceptance.

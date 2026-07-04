@@ -79,7 +79,7 @@ follow-ups, not blockers; the shipped pipeline is correct without them. Each pai
 
 | NN | Phase | QA | ctx |
 |----|-------|----|-----|
-| 26 | [Closeout cleanup: de-phase and de-stale the pipeline comments](phase-26-comment-cleanup.md) | (on run) | low |
+| 26 | [Closeout cleanup: de-phase and de-stale the pipeline comments](phase-26-comment-cleanup.md) | DONE 2026-07-04, apply-all 0/0 (record: progress.md Phase 26; no separate qa file) | low |
 | 27 | [Closeout: honor the flag-flip precondition (bound the log-only mismatch sinks)](phase-27-flip-precondition.md) | (on run) | low |
 | 28 | [Closeout: complete or formally defer the four attack-signal RED metrics](phase-28-observability-metrics.md) | (on run) | low |
 

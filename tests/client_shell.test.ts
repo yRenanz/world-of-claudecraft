@@ -1269,33 +1269,52 @@ describe('client HTML shell', () => {
     expect(marketWindowTs).not.toContain('<select data-market-filter=');
   });
 
-  it('keeps the mobile More and Autorun buttons in the combat row', () => {
+  it('anchors the mobile combat cluster to the thumb-reach corner, not dead-center', () => {
     const combatControls = html.slice(
       html.indexOf('<div id="mobile-combat-controls">'),
       html.indexOf('<div id="mobile-extra-controls"'),
     );
+    const combatGridEnd = combatControls.indexOf('</div>') + '</div>'.length;
+    const combatGrid = combatControls.slice(0, combatGridEnd);
+    const afterGrid = combatControls.slice(combatGridEnd);
     const primaryButtons = [...combatControls.matchAll(/<button class="mobile-btn"/g)];
-    const attack = combatControls.indexOf('id="mobile-attack-nearest"');
-    const autorun = combatControls.indexOf('id="mobile-autorun"');
-    const jump = combatControls.indexOf('id="mobile-jump"');
+    const attack = combatGrid.indexOf('id="mobile-attack-nearest"');
+    const jump = combatGrid.indexOf('id="mobile-jump"');
+    const target = combatGrid.indexOf('id="mobile-target"');
+    const interact = combatGrid.indexOf('id="mobile-interact"');
+    const autorun = afterGrid.indexOf('id="mobile-autorun"');
+    const chat = afterGrid.indexOf('id="mobile-chat"');
+    const more = afterGrid.indexOf('id="mobile-more"');
 
+    // The 4 core, frequently-pressed verbs live inside #mobile-combat-grid...
     expect(primaryButtons).toHaveLength(7);
     expect(attack).toBeGreaterThanOrEqual(0);
-    expect(autorun).toBeGreaterThan(attack);
-    expect(jump).toBeGreaterThan(autorun);
-    expect(hudMobileCss).toContain('grid-template-columns: 124px repeat(6, 58px);');
-    expect(hudMobileCss).toContain('grid-template-columns: 115px repeat(6, 54px);');
-    expect(hudMobileCss).toContain('grid-template-columns: 96px repeat(6, 42px);');
+    expect(jump).toBeGreaterThan(attack);
+    expect(target).toBeGreaterThan(jump);
+    expect(interact).toBeGreaterThan(target);
+    // ...while the low-frequency verbs (a travel toggle, two menu-openers) sit
+    // outside the grid, so they can be pulled out to a top-corner row instead
+    // of crowding the thumb-reach cluster.
+    expect(autorun).toBeGreaterThanOrEqual(0);
+    expect(chat).toBeGreaterThan(autorun);
+    expect(more).toBeGreaterThan(chat);
+
+    // The cluster anchors to the corner above the camera/look joystick, not the
+    // old dead-center strip (left: 50%) -- across every responsive breakpoint.
+    expect(hudMobileCss).not.toContain('left: 50%;\n    bottom: calc(3px');
     expect(hudMobileCss).toContain(
-      'position: absolute;\n    left: 50%;\n    bottom: calc(3px + env(safe-area-inset-bottom));',
+      'body.mobile-touch #mobile-combat-controls {\n    position: absolute;\n    left: auto;\n    right: max(14px, env(safe-area-inset-right));\n    bottom: calc(156px + env(safe-area-inset-bottom));\n    z-index: 30;\n  }',
     );
+    expect(hudMobileCss).toContain('grid-template-columns: repeat(3, 58px);');
+    expect(hudMobileCss).toContain('grid-template-columns: repeat(3, 54px);');
+    expect(hudMobileCss).toContain('grid-template-columns: repeat(3, 42px);');
+    expect(hudMobileCss).toContain('grid-template-columns: repeat(3, 36px);');
+    // Autorun/Chat/More are fixed-positioned out of the grid into their own
+    // top-corner row, mirrored for the left-handed toggle.
     expect(hudMobileCss).toContain(
-      'bottom: calc(2px + env(safe-area-inset-bottom));\n      grid-template-columns: 115px repeat(6, 54px);',
+      'body.mobile-touch #mobile-autorun,\n  body.mobile-touch #mobile-chat,\n  body.mobile-touch #mobile-more {\n    position: fixed;',
     );
-    expect(hudMobileCss).toContain(
-      'pointer-events: auto;\n    align-items: end;\n    z-index: 30;',
-    );
-    expect(hudMobileCss).toContain('body.mobile-touch #mobile-more {\n    position: static;');
+    expect(hudMobileCss).toContain('body.mobile-touch.mobile-left-handed #mobile-autorun {');
     expect(mainTs).toContain('onMenu: () => hud.toggleOptionsMenu(),');
   });
 

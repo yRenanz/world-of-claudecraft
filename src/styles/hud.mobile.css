@@ -253,18 +253,50 @@
     color: #c8b888;
     text-shadow: 1px 1px 2px #000;
   }
+  /* Corner-anchored, thumb-reach layout (not a dead-center strip): the core
+     verbs cluster right above the camera/look joystick, in the same corner the
+     right thumb already rests in to look around, the way action-RPG gacha
+     mobile HUDs (Genshin/Star Rail/Wuthering Waves/Endfield-style) keep the
+     lower-middle of the screen clear and put frequent taps in a tight
+     bottom-corner cluster instead of a wide centered row. Attack spans the top
+     row (the single most-pressed action, biggest target); Jump/Target/Use
+     auto-fill the row below it. bottom offset clears the 122px camera
+     joystick (26px anchor + 122px + ~8px gap).
+     #mobile-combat-controls is just a positioning anchor (no transform): its
+     other children, #mobile-autorun/#mobile-chat/#mobile-more, are pulled out
+     to a top-corner row (see their own rules below) via position: fixed, and a
+     transform on an ANCESTOR creates a new containing block for fixed/absolute
+     DESCENDANTS -- if the btn-scale transform stayed here, those three would
+     be positioned relative to this bottom-right box instead of the viewport.
+     The actual grid + scale transform live on the inner #mobile-combat-grid,
+     which holds only the 4 real cluster buttons. */
   body.mobile-touch #mobile-combat-controls {
     position: absolute;
-    left: 50%;
-    bottom: calc(3px + env(safe-area-inset-bottom));
-    transform: translateX(-50%) scale(var(--btn-scale, 1));
-    transform-origin: center bottom;
-    display: grid;
-    grid-template-columns: 124px repeat(6, 58px);
-    gap: 8px;
-    pointer-events: auto;
-    align-items: end;
+    left: auto;
+    right: max(14px, env(safe-area-inset-right));
+    bottom: calc(156px + env(safe-area-inset-bottom));
     z-index: 30;
+  }
+  body.mobile-touch #mobile-combat-grid {
+    transform: scale(var(--btn-scale, 1));
+    transform-origin: right bottom;
+    display: grid;
+    grid-template-columns: repeat(3, 58px);
+    gap: 8px;
+    pointer-events: none;
+    align-items: end;
+    justify-items: end;
+  }
+  body.mobile-touch #mobile-combat-grid .mobile-btn {
+    pointer-events: auto;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-combat-controls {
+    right: auto;
+    left: max(14px, env(safe-area-inset-left));
+  }
+  body.mobile-touch.mobile-left-handed #mobile-combat-grid {
+    transform-origin: left bottom;
+    justify-items: start;
   }
   body.mobile-touch .mobile-btn {
     width: 58px;
@@ -305,23 +337,59 @@
     height: 22px;
   }
   body.mobile-touch #mobile-attack-nearest {
-    width: 124px;
+    grid-column: 1 / -1;
+    width: 100%;
     color: #ffdf9c;
     border-color: #8b4e2c;
   }
+  /* Autorun/Chat/More are the low-frequency verbs (a travel toggle and two
+     menu-openers, never a split-second combat tap), so they move out of the
+     thumb-reach cluster entirely into a small top-corner row -- the same
+     "secondary actions cost a reach, core actions don't" split these games use.
+     They stay real DOM children of #mobile-combat-controls (idle-fade's
+     descendant selector still reaches them) but position:fixed removes them
+     from its CSS Grid flow, so the grid above only ever lays out the 4 core
+     buttons. Anchored to the MOVE-joystick side (left by default), mirrored in
+     left-handed mode below, since that's the thumb NOT busy holding the
+     camera/look joystick. */
+  body.mobile-touch #mobile-autorun,
+  body.mobile-touch #mobile-chat,
   body.mobile-touch #mobile-more {
-    position: static;
-    z-index: 19;
+    position: fixed;
+    top: calc(max(8px, env(safe-area-inset-top)) + 84px);
+    bottom: auto;
+    width: 44px;
+    height: 44px;
+    z-index: 30;
+    pointer-events: auto;
+  }
+  body.mobile-touch #mobile-autorun {
+    left: max(8px, env(safe-area-inset-left));
+  }
+  body.mobile-touch #mobile-chat {
+    left: calc(max(8px, env(safe-area-inset-left)) + 52px);
+  }
+  body.mobile-touch #mobile-more {
+    left: calc(max(8px, env(safe-area-inset-left)) + 104px);
+  }
+  body.mobile-touch.mobile-left-handed #mobile-autorun,
+  body.mobile-touch.mobile-left-handed #mobile-chat,
+  body.mobile-touch.mobile-left-handed #mobile-more {
+    left: auto;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-autorun {
+    right: max(8px, env(safe-area-inset-right));
+  }
+  body.mobile-touch.mobile-left-handed #mobile-chat {
+    right: calc(max(8px, env(safe-area-inset-right)) + 52px);
+  }
+  body.mobile-touch.mobile-left-handed #mobile-more {
+    right: calc(max(8px, env(safe-area-inset-right)) + 104px);
   }
   body.mobile-touch .mobile-btn:active {
     transform: translateY(1px);
     border-color: var(--gold);
     color: #fff;
-  }
-  body.mobile-touch #mobile-autorun {
-    position: static;
-    pointer-events: auto;
-    z-index: 19;
   }
   body.mobile-touch #mobile-autorun.active {
     border-color: var(--gold);
@@ -920,9 +988,10 @@
     overflow: hidden;
     z-index: 25;
   }
-  /* Left-handed mirror: swap the two thumb joysticks (and the bottom HUD that
-     hugs them) so the movement stick sits under the right thumb. Opt-in via the
-     "Left-handed Touch" toggle in Key Bindings; centred combat buttons stay put. */
+  /* Left-handed mirror: swap the two thumb joysticks (and the corner-anchored
+     HUD that hugs them -- see #mobile-combat-controls/#mobile-autorun/
+     #mobile-chat/#mobile-more above) so the movement stick sits under the
+     right thumb. Opt-in via the "Left-handed Touch" toggle in Key Bindings. */
   body.mobile-touch.mobile-left-handed .mobile-joystick {
     left: auto;
     right: max(18px, env(safe-area-inset-right));
@@ -930,10 +999,6 @@
   body.mobile-touch.mobile-left-handed #mobile-camera-joystick {
     right: auto;
     left: max(18px, env(safe-area-inset-left));
-  }
-  body.mobile-touch.mobile-left-handed #mobile-more {
-    left: auto;
-    right: auto;
   }
   body.mobile-touch.mobile-left-handed #mobile-extra-controls {
     left: 50%;
@@ -1712,17 +1777,14 @@
   }
 
   @media (orientation: portrait) {
-    body.mobile-touch #mobile-combat-controls {
-      grid-template-columns: 96px repeat(6, 42px);
+    body.mobile-touch #mobile-combat-grid {
+      grid-template-columns: repeat(3, 42px);
       gap: 4px;
     }
     body.mobile-touch .mobile-btn {
       width: 42px;
       height: 44px;
       font-size: 16px;
-    }
-    body.mobile-touch #mobile-attack-nearest {
-      width: 96px;
     }
     body.mobile-touch #community-hud {
       /* var(--app-vh), not dvh: viewport units resolve against the initial
@@ -1742,23 +1804,20 @@
     }
   }
 
-  /* Narrow-portrait phones (320-384px: iPhone SE, small Androids): the portrait
-     combat row above is 372px wide (96 + 6x42 + gaps), so centred it clips both
-     the Attack and More buttons off-screen. Shrink the row to 312px so the whole
-     strip always fits with a margin. 36px-wide buttons are below the 40px touch
-     floor, the documented infeasible case (7 targets across a 320px screen); the
-     44px height keeps each target at WCAG size. */
+  /* Narrow-portrait phones (320-384px: iPhone SE, small Androids): the corner
+     cluster above is only 3 columns wide now (no longer a 7-across row), so it
+     already clears these widths comfortably; still shave the buttons down a
+     touch so the cluster doesn't crowd the camera joystick beneath it. 36px is
+     below the 40px touch floor, the documented infeasible case, on the
+     narrowest phones; 44px height keeps each target at WCAG size. */
   @media (orientation: portrait) and (max-width: 384px) {
-    body.mobile-touch #mobile-combat-controls {
-      grid-template-columns: 78px repeat(6, 36px);
+    body.mobile-touch #mobile-combat-grid {
+      grid-template-columns: repeat(3, 36px);
       gap: 3px;
     }
     body.mobile-touch .mobile-btn {
       width: 36px;
       font-size: 14px;
-    }
-    body.mobile-touch #mobile-attack-nearest {
-      width: 78px;
     }
   }
 
@@ -1869,8 +1928,11 @@
       color: #d7c987aa;
     }
     body.mobile-touch #mobile-combat-controls {
-      bottom: calc(2px + env(safe-area-inset-bottom));
-      grid-template-columns: 115px repeat(6, 54px);
+      /* Clears this breakpoint's smaller 100px joystick (15px anchor + 100px + ~8px gap). */
+      bottom: calc(123px + env(safe-area-inset-bottom));
+    }
+    body.mobile-touch #mobile-combat-grid {
+      grid-template-columns: repeat(3, 54px);
       gap: 7px;
     }
     body.mobile-touch .mobile-btn {
@@ -1878,9 +1940,6 @@
       height: 48px;
       font-size: 20px;
       background: radial-gradient(circle at 35% 30%, #2d3048bf, #11121ec2 72%);
-    }
-    body.mobile-touch #mobile-attack-nearest {
-      width: 115px;
     }
     body.mobile-touch #mobile-extra-controls {
       left: 50%;

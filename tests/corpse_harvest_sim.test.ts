@@ -127,7 +127,7 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
 
   it('clears the claim on respawn, so the next corpse is harvestable again', () => {
     const { sim, internals, mob, a, b } = setup();
-    sim.harvestCorpse(mob.id, a);
+    sim.harvestCorpse(mob.id, undefined, a);
     expect(mob.harvestClaimedBy).toBe(a);
 
     (sim as unknown as { ctx: { respawnMob(m: Entity): void } }).ctx.respawnMob(mob);
@@ -139,7 +139,7 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     mob.respawnTimer = 9999;
     internals.entities.set(mob.id, mob);
 
-    sim.harvestCorpse(mob.id, b);
+    sim.harvestCorpse(mob.id, undefined, b);
     expect(mob.harvestClaimedBy).toBe(b);
   });
 });

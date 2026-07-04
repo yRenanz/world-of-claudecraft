@@ -5065,10 +5065,6 @@ export class Sim {
     interaction.harvestCorpse(this.ctx, mobId, components, pid);
   }
 
-  harvestCorpse(mobId: number, pid?: number): void {
-    interaction.harvestCorpse(this.ctx, mobId, pid);
-  }
-
   pickUpObject(objId: number, pid?: number): void {
     interaction.pickUpObject(this.ctx, objId, pid);
   }

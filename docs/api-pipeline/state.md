@@ -43,7 +43,28 @@ tests/server/http/known_deviations.ts and sibling test comments is DEFERRED to t
 PR (frozen ledger prose; those entries fire at the deletion anyway). Validation green at the
 final tree: tsc 0, golden 23/23, dispatch_default + config 32/32, tests/server/http 41
 files / 912 tests with zero fixture edits, PERF_GATE_WALLCLOCK=1 perf_gate 10/10,
-ci:changed 0, npm run gate PASS all 9 steps. The migration packet is COMPLETE.
+ci:changed 0, npm run gate PASS all 9 steps. The core MIGRATION is COMPLETE.
+
+CLOSEOUT REVIEW (2026-07-04): an independent whole-branch review confirmed the migration is
+functionally complete (gate green, dispatch default 'new' across all four entries, every REST
+surface migrated, no un-carved-out surface, load-bearing counts hold: admin 38 RouteDefs,
+release-merge set 34) and the deletion-exit-criteria index is honest. It surfaced THREE closeout
+polish items, none a correctness or safety blocker, each now a follow-up phase (see README
+"Closeout phases (post-25)" and the phase-26/27/28 files):
+- Phase 26 (cleanup): the shipped code carries development-process "Phase N of docs/api-pipeline/"
+  framing in about 122 files and a handful of stale "registry EMPTY today / loader is a later
+  phase / nothing sets these" comments that now misdescribe the wired pipeline; plus a deferred
+  oauth em-dash copy sweep including a player-facing string at server/oauth.ts:490.
+- Phase 27: the Phase 25 flag flip to 'new' crossed the Phase 21 QA pre-flip watch-item (bound the
+  two log-only mismatch sinks before flipping) without clearing it on the record; resolve by
+  bounding the sinks or recording a conscious acceptance.
+- Phase 28: only 2 of the 6 source-spec 4.9 "Request layer (RED), this PR" metrics shipped
+  (http_requests_total, http_request_duration_seconds); the four attack-signal counters
+  (rate_limit_hits_total, auth_failures_total, bola_denied_total, pg_limiter_writes_total) were
+  silently narrowed out with no durable deferral; qa-checklist.md:153 still names the never-shipped
+  pg_limiter_writes_total. Ship the four or formally defer and true up the stale references.
+These three float OUTSIDE the durable deletion-exit-criteria index today; each closeout phase lands
+its resolution in a durable index (this file's OPEN items) as it runs.
 
 THIRD v0.20.0 RELEASE-MERGE SLICE (2026-07-03, after the Phase 24 QA gate): the map
 editor surface landed and was migrated IN-MERGE (9 custom-map + 4 uploaded-GLB /api

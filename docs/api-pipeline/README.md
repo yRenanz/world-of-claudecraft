@@ -69,6 +69,20 @@ so in their own file when the session runs hot.
 | 24 | [Validated config + server timeouts + no-magic-values consolidation + perf gate](phase-24-config-timeouts.md) | [QA](phase-24-qa.md) | low |
 | 25 | [Docs + new:endpoint scaffold + flag-default flip](phase-25-docs-flag-flip.md) | [QA](phase-25-qa.md) | low |
 
+## Closeout phases (post-25)
+
+The core migration finished at Phase 25 (every REST surface behind the pipeline, the
+`API_DISPATCH` default flipped to `'new'`, the pre-merge gate green). A closeout review
+(2026-07-04) then surfaced three polish items, each its own focused, bisectable PR. They are
+follow-ups, not blockers; the shipped pipeline is correct without them. Each pairs with its
+`phase-NN-qa.md` when it runs.
+
+| NN | Phase | QA | ctx |
+|----|-------|----|-----|
+| 26 | [Closeout cleanup: de-phase and de-stale the pipeline comments](phase-26-comment-cleanup.md) | (on run) | low |
+| 27 | [Closeout: honor the flag-flip precondition (bound the log-only mismatch sinks)](phase-27-flip-precondition.md) | (on run) | low |
+| 28 | [Closeout: complete or formally defer the four attack-signal RED metrics](phase-28-observability-metrics.md) | (on run) | low |
+
 ## Ground rules every phase keeps
 
 - Server-only work. It must not touch `src/sim/` (Phase 22 is the one client-side touch:

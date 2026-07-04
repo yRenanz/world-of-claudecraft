@@ -80,6 +80,22 @@ present); the rest is WS/sim/UI surface (one-online-character-per-account, mail 
 block-invites, haste item sets, cast-target locking, chat tab strip, delve fixes) with no
 HTTP route changes. Full record: progress.md "v0.20.0 release merge, fifth slice".
 
+v0.21.0 RELEASE-MERGE SLICE (2026-07-04, merge dc392dca1): corpse-harvest profession
+(#1141) + monster component tags (#1140). ZERO HTTP API surface: the only server delta is
+server/game.ts (one new WS command harvestCorpse plus its HEAVY_SELF_CMDS membership),
+pinned release-side in tests/command_schema.test.ts (117 sends / 126 dispatch) and
+tests/world_api_parity.test.ts (168 members / 42 data / 126 methods). New sim claim logic
+in src/sim/professions/gathering.ts behind the SimContext seam (command body in
+src/sim/interaction.ts). Migrated set STAYS 34; no corpus rows, RouteDefs, deviations, or
+deletion-exit-criteria changes. Post-merge audit fixes applied branch-side: dead-player +
+full-bags guards on harvestCorpse (sibling-precedent, tested), real fills for the two new
+sim error strings across all 19 non-en locales (M16), the S3 simSrc list extended with
+interaction.ts + professions/gathering.ts, HARVEST_COMPONENT_ITEMS relocated to
+src/sim/content/professions.ts, world_api.ts FACET MAP header made count-free. OPEN
+UPSTREAM (content design, flagged to the maintainer, NOT papered over here): harvest
+yields are quest items, granting cross-quest collect credit from any tagged mob. Full
+record: progress.md "v0.21.0 release merge, first slice".
+
 loadConfig(env) is now the validated FAIL-FAST boot edge, called once as startServer's
 first step (before the DB retry loop) and memoized behind main.ts activeConfig() (+
 resetActiveConfigForTests) so request-time consumers read lazily and a bare import stays

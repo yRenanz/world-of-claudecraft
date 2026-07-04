@@ -1948,3 +1948,53 @@ NEXT: the next-release old-ladder deletion PR under the exit criteria above (own
 Fernando; the deletion PR adds the bounded delegate counter FIRST). The whole-feature
 integration matrix (qa-checklist.md) remains available to run once at packet completion if
 the maintainer wants the final cross-phase pass before ship.
+
+## v0.21.0 release merge, first slice (2026-07-04): corpse harvest + component tags
+
+Merge dc392dca1 brings release/v0.21.0 (tip 9ab4c0c92, PR #1181: single-use first-come
+corpse harvest #1141, on the monster component tags from #1140) into the branch. Two
+conflicts, both known classes: tests/world_api_parity.test.ts (method-count test title,
+resolved to the release's correct 126) and src/ui/i18n.status.summary.json (generated;
+taken from the release side then regenerated via npm run i18n:gen). Post-merge audit (the
+release-merge-audit skill, 6-lens / 11-agent workflow run, every consequential finding
+adversarially verified): merge RESOLUTION clean in both directions (exact union of the
+parents; branch-era game.ts/online.ts work intact, harvestCorpse landed like its siblings),
+ZERO HTTP API surface (no server/http, main.ts, or route-table files in the 24-file delta;
+the WS command is pinned by command_schema 117/126 per the slice-4 precedent; surface
+corpus is HTTP-only by design so no rows), IWorld extended and implemented in BOTH worlds
+(world_api_parity 168 members), docs premises intact (migrated set stays 34; deletion exit
+criteria untouched).
+
+Audit findings fixed branch-side in the same slice: (1) harvestCorpse lacked the
+dead-player rejection every sibling interaction command enforces; added with the standard
+"You can't do that while dead." error plus a claim-not-consumed test. (2) harvestCorpse
+violated addItem's command-boundary contract by skipping the canAddItem capacity
+pre-check; added BEFORE the claim write (a full-bags refusal leaves the corpse unclaimed)
+with the standard "Your bags are full." error plus a test. (3) M16: the two new wordy sim
+error strings were pasted as byte-identical English into all 19 non-en sim locale blocks
+(13 in sim_i18n.ts + 7 in sim_i18n.newlocales.ts) and the scanner records any present dict
+entry as translated-by-human, so no gate at any tier would ever flag them; replaced with
+real fills in all 19 locales. (4) The S3 drift guard's simSrc list did not scan
+src/sim/interaction.ts, where the new emits' ONLY literal occurrences live; appended it
+plus src/sim/professions/gathering.ts (H1 entries). (5) HARVEST_COMPONENT_ITEMS was game
+data inside src/sim/professions/ against that directory's no-game-data contract; moved to
+src/sim/content/professions.ts (gathering.ts re-exports for existing importers). (6) Stale
+prose trued up: world_api.ts FACET MAP header counts made count-free (they had re-staled
+twice across release merges; the pinned gates own the literals), the types.ts
+componentTags "unconsumed" comment updated, and harvestClaimedBy documented as
+SERVER-PRIVATE (no snapshot delta mirrors it; the online ClientWorld always reads null,
+noted for whichever slice first adds a UI consumer).
+
+OPEN UPSTREAM (content design, deliberately not fixed here): the harvest yield map's
+hide/silk/venomSac tags map to kind:'quest' items (q_boars/q_spiders/q_widows), so a
+harvest grants quest-collect credit from ANY tagged mob (a wolf hide advances the boar
+quest) and bypasses the quest-state gates the loot/pickup paths enforce. The complete fix
+is dedicated profession-material items, which is content design owned by the professions
+epic; flagged in a KNOWN CONTENT GAP comment at the relocated table and reported to the
+maintainer. Also pre-existing, reported not fixed: 35 byte-identical wordy-English rows
+for 7 Drowned Litany keys across the five non-Latin sim locale blocks (same
+registry-blindness pattern; candidate for a dedicated fill session together with pointing
+the scanner at the sparse sim dicts and extending the release-tier copied-English guard
+H3b to simDICT), and the empty-yield harvest success path (unmapped tags consume the
+claim with zero player feedback; upstream design call between an emit and not consuming
+the claim).

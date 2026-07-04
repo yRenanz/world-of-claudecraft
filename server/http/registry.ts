@@ -1,12 +1,11 @@
-// Phase 9 route registry for the API pipeline (docs/api-pipeline/).
+// The route registry for the API request pipeline.
 //
-// The registry assembles the per-domain RouteDef arrays (populated by the
-// migration phases, Phase 10 onward) into ONE lookup that the Phase 9 dispatcher
-// places in front of the legacy /api handleApi ladder: for a path the registry
-// owns, the dispatcher runs the onion; for anything else it delegates to the
-// legacy handler unchanged.
+// The registry assembles the per-domain RouteDef arrays into ONE lookup that
+// the dispatcher places in front of the legacy /api handleApi ladder: for a
+// path the registry owns, the dispatcher runs the onion; for anything else it
+// delegates to the legacy handler unchanged.
 //
-// resolve() does NOT reimplement matching: it reuses the Phase 4 router
+// resolve() does NOT reimplement matching: it reuses the table router
 // (server/http/router.ts) via createRouter(...).match, inheriting its static-
 // first-then-dynamic scan, its 404-vs-405+Allow decision, HEAD-for-GET, the
 // synthesized OPTIONS, trailing-slash normalization, and its build-time rejection
@@ -52,7 +51,7 @@ const ACCOUNT_OWNER_SCOPE: OwnerScope = 'account';
 export interface ApiRegistry {
   /**
    * Resolve a (method, path) pair against the registered routes, returning the
-   * Phase 4 MatchResult: a matched RouteDef with captured params, a 405
+   * router's MatchResult: a matched RouteDef with captured params, a 405
    * methodNotAllowed with the Allow set, a synthesized OPTIONS, or notFound (the
    * no-match decision the dispatcher delegates to the legacy ladder on).
    */
@@ -60,50 +59,54 @@ export interface ApiRegistry {
 }
 
 /**
- * The single flat list of API routes. The migration phases populate it by
- * spreading their per-domain `routes: RouteDef[]` arrays here, one domain at a
- * time. Phase 10 adds the first domain: the public-read surface
- * (server/leaderboard.ts). Every un-migrated /api path is not in this list, so
- * the Phase 9 dispatcher delegates it to the legacy handleApi ladder unchanged.
- * A migrated route stays served by its legacy arm too (the flag-off rollback
- * path) until the ladder-deletion PR (next release). Phase 10 added the public reads
- * (server/leaderboard.ts); Phase 11 added the auth credential surface
- * (server/auth_routes.ts: register, login, native-attestation challenge); Phase 12
- * adds the owner-gated character surface (server/characters.ts: the character list
- * pair, create, and the account-owned :id subroutes behind requireOwnedCharacter).
- * Phase 13 adds the account-portal surface (server/account.ts: the /api/account/*
- * family, the companion-token method trio, and /api/email/unsubscribe). Phase 14
- * adds the wallet / card / referral surface (server/wallet.ts: the wallet-link
- * family, GET /api/wallet, the public GET /api/woc/balance, the binary POST
- * /api/card, and GET /api/referrals). Phase 15 adds the reports + telemetry surface
- * (server/reports.ts: POST /api/reports, POST /api/bug-reports, and the public
- * beacons POST /api/perf-report and POST /api/site-presence). Phase 16 adds the
- * Discord family (server/discord.ts: the OAuth start/callback pair, the two
- * first-login chooser routes login/new + login/link, the GET/DELETE /api/discord
- * link status + unlink pair, and the previously-orphaned POST
- * /api/discord/swag/claim). Phase 17 adds the admin surface (server/admin.ts:
- * the anonymous login plus the 31 authed /admin/api reads, moderation /
- * chat-filter / ip-block writes, and the restructured :id/:action sanction
- * route, all behind requireAdmin and served through main.ts's own flag-gated
- * admin dispatcher). Phase 18 adds the OAuth POST JSON surface (server/oauth.ts:
- * the 5 consent / token / revoke / device endpoints; the GET consent and device
- * HTML pages stay on the top-level ladder, off this table) and the secret-gated
- * /internal ops surface (server/internal.ts: restart-countdown plus the 10
- * Discord-bot routes behind requireInternalSecret), each served through its own
- * flag-gated dispatcher in main.ts. Phase 18b adds the three release-merge
- * late-arrival families: the GitHub link family (server/github.ts: the OAuth
- * start/callback pair and the GET/DELETE /api/github status + unlink pair),
- * the desktop-login handoff pair (server/desktop_login_routes.ts: create +
- * exchange, on the fused register/login per-IP budget), and both daily-rewards
- * families (server/daily_rewards.ts: the three bearer-gated player routes plus
- * the three fail-closed secret-gated /internal/daily-rewards ops routes).
- * The v0.20.0 release merge adds the map editor surface in the merge itself:
- * the custom-map family (server/maps_routes.ts: the owner list/create pair,
- * the public browse list, the public-or-owner :id read, and the owner-gated
- * save/delete/fork/publish/unpublish :id routes behind requireOwnedMap) and
- * the uploaded-GLB family (server/user_assets_routes.ts: the binary upload,
- * the owner list, the public content-addressed byte read, and the owner-gated
- * :id delete behind requireOwnedAsset).
+ * The single flat list of API routes: one spread per domain module, each
+ * exporting its `routes: RouteDef[]` table. Any path NOT in this list is
+ * delegated by the dispatcher to the legacy handleApi ladder unchanged, and a
+ * migrated route stays served by its legacy arm too (the flag-off rollback
+ * path) until the ladder-deletion PR (next release). The aggregated domains:
+ *  - the public reads (server/leaderboard.ts): the leaderboard family and the
+ *    genuinely public :id reads;
+ *  - the auth credential surface (server/auth_routes.ts: register, login,
+ *    native-attestation challenge);
+ *  - the owner-gated character surface (server/characters.ts: the character
+ *    list pair, create, and the account-owned :id subroutes behind
+ *    requireOwnedCharacter);
+ *  - the account-portal surface (server/account.ts: the /api/account/* family,
+ *    the companion-token method trio, and /api/email/unsubscribe);
+ *  - the wallet / card / referral surface (server/wallet.ts: the wallet-link
+ *    family, GET /api/wallet, the public GET /api/woc/balance, the binary POST
+ *    /api/card, and GET /api/referrals);
+ *  - the reports + telemetry surface (server/reports.ts: POST /api/reports,
+ *    POST /api/bug-reports, and the public beacons POST /api/perf-report and
+ *    POST /api/site-presence);
+ *  - the Discord family (server/discord.ts: the OAuth start/callback pair, the
+ *    two first-login chooser routes login/new + login/link, the GET/DELETE
+ *    /api/discord link status + unlink pair, and POST /api/discord/swag/claim);
+ *  - the GitHub link family (server/github.ts: the OAuth start/callback pair
+ *    and the GET/DELETE /api/github status + unlink pair);
+ *  - the desktop-login handoff pair (server/desktop_login_routes.ts: create +
+ *    exchange, on the fused register/login per-IP budget);
+ *  - both daily-rewards families (server/daily_rewards.ts: the bearer-gated
+ *    player routes plus the fail-closed secret-gated /internal/daily-rewards
+ *    ops routes);
+ *  - the custom-map family (server/maps_routes.ts: the owner list/create pair,
+ *    the public browse list, the public-or-owner :id read, and the owner-gated
+ *    save/delete/fork/publish/unpublish :id routes behind requireOwnedMap);
+ *  - the uploaded-GLB family (server/user_assets_routes.ts: the binary upload,
+ *    the owner list, the public content-addressed byte read, and the
+ *    owner-gated :id delete behind requireOwnedAsset);
+ *  - the admin surface (server/admin.ts: the anonymous login plus the authed
+ *    /admin/api reads, moderation / chat-filter / ip-block writes, and the
+ *    :id/:action sanction route, all behind requireAdmin and served through
+ *    main.ts's own flag-gated admin dispatcher);
+ *  - the OAuth POST JSON surface (server/oauth.ts: the consent / token /
+ *    revoke / device endpoints; the GET consent and device HTML pages stay on
+ *    the top-level ladder, off this table);
+ *  - the secret-gated /internal ops surface (server/internal.ts:
+ *    restart-countdown plus the Discord-bot routes behind
+ *    requireInternalSecret);
+ * the oauth and internal surfaces are each served through their own flag-gated
+ * dispatcher in main.ts.
  */
 export const apiRoutes: readonly RouteDef[] = [
   ...leaderboardRoutes,
@@ -131,7 +134,7 @@ export const apiRoutes: readonly RouteDef[] = [
  *     routes resolve to the more specific one (the router has no specificity
  *     tiebreak and would otherwise pick the first-registered);
  *  2. run the BOLA-shadow guard over the FINAL order, before the router is built;
- *  3. build the Phase 4 router, which additionally rejects duplicate
+ *  3. build the table router, which additionally rejects duplicate
  *     (method, shape) and non-registrable-method registrations at build time.
  */
 export function createApiRegistry(routes: readonly RouteDef[] = apiRoutes): ApiRegistry {
@@ -141,7 +144,7 @@ export function createApiRegistry(routes: readonly RouteDef[] = apiRoutes): ApiR
   return { resolve: (method, path) => router.match(method, path) };
 }
 
-/** The default registry over apiRoutes (empty until the migration phases run). */
+/** The default registry over apiRoutes. */
 export const apiRegistry: ApiRegistry = createApiRegistry(apiRoutes);
 
 /**
@@ -150,8 +153,7 @@ export const apiRegistry: ApiRegistry = createApiRegistry(apiRoutes);
  * different-shape DYNAMIC route that runs no ownership loader. Throws with a
  * pointed message naming both routes.
  *
- * It is a no-op while apiRoutes is empty, but it is a recorded Phase 4 QA
- * obligation: the router matches dynamic patterns first-registered, so a
+ * The router matches dynamic patterns first-registered, so a
  * non-owned leading-":param" catch-all registered ahead of a specific
  * requireOwned route would skip that route's ownership loader (a BOLA hole). The
  * specificity sort normally orders the owned route first; this guard fails the

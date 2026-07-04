@@ -6,8 +6,8 @@
 // a `const`, `enum`, `class`, `namespace`, or any value export here.
 //
 // This is the SINGLE home of RouteDef, Ctx, EnvelopeKind, Method, Surface,
-// Middleware/Next and the RateLimitStore interface. Phases 4 to 9 IMPORT these
-// types and never redefine them. Frozen by Phase 2 of docs/api-pipeline/.
+// Middleware/Next and the RateLimitStore interface. The pipeline modules IMPORT
+// these types and never redefine them.
 
 import type * as http from 'node:http';
 
@@ -21,7 +21,7 @@ export type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | '
  * The coarse dispatch family a route belongs to. Each surface maps to a default
  * response envelope (see EnvelopeKind); an individual route may override the
  * envelope via RouteMeta.envelope (e.g. a binary card route inside 'api', or the
- * HTML unsubscribe page). These mirror the prefix arms of the Phase-1
+ * HTML unsubscribe page). These mirror the prefix arms of main.ts's
  * routeHttpRequest dispatcher (/api, /oauth, /admin/api, /internal).
  */
 export type Surface =
@@ -31,9 +31,9 @@ export type Surface =
   | 'internal'; // /internal/*  secret-gated ops endpoints
 
 /**
- * The seven per-surface response envelopes from the canonical design. The error
- * codes that later phases (7/22) serialize do so THROUGH one of these; this is
- * the envelope seam, not a code source.
+ * The seven per-surface response envelopes from the canonical design. The stable
+ * error codes (the catalog the client i18n matcher keys on) serialize THROUGH
+ * one of these; this is the envelope seam, not a code source.
  */
 export type EnvelopeKind =
   | 'problem+json' // /api errors: RFC 9457 application/problem+json
@@ -59,7 +59,8 @@ export type TokenScope = 'read' | 'full';
 
 /**
  * Marks a route whose :id resource must be loaded and ownership-authorized
- * before the handler runs. Frozen now; the loader runtime is a later phase.
+ * before the handler runs; the require_owned middleware is the loader that
+ * fetches and authorizes it.
  */
 export interface RequireOwned {
   /** The resource kind the loader fetches and authorizes (e.g. 'character'). */
@@ -75,15 +76,15 @@ export interface RouteMeta {
   /**
    * Marks a :id route that is INTENTIONALLY public (no ownership check), so the
    * registry-introspection coverage helper does not flag it as missing a
-   * requireOwned loader. Frozen now; Phase 10 (public reads) sets it on the
-   * genuinely public character/leaderboard :id read routes.
+   * requireOwned loader. Set on the genuinely public character/leaderboard :id
+   * read routes.
    */
   readonly publicRead?: boolean;
   /** Overrides the surface's default response envelope for this one route. */
   readonly envelope?: EnvelopeKind;
   /**
    * The REQUEST-body media type this route accepts (the response side is
-   * `envelope`). Read by the Phase 21 Content-Type gate: absent means the /api
+   * `envelope`). Read by the Content-Type 415 gate: absent means the /api
    * surface default (application/json); 'binary' marks a raw-bytes upload (the
    * card PNG) the JSON 415 gate must exempt. Declared here so the gate reads
    * matched-RouteDef metadata, never a hardcoded path list.
@@ -97,9 +98,10 @@ export interface RouteMeta {
 
 /**
  * A validation schema slot. The contract is Standard Schema v1 (the locked,
- * published interface); Phase 6's zero-dep validator produces objects that
- * satisfy it. Frozen here as the type contract only (no validator runtime).
- * Flattened into standalone interfaces (no TS namespace) to stay Biome-clean.
+ * published interface); the zero-dep validator (schema.ts) produces objects that
+ * satisfy it. This module holds the type contract only (the validator runtime
+ * lives in schema.ts). Flattened into standalone interfaces (no TS namespace)
+ * to stay Biome-clean.
  */
 export interface StandardSchemaV1<Input = unknown, Output = Input> {
   readonly '~standard': StandardSchemaProps<Input, Output>;
@@ -148,7 +150,7 @@ export interface CtxAccount {
 }
 
 /**
- * The per-request context. Phase 5's buildContext produces this; handlers and
+ * The per-request context. context.ts's buildContext produces this; handlers and
  * middleware read/write it instead of touching req/res directly, which is what
  * keeps the route core req/res-free and usable from both REST and WS.
  */
@@ -168,7 +170,7 @@ export interface Ctx {
   readonly params: Record<string, string>;
   /** Resolved client IP (X-Forwarded-For aware; see ratelimit.requestIp). */
   readonly ip: string;
-  /** Per-request id (AsyncLocalStorage-backed in a later phase). */
+  /** Per-request id (AsyncLocalStorage-backed: context.ts runWithReqId/newReqId). */
   readonly reqId: string;
   /** Parsed/validated request body; populated by the withBody/validator middleware. */
   body?: unknown;
@@ -193,7 +195,7 @@ export type Middleware = (ctx: Ctx, next: Next) => Promise<void>;
 /**
  * One route in the table. The handler stays req/res-free (takes a Ctx) so the
  * same core can serve REST and WS and is unit-testable. schema/params/query are
- * validation slots filled by Phase 6; meta carries the BOLA + envelope markers.
+ * the schema.ts validation slots; meta carries the BOLA + envelope markers.
  */
 export interface RouteDef {
   readonly method: Method;
@@ -213,9 +215,9 @@ export interface RouteDef {
 }
 
 /**
- * The outcome of recording one rate-limit attempt. This is the shape the Phase
- * 19 PgRateLimitStore, the Phase 2 in-memory FakeRateLimitStore, and (since
- * Phase 19) every ratelimit.ts limiter all speak.
+ * The outcome of recording one rate-limit attempt. This is the shape the
+ * PgRateLimitStore, the in-memory FakeRateLimitStore test fake, and every
+ * ratelimit.ts limiter all speak.
  */
 export interface RateLimitOutcome {
   /** true if the attempt is under the limit and allowed. */
@@ -229,8 +231,8 @@ export interface RateLimitOutcome {
 /**
  * A keyed sliding-window rate-limit store. Implementations are clock-
  * parameterized via an injected now() supplied at construction (NOT a method
- * arg), so windows and resetSeconds are deterministic in tests. The Phase 2
- * FakeRateLimitStore and the Phase 19 PgRateLimitStore both implement this.
+ * arg), so windows and resetSeconds are deterministic in tests. The
+ * FakeRateLimitStore test fake and the PgRateLimitStore both implement this.
  */
 export interface RateLimitStore {
   /** Record an attempt for `key` under `maxPerMinute` and report the outcome. */

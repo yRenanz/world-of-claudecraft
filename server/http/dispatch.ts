@@ -1,12 +1,12 @@
-// The dispatcher-in-front for the API pipeline (Phase 9 of docs/api-pipeline/).
+// The dispatcher-in-front for the API request pipeline.
 //
-// It places the new in-house pipeline ahead of the legacy /api handleApi ladder
+// It places the in-house pipeline ahead of the legacy /api handleApi ladder
 // via a per-path CATCH-ALL DELEGATE: for a path the registry OWNS (a matched
-// RouteDef) it runs the Phase 5 onion under runOnion (the exactly-one-response
-// wrapper); for ANY OTHER /api path it calls the injected legacy handleApi
-// delegate UNCHANGED. The registry is EMPTY today (Phase 10 onward migrates the
-// per-domain route tables), so every request delegates and behavior is
-// byte-for-byte identical to today; the parity harness proves it.
+// RouteDef) it runs the middleware onion under runOnion (the exactly-one-response
+// wrapper); for ANY OTHER /api path (and for HEAD, see below) it calls the
+// injected legacy handleApi delegate UNCHANGED. The registry owns the migrated
+// per-domain route tables, and a migrated route stays byte-for-byte identical
+// old-vs-new; the parity harness (tests/server/http/parity.test.ts) proves it.
 //
 // The returned dispatcher matches the legacy handleApi call shape (a
 // fire-and-forget (req, res) => void): runOnion owns the single response, so the
@@ -39,7 +39,7 @@ export type ApiDispatcher = (req: http.IncomingMessage, res: http.ServerResponse
 
 /**
  * Invoke the legacy delegate under a FRESH ambient reqId scope. The onion path
- * gets its scope from runOnion; the delegate paths (un-migrated, HEAD, and the
+ * gets its scope from runOnion; the delegate paths (unowned paths, HEAD, and the
  * 'legacy' entry) would otherwise run outside any runWithReqId, so a swept
  * logger line inside a legacy handler would carry no reqId. The binding is
  * observability-only: it never touches req/res, so the delegate's response
@@ -55,11 +55,14 @@ function delegateWithReqId(
 
 /** Everything the dispatcher needs, injected so it stays pure and unit-testable. */
 export interface ApiDispatcherDeps {
-  /** The assembled route registry (empty today; the migration phases populate it). */
+  /** The assembled route registry (the migrated per-domain route tables). */
   readonly registry: ApiRegistry;
   /** The legacy /api handleApi, called UNCHANGED for every path the registry does not own. */
   readonly delegate: ApiDelegate;
-  /** Where per-request metric events go; defaults to the no-op sink (Phase 23 wires a real one). */
+  /**
+   * Where per-request metric events go; defaults to the no-op sink (main.ts
+   * injects the real access-log + metrics sink at boot).
+   */
   readonly metricSink?: MetricSink;
 }
 
@@ -75,14 +78,14 @@ export function createApiDispatcher(deps: ApiDispatcherDeps): ApiDispatcher {
     const path = (req.url ?? '').split('?')[0];
     const match = deps.registry.resolve(method, path);
     if (match.kind !== 'matched') {
-      // Un-migrated path (this phase: EVERY path): delegate to the legacy ladder
+      // A path the registry does not own: delegate to the legacy ladder
       // UNCHANGED. The delegate owns its own response; we never touch req/res
       // (the reqId wrapper only binds ambient logging context).
       delegateWithReqId(deps.delegate, req, res);
       return;
     }
     if (match.head) {
-      // A HEAD request resolves to a matched GET route (the Phase 4 router
+      // A HEAD request resolves to a matched GET route (the table router
       // synthesizes HEAD from GET, head:true). The legacy ladder answers HEAD with
       // a 404 (every === arm gates on GET), so while the legacy arms are retained
       // (until the ladder-deletion PR) a HEAD match delegates too, keeping the
@@ -92,7 +95,7 @@ export function createApiDispatcher(deps: ApiDispatcherDeps): ApiDispatcher {
       delegateWithReqId(deps.delegate, req, res);
       return;
     }
-    // A registry-owned route: run the Phase 5 onion. runOnion guarantees exactly
+    // A registry-owned route: run the middleware onion. runOnion guarantees exactly
     // one idempotent response on both the resolve and the throw path, so we
     // fire-and-forget its promise, matching the legacy void call site.
     const route = match.route;
@@ -110,10 +113,10 @@ export function createApiDispatcher(deps: ApiDispatcherDeps): ApiDispatcher {
         onUnexpected: (err) => logger.error({ err }, 'unhandled request error'),
       }),
       // The metric observation point (the :param TEMPLATE, never the concrete
-      // path, to bound sink cardinality). Phase 23 wires the real access-log sink
-      // here (main.ts), so every request emits one structured access line.
+      // path, to bound sink cardinality). main.ts injects the real access-log
+      // sink here, so every onion-served request emits one structured access line.
       withMetrics(metricSink, route.path),
-      // The Phase 21 hardening gates, global frames ahead of the route-local
+      // The Content-Type + Origin hardening gates, global frames ahead of the route-local
       // middleware so an (enforce-mode) reject is cheap and still serializes
       // through withErrors. Both self-scope to the 'api' surface and mutating
       // methods, and both ship LOG-ONLY behind their named enforce flags, so
@@ -134,12 +137,10 @@ export function createApiDispatcher(deps: ApiDispatcherDeps): ApiDispatcher {
       // or register it corpus-wide). withErrors still emits X-Request-Id on the
       // error path, which the existing per-domain deviations already cover.
       // Route-local middleware (per-route rate limits, withBody, requireAccount)
-      // composed after the global frames, exactly as each RouteDef declares them
-      // when it migrates (Phase 10 onward).
+      // composed after the global frames, exactly as each RouteDef declares them.
       ...(route.middleware ?? []),
-      // The handler. Turning its returned value into the surface envelope lands
-      // with the first migrated route (Phase 10); today no route is migrated, so a
-      // dispatcher-run handler writes to ctx.res directly.
+      // The handler. runHandler discards its return value: a handler writes its
+      // own response via json(ctx.res, ...) (see leaderboard.ts).
       runHandler(route),
     ];
     void runOnion(ctx, stack);
@@ -157,8 +158,8 @@ function runHandler(route: RouteDef): Middleware {
  * Pick the /api entry for the current dispatch mode. When 'new', the in-house
  * dispatcher fronts the legacy ladder; when 'legacy', the legacy handleApi runs
  * directly, an inert rollback in which the new pipeline is never entered. main.ts
- * reads the mode from loadConfig once at boot; Phase 25 flipped the production
- * default to 'new' (API_DISPATCH=legacy is the one-flag rollback).
+ * reads the mode from loadConfig once at boot; the production default is 'new'
+ * (API_DISPATCH=legacy is the one-flag rollback).
  */
 export function selectApiEntry(
   mode: DispatchMode,

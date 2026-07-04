@@ -1,12 +1,12 @@
 import type * as http from 'node:http';
 
-// node:http server timeouts + max header size, pinned as named constants (Phase 24
-// of docs/api-pipeline/). Today NOTHING sets these: the server runs on Node's
-// built-in defaults. Codifying them here as named constants that EQUAL those
-// defaults changes NO runtime behavior, it only makes the numbers named, visible
-// in one place, and pinned by a test (tests/server/tunables.test.ts) so a future
-// Node default change (or an accidental edit) is caught rather than silently
-// inherited.
+// node:http server timeouts + max header size, pinned as named constants. These
+// EQUAL Node's built-in defaults, so applying them changes NO runtime behavior:
+// boot wires them deliberately (server/main.ts startServer calls
+// applyServerTimeouts and passes maxHeaderSize to http.createServer), which
+// makes the numbers named, visible in one place, and pinned by a test
+// (tests/server/tunables.test.ts) so a future Node default change (or an
+// accidental edit) is caught rather than silently inherited.
 //
 // Three constraints the values satisfy, and why:
 //   (i)  HEADERS_TIMEOUT_MS (60s) MUST exceed KEEP_ALIVE_TIMEOUT_MS (5s). On a
@@ -21,8 +21,8 @@ import type * as http from 'node:http';
 //        request body is a player-card PNG capped at MAX_CARD_BYTES = 4 MiB
 //        (server/player_card.ts); 4 MiB spread over 300s needs only ~14 KiB/s
 //        sustained, far below any real uploader, so 300s never cuts one off.
-//   (iii) Every value equals the Node default, so this phase changes ZERO runtime
-//        behavior. Verified against the installed Node (node -p
+//   (iii) Every value equals the Node default, so codifying them changes ZERO
+//        runtime behavior. Verified against the installed Node (node -p
 //        "http.createServer().requestTimeout" etc. on Node v24.15.0): requestTimeout
 //        300000, headersTimeout 60000, keepAliveTimeout 5000, maxHeaderSize 16384.
 //

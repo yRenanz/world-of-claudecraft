@@ -247,6 +247,8 @@ export class MobileControls {
   private swipeLookLastX = 0;
   private swipeLookLastY = 0;
   private swipeLookActive = false;
+  private swipeLookDownAt = 0;
+  private lastSwipeTapAt = 0;
 
   private chatPressTimer: ReturnType<typeof setTimeout> | null = null;
   private chatLongFired = false;
@@ -771,6 +773,7 @@ export class MobileControls {
     this.swipeLookLastX = e.clientX;
     this.swipeLookLastY = e.clientY;
     this.swipeLookActive = false;
+    this.swipeLookDownAt = this.now();
     try {
       this.canvas?.setPointerCapture(e.pointerId);
     } catch {
@@ -800,6 +803,18 @@ export class MobileControls {
   private onSwipeLookEnd(e: PointerEvent): void {
     if (e.pointerId !== this.swipeLookPointer) return;
     if (this.swipeLookActive) e.preventDefault();
+    // Double-tap-to-recenter: with the camera joystick removed, this is the
+    // only recenter gesture left, so it moves here. A "tap" is a press that
+    // never crossed the swipe deadzone (never became a drag); two of those in
+    // quick succession recenter the camera, mirroring the old joystick logic.
+    const now = this.now();
+    const quickTap = !this.swipeLookActive && now - this.swipeLookDownAt <= RECENTER_DOUBLE_TAP_MS;
+    if (quickTap && isRecenterDoubleTap(this.lastSwipeTapAt, now, this.swipeLookActive)) {
+      this.callbacks.onRecenterCamera();
+      this.lastSwipeTapAt = 0;
+    } else {
+      this.lastSwipeTapAt = quickTap ? now : 0;
+    }
     this.releaseSwipeLook();
   }
 

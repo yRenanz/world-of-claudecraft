@@ -124,12 +124,18 @@
     height: 0;
     display: none;
   }
+  /* Move-only joystick: the camera/look joystick is hidden entirely (see
+     #mobile-camera-joystick below) -- looking around is swipe-drag-anywhere on
+     the canvas (onSwipeLookDown/Move/End in mobile_controls.ts), the way most
+     modern touch action games do it, so a second literal control surface was
+     redundant. What's left is a single, SMALLER pad (76px, was 122px): "the
+     smaller joystick is enough, no need the bigger outer ring." */
   body.mobile-touch .mobile-joystick {
     position: absolute;
-    left: max(18px, env(safe-area-inset-left));
-    bottom: calc(26px + env(safe-area-inset-bottom));
-    width: 122px;
-    height: 122px;
+    left: max(28px, calc(env(safe-area-inset-left) + 14px));
+    bottom: calc(22px + env(safe-area-inset-bottom));
+    width: 76px;
+    height: 76px;
     border-radius: 50%;
     pointer-events: auto;
     touch-action: none;
@@ -154,13 +160,6 @@
     body.mobile-touch .mobile-joystick {
       transition: none;
     }
-  }
-  body.mobile-touch .mobile-joystick::before {
-    content: "";
-    position: absolute;
-    inset: 28px;
-    border-radius: 50%;
-    border: 1px solid #ffffff18;
   }
   /* Floating move joystick: a lower-left capture zone lets the thumb land
      anywhere; the joystick rests dimmed at home until touched, then springs to
@@ -198,43 +197,21 @@
       inset 0 0 26px #0008,
       0 0 16px 3px #e3c66a55;
   }
+  /* The camera/look joystick UI is removed: swipe-drag on the canvas already
+     provides full camera control (see the comment above), so a second visual
+     control surface was redundant screen furniture. Its double-tap-to-recenter
+     gesture moved to the canvas swipe-look path instead (mobile_controls.ts),
+     so the feature survives even though this control doesn't. */
   body.mobile-touch #mobile-camera-joystick {
-    left: auto;
-    right: max(18px, env(safe-area-inset-right));
-    transform-origin: right bottom;
-  }
-  body.mobile-touch #mobile-camera-joystick.recentering {
-    animation: mobile-recenter-pulse 0.22s ease-out;
-  }
-  @keyframes mobile-recenter-pulse {
-    0% {
-      box-shadow:
-        0 3px 18px #0008,
-        inset 0 1px 0 #ffffff12,
-        inset 0 0 26px #0008;
-      border-color: #b7a35a80;
-    }
-    45% {
-      box-shadow:
-        0 0 22px 4px #e3d47588,
-        inset 0 0 26px #0008;
-      border-color: #e3d475e0;
-    }
-    100% {
-      box-shadow:
-        0 3px 18px #0008,
-        inset 0 1px 0 #ffffff12,
-        inset 0 0 26px #0008;
-      border-color: #b7a35a80;
-    }
+    display: none;
   }
   body.mobile-touch .mobile-stick {
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 54px;
-    height: 54px;
-    margin: -27px 0 0 -27px;
+    width: 34px;
+    height: 34px;
+    margin: -17px 0 0 -17px;
     border-radius: 50%;
     border: 2px solid #e3d475b8;
     background: radial-gradient(circle at 35% 30%, #867ab6aa, #1d1d2b9a 70%);
@@ -273,30 +250,33 @@
   body.mobile-touch #mobile-combat-controls {
     position: absolute;
     left: auto;
-    right: max(14px, env(safe-area-inset-right));
-    bottom: calc(156px + env(safe-area-inset-bottom));
+    right: max(28px, calc(env(safe-area-inset-right) + 14px));
+    bottom: calc(22px + env(safe-area-inset-bottom));
     z-index: 30;
   }
+  /* Vertical stack, not a row: Attack (biggest, most-pressed) sits CLOSEST to
+     the thumb's resting point at the bottom, Jump/Target/Use stack upward
+     above it. column-reverse means the first DOM child (Attack) renders last
+     (bottom); no need to reorder the markup. */
   body.mobile-touch #mobile-combat-grid {
     transform: scale(var(--btn-scale, 1));
     transform-origin: right bottom;
-    display: grid;
-    grid-template-columns: repeat(3, 58px);
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-end;
     gap: 8px;
     pointer-events: none;
-    align-items: end;
-    justify-items: end;
   }
   body.mobile-touch #mobile-combat-grid .mobile-btn {
     pointer-events: auto;
   }
   body.mobile-touch.mobile-left-handed #mobile-combat-controls {
     right: auto;
-    left: max(14px, env(safe-area-inset-left));
+    left: max(28px, calc(env(safe-area-inset-left) + 14px));
   }
   body.mobile-touch.mobile-left-handed #mobile-combat-grid {
     transform-origin: left bottom;
-    justify-items: start;
+    align-items: flex-start;
   }
   body.mobile-touch .mobile-btn {
     width: 58px;
@@ -337,8 +317,8 @@
     height: 22px;
   }
   body.mobile-touch #mobile-attack-nearest {
-    grid-column: 1 / -1;
-    width: 100%;
+    width: 64px;
+    height: 58px;
     color: #ffdf9c;
     border-color: #8b4e2c;
   }
@@ -356,35 +336,25 @@
   body.mobile-touch #mobile-chat,
   body.mobile-touch #mobile-more {
     position: fixed;
-    top: calc(max(8px, env(safe-area-inset-top)) + 84px);
+    left: max(20px, calc(env(safe-area-inset-left) + 10px));
+    top: calc(max(8px, env(safe-area-inset-top)) + 104px);
     bottom: auto;
     width: 44px;
     height: 44px;
     z-index: 30;
     pointer-events: auto;
   }
-  body.mobile-touch #mobile-autorun {
-    left: max(8px, env(safe-area-inset-left));
-  }
   body.mobile-touch #mobile-chat {
-    left: calc(max(8px, env(safe-area-inset-left)) + 52px);
+    top: calc(max(8px, env(safe-area-inset-top)) + 152px);
   }
   body.mobile-touch #mobile-more {
-    left: calc(max(8px, env(safe-area-inset-left)) + 104px);
+    top: calc(max(8px, env(safe-area-inset-top)) + 200px);
   }
   body.mobile-touch.mobile-left-handed #mobile-autorun,
   body.mobile-touch.mobile-left-handed #mobile-chat,
   body.mobile-touch.mobile-left-handed #mobile-more {
     left: auto;
-  }
-  body.mobile-touch.mobile-left-handed #mobile-autorun {
-    right: max(8px, env(safe-area-inset-right));
-  }
-  body.mobile-touch.mobile-left-handed #mobile-chat {
-    right: calc(max(8px, env(safe-area-inset-right)) + 52px);
-  }
-  body.mobile-touch.mobile-left-handed #mobile-more {
-    right: calc(max(8px, env(safe-area-inset-right)) + 104px);
+    right: max(20px, calc(env(safe-area-inset-right) + 10px));
   }
   body.mobile-touch .mobile-btn:active {
     transform: translateY(1px);
@@ -620,7 +590,7 @@
   }
   body.mobile-touch #side-buttons {
     display: block;
-    right: max(8px, env(safe-area-inset-right));
+    right: max(16px, calc(env(safe-area-inset-right) + 8px));
     top: calc(max(8px, env(safe-area-inset-top)) + 206px);
     bottom: auto;
     width: 70px;
@@ -665,26 +635,48 @@
       transition: none;
     }
   }
+  /* The hotbar is corner-anchored and VERTICAL, not a horizontal strip across
+     the bottom-middle: a scrollable column tucked beside the combat cluster
+     (same bottom-right corner, one column further left) so a class with a
+     full 12-slot bar never needs a wide dead-center bar to hold them. Round
+     buttons (not the old 7px-radius squares) match the circular, cooldown-ring
+     visual language these games use for ability buttons. Overflow beyond the
+     visible height scrolls vertically in place -- the corner never grows past
+     its footprint the way a games-industry "just add more buttons in a row"
+     fix would. */
   body.mobile-touch #actionbar {
+    position: fixed;
+    right: calc(max(28px, env(safe-area-inset-right) + 14px) + 74px);
+    bottom: calc(22px + env(safe-area-inset-bottom));
+    left: auto;
     display: flex;
+    flex-direction: column-reverse;
     flex-wrap: nowrap;
-    gap: 4px;
+    align-items: center;
+    gap: 6px;
     padding: 4px;
-    width: 100%;
-    max-width: 100%;
-    min-height: 50px;
+    width: auto;
+    max-width: none;
+    min-height: 0;
+    max-height: min(240px, calc(var(--app-vh) - 260px));
     box-sizing: border-box;
-    overflow-x: auto;
-    overflow-y: hidden;
-    overscroll-behavior-x: contain;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-x;
+    touch-action: pan-y;
+    border-radius: 12px;
     background: linear-gradient(170deg, #15151fc8, #08080dd8);
+    z-index: 29;
+  }
+  body.mobile-touch.mobile-left-handed #actionbar {
+    right: auto;
+    left: calc(max(28px, env(safe-area-inset-left) + 14px) + 74px);
   }
   body.mobile-touch #actionbar.many-spells {
     grid-template-columns: none;
   }
-  /* The second action bar is desktop-only; the mobile hotbar stays a single scroll row. */
+  /* The second action bar is desktop-only; the mobile hotbar stays one scrollable column. */
   body.mobile-touch #actionbar2 {
     display: none;
   }
@@ -692,7 +684,7 @@
     width: 42px;
     height: 42px;
     flex: 0 0 42px;
-    border-radius: 7px;
+    border-radius: 50%;
   }
   body.mobile-touch.mobile-hotbar-dragging #actionbar {
     touch-action: none;
@@ -707,7 +699,7 @@
     border-color: #4a3d1d;
   }
   body.mobile-touch .action-btn .icon-label {
-    border-radius: 6px;
+    border-radius: 50%;
   }
   body.mobile-touch .action-btn .cd-text {
     font-size: 13px;
@@ -726,7 +718,7 @@
      other; unify their spacing (48px apart, was 52) and glass finish so they read
      as one rail below the minimap instead of two unrelated floating badges. */
   body.mobile-touch #community-hud {
-    right: max(8px, env(safe-area-inset-right));
+    right: max(16px, calc(env(safe-area-inset-right) + 8px));
     top: calc(max(8px, env(safe-area-inset-top)) + 158px);
     bottom: auto;
     width: 70px;
@@ -860,7 +852,7 @@
   }
   body.mobile-touch #player-frame {
     position: fixed;
-    left: max(8px, env(safe-area-inset-left));
+    left: max(16px, calc(env(safe-area-inset-left) + 8px));
     top: max(8px, env(safe-area-inset-top));
     z-index: 21;
     width: 300px;
@@ -881,14 +873,14 @@
     flex: none;
   }
   body.mobile-touch #target-frame {
-    left: max(8px, env(safe-area-inset-left));
+    left: max(16px, calc(env(safe-area-inset-left) + 8px));
     top: calc(max(8px, env(safe-area-inset-top)) + 72px);
     transform: scale(0.82);
     transform-origin: left top;
   }
   body.mobile-touch #party-frames {
     position: fixed;
-    left: max(8px, env(safe-area-inset-left));
+    left: max(16px, calc(env(safe-area-inset-left) + 8px));
     top: calc(max(8px, env(safe-area-inset-top)) + 74px);
     gap: 0;
     z-index: 5;
@@ -958,12 +950,12 @@
     max-width: 180px;
   }
   body.mobile-touch #debuff-bar {
-    right: max(10px, env(safe-area-inset-right));
+    right: max(16px, calc(env(safe-area-inset-right) + 8px));
     top: calc(max(140px, env(safe-area-inset-top)) + 36px);
     max-width: 180px;
   }
   body.mobile-touch #minimap-wrap {
-    right: max(8px, env(safe-area-inset-right));
+    right: max(16px, calc(env(safe-area-inset-right) + 8px));
     top: max(8px, env(safe-area-inset-top));
     transform: scale(0.72);
     transform-origin: right top;
@@ -988,17 +980,13 @@
     overflow: hidden;
     z-index: 25;
   }
-  /* Left-handed mirror: swap the two thumb joysticks (and the corner-anchored
-     HUD that hugs them -- see #mobile-combat-controls/#mobile-autorun/
-     #mobile-chat/#mobile-more above) so the movement stick sits under the
-     right thumb. Opt-in via the "Left-handed Touch" toggle in Key Bindings. */
+  /* Left-handed mirror: swap the move joystick (and the corner-anchored HUD
+     that hugs it -- see #mobile-combat-controls/#mobile-autorun/#mobile-chat/
+     #mobile-more above) so it sits under the right thumb. Opt-in via the
+     "Left-handed Touch" toggle in Key Bindings. */
   body.mobile-touch.mobile-left-handed .mobile-joystick {
     left: auto;
-    right: max(18px, env(safe-area-inset-right));
-  }
-  body.mobile-touch.mobile-left-handed #mobile-camera-joystick {
-    right: auto;
-    left: max(18px, env(safe-area-inset-left));
+    right: max(28px, calc(env(safe-area-inset-right) + 14px));
   }
   body.mobile-touch.mobile-left-handed #mobile-extra-controls {
     left: 50%;
@@ -1902,25 +1890,28 @@
       font-size: 20px;
     }
     body.mobile-touch .mobile-joystick {
-      width: 100px;
-      height: 100px;
-      bottom: calc(15px + env(safe-area-inset-bottom));
+      width: 64px;
+      height: 64px;
+      bottom: calc(13px + env(safe-area-inset-bottom));
       opacity: 0.72;
       border-color: #d2bd6a66;
     }
     body.mobile-touch #mobile-move-joystick {
-      left: max(20px, env(safe-area-inset-left));
+      left: max(24px, calc(env(safe-area-inset-left) + 12px));
     }
-    body.mobile-touch #mobile-camera-joystick {
-      right: max(20px, env(safe-area-inset-right));
-    }
-    body.mobile-touch .mobile-joystick::before {
-      inset: 23px;
+    /* #mobile-move-joystick is an ID selector, which outranks the class-based
+       left-handed swap rule (.mobile-left-handed .mobile-joystick) on
+       specificity alone -- without this override the joystick silently never
+       swaps sides in landscape (pre-existing bug, fixed here since it's the
+       same rule this pass already touches). */
+    body.mobile-touch.mobile-left-handed #mobile-move-joystick {
+      left: auto;
+      right: max(24px, calc(env(safe-area-inset-right) + 12px));
     }
     body.mobile-touch .mobile-stick {
-      width: 44px;
-      height: 44px;
-      margin: -22px 0 0 -22px;
+      width: 30px;
+      height: 30px;
+      margin: -15px 0 0 -15px;
     }
     body.mobile-touch .mobile-joy-label {
       bottom: -15px;
@@ -1928,11 +1919,9 @@
       color: #d7c987aa;
     }
     body.mobile-touch #mobile-combat-controls {
-      /* Clears this breakpoint's smaller 100px joystick (15px anchor + 100px + ~8px gap). */
-      bottom: calc(123px + env(safe-area-inset-bottom));
+      bottom: calc(13px + env(safe-area-inset-bottom));
     }
     body.mobile-touch #mobile-combat-grid {
-      grid-template-columns: repeat(3, 54px);
       gap: 7px;
     }
     body.mobile-touch .mobile-btn {
@@ -1972,12 +1961,8 @@
     body.mobile-touch #mobile-extra-controls .mobile-label {
       font-size: 9px;
     }
-    body.mobile-touch #bottom-bar {
-      left: calc(max(20px, env(safe-area-inset-left)) + 136px);
-      right: calc(max(20px, env(safe-area-inset-right)) + 136px);
-      bottom: calc(57px + env(safe-area-inset-bottom));
-    }
     body.mobile-touch #actionbar {
+      bottom: calc(13px + env(safe-area-inset-bottom));
       gap: 4px;
       padding: 4px;
       background: linear-gradient(170deg, #15151fa8, #08080db8);

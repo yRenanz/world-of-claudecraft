@@ -775,7 +775,7 @@ describe('client HTML shell', () => {
     expect(html).toContain('<a class="community-link donate"');
     expect(hudMobileCss).toContain('body.mobile-touch.game-active #ui {\n    z-index: 80;\n  }');
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #community-hud {\n    right: max(8px, env(safe-area-inset-right));\n    top: calc(max(8px, env(safe-area-inset-top)) + 158px);',
+      'body.mobile-touch #community-hud {\n    right: max(16px, calc(env(safe-area-inset-right) + 8px));\n    top: calc(max(8px, env(safe-area-inset-top)) + 158px);',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch .community-toggle {\n    width: 44px;\n    height: 44px;',
@@ -843,7 +843,7 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('calc(var(--xp-fill, 0) * 360deg)');
     expect(hudMobileCss).toContain('transparent var(--xp-ring-arc) 360deg');
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #player-frame {\n    position: fixed;\n    left: max(8px, env(safe-area-inset-left));\n    top: max(8px, env(safe-area-inset-top));\n    z-index: 21;',
+      'body.mobile-touch #player-frame {\n    position: fixed;\n    left: max(16px, calc(env(safe-area-inset-left) + 8px));\n    top: max(8px, env(safe-area-inset-top));\n    z-index: 21;',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #player-frame .portrait-wrap {\n    z-index: 3;\n  }',
@@ -861,10 +861,10 @@ describe('client HTML shell', () => {
       'body.mobile-touch #player-frame::before {\n      left: -5px;\n      top: -5px;\n      width: 73px;\n      height: 73px;',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #target-frame {\n    left: max(8px, env(safe-area-inset-left));\n    top: calc(max(8px, env(safe-area-inset-top)) + 72px);',
+      'body.mobile-touch #target-frame {\n    left: max(16px, calc(env(safe-area-inset-left) + 8px));\n    top: calc(max(8px, env(safe-area-inset-top)) + 72px);',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames {\n    position: fixed;\n    left: max(8px, env(safe-area-inset-left));\n    top: calc(max(8px, env(safe-area-inset-top)) + 74px);',
+      'body.mobile-touch #party-frames {\n    position: fixed;\n    left: max(16px, calc(env(safe-area-inset-left) + 8px));\n    top: calc(max(8px, env(safe-area-inset-top)) + 74px);',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #party-frames.below-target {\n    top: calc(max(8px, env(safe-area-inset-top)) + 130px);',
@@ -1299,48 +1299,55 @@ describe('client HTML shell', () => {
     expect(chat).toBeGreaterThan(autorun);
     expect(more).toBeGreaterThan(chat);
 
-    // The cluster anchors to the corner above the camera/look joystick, not the
+    // The cluster anchors to the corner above where the thumb rests, not the
     // old dead-center strip (left: 50%) -- across every responsive breakpoint.
+    // It's now a vertical stack (column-reverse), not a row, and there's no
+    // camera joystick to clear anymore (swipe-drag on canvas replaced it).
     expect(hudMobileCss).not.toContain('left: 50%;\n    bottom: calc(3px');
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #mobile-combat-controls {\n    position: absolute;\n    left: auto;\n    right: max(14px, env(safe-area-inset-right));\n    bottom: calc(156px + env(safe-area-inset-bottom));\n    z-index: 30;\n  }',
+      'body.mobile-touch #mobile-combat-controls {\n    position: absolute;\n    left: auto;\n    right: max(28px, calc(env(safe-area-inset-right) + 14px));\n    bottom: calc(22px + env(safe-area-inset-bottom));\n    z-index: 30;\n  }',
     );
-    expect(hudMobileCss).toContain('grid-template-columns: repeat(3, 58px);');
-    expect(hudMobileCss).toContain('grid-template-columns: repeat(3, 54px);');
-    expect(hudMobileCss).toContain('grid-template-columns: repeat(3, 42px);');
-    expect(hudMobileCss).toContain('grid-template-columns: repeat(3, 36px);');
+    expect(hudMobileCss).toContain('body.mobile-touch #mobile-combat-grid {\n');
+    expect(hudMobileCss).toContain('flex-direction: column-reverse;');
     // Autorun/Chat/More are fixed-positioned out of the grid into their own
-    // top-corner row, mirrored for the left-handed toggle.
+    // top-corner column, mirrored for the left-handed toggle.
     expect(hudMobileCss).toContain(
       'body.mobile-touch #mobile-autorun,\n  body.mobile-touch #mobile-chat,\n  body.mobile-touch #mobile-more {\n    position: fixed;',
     );
-    expect(hudMobileCss).toContain('body.mobile-touch.mobile-left-handed #mobile-autorun {');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #mobile-autorun,\n  body.mobile-touch.mobile-left-handed #mobile-chat,\n  body.mobile-touch.mobile-left-handed #mobile-more {',
+    );
     expect(mainTs).toContain('onMenu: () => hud.toggleOptionsMenu(),');
   });
 
-  it('keeps the mobile spell bar in a scrollable row between the joysticks', () => {
+  it('removes the camera joystick UI (swipe-drag on canvas replaces it) and shrinks the move joystick', () => {
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-camera-joystick {\n    display: none;\n  }',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch .mobile-joystick {\n    position: absolute;\n    left: max(28px, calc(env(safe-area-inset-left) + 14px));\n    bottom: calc(22px + env(safe-area-inset-bottom));\n    width: 76px;\n    height: 76px;',
+    );
+    expect(mobileControlsTs).toContain('private swipeLookDownAt = 0;');
+    expect(mobileControlsTs).toContain('private lastSwipeTapAt = 0;');
+    expect(mobileControlsTs).toContain('this.callbacks.onRecenterCamera();');
+  });
+
+  it('keeps the mobile spell bar as a vertical, corner-anchored, scrollable column', () => {
     expect(hudMobileCss).toContain('width: min(30vw, 132px);');
     expect(hudMobileCss).toContain('min-width: 112px;');
     expect(hudMobileCss).toContain('height: min(36vh, 172px);');
-    expect(hudMobileCss).toContain('left: calc(max(18px, env(safe-area-inset-left)) + 154px);');
-    expect(hudMobileCss).toContain('right: calc(max(18px, env(safe-area-inset-right)) + 154px);');
-    expect(hudMobileCss).toContain('bottom: calc(64px + env(safe-area-inset-bottom));');
-    expect(hudMobileCss).toContain('left: calc(max(20px, env(safe-area-inset-left)) + 136px);');
-    expect(hudMobileCss).toContain('right: calc(max(20px, env(safe-area-inset-right)) + 136px);');
-    expect(hudMobileCss).toContain('bottom: calc(57px + env(safe-area-inset-bottom));');
+    expect(hudMobileCss).toContain('body.mobile-touch #actionbar {\n    position: fixed;');
+    expect(hudMobileCss).toContain('flex-direction: column-reverse;');
+    expect(hudMobileCss).toContain('overflow-x: hidden;\n    overflow-y: auto;');
+    expect(hudMobileCss).toContain('touch-action: pan-y;');
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #actionbar {\n    display: flex;\n    flex-wrap: nowrap;',
-    );
-    expect(hudMobileCss).toContain('overflow-x: auto;\n    overflow-y: hidden;');
-    expect(hudMobileCss).toContain('touch-action: pan-x;');
-    expect(hudMobileCss).toContain('min-height: 50px;');
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch .action-btn {\n    width: 42px;\n    height: 42px;\n    flex: 0 0 42px;',
+      'body.mobile-touch .action-btn {\n    width: 42px;\n    height: 42px;\n    flex: 0 0 42px;\n    border-radius: 50%;\n  }',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-hotbar-dragging #actionbar {\n    touch-action: none;\n  }',
     );
     expect(hudMobileCss).toContain('body.mobile-touch .action-btn.mobile-drag-source');
+    expect(hudMobileCss).toContain('body.mobile-touch.mobile-left-handed #actionbar {');
   });
 
   it('seeds druid form bars with the form kit, and only clones normal for rogue stealth', () => {

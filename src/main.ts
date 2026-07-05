@@ -1200,7 +1200,6 @@ async function startGame(
   const mobileControls = new MobileControls(input, {
     onAttackNearest: () => attackNearest(),
     onJump: () => input.triggerTouchJump(),
-    onTarget: () => world.tabTarget(),
     onInteract: () => interactKey(),
     onAutorun: () => input.toggleAutorun(),
     onChat: () => openChat(),

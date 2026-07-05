@@ -51,6 +51,14 @@ describe('resolveMobileHudLayout: the six target viewports', () => {
     expect(layout.tier).toBe('compact');
   });
 
+  it('932x430 (Pro-Max-class phone landscape) resolves to compact, not standard', () => {
+    // The whole hand-held phone class is compact: a 430px-tall landscape phone
+    // is held exactly like a 390px one and has the same top-strip/bottom-arc
+    // vertical squeeze, so the compact height floor (480) covers it.
+    const layout = resolveMobileHudLayout(input({ width: 932, height: 430 }));
+    expect(layout.tier).toBe('compact');
+  });
+
   it('1024x768 (tablet landscape) resolves to tablet', () => {
     const layout = resolveMobileHudLayout(input({ width: 1024, height: 768 }));
     expect(layout.tier).toBe('tablet');
@@ -105,6 +113,13 @@ describe('resolveMobileHudLayout: determinism', () => {
 });
 
 describe('resolveMobileHudLayout: threshold boundaries', () => {
+  it('pins the threshold literals (a silent constant drift re-tiers real devices)', () => {
+    expect(COMPACT_MAX_HEIGHT_PX).toBe(480);
+    expect(COMPACT_MAX_WIDTH_PX).toBe(700);
+    expect(TABLET_MIN_DIMENSION_PX).toBe(768);
+    expect(TABLET_MIN_WIDTH_PX).toBe(1000);
+  });
+
   it('COMPACT_MAX_HEIGHT_PX: at or below is compact, one above is not (by height alone)', () => {
     const wide = 1500; // clear of COMPACT_MAX_WIDTH_PX
     expect(resolveMobileHudLayout(input({ width: wide, height: COMPACT_MAX_HEIGHT_PX })).tier).toBe(

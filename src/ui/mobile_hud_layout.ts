@@ -11,9 +11,12 @@
 // - compact: a small or short viewport where the full desktop-scaled HUD
 //   (chat, quest tracker, minimap, action ring) would overlap. Two independent
 //   triggers land in "compact": a short LANDSCAPE viewport (viewport height at
-//   or below COMPACT_MAX_HEIGHT_PX, e.g. a notched phone in landscape at
-//   844x390 or an Android phone at 915x412: plenty of width but very little
-//   vertical room for the top HUD + bottom ring) OR a narrow viewport (width at
+//   or below COMPACT_MAX_HEIGHT_PX, covering the whole hand-held phone class:
+//   a notched phone at 844x390, an Android phone at 915x412, and a Pro-Max /
+//   tall-Android class phone at 932x430; they are all held the same way and
+//   all have very little vertical room for the top HUD + bottom combat arc, so
+//   the floor sits at 480 to catch every one of them, while true small-laptop
+//   viewports like 1280x720 stay standard) OR a narrow viewport (width at
 //   or below COMPACT_MAX_WIDTH_PX, which also covers a portrait phone like
 //   390x844: portrait keeps the existing hud.mobile.css portrait media blocks,
 //   this tier class layers on top of them, it does not replace them).
@@ -27,7 +30,7 @@
 //   720px height sits just below the 768px tablet floor (a common small-laptop
 //   viewport, not a large hand-held tablet), and it is far above the compact
 //   thresholds, so the baseline HUD (no tier overrides) is the right call.
-export const COMPACT_MAX_HEIGHT_PX = 420;
+export const COMPACT_MAX_HEIGHT_PX = 480;
 export const COMPACT_MAX_WIDTH_PX = 700;
 export const TABLET_MIN_DIMENSION_PX = 768;
 export const TABLET_MIN_WIDTH_PX = 1000;

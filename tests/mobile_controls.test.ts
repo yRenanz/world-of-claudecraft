@@ -486,7 +486,6 @@ function mobileCallbacks() {
   return {
     onAttackNearest: noop,
     onJump: noop,
-    onTarget: noop,
     onInteract: noop,
     onAutorun: () => false,
     onChat: noop,

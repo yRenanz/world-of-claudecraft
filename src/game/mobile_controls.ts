@@ -105,7 +105,6 @@ const RECENTER_TAP_MOVE_PX = 12;
 export interface MobileControlCallbacks {
   onAttackNearest(): void;
   onJump(): void;
-  onTarget(): void;
   onInteract(): void;
   onAutorun(): boolean;
   onChat(): void;
@@ -402,7 +401,6 @@ export class MobileControls {
 
     this.bindButton('mobile-attack-nearest', () => this.callbacks.onAttackNearest());
     this.bindButton('mobile-jump', () => this.callbacks.onJump(), { pressFirst: true });
-    this.bindButton('mobile-target', () => this.callbacks.onTarget());
     this.bindButton('mobile-interact', () => this.callbacks.onInteract());
     this.bindChatButton('mobile-chat');
     this.bindButton('mobile-menu', () => this.callbacks.onMenu());

@@ -1287,38 +1287,108 @@ describe('client HTML shell', () => {
     expect(marketWindowTs).not.toContain('<select data-market-filter=');
   });
 
-  it('keeps the mobile More and Autorun buttons in the combat row', () => {
-    const combatControls = html.slice(
-      html.indexOf('<div id="mobile-combat-controls">'),
-      html.indexOf('<div id="mobile-extra-controls"'),
-    );
-    const primaryButtons = [...combatControls.matchAll(/<button class="mobile-btn"/g)];
-    const attack = combatControls.indexOf('id="mobile-attack-nearest"');
-    const autorun = combatControls.indexOf('id="mobile-autorun"');
-    const jump = combatControls.indexOf('id="mobile-jump"');
-
-    expect(primaryButtons).toHaveLength(7);
-    expect(attack).toBeGreaterThanOrEqual(0);
-    expect(autorun).toBeGreaterThan(attack);
-    expect(jump).toBeGreaterThan(autorun);
-    // #mobile-attack-nearest is taken out of grid flow (position: absolute, a
-    // secondary utility button near the mobile action ring per the Phase 1
-    // rework), so the combat-controls grid only lays out the remaining 6
-    // buttons (autorun/jump/target/interact/chat/more) at each breakpoint.
-    expect(hudMobileCss).toContain('grid-template-columns: repeat(6, 58px);');
-    expect(hudMobileCss).toContain('grid-template-columns: repeat(6, 54px);');
-    expect(hudMobileCss).toContain('grid-template-columns: repeat(6, 42px);');
+  it('keeps Chat and More alone at bottom-centre, away from both thumb clusters', () => {
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      const combatControls = entry.slice(
+        entry.indexOf('<div id="mobile-combat-controls">'),
+        entry.indexOf('<div id="mobile-action-ring"'),
+      );
+      const primaryButtons = [...combatControls.matchAll(/<button class="mobile-btn"/g)];
+      const chat = combatControls.indexOf('id="mobile-chat"');
+      const more = combatControls.indexOf('id="mobile-more"');
+      // Chat/More are deliberately the ONLY bottom-centre buttons: everything a
+      // thumb needs mid-fight lives in the two corner clusters, so the pair is
+      // hard to fat-finger but still one reach away.
+      expect(primaryButtons, name).toHaveLength(2);
+      expect(chat, name).toBeGreaterThanOrEqual(0);
+      expect(more, name).toBeGreaterThan(chat);
+      // No separate Target button anywhere: Target Closest (in the action ring)
+      // is the one targeting helper on touch.
+      expect(entry, name).not.toContain('id="mobile-target"');
+    }
+    expect(hudMobileCss).toContain('grid-template-columns: repeat(2, 58px);');
+    expect(hudMobileCss).toContain('grid-template-columns: repeat(2, 54px);');
+    expect(hudMobileCss).toContain('grid-template-columns: repeat(2, 42px);');
     expect(hudMobileCss).toContain(
       'position: absolute;\n    left: 50%;\n    bottom: calc(3px + env(safe-area-inset-bottom));',
     );
     expect(hudMobileCss).toContain(
-      'bottom: calc(2px + env(safe-area-inset-bottom));\n      grid-template-columns: repeat(6, 54px);',
+      'bottom: calc(2px + env(safe-area-inset-bottom));\n      grid-template-columns: repeat(2, 54px);',
     );
     expect(hudMobileCss).toContain(
       'pointer-events: auto;\n    align-items: end;\n    z-index: 30;',
     );
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-more {\n    position: static;');
     expect(mainTs).toContain('onMenu: () => hud.toggleOptionsMenu(),');
+    // The Target callback is gone with the button: Closest (onAttackNearest) is
+    // the only targeting helper the touch layer wires.
+    expect(mainTs).not.toContain('onTarget:');
+    expect(mobileControlsTs).not.toContain("bindButton('mobile-target'");
+  });
+
+  it('keeps the left utility cluster (Autorun/Use/Jump) beside the move joystick', () => {
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      const cluster = entry.slice(
+        entry.indexOf('<div id="mobile-utility-cluster">'),
+        entry.indexOf('<div id="mobile-combat-controls">'),
+      );
+      const clusterButtons = [...cluster.matchAll(/<button class="mobile-btn"/g)];
+      expect(clusterButtons, name).toHaveLength(3);
+      for (const id of ['mobile-autorun', 'mobile-interact', 'mobile-jump']) {
+        expect(cluster, name).toContain(`id="${id}"`);
+      }
+    }
+    // The cluster's horizontal offset scales with the Joystick Size setting so
+    // a grown joystick never slides under the buttons, and the whole stack
+    // starts past the 132px floating-joystick capture zone.
+    expect(hudMobileCss).toContain(
+      'left: calc(max(18px, env(safe-area-inset-left)) + 122px * var(--joy-scale, 1) + 10px);',
+    );
+    expect(hudMobileCss).toContain(
+      'left: calc(max(20px, env(safe-area-inset-left)) + 100px * var(--joy-scale, 1) + 14px);',
+    );
+    expect(hudMobileCss).toContain('body.mobile-touch #mobile-utility-cluster {');
+    // Left-handed mode mirrors the cluster with the joystick, and the floating
+    // capture zone follows the joystick's mirrored home.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #mobile-utility-cluster {',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #mobile-move-zone {\n    left: auto;\n    right: 0;\n  }',
+    );
+  });
+
+  it('keeps the Target Closest helper and page toggle inside the action ring', () => {
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      const ring = entry.slice(
+        entry.indexOf('<div id="mobile-action-ring"'),
+        entry.indexOf('<div id="mobile-extra-controls"'),
+      );
+      expect(ring, name).toContain('id="mobile-attack-nearest"');
+      expect(ring, name).toContain('id="mobile-action-page-toggle"');
+      expect(ring, name).toContain('data-i18n="hudChrome.mobile.targetClosestShort"');
+    }
+    // The arc is a single quarter-circle: every slot offset is derived from the
+    // shared radius var and stays non-negative (nothing can leave the screen,
+    // the regression the redesign fixed).
+    expect(hudMobileCss).toContain('--mobile-ring-radius: 190px;');
+    expect(hudMobileCss).toContain('--mobile-ring-radius: 160px;');
+    expect(hudMobileCss).toContain('--mobile-ring-radius: 226px;');
+    expect(hudMobileCss).not.toContain('calc(0px -');
+    // Closest nests in the crescent hollow; the page toggle is the outer
+    // satellite pip, larger than the old 44px floor.
+    expect(hudMobileCss).toContain('--mobile-ring-hollow: 104px;');
+    expect(hudMobileCss).toContain('--mobile-ring-toggle-size: 52px;');
+    expect(hudMobileCss).toContain('--mobile-ring-toggle-radius: calc(');
   });
 
   it('keeps the mobile spell bar in a scrollable row between the joysticks', () => {

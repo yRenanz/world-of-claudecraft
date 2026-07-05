@@ -1552,7 +1552,10 @@ describe('i18n Localization Key Coverage', () => {
     // primary attack toggle, so this utility button's copy moved to
     // hudChrome.mobile.targetClosestShort.
     expect(html).toContain('data-i18n="hudChrome.mobile.targetClosestShort"');
-    expect(html).toContain('data-i18n="hud.core.mobileTarget"');
+    // The separate Target button was removed (Target Closest in the action ring
+    // is the one targeting helper); hud.core.mobileTarget stays in the catalog
+    // (the hudKeys existence list above) but no longer appears in the markup.
+    expect(html).not.toContain('data-i18n="hud.core.mobileTarget"');
     expect(html).toContain('data-i18n="hud.core.mobileChat"');
     expect(html).toContain('data-i18n="hud.core.mobileMore"');
     expect(html).toContain('data-i18n="hud.core.mobileSocial"');

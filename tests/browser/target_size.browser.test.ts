@@ -49,55 +49,59 @@ function el(tag: string, attrs: Record<string, string> = {}): HTMLElement {
 }
 
 describe('mobile target-size: in-game touch controls are >=40x40 in landscape', () => {
-  it('mobile action-ring controls (slot, attack, page toggle, Target Closest)', () => {
+  it('mobile action-ring controls (slot, attack, page toggle, Target swap, Use)', () => {
     // The paged action ring replaced the desktop #actionbar on touch (which is
     // display:none under body.mobile-touch); its sizes resolve from the
     // --mobile-ring-* variables on the ring container, so the buttons must be
-    // measured inside it, mirroring the real index.html/play.html markup.
+    // measured inside it, mirroring the real index.html/play.html markup (the
+    // Target swap and Use helpers live in the ring's crescent hollow, not the
+    // left utility cluster).
     const ring = el('div', { id: 'mobile-action-ring' });
     const slot = el('button', { class: 'mobile-action-slot', 'data-mobile-index': '1' });
     const attack = el('button', { id: 'mobile-action-attack' });
-    const closest = el('button', { id: 'mobile-attack-nearest' });
+    const targetCycle = el('button', { id: 'mobile-target-cycle' });
+    const interact = el('button', { id: 'mobile-interact' });
     const toggle = el('button', { id: 'mobile-action-page-toggle' });
-    ring.append(slot, attack, closest, toggle);
+    ring.append(slot, attack, targetCycle, interact, toggle);
     document.body.appendChild(ring);
     expectAtLeastFloor(slot, '.mobile-action-slot');
     expectAtLeastFloor(attack, '#mobile-action-attack');
-    expectAtLeastFloor(closest, '#mobile-attack-nearest');
+    expectAtLeastFloor(targetCycle, '#mobile-target-cycle');
+    expectAtLeastFloor(interact, '#mobile-interact');
     expectAtLeastFloor(toggle, '#mobile-action-page-toggle');
   });
 
   it('the compact-tier ring keeps every control at the floor (smallest sizes)', () => {
     // hud-mobile-compact re-tunes every --mobile-ring-* var downward for short
-    // landscape phones; the smallest of them (toggle 46, closest 50) must still
-    // clear the 40px floor with margin.
+    // landscape phones; the smallest of them (toggle 46, Target/Use 50) must
+    // still clear the 40px floor with margin.
     document.body.className = 'mobile-touch game-active hud-mobile-compact';
     const ring = el('div', { id: 'mobile-action-ring' });
     const slot = el('button', { class: 'mobile-action-slot', 'data-mobile-index': '2' });
     const attack = el('button', { id: 'mobile-action-attack' });
-    const closest = el('button', { id: 'mobile-attack-nearest' });
+    const targetCycle = el('button', { id: 'mobile-target-cycle' });
+    const interact = el('button', { id: 'mobile-interact' });
     const toggle = el('button', { id: 'mobile-action-page-toggle' });
-    ring.append(slot, attack, closest, toggle);
+    ring.append(slot, attack, targetCycle, interact, toggle);
     document.body.appendChild(ring);
     expectAtLeastFloor(slot, 'compact .mobile-action-slot');
     expectAtLeastFloor(attack, 'compact #mobile-action-attack');
-    expectAtLeastFloor(closest, 'compact #mobile-attack-nearest');
+    expectAtLeastFloor(targetCycle, 'compact #mobile-target-cycle');
+    expectAtLeastFloor(interact, 'compact #mobile-interact');
     expectAtLeastFloor(toggle, 'compact #mobile-action-page-toggle');
   });
 
-  it('the left utility cluster (Autorun/Use/Jump) and the Chat/More pair', () => {
+  it('the left utility cluster (Autorun/Jump) and the Chat/More pair', () => {
     const cluster = el('div', { id: 'mobile-utility-cluster' });
     const autorun = el('button', { id: 'mobile-autorun', class: 'mobile-btn' });
-    const interact = el('button', { id: 'mobile-interact', class: 'mobile-btn' });
     const jump = el('button', { id: 'mobile-jump', class: 'mobile-btn' });
-    cluster.append(autorun, interact, jump);
+    cluster.append(autorun, jump);
     const combat = el('div', { id: 'mobile-combat-controls' });
     const chat = el('button', { id: 'mobile-chat', class: 'mobile-btn' });
     const more = el('button', { id: 'mobile-more', class: 'mobile-btn' });
     combat.append(chat, more);
     document.body.append(cluster, combat);
     expectAtLeastFloor(autorun, '#mobile-autorun');
-    expectAtLeastFloor(interact, '#mobile-interact');
     expectAtLeastFloor(jump, '#mobile-jump');
     expectAtLeastFloor(chat, '#mobile-chat');
     expectAtLeastFloor(more, '#mobile-more');

@@ -120,8 +120,14 @@
     position: absolute;
     left: max(18px, env(safe-area-inset-left));
     bottom: calc(26px + env(safe-area-inset-bottom));
-    width: 122px;
-    height: 122px;
+    /* 140px wheel (landscape tier: 128px): sized to the mobile-MOBA convention
+       (Wild Rift-class games run the movement wheel at roughly a third of the
+       landscape viewport height; the old 122/100px sat nearer a quarter). The
+       floating capture zone stays FIXED at min(30vw, 132px), which the wheel
+       may overhang at rest: clampJoystickOrigin midpoint-falls-back per axis,
+       the same already-shipped behavior as joystickScale 1.3. */
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
     pointer-events: auto;
     touch-action: none;
@@ -150,7 +156,7 @@
   body.mobile-touch .mobile-joystick::before {
     content: "";
     position: absolute;
-    inset: 28px;
+    inset: 32px;
     border-radius: 50%;
     border: 1px solid #ffffff18;
   }
@@ -198,14 +204,14 @@
     display: none;
   }
   body.mobile-touch #mobile-camera-joystick {
-    /* Stacked above the move joystick (26px bottom + 122px tall = 148px to its
+    /* Stacked above the move joystick (26px bottom + 140px tall = 166px to its
        top edge, plus a 10px gap) on the LEFT side, not the ring's bottom-right
        corner, so an opted-in joystick never overlaps the paged action ring
        cluster (#mobile-action-ring, bottom-right, up to ~290px tall) and stays
        left of the utility cluster (which starts past the 132px move zone). */
     left: max(18px, env(safe-area-inset-left));
     right: auto;
-    bottom: calc(158px + env(safe-area-inset-bottom));
+    bottom: calc(176px + env(safe-area-inset-bottom));
     transform-origin: left bottom;
   }
   body.mobile-touch #mobile-camera-joystick.recentering {
@@ -237,9 +243,9 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 54px;
-    height: 54px;
-    margin: -27px 0 0 -27px;
+    width: 62px;
+    height: 62px;
+    margin: -31px 0 0 -31px;
     border-radius: 50%;
     border: 2px solid #e3d475b8;
     background: radial-gradient(circle at 35% 30%, #867ab6aa, #1d1d2b9a 70%);
@@ -299,26 +305,27 @@
     width: 22px;
     height: 22px;
   }
-  /* Left-side utility cluster: Autorun / Use / Jump in a compact vertical arc
+  /* Left-side utility cluster: Autorun / Jump in a compact vertical stack
      hugging the right edge of the move-joystick zone, mirroring the right-side
-     combat cluster's organisation for the left thumb. The horizontal offset
-     scales with --joy-scale (the Joystick Size setting) so a grown joystick
-     never slides under the buttons, FLOORED so the cluster's left edge never
-     drops below 134px: the floating-joystick capture zone (#mobile-move-zone)
-     stays a FIXED min(30vw, 132px) at every joystick scale, so without the
-     floor the minimum setting (0.7) would park Jump over the zone's right
-     column and steal movement touches. Jump is nearest the resting thumb, Use
-     bulges outward mid-arc, Autorun tops the stack; 12px vertical gaps keep
-     the taps unambiguous. */
+     combat cluster's organisation for the left thumb (Use lives in the combat
+     ring's crescent hollow with the Target swap button, under the right thumb). The
+     horizontal offset scales with --joy-scale (the Joystick Size setting) so a
+     grown joystick never slides under the buttons, FLOORED so the cluster's
+     left edge never drops below 134px: the floating-joystick capture zone
+     (#mobile-move-zone) stays a FIXED min(30vw, 132px) at every joystick
+     scale, so without the floor the minimum setting (0.7) would park Jump over
+     the zone's right column and steal movement touches. Jump is nearest the
+     resting thumb, Autorun tops the stack; 12px vertical gaps keep the taps
+     unambiguous. */
   body.mobile-touch #mobile-utility-cluster {
     position: absolute;
     left: calc(
       max(18px, env(safe-area-inset-left)) +
-      max(116px, 122px * var(--joy-scale, 1) + 10px)
+      max(116px, 140px * var(--joy-scale, 1) + 10px)
     );
     bottom: calc(14px + env(safe-area-inset-bottom));
     width: 76px;
-    height: 200px;
+    height: 124px;
     pointer-events: none;
     transform-origin: left bottom;
     transform: scale(var(--btn-scale, 1));
@@ -332,13 +339,9 @@
     left: 0;
     bottom: 0;
   }
-  body.mobile-touch #mobile-interact {
-    left: 12px;
-    bottom: 66px;
-  }
   body.mobile-touch #mobile-autorun {
     left: 0;
-    bottom: 132px;
+    bottom: 66px;
   }
   body.mobile-touch #mobile-more {
     position: static;
@@ -406,7 +409,7 @@
      makes the existing hotbar castable on touch (desktop drag/drop keybinds are
      unusable on a phone). One fixed primary Attack toggle (castSlot(0), unpaged),
      5 paged action buttons (2 pages of 5 covering hotbar source slots 1-10, see
-     mobile_action_page_view.ts), a page-cycle toggle, and the Target Closest
+     mobile_action_page_view.ts), a page-cycle toggle, and the Target swap
      helper. The ring supersedes the desktop #actionbar/#actionbar2 rows under
      body.mobile-touch (hidden below); xpbar/player-frame/petbar keep rendering
      (their own mobile rules are untouched).
@@ -416,13 +419,15 @@
      22.5deg steps, so every adjacent pair has the same centre distance
      (chord = 2 * R * sin(11.25deg), tuned per tier to action-size + ~10px so
      buttons never crowd or overlap and nothing pokes past the screen edge; the
-     numeric factors below are cos/sin of 157.5/135/112.5deg). Target Closest
-     nests in the crescent hollow on the 45deg diagonal at --mobile-ring-hollow
-     from the attack centre; the page toggle is a satellite pip past the arc's
-     upper end at 125deg on --mobile-ring-toggle-radius. Sizing hooks:
-     --mobile-ring-* are scoped to #mobile-action-ring and re-tuned per layout
-     tier (see the tiers section); --btn-scale (actionButtonScale) and
-     --touch-opacity (touchOpacity) are reused directly, not forked. */
+     numeric factors below are cos/sin of 157.5/135/112.5deg). Use (180deg, due
+     left), Target swap (135deg, the up-left diagonal) and the page toggle
+     (90deg, due up over the attack button, to Target's upper right) nest in
+     the crescent hollow at --mobile-ring-hollow from the attack centre; every
+     seat stays inside the ring box, so nothing overhangs the screen edge.
+     Sizing hooks: --mobile-ring-* are scoped to #mobile-action-ring and
+     re-tuned per layout tier (see the tiers section); --btn-scale
+     (actionButtonScale) and --touch-opacity (touchOpacity) are reused
+     directly, not forked. */
   body.mobile-touch #mobile-action-ring {
     --mobile-ring-attack-size: 100px;
     --mobile-ring-action-size: 64px;
@@ -563,11 +568,15 @@
       2
     );
   }
-  /* Target Closest: the one targeting helper (calls the Attack Nearest path).
-     It nests in the crescent hollow between the attack button and the arc on
-     the 45deg diagonal, visually distinct from both (smaller than the arc
-     buttons, amber crosshair styling, captioned). */
-  body.mobile-touch #mobile-attack-nearest {
+  /* The crescent-hollow trio between the attack button and the arc, all on
+     the --mobile-ring-hollow circle in 45deg steps: Use (interact/loot) due
+     left at 180deg, Target swap (Tab-cycle) on the up-left 45deg diagonal at
+     135deg, and the page-swap badge due up at 90deg over the attack button
+     (the seat to Target's upper right). The numeric factors are cos/sin of
+     those angles (0 and 1 terms folded away). Chord between neighbours:
+     2 * hollow * sin(22.5deg) = 79.6px at the standard 104px hollow,
+     comfortably past the 52-56px circles at every tier. */
+  body.mobile-touch #mobile-target-cycle {
     right: calc(
       var(--mobile-ring-attack-size) /
       2 +
@@ -584,58 +593,76 @@
       var(--mobile-ring-secondary-size) /
       2
     );
+  }
+  body.mobile-touch #mobile-action-ring #mobile-interact {
+    right: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-hollow) -
+      var(--mobile-ring-secondary-size) /
+      2
+    );
+    bottom: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-secondary-size) / 2);
+  }
+  body.mobile-touch #mobile-target-cycle,
+  body.mobile-touch #mobile-action-ring #mobile-interact {
     width: var(--mobile-ring-secondary-size);
     height: var(--mobile-ring-secondary-size);
     color: #ffdf9c;
     border-color: #8b4e2c;
   }
-  body.mobile-touch #mobile-attack-nearest:active {
+  body.mobile-touch #mobile-target-cycle:active,
+  body.mobile-touch #mobile-action-ring #mobile-interact:active {
     border-color: var(--gold);
     color: #fff;
   }
-  body.mobile-touch #mobile-attack-nearest .ui-icon {
+  body.mobile-touch #mobile-target-cycle .ui-icon,
+  body.mobile-touch #mobile-action-ring #mobile-interact .ui-icon {
     width: 22px;
     height: 22px;
   }
-  body.mobile-touch #mobile-attack-nearest .mobile-label {
+  body.mobile-touch #mobile-target-cycle .mobile-label,
+  body.mobile-touch #mobile-action-ring #mobile-interact .mobile-label {
     display: block;
     margin-top: 1px;
     font-size: 8px;
     font-family: var(--ui-font);
     color: #d8b98a;
   }
-  /* Page-cycle toggle: a compact "(1)"/"(2)" satellite pip past the arc's upper
-     end (125deg on an outer radius), larger than its old 44px floor and spaced
-     off the action buttons so a page flip never fat-fingers a cast. */
+  /* Page-cycle toggle: the gold swap badge at the hollow trio's 90deg seat
+     (due up over the attack centre on the --mobile-ring-hollow circle, to the
+     Target button's upper right), spaced a full 45deg chord off Target and
+     clear of the arc's top button so a page flip never fat-fingers a cast.
+     The face is the current page number in the same gold as the attack/Target
+     accents, over a small swap-arrows glyph (the ordering is CSS `order`:
+     hydrateIcons prepends the SVG, the number must still read first). */
   body.mobile-touch #mobile-action-page-toggle {
-    --mobile-ring-toggle-radius: calc(
-      var(--mobile-ring-radius) +
-      var(--mobile-ring-action-size) /
-      2 +
-      10px +
-      var(--mobile-ring-toggle-size) /
-      2
-    );
-    right: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-toggle-radius) *
-      0.5736 -
-      var(--mobile-ring-toggle-size) /
-      2
-    );
+    right: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-toggle-size) / 2);
     bottom: calc(
       var(--mobile-ring-attack-size) /
       2 +
-      var(--mobile-ring-toggle-radius) *
-      0.8192 -
+      var(--mobile-ring-hollow) -
       var(--mobile-ring-toggle-size) /
       2
     );
     width: var(--mobile-ring-toggle-size);
     height: var(--mobile-ring-toggle-size);
-    font-size: 13px;
     font-family: var(--ui-font);
+    color: #ffdf9c;
+    border-color: #8b4e2c;
+  }
+  body.mobile-touch #mobile-action-page-toggle .mobile-action-page-indicator {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1;
+    text-shadow: 1px 1px 2px #000;
+  }
+  body.mobile-touch #mobile-action-page-toggle .ui-icon {
+    order: 2;
+    width: 15px;
+    height: 15px;
+    margin-top: 2px;
+    color: #d8b98a;
   }
   body.mobile-touch #mobile-action-page-toggle:active {
     border-color: var(--gold);
@@ -655,7 +682,7 @@
      (hud.ts's ring icon resolver special-cases ATTACK_ICON_KEY to an empty
      string), so the plain data-icon="attack" SVG hydrateIcons() already
      inserted as the button's first child shows through instead, matching the
-     Target Closest button's glyph. The button's own flex centering positions
+     Target swap button's glyph. The button's own flex centering positions
      it; only sizing is needed here, as a percentage of the sizing var so it
      stays proportional across the standard/tablet ring scales. */
   body.mobile-touch #mobile-action-attack .ui-icon {
@@ -825,8 +852,8 @@
     pointer-events: none;
   }
   body.mobile-touch #bottom-bar {
-    left: calc(max(18px, env(safe-area-inset-left)) + 154px);
-    right: calc(max(18px, env(safe-area-inset-right)) + 154px);
+    left: calc(max(18px, env(safe-area-inset-left)) + 172px);
+    right: calc(max(18px, env(safe-area-inset-right)) + 172px);
     bottom: calc(64px + env(safe-area-inset-bottom));
     width: auto;
     transform: none;
@@ -1321,18 +1348,13 @@
     right: auto;
   }
   body.mobile-touch.mobile-left-handed #mobile-action-page-toggle {
-    left: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-toggle-radius) *
-      0.5736 -
-      var(--mobile-ring-toggle-size) /
-      2
-    );
+    left: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-toggle-size) / 2);
     right: auto;
   }
-  /* Target Closest keeps its crescent-hollow seat, mirrored with the ring. */
-  body.mobile-touch.mobile-left-handed #mobile-attack-nearest {
+  /* Target swap and Use keep their crescent-hollow seats, mirrored with the
+     ring (same cos factors as their right-handed rules: 0.7071 for Target at
+     135deg, due left for Use at 180deg). */
+  body.mobile-touch.mobile-left-handed #mobile-target-cycle {
     left: calc(
       var(--mobile-ring-attack-size) /
       2 +
@@ -1343,22 +1365,28 @@
     );
     right: auto;
   }
+  body.mobile-touch.mobile-left-handed #mobile-action-ring #mobile-interact {
+    left: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-hollow) -
+      var(--mobile-ring-secondary-size) /
+      2
+    );
+    right: auto;
+  }
   /* The utility cluster mirrors with the (now right-side) move joystick. */
   body.mobile-touch.mobile-left-handed #mobile-utility-cluster {
     left: auto;
     right: calc(
       max(18px, env(safe-area-inset-right)) +
-      max(116px, 122px * var(--joy-scale, 1) + 10px)
+      max(116px, 140px * var(--joy-scale, 1) + 10px)
     );
     transform-origin: right bottom;
   }
   body.mobile-touch.mobile-left-handed #mobile-jump {
     left: auto;
     right: 0;
-  }
-  body.mobile-touch.mobile-left-handed #mobile-interact {
-    left: auto;
-    right: 12px;
   }
   body.mobile-touch.mobile-left-handed #mobile-autorun {
     left: auto;
@@ -1373,7 +1401,7 @@
        either the move stick or the ring. */
     right: max(18px, env(safe-area-inset-right));
     left: auto;
-    bottom: calc(158px + env(safe-area-inset-bottom));
+    bottom: calc(176px + env(safe-area-inset-bottom));
     transform-origin: right bottom;
   }
   body.mobile-touch.mobile-left-handed #mobile-extra-controls {
@@ -2235,11 +2263,8 @@
     /* Portrait .mobile-btn rows are 44px tall (above); re-seat the utility
        stack so its 12px gaps hold. In-game play is landscape-enforced, this
        only covers the brief pre-rotate state. */
-    body.mobile-touch #mobile-interact {
-      bottom: 56px;
-    }
     body.mobile-touch #mobile-autorun {
-      bottom: 112px;
+      bottom: 56px;
     }
     body.mobile-touch #community-hud {
       /* var(--app-vh), not dvh: viewport units resolve against the initial
@@ -2340,8 +2365,8 @@
       font-size: 20px;
     }
     body.mobile-touch .mobile-joystick {
-      width: 100px;
-      height: 100px;
+      width: 128px;
+      height: 128px;
       bottom: calc(15px + env(safe-area-inset-bottom));
       opacity: 0.72;
       border-color: #d2bd6a66;
@@ -2353,12 +2378,12 @@
       left: max(20px, env(safe-area-inset-left));
     }
     body.mobile-touch .mobile-joystick::before {
-      inset: 23px;
+      inset: 29px;
     }
     body.mobile-touch .mobile-stick {
-      width: 44px;
-      height: 44px;
-      margin: -22px 0 0 -22px;
+      width: 56px;
+      height: 56px;
+      margin: -28px 0 0 -28px;
     }
     body.mobile-touch .mobile-joy-label {
       bottom: -15px;
@@ -2370,7 +2395,7 @@
       grid-template-columns: repeat(2, 54px);
       gap: 10px;
     }
-    /* Landscape joystick is 100px (above), so the utility cluster tucks in
+    /* Landscape joystick is 128px (above), so the utility cluster tucks in
        closer; button rows re-seat for the 48px landscape .mobile-btn height.
        The 114px floor keeps the cluster's left edge at or past 134px at EVERY
        Joystick Size (the capture zone stays a fixed 132px while --joy-scale
@@ -2378,7 +2403,7 @@
     body.mobile-touch #mobile-utility-cluster {
       left: calc(
         max(20px, env(safe-area-inset-left)) +
-        max(114px, 100px * var(--joy-scale, 1) + 14px)
+        max(114px, 128px * var(--joy-scale, 1) + 14px)
       );
       bottom: calc(10px + env(safe-area-inset-bottom));
     }
@@ -2386,14 +2411,11 @@
       left: auto;
       right: calc(
         max(20px, env(safe-area-inset-right)) +
-        max(114px, 100px * var(--joy-scale, 1) + 14px)
+        max(114px, 128px * var(--joy-scale, 1) + 14px)
       );
     }
-    body.mobile-touch #mobile-interact {
-      bottom: 60px;
-    }
     body.mobile-touch #mobile-autorun {
-      bottom: 120px;
+      bottom: 60px;
     }
     body.mobile-touch .mobile-btn {
       width: 54px;
@@ -2433,8 +2455,8 @@
       font-size: 9px;
     }
     body.mobile-touch #bottom-bar {
-      left: calc(max(20px, env(safe-area-inset-left)) + 136px);
-      right: calc(max(20px, env(safe-area-inset-right)) + 136px);
+      left: calc(max(20px, env(safe-area-inset-left)) + 164px);
+      right: calc(max(20px, env(safe-area-inset-right)) + 164px);
       bottom: calc(57px + env(safe-area-inset-bottom));
     }
     body.mobile-touch #xpbar {
@@ -2689,12 +2711,12 @@
     display: none;
   }
   /* Compact (short landscape phones): shrink the whole combat cluster and hug
-     the corner tighter so the arc's top button and the page-toggle satellite
-     clear the top-right minimap/chest strip even on a 360px-tall viewport
-     (the 0.44 minimap above is the other half of that budget). The radius
-     keeps the equal-chord arc rule: 160 * 2 * sin(11.25deg) = 62.4 =
+     the corner tighter so the arc's top button and the page toggle above the
+     attack button clear the top-right minimap/chest strip even on a 360px-tall
+     viewport (the 0.44 minimap above is the other half of that budget). The
+     radius keeps the equal-chord arc rule: 160 * 2 * sin(11.25deg) = 62.4 =
      action-size 54 + an 8.4px edge gap. Every control still clears the 40px
-     touch floor with margin (smallest: toggle 46 / closest 50). */
+     touch floor with margin (smallest: toggle 46 / target and use 50). */
   body.mobile-touch.hud-mobile-compact #mobile-action-ring {
     --mobile-ring-attack-size: 84px;
     --mobile-ring-action-size: 54px;

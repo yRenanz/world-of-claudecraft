@@ -314,9 +314,9 @@ export const ko_KR: EnTranslations = {
       "toggleHaptics": "진동 전환",
       "actionRing": "전투 행동",
       "actionPageToggle": "행동 페이지 전환",
-      "actionPageIndicator": "({page})",
-      "targetClosest": "가장 가까운 대상",
-      "targetClosestShort": "근접",
+      "actionPageIndicator": "{page}",
+      "targetCycle": "대상 전환",
+      "targetCycleShort": "대상",
       "spellbookPageLabel": "Page {page}"
     },
     "tutorial": {

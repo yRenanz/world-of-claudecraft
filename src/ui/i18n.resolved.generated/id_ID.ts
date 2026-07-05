@@ -314,9 +314,9 @@ export const id_ID: EnTranslations = {
       "toggleHaptics": "Alihkan haptik",
       "actionRing": "Combat actions",
       "actionPageToggle": "Switch action page",
-      "actionPageIndicator": "({page})",
-      "targetClosest": "Target closest",
-      "targetClosestShort": "Closest",
+      "actionPageIndicator": "{page}",
+      "targetCycle": "Swap target",
+      "targetCycleShort": "Target",
       "spellbookPageLabel": "Page {page}"
     },
     "tutorial": {

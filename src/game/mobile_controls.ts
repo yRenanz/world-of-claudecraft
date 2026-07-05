@@ -103,7 +103,8 @@ export const RECENTER_DOUBLE_TAP_MS = 300;
 const RECENTER_TAP_MOVE_PX = 12;
 
 export interface MobileControlCallbacks {
-  onAttackNearest(): void;
+  /** Cycle the hostile target (the Tab-target path) from the ring's Target button. */
+  onCycleTarget(): void;
   onJump(): void;
   onInteract(): void;
   onAutorun(): boolean;
@@ -399,7 +400,7 @@ export class MobileControls {
       this.closeMoreModal();
     });
 
-    this.bindButton('mobile-attack-nearest', () => this.callbacks.onAttackNearest());
+    this.bindButton('mobile-target-cycle', () => this.callbacks.onCycleTarget());
     this.bindButton('mobile-jump', () => this.callbacks.onJump(), { pressFirst: true });
     this.bindButton('mobile-interact', () => this.callbacks.onInteract());
     this.bindChatButton('mobile-chat');

@@ -314,9 +314,9 @@ export const tr_TR: EnTranslations = {
       "toggleHaptics": "Dokunsal geri bildirimi aç/kapat",
       "actionRing": "Combat actions",
       "actionPageToggle": "Switch action page",
-      "actionPageIndicator": "({page})",
-      "targetClosest": "Target closest",
-      "targetClosestShort": "Closest",
+      "actionPageIndicator": "{page}",
+      "targetCycle": "Swap target",
+      "targetCycleShort": "Target",
       "spellbookPageLabel": "Page {page}"
     },
     "tutorial": {

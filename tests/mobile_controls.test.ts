@@ -484,7 +484,7 @@ function pointerEvent(
 function mobileCallbacks() {
   const noop = () => {};
   return {
-    onAttackNearest: noop,
+    onCycleTarget: noop,
     onJump: noop,
     onInteract: noop,
     onAutorun: () => false,

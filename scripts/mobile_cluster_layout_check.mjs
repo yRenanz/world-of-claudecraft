@@ -1,6 +1,6 @@
 // Geometric regression gate for the mobile HUD thumb clusters (the combat arc,
-// the Target Closest hollow seat, the page-toggle satellite, the left utility
-// cluster, and the bottom-centre Chat/More pair).
+// the Target swap / Use hollow seats, the page-toggle satellite, the left
+// utility cluster, and the bottom-centre Chat/More pair).
 //
 // Per device profile it measures REAL rendered getBoundingClientRect geometry
 // (never CSS text) and asserts:
@@ -31,7 +31,7 @@ const IGNORED_CONSOLE = /502|Bad Gateway|fetch project stats/i;
 
 const CONTROL_IDS = [
   'mobile-action-attack',
-  'mobile-attack-nearest',
+  'mobile-target-cycle',
   'mobile-action-page-toggle',
   'mobile-autorun',
   'mobile-interact',
@@ -108,7 +108,8 @@ function edgeGap(a, b) {
 // the corners by design while the circles keep a >=10px gap).
 const CIRCLE_IDS = new Set([
   'mobile-action-attack',
-  'mobile-attack-nearest',
+  'mobile-target-cycle',
+  'mobile-interact',
   'mobile-action-page-toggle',
   'slot-0',
   'slot-1',
@@ -315,7 +316,7 @@ try {
   await sleep(300);
   const cj = await collectRects(page);
   if (cj.cameraJoystick) {
-    for (const id of ['mobile-autorun', 'mobile-interact', 'mobile-jump']) {
+    for (const id of ['mobile-autorun', 'mobile-jump']) {
       const r = cj.controls[id];
       if (r && edgeGap(r, cj.cameraJoystick) < 0) fail(`camera-joystick overlaps #${id}`);
     }
@@ -340,7 +341,7 @@ try {
     await sleep(300);
     const ext = await collectRects(page);
     if (ext.moveZone) {
-      for (const id of ['mobile-jump', 'mobile-interact', 'mobile-autorun']) {
+      for (const id of ['mobile-jump', 'mobile-autorun']) {
         const r = ext.controls[id];
         if (r && edgeGap(r, ext.moveZone) < 0) {
           fail(`joy-scale ${joyScale}: #${id} overlaps the move capture zone`);
@@ -357,7 +358,7 @@ try {
     return r ? { left: r.left, top: r.top, right: r.right, bottom: r.bottom } : null;
   });
   if (joy) {
-    for (const id of ['mobile-jump', 'mobile-interact', 'mobile-autorun']) {
+    for (const id of ['mobile-jump', 'mobile-autorun']) {
       const r = sc.controls[id];
       if (r && edgeGap(r, joy) < 0) fail(`joy-scale 1.3: joystick overlaps #${id}`);
     }

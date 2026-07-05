@@ -314,9 +314,9 @@ export const nl_NL: EnTranslations = {
       "toggleHaptics": "Haptiek aan/uit",
       "actionRing": "Combat actions",
       "actionPageToggle": "Switch action page",
-      "actionPageIndicator": "({page})",
-      "targetClosest": "Target closest",
-      "targetClosestShort": "Closest",
+      "actionPageIndicator": "{page}",
+      "targetCycle": "Swap target",
+      "targetCycleShort": "Target",
       "spellbookPageLabel": "Page {page}"
     },
     "tutorial": {

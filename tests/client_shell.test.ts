@@ -1305,8 +1305,9 @@ describe('client HTML shell', () => {
       expect(primaryButtons, name).toHaveLength(2);
       expect(chat, name).toBeGreaterThanOrEqual(0);
       expect(more, name).toBeGreaterThan(chat);
-      // No separate Target button anywhere: Target Closest (in the action ring)
-      // is the one targeting helper on touch.
+      // No bottom-centre Target button: the one targeting helper on touch is
+      // the Target swap button inside the action ring (#mobile-target-cycle),
+      // never a third centre button (the old #mobile-target design).
       expect(entry, name).not.toContain('id="mobile-target"');
       expect(entry, name).not.toContain('data-i18n="hud.core.mobileTarget"');
     }
@@ -1324,19 +1325,28 @@ describe('client HTML shell', () => {
     );
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-more {\n    position: static;');
     expect(mainTs).toContain('onMenu: () => hud.toggleOptionsMenu(),');
-    // The Target callback is gone with the button: Closest (onAttackNearest) is
-    // the only targeting helper the touch layer wires. Pin BOTH arms: the
-    // removal AND the surviving Closest wiring (bindButton silently no-ops on
-    // a missing element, so only a positive source pin catches a lost binding).
+    // The touch targeting split: the ring's Target swap button cycles hostiles
+    // via the Tab path (onCycleTarget), and the attack toggle owns the
+    // acquire-nearest fallback through the hud hook. Pin every arm positively
+    // (bindButton silently no-ops on a missing element, so only a positive
+    // source pin catches a lost binding) plus the old bottom-centre Target
+    // button's removal.
     expect(mainTs).not.toContain('onTarget:');
     expect(mobileControlsTs).not.toContain("bindButton('mobile-target'");
-    expect(mainTs).toContain('onAttackNearest: () => attackNearest(),');
+    expect(mainTs).toContain('onCycleTarget: () => world.tabTarget(),');
+    expect(mainTs).toContain('hud.onMobileAttackNearest = () => attackNearest();');
     expect(mobileControlsTs).toContain(
-      "this.bindButton('mobile-attack-nearest', () => this.callbacks.onAttackNearest());",
+      "this.bindButton('mobile-target-cycle', () => this.callbacks.onCycleTarget());",
+    );
+    // The attack toggle's fallback fires ONLY with no live hostile target (and
+    // never while auto-attacking), so a tap on a live target still toggles the
+    // classic castSlot(0) attack.
+    expect(hudTs).toContain(
+      'if (p.autoAttack || hasLiveHostileTarget || !this.onMobileAttackNearest) {',
     );
   });
 
-  it('keeps the left utility cluster (Autorun/Use/Jump) beside the move joystick', () => {
+  it('keeps the left utility cluster (Autorun/Jump) beside the move joystick', () => {
     for (const [name, entry] of [
       ['index.html', html],
       ['play.html', playHtml],
@@ -1346,28 +1356,29 @@ describe('client HTML shell', () => {
         entry.indexOf('<div id="mobile-combat-controls">'),
       );
       const clusterButtons = [...cluster.matchAll(/<button class="mobile-btn"/g)];
-      expect(clusterButtons, name).toHaveLength(3);
-      for (const id of ['mobile-autorun', 'mobile-interact', 'mobile-jump']) {
+      expect(clusterButtons, name).toHaveLength(2);
+      for (const id of ['mobile-autorun', 'mobile-jump']) {
         expect(cluster, name).toContain(`id="${id}"`);
       }
+      // Use moved into the combat ring's crescent hollow (right thumb), so it
+      // must NOT reappear in the left cluster.
+      expect(cluster, name).not.toContain('id="mobile-interact"');
     }
     // The cluster's horizontal offset scales with the Joystick Size setting so
     // a grown joystick never slides under the buttons, FLOORED (the max()) so
     // even the minimum joy-scale 0.7 keeps the stack past the FIXED 132px
-    // floating-joystick capture zone.
-    expect(hudMobileCss).toContain('max(116px, 122px * var(--joy-scale, 1) + 10px)');
-    expect(hudMobileCss).toContain('max(114px, 100px * var(--joy-scale, 1) + 14px)');
+    // floating-joystick capture zone. The multipliers are the Wild Rift-sized
+    // wheel diameters (140px base, 128px landscape).
+    expect(hudMobileCss).toContain('max(116px, 140px * var(--joy-scale, 1) + 10px)');
+    expect(hudMobileCss).toContain('max(114px, 128px * var(--joy-scale, 1) + 14px)');
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-utility-cluster {');
-    // The per-button seats: Jump at the thumb, Use bulging mid-arc, Autorun on
-    // top, 12px vertical gaps (base .mobile-btn is 54px tall).
+    // The per-button seats: Jump at the thumb, Autorun on top, a 12px vertical
+    // gap (base .mobile-btn is 54px tall).
     expect(hudMobileCss).toContain(
       'body.mobile-touch #mobile-jump {\n    left: 0;\n    bottom: 0;\n  }',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #mobile-interact {\n    left: 12px;\n    bottom: 66px;\n  }',
-    );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #mobile-autorun {\n    left: 0;\n    bottom: 132px;\n  }',
+      'body.mobile-touch #mobile-autorun {\n    left: 0;\n    bottom: 66px;\n  }',
     );
     // The cast bar starts in the same over-132px strip the cluster now owns;
     // it must sit ABOVE Jump (base 72 > 14+54, landscape 64 > 10+48), never
@@ -1384,7 +1395,7 @@ describe('client HTML shell', () => {
     );
   });
 
-  it('keeps the Target Closest helper and page toggle inside the action ring', () => {
+  it('keeps the Target swap and Use helpers and page toggle inside the action ring', () => {
     for (const [name, entry] of [
       ['index.html', html],
       ['play.html', playHtml],
@@ -1393,9 +1404,13 @@ describe('client HTML shell', () => {
         entry.indexOf('<div id="mobile-action-ring"'),
         entry.indexOf('<div id="mobile-extra-controls"'),
       );
-      expect(ring, name).toContain('id="mobile-attack-nearest"');
+      expect(ring, name).toContain('id="mobile-target-cycle"');
+      expect(ring, name).toContain('id="mobile-interact"');
       expect(ring, name).toContain('id="mobile-action-page-toggle"');
-      expect(ring, name).toContain('data-i18n="hudChrome.mobile.targetClosestShort"');
+      expect(ring, name).toContain('data-i18n="hudChrome.mobile.targetCycleShort"');
+      expect(ring, name).toContain('data-i18n="hud.core.mobileUse"');
+      // The page toggle is the gold swap badge: number over the swap glyph.
+      expect(ring, name).toContain('data-icon="swap"');
     }
     // The arc is a single quarter-circle: every slot offset is derived from the
     // shared radius var and stays non-negative (nothing can leave the screen,
@@ -1418,16 +1433,28 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       '.mobile-action-slot[data-mobile-index="4"] {\n    left: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-action-size) / 2);\n    right: auto;\n  }',
     );
-    // Closest nests in the crescent hollow; the page toggle is the outer
-    // satellite pip (125deg factors), larger than the old 44px floor. Both
-    // keep their seats in the left-handed mirror.
+    // Use (180deg, due left), Target swap (135deg, the up-left diagonal) and
+    // the page toggle (90deg, due up over the attack button, to Target's
+    // upper right) nest in the crescent hollow in 45deg steps. All three keep
+    // their seats in the left-handed mirror. Pin the literal cos/sin factors:
+    // corrupting one breaks the even spacing without moving anything
+    // off-screen, so only a literal pin catches it.
     expect(hudMobileCss).toContain('--mobile-ring-hollow: 104px;');
     expect(hudMobileCss).toContain('--mobile-ring-toggle-size: 52px;');
-    expect(hudMobileCss).toContain('--mobile-ring-toggle-radius: calc(');
-    expect(hudMobileCss).toContain('var(--mobile-ring-toggle-radius) *\n      0.5736 -');
-    expect(hudMobileCss).toContain('var(--mobile-ring-toggle-radius) *\n      0.8192 -');
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.mobile-left-handed #mobile-attack-nearest {\n    left: calc(',
+      'body.mobile-touch #mobile-target-cycle {\n    right: calc(\n      var(--mobile-ring-attack-size) /\n      2 +\n      var(--mobile-ring-hollow) *\n      0.7071 -',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-action-ring #mobile-interact {\n    right: calc(\n      var(--mobile-ring-attack-size) /\n      2 +\n      var(--mobile-ring-hollow) -',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-action-page-toggle {\n    right: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-toggle-size) / 2);',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #mobile-target-cycle {\n    left: calc(',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #mobile-action-ring #mobile-interact {\n    left: calc(',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-left-handed #mobile-action-page-toggle {\n    left: calc(',
@@ -1471,11 +1498,11 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('width: min(30vw, 132px);');
     expect(hudMobileCss).toContain('min-width: 112px;');
     expect(hudMobileCss).toContain('height: min(36vh, 172px);');
-    expect(hudMobileCss).toContain('left: calc(max(18px, env(safe-area-inset-left)) + 154px);');
-    expect(hudMobileCss).toContain('right: calc(max(18px, env(safe-area-inset-right)) + 154px);');
+    expect(hudMobileCss).toContain('left: calc(max(18px, env(safe-area-inset-left)) + 172px);');
+    expect(hudMobileCss).toContain('right: calc(max(18px, env(safe-area-inset-right)) + 172px);');
     expect(hudMobileCss).toContain('bottom: calc(64px + env(safe-area-inset-bottom));');
-    expect(hudMobileCss).toContain('left: calc(max(20px, env(safe-area-inset-left)) + 136px);');
-    expect(hudMobileCss).toContain('right: calc(max(20px, env(safe-area-inset-right)) + 136px);');
+    expect(hudMobileCss).toContain('left: calc(max(20px, env(safe-area-inset-left)) + 164px);');
+    expect(hudMobileCss).toContain('right: calc(max(20px, env(safe-area-inset-right)) + 164px);');
     expect(hudMobileCss).toContain('bottom: calc(57px + env(safe-area-inset-bottom));');
   });
 

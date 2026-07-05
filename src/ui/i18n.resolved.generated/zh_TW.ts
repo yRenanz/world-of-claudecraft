@@ -314,9 +314,9 @@ export const zh_TW: EnTranslations = {
       "toggleHaptics": "切換觸覺回饋",
       "actionRing": "戰鬥動作",
       "actionPageToggle": "切換動作頁",
-      "actionPageIndicator": "({page})",
-      "targetClosest": "鎖定最近目標",
-      "targetClosestShort": "最近",
+      "actionPageIndicator": "{page}",
+      "targetCycle": "切換目標",
+      "targetCycleShort": "目標",
       "spellbookPageLabel": "Page {page}"
     },
     "tutorial": {

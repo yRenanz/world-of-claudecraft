@@ -49,12 +49,20 @@ function el(tag: string, attrs: Record<string, string> = {}): HTMLElement {
 }
 
 describe('mobile target-size: in-game touch controls are >=40x40 in landscape', () => {
-  it('action-bar buttons (a non-first, non-empty slot)', () => {
-    const bar = el('div', { id: 'actionbar' });
-    // The first slot is display:none on mobile; measure a subsequent real slot.
-    bar.append(el('button', { class: 'action-btn' }), el('button', { class: 'action-btn' }));
-    document.body.appendChild(bar);
-    expectAtLeastFloor(bar.children[1] as HTMLElement, 'action-btn');
+  it('mobile action-ring controls (slot, attack, page toggle)', () => {
+    // The paged action ring replaced the desktop #actionbar on touch (which is
+    // display:none under body.mobile-touch); its sizes resolve from the
+    // --mobile-ring-* variables on the ring container, so the buttons must be
+    // measured inside it, mirroring the real index.html/play.html markup.
+    const ring = el('div', { id: 'mobile-action-ring' });
+    const slot = el('button', { class: 'mobile-action-slot', 'data-mobile-index': '1' });
+    const attack = el('button', { id: 'mobile-action-attack' });
+    const toggle = el('button', { id: 'mobile-action-page-toggle' });
+    ring.append(slot, attack, toggle);
+    document.body.appendChild(ring);
+    expectAtLeastFloor(slot, '.mobile-action-slot');
+    expectAtLeastFloor(attack, '#mobile-action-attack');
+    expectAtLeastFloor(toggle, '#mobile-action-page-toggle');
   });
 
   it('party-member rows (role=button tap targets)', () => {

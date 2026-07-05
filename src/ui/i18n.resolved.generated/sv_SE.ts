@@ -1171,10 +1171,10 @@ export const sv_SE: EnTranslations = {
       "lastSeenNever": "aldrig"
     },
     "gathering": {
-      "title": "Gathering",
-      "mining": "Mining",
-      "logging": "Logging",
-      "herbalism": "Herbalism"
+      "title": "Insamling",
+      "mining": "Gruvdrift",
+      "logging": "Skogsavverkning",
+      "herbalism": "Örtkunskap"
     }
   },
   "guide": {

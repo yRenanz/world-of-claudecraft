@@ -1171,10 +1171,10 @@ export const pt_BR: EnTranslations = {
       "lastSeenNever": "nunca"
     },
     "gathering": {
-      "title": "Gathering",
-      "mining": "Mining",
-      "logging": "Logging",
-      "herbalism": "Herbalism"
+      "title": "Coleta",
+      "mining": "Mineração",
+      "logging": "Lenharia",
+      "herbalism": "Herborismo"
     }
   },
   "guide": {

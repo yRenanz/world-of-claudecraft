@@ -193,6 +193,11 @@ import {
   isNodeHarvestableBy,
   normalizeGatheringProficiency,
 } from './professions/gathering';
+  craftSkillsFor,
+  emptyCraftSkills,
+  gainCraftSkill,
+  normalizeCraftSkills,
+} from './professions/wheel';
 import {
   craftSkillsFor,
   emptyCraftSkills,
@@ -790,6 +795,11 @@ export interface PlayerMeta {
   // so the player can page through and filter the WHOLE market a window at a time.
   // Never persisted, resets on login.
   marketQuery: MarketQuery;
+  // Session-only World Market browse filter. The market is capped at
+  // MARKET_WIRE_LIMIT listings per snapshot to bound wire cost, so this
+  // server-side substring filter (matched against item names) is how a player
+  // reaches goods past the cap. Never persisted — resets on login.
+  marketFilter: string;
   // Flat per-craft skill tracking (#1126): one independent, additive-only skill
   // value per craft on the ten-craft ring (see professions/wheel.ts). Persisted
   // in CharacterState.
@@ -908,6 +918,9 @@ export interface CharacterState {
   // that still carry it just ignore it (a player locked at deploy may loot once more, a
   // one-time, player-friendly transition), and their lockouts persist via raidLockouts
   // from then on.
+  // World-boss daily loot record. Optional so saves from before world bosses load
+  // cleanly (addPlayer falls back to an empty record).
+  worldBossDaily?: { date: string; looted: string[] };
   // Flat per-craft skill tracking (#1126; JSONB, additive back-compat: absent or
   // partial on older saves loads the missing crafts as 0, see normalizeCraftSkills).
   craftSkills?: Record<string, number>;
@@ -1455,6 +1468,8 @@ export class Sim {
       marketQuery: defaultMarketQuery(),
       craftSkills: emptyCraftSkills(),
       mailWelcomed: false,
+      marketFilter: '',
+      craftSkills: emptyCraftSkills(),
       delveMarks: 0,
       delveClears: {},
       companionUpgrades: {},

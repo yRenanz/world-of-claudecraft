@@ -54,36 +54,81 @@ describe('stepKeyboardTurnFacing', () => {
     expect(st.facing).toBeNull();
   });
 
-  it('converges instead of integrating while turning is not allowed (stun family)', () => {
+  it('NEVER rewinds toward the lagging server facing on release (the nausea bug)', () => {
+    // Hold left for half a second, then release. The server facing is still a
+    // round trip behind and converging toward us; the display must HOLD, not
+    // step backwards at TURN_SPEED and then forward again.
+    const st = newKeyboardTurnState();
+    let serverFacing = 0;
+    for (let i = 0; i < 30; i++) {
+      stepKeyboardTurnFacing(st, args({ turnLeft: true, serverFacing }));
+    }
+    const held = st.facing as number;
+    // a realistic echo: the server facing is ~150ms (9 frames) of turning behind
+    serverFacing = held - 9 * TURN_SPEED * FRAME_60;
+    let f: number | null = held;
+    let minSeen = held;
+    let frames = 0;
+    while (f !== null && frames < 60) {
+      serverFacing = Math.min(held, serverFacing + TURN_SPEED * FRAME_60);
+      f = stepKeyboardTurnFacing(st, args({ serverFacing }));
+      if (f !== null) minSeen = Math.min(minSeen, f);
+      frames++;
+    }
+    expect(minSeen).toBeGreaterThanOrEqual(held - 1e-9); // no backward motion at all
+    expect(frames).toBeLessThan(30); // handed off as soon as the server caught up
+    expect(st.facing).toBeNull();
+  });
+
+  it('hands off on the frame the server facing crosses the held heading', () => {
+    const st = newKeyboardTurnState();
+    stepKeyboardTurnFacing(st, args({ turnLeft: true, serverFacing: 0 }));
+    const held = st.facing as number;
+    // a coarse snapshot step jumps the interpolated server facing PAST us
+    const f = stepKeyboardTurnFacing(st, args({ serverFacing: held + 0.04 }));
+    expect(f).toBeCloseTo(held + 0.04, 6); // bridges to the server value
+    expect(st.facing).toBeNull(); // handed off
+  });
+
+  it('holds a persistent residual through the grace window, then glides it out gently', () => {
+    const st = newKeyboardTurnState();
+    for (let i = 0; i < 30; i++) {
+      stepKeyboardTurnFacing(st, args({ turnLeft: true, serverFacing: 0 }));
+    }
+    const held = st.facing as number;
+    // the server never catches up (stun landed mid-turn): facing stays behind
+    const serverFacing = held - 0.15;
+    // during the grace window the display holds perfectly still
+    for (let i = 0; i < 18; i++) {
+      // 300ms < grace
+      expect(stepKeyboardTurnFacing(st, args({ serverFacing }))).toBeCloseTo(held, 9);
+    }
+    // past the grace window it glides back, far slower than TURN_SPEED
+    let prev = held;
+    let f: number | null = held;
+    let frames = 0;
+    while (f !== null && frames < 600) {
+      f = stepKeyboardTurnFacing(st, args({ serverFacing }));
+      if (f !== null) {
+        const step = Math.abs(f - prev);
+        expect(step).toBeLessThan((TURN_SPEED / 2) * FRAME_60); // gentle, not a snap
+        prev = f;
+      }
+      frames++;
+    }
+    expect(st.facing).toBeNull(); // eventually converged and handed off
+  });
+
+  it('holds instead of integrating while turning is not allowed (stun family)', () => {
     const st = newKeyboardTurnState();
     stepKeyboardTurnFacing(st, args({ turnLeft: true, serverFacing: 0 }));
     const engaged = st.facing as number;
     const f = stepKeyboardTurnFacing(
       st,
       args({ turnLeft: true, turnAllowed: false, serverFacing: 0 }),
-    ) as number;
-    // stepped back toward the server facing, not further away
-    expect(Math.abs(f)).toBeLessThan(Math.abs(engaged));
-  });
-
-  it('press-then-release converges exactly onto the server facing and hands off', () => {
-    const st = newKeyboardTurnState();
-    // hold left for 30 frames
-    for (let i = 0; i < 30; i++) {
-      stepKeyboardTurnFacing(st, args({ turnLeft: true, serverFacing: 0 }));
-    }
-    const local = st.facing as number;
-    // the server integrated the same held duration, so its facing arrives near
-    // the local one (up to tick quantization); converge onto it
-    const serverFacing = local - 0.1;
-    let f: number | null = local;
-    let frames = 0;
-    while (f !== null && frames < 1000) {
-      f = stepKeyboardTurnFacing(st, args({ serverFacing }));
-      frames++;
-    }
-    expect(frames).toBeLessThan(20); // 0.1 rad at PI rad/s is a few frames
-    expect(st.facing).toBeNull(); // handed off, no residual drift
+    );
+    // no further integration, and no immediate rewind either (grace window)
+    expect(f).toBeCloseTo(engaged, 9);
   });
 
   it('clamps an over-long frame so a hitch cannot over-rotate', () => {

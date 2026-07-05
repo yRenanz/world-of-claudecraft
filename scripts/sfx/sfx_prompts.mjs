@@ -452,7 +452,10 @@ export const SFX = [
   { key: 'quest_ready', custom: true },
   { key: 'quest_complete', custom: true },
 
-  // --- Lockpick minigame (custom recordings, not ElevenLabs) ---------------
+  // --- Lockpick minigame (custom recordings, not ElevenLabs) ------------------
+  // custom: true means gen_sfx.mjs will never call the API for these, even with
+  // --force. Drop the MP3 into public/audio/sfx/ and add an entry here to register
+  // any future custom recording in the same way.
   { key: 'lockpick_advanced_1', custom: true },
   { key: 'lockpick_advanced_2', custom: true },
   { key: 'lockpick_advanced_3', custom: true },

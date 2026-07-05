@@ -9410,13 +9410,27 @@ export class Hud {
               sfx.playUi(`lockpick_advanced_${pick + 1}`);
               break;
             }
-            case 'slip':        sfx.playUi('lockpick_slip');         break;
-            case 'bind':        sfx.playUi('lockpick_bind');         break;
-            case 'trap':        sfx.playUi('lockpick_trap');         break;
-            case 'pageCleared': sfx.playUi('lockpick_page_cleared'); break;
-            case 'retry':       sfx.playUi('lockpick_retry');        break;
-            case 'success':     sfx.playUi('lockpick_success');      break;
-            case 'fail':        sfx.playUi('lockpick_fail');         break;
+            case 'slip':
+              sfx.playUi('lockpick_slip');
+              break;
+            case 'bind':
+              sfx.playUi('lockpick_bind');
+              break;
+            case 'trap':
+              sfx.playUi('lockpick_trap');
+              break;
+            case 'pageCleared':
+              sfx.playUi('lockpick_page_cleared');
+              break;
+            case 'retry':
+              sfx.playUi('lockpick_retry');
+              break;
+            case 'success':
+              sfx.playUi('lockpick_success');
+              break;
+            case 'fail':
+              sfx.playUi('lockpick_fail');
+              break;
           }
           break;
         }

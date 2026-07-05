@@ -80,8 +80,19 @@ failure, kept as stable English that `main.ts` re-localizes.
   stays English by design (the "diagnostic errors stay English" rule).
 
 ## Never
-- Never mutate game state authoritatively here or "predict" an outcome. The only
-  sanctioned optimism is the trivial local UI nudges already present
-  (`targetEntity` setting `targetId`; `pendingQuestCommands`); keep that scope.
+- Never mutate game state authoritatively here or "predict" an OUTCOME: no
+  client-side anticipation of combat, casts, resources, loot, aggro, or anything
+  else the server resolves. The only sanctioned optimism inside `net/` is the
+  trivial local UI nudges already present (`targetEntity` setting `targetId`;
+  `pendingQuestCommands`); keep that scope.
+- **Display-layer locomotion anticipation is the one sanctioned prediction**, and
+  it lives OUTSIDE `net/` (`src/render/self_motion.ts`, `src/game/
+  keyboard_turn_facing.ts`): a visual-only pose/facing for the LOCAL player that
+  is (a) bounded by measured latency with a hard cap, (b) always blending toward
+  the authoritative server pose, (c) never written into `ClientWorld` mirrored
+  state or any `IWorld` read that logic consumes (targeting, range checks, quest
+  triggers, and interest all use authoritative positions), and (d) never affects
+  what is sent to the server. Widening any of those four constraints is a
+  maintainer decision, see `docs/online-movement-latency.md`.
 - Never read `Math.random`/timing into *gameplay*; `performance.now` here is for
   render interpolation only (`lastSnapAt`, per-entity `netInterval`), not logic.

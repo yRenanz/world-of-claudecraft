@@ -1,7 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import {
-  HARVEST_COMPONENT_ITEMS,
-  harvestItemFor,
   harvestTierQuantity,
   isHarvestableCorpse,
   resolveCorpseFocusHarvest,
@@ -69,26 +67,6 @@ describe('isHarvestableCorpse', () => {
 
   it('is true with at least one component tag', () => {
     expect(isHarvestableCorpse(['hide'])).toBe(true);
-  });
-});
-
-describe('harvestItemFor', () => {
-  it('returns null with no component tags', () => {
-    expect(harvestItemFor(undefined)).toBeNull();
-  });
-
-  it('returns null when no tag maps to a wired-up item yet', () => {
-    expect(harvestItemFor(['unmapped_tag_future_issue'])).toBeNull();
-  });
-
-  it('maps every currently-wired component tag to its item', () => {
-    for (const [tag, itemId] of Object.entries(HARVEST_COMPONENT_ITEMS)) {
-      expect(harvestItemFor([tag])).toBe(itemId);
-    }
-  });
-
-  it('returns the first mapped tag when a mob has several', () => {
-    expect(harvestItemFor(['unmapped_tag_future_issue', 'fang'])).toBe('wolf_fang');
   });
 });
 

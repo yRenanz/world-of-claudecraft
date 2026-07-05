@@ -327,16 +327,6 @@ export function resolveCorpseHarvest(currentClaimedBy: number | null, pid: numbe
   return { success: true, claimedBy: pid };
 }
 
-/** The item id this harvest yields, or null if no component tag maps to one yet. */
-export function harvestItemFor(componentTags: readonly string[] | undefined): string | null {
-  if (!componentTags) return null;
-  for (const tag of componentTags) {
-    const itemId = HARVEST_COMPONENT_ITEMS[tag];
-    if (itemId) return itemId;
-  }
-  return null;
-}
-
 // Per-corpse focus picker (#1142): concentrate vs spread tradeoff.
 //
 // At a harvestable corpse the player chooses which tagged component(s) to

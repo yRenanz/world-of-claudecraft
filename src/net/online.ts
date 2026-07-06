@@ -1141,6 +1141,19 @@ export class ClientWorld implements IWorld {
     this.ws.close();
   }
 
+  // Signal a deliberate logout to the server so it skips linkdead grace and
+  // calls leave() immediately. Must be called before a page reload so the
+  // character is properly removed from the world instead of being held
+  // in-world for the 5-minute linkdead window.
+  sendLogout(): void {
+    this.sessionEnded = true;
+    clearInterval(this.sendTimer);
+    if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
+    if (this.ws.readyState === 1) {
+      this.ws.send(JSON.stringify({ t: 'logout' }));
+    }
+  }
+
   get player(): Entity {
     return this.entities.get(this.playerId) ?? blankEntity(-1);
   }

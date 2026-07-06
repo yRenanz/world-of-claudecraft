@@ -81,7 +81,9 @@ export function hasRecipeMaterials(
   const meta = ctx.players.get(pid);
   const craftSkills = meta ? meta.craftSkills : {};
   return recipe.reagents.every(
-    (r) => ctx.countItem(r.itemId, pid) >= discountedReagentCount(r.count, craftSkills, recipe.professionId),
+    (r) =>
+      ctx.countItem(r.itemId, pid) >=
+      discountedReagentCount(r.count, craftSkills, recipe.professionId),
   );
 }
 

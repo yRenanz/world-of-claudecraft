@@ -713,6 +713,37 @@
   .loot-item:hover {
     background: #ffffff10;
   }
+  .corpse-harvest {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--color-border-default);
+  }
+  .corpse-harvest-title {
+    font-weight: 600;
+    font-size: 12px;
+    margin-bottom: 2px;
+  }
+  .corpse-harvest-hint {
+    font-size: 11px;
+    opacity: 0.75;
+    margin-bottom: 6px;
+  }
+  .corpse-harvest-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+  .corpse-harvest-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .corpse-harvest-btn {
+    width: 100%;
+  }
   #loot-rolls {
     position: fixed;
     right: max(14px, env(safe-area-inset-right));

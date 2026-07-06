@@ -62,6 +62,30 @@ export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = ['mining', 'log
 // effect sips charges against a low-rarity target and spends them every use
 // against an equal-or-higher-rarity one. `kind` selects which harvest/craft
 // outcome field the bonus adjusts.
+// Corpse-harvest yield map (#1141): component tag -> the item id a profession
+// harvest of a tagged corpse yields (claim logic: src/sim/professions/gathering.ts,
+// command body: src/sim/interaction.ts harvestCorpse). Only tags with a concrete
+// item wired up so far are listed here; a mob whose componentTags don't map to any
+// of these still becomes single-use claimed, it just yields no item yet (future
+// profession-harvest issues wire up the rest).
+// KNOWN CONTENT GAP (v0.21.0 release-merge audit, needs a maintainer content call):
+// hide/silk/venomSac map to kind:'quest' items (q_boars/q_spiders/q_widows), so a
+// harvest currently grants quest-collect credit from ANY tagged mob (a wolf hide
+// advances the boar quest). The intended fix is dedicated profession-material
+// items, which is content design, not wiring; do not paper over it here.
+export const HARVEST_COMPONENT_ITEMS: Readonly<Record<string, string>> = {
+  hide: 'boar_hide',
+  fang: 'wolf_fang',
+  silk: 'webwood_silk',
+  venomSac: 'widow_venom_sac',
+};
+
+// Tool effect slotting (#1136): a slottable bonus layered on top of a base
+// gathering tool's tier (see ../professions/tools.ts). Each effect carries its
+// own starting durability, separate from the base tool's tier gating, and a
+// per-use depletion chance: durability only drops on a losing roll, not on
+// every use, so the effect's lifespan is itself probabilistic. `kind` selects
+// which harvest/craft outcome field the bonus adjusts.
 export type ToolEffectId = 'gatherers_cache' | 'artisans_eye' | 'quickening_charm';
 
 export interface ToolEffectDef {
@@ -74,6 +98,8 @@ export interface ToolEffectDef {
   bonus: number;
   /** Charges the effect starts with when freshly slotted onto a tool. */
   startingDurability: number;
+  /** Chance per use that this effect's durability decrements by 1 (0 to 1). */
+  depletionChance: number;
 }
 
 export const TOOL_EFFECTS: Record<ToolEffectId, ToolEffectDef> = {
@@ -85,6 +111,7 @@ export const TOOL_EFFECTS: Record<ToolEffectId, ToolEffectDef> = {
     kind: 'quantity',
     bonus: 1,
     startingDurability: 20,
+    depletionChance: 0.5,
   },
   artisans_eye: {
     id: 'artisans_eye',
@@ -94,6 +121,7 @@ export const TOOL_EFFECTS: Record<ToolEffectId, ToolEffectDef> = {
     kind: 'quality',
     bonus: 1,
     startingDurability: 20,
+    depletionChance: 0.5,
   },
   quickening_charm: {
     id: 'quickening_charm',
@@ -103,6 +131,7 @@ export const TOOL_EFFECTS: Record<ToolEffectId, ToolEffectDef> = {
     kind: 'respawnSpeed',
     bonus: 1,
     startingDurability: 20,
+    depletionChance: 0.5,
   },
 };
 

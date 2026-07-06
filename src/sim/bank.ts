@@ -15,6 +15,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts). This module draws NO rng.
 
+import type { BankInfo } from '../world_api';
 import { addStacked, bagCapacity, bagsFullError, countFit } from './bags';
 import { ITEMS } from './data';
 import type { SimContext } from './sim_context';
@@ -215,6 +216,29 @@ export function bankBuySlots(ctx: SimContext, pid?: number): void {
   meta.copper -= price;
   meta.bank.purchasedSlots += BANK_EXPANSION_SLOTS;
   ctx.notice(meta.entityId, 'You purchase additional bank slots.');
+}
+
+/** The proximity-gated bank snapshot the IWorld seam exposes (the mailInfoFor
+ *  pattern): null unless the player stands within reach of a banker NPC, else a
+ *  boundary-cloned view of PlayerMeta.bank. A pure read: it draws NO rng and never
+ *  hands out live sim slot references. `nextExpansionCost` is the copper price of
+ *  the NEXT expansion, null once every expansion has been purchased. */
+export function bankInfoFor(ctx: SimContext, pid: number): BankInfo | null {
+  const r = ctx.resolve(pid);
+  if (!r) return null;
+  const { meta, e: p } = r;
+  if (!nearBanker(ctx, p)) return null;
+  const bank = meta.bank;
+  const purchases = Math.floor(bank.purchasedSlots / BANK_EXPANSION_SLOTS);
+  const nextExpansionCost =
+    purchases < BANK_EXPANSION_PRICES.length ? BANK_EXPANSION_PRICES[purchases] : null;
+  return {
+    slots: bank.inventory.map(cloneInvSlot),
+    capacity: bankCapacity(bank),
+    purchasedSlots: bank.purchasedSlots,
+    bonusSlots: bank.bonusSlots,
+    nextExpansionCost,
+  };
 }
 
 /** The ONE load path for persisted bank state. Tampered/legacy saves sanitize;

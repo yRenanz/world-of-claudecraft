@@ -6015,6 +6015,10 @@ export class Sim {
     bankMod.bankBuySlots(this.ctx, pid);
   }
 
+  bankInfoFor(pid: number): import('../world_api').BankInfo | null {
+    return bankMod.bankInfoFor(this.ctx, pid);
+  }
+
   // -------------------------------------------------------------------------
   // The World Market — the Merchant's auction house
   // -------------------------------------------------------------------------
@@ -6247,6 +6251,10 @@ export class Sim {
 
   get mailUnread(): number {
     return this.primaryId === -1 ? 0 : this.mailUnreadFor(this.primaryId);
+  }
+
+  get bankInfo(): import('../world_api').BankInfo | null {
+    return this.primaryId === -1 ? null : this.bankInfoFor(this.primaryId);
   }
 
   instanceSlotAt(pos: Vec3): number | null {

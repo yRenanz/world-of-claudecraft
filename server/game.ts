@@ -305,6 +305,9 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'mail_take',
   'mail_delete',
   'mail_read',
+  'bank_deposit',
+  'bank_withdraw',
+  'bank_buy_slots',
   'pet_feed',
   'dev_give',
   'dev_level',
@@ -3192,6 +3195,25 @@ export class GameServer {
       case 'mail_read':
         if (typeof msg.id === 'number') sim.mailMarkRead(msg.id, pid);
         break;
+      // Bank: the per-character deposit box. `slot` is a container index (the
+      // castAbilityBySlot wire idiom); `count` is optional (omit = whole stack).
+      // The Sim owns every gameplay rule (banker proximity, capacity, quest-bind,
+      // alive-state, exact-copper cost + purchase cap); `bonusSlots` is never
+      // client-supplied. bank_buy_slots is an economy action bounded by the
+      // blanket per-frame message limiter plus the Sim's escalating-price cap.
+      case 'bank_deposit':
+        if (typeof msg.slot === 'number') {
+          sim.bankDeposit(msg.slot, typeof msg.count === 'number' ? msg.count : undefined, pid);
+        }
+        break;
+      case 'bank_withdraw':
+        if (typeof msg.slot === 'number') {
+          sim.bankWithdraw(msg.slot, typeof msg.count === 'number' ? msg.count : undefined, pid);
+        }
+        break;
+      case 'bank_buy_slots':
+        sim.bankBuySlots(pid);
+        break;
       // dev/ops commands, only when ALLOW_DEV_COMMANDS=1 (never in production)
       case 'dev_level': {
         if (process.env.ALLOW_DEV_COMMANDS === '1' && typeof msg.level === 'number') {
@@ -3622,6 +3644,11 @@ export class GameServer {
     maybe('market', this.sim.marketInfoFor(anchorSession.pid));
     maybe('mail', this.sim.mailInfoFor(anchorSession.pid));
     maybe('mailU', this.sim.mailUnreadFor(anchorSession.pid));
+    // bank info is null unless the player is standing at a banker, so it only
+    // rides the wire for players actually browsing their deposit box (the mail
+    // pattern). Not heavy-gated: it appears from proximity, not this session's
+    // own dirty-marking commands.
+    maybe('bank', this.sim.bankInfoFor(anchorSession.pid));
     // open need-greed rolls this player can still answer, so a client that
     // missed the transient lootRoll event re-shows the prompt from state. Stays
     // per-tick (it's interactive state that appears from others' actions).

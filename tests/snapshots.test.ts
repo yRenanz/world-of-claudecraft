@@ -357,7 +357,7 @@ describe('delta snapshots', () => {
     const snap = lastSnap(fc.sent);
     expect(snap).not.toBeNull();
     // a fresh session has an empty lastSent, so EVERY maybe() delta key rides the
-    // first snapshot (even the null-valued ones like party/trade); widened to all 27
+    // first snapshot (even the null-valued ones like party/trade/bank); all 32 of them
     for (const key of ALL_DELTA_KEYS) {
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
     }
@@ -1838,6 +1838,7 @@ describe('lockpick view rebuilds from events on the online client', () => {
 const ALL_DELTA_KEYS = [
   'arena',
   'bags',
+  'bank',
   'buyback',
   'cds',
   'corpse',
@@ -1879,6 +1880,7 @@ const ALL_DELTA_KEYS = [
 const TERSE_TO_IWORLD: Record<string, string> = {
   arena: 'arenaInfo',
   bags: 'bags',
+  bank: 'bankInfo',
   buyback: 'vendorBuyback',
   cds: 'cooldowns',
   cosmetics: 'accountCosmetics',
@@ -1968,6 +1970,11 @@ function dirtyEveryDeltaField(): {
   // Ravenpost welcome letter (delay 0) at join.
   const mailbox = sim.entities.get(sim.postOffice.mailboxIds[0]);
   if (mailbox) mailbox.pos = { ...p.pos };
+  // `bank`: bankInfoFor is null unless near a banker, so relocate a bursar onto the
+  // player; a stocked bank slot makes the mirrored contents distinguishable.
+  const banker = sim.entities.get(sim.bankerIds[0]);
+  if (banker) banker.pos = { ...p.pos };
+  meta.bank.inventory = [{ itemId: 'wolf_fang', count: 2 }];
 
   // Direct PlayerMeta fields.
   meta.inventory = [{ itemId: 'baked_bread', count: 3 }];
@@ -2085,6 +2092,8 @@ describe('full self-state snapshot delta fixture', () => {
     expect((client.duelInfo as any)?.state).toBe('countdown'); // duel -> duelInfo
     expect(client.arenaInfo).not.toBeNull(); // arena -> arenaInfo
     expect(client.marketInfo).not.toBeNull(); // market -> marketInfo
+    expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
+    expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
     expect(client.activeLootRolls().map((r) => r.rollId)).toEqual([1]); // lroll -> lootRollPrompts
     expect(client.delveRun).not.toBeNull(); // drun -> delveRun
     expect(client.companionState?.companionId).toBe('companion_tessa'); // dcompanion -> companionState
@@ -2147,9 +2156,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 31 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(31);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(31);
+  it('ALL_DELTA_KEYS contains exactly 32 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(32);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(32);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2161,7 +2170,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(31);
+    expect(scraped.size).toBe(32);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

@@ -130,28 +130,6 @@ describe('stepKeyboardTurnFacing', () => {
     expect(st.facing).toBeNull(); // eventually converged and handed off
   });
 
-  it('latches the final heading for the wire on the release edge, exactly once', () => {
-    const st = newKeyboardTurnState();
-    for (let i = 0; i < 10; i++) {
-      stepKeyboardTurnFacing(st, args({ turnLeft: true, serverFacing: 0 }));
-      expect(st.releaseFacingToSend).toBeNull(); // never while still turning
-    }
-    const held = st.facing as number;
-    stepKeyboardTurnFacing(st, args({ serverFacing: held - 0.4 }));
-    expect(st.releaseFacingToSend).toBeCloseTo(held, 9); // the exact shown angle
-    st.releaseFacingToSend = null; // the caller consumes it
-    stepKeyboardTurnFacing(st, args({ serverFacing: held - 0.3 }));
-    expect(st.releaseFacingToSend).toBeNull(); // one-shot, not re-latched
-  });
-
-  it('does not latch when a foreign facing owner takes over', () => {
-    const st = newKeyboardTurnState();
-    stepKeyboardTurnFacing(st, args({ turnLeft: true }));
-    stepKeyboardTurnFacing(st, args({ sentFacing: 1.2 })); // mouselook engaged on release
-    expect(st.releaseFacingToSend).toBeNull(); // mouselook streams its own facing
-    expect(st.facing).toBeNull();
-  });
-
   it('holds instead of integrating while turning is not allowed (stun family)', () => {
     const st = newKeyboardTurnState();
     stepKeyboardTurnFacing(st, args({ turnLeft: true, serverFacing: 0 }));

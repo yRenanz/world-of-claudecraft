@@ -2027,10 +2027,6 @@ async function startGame(
   let pendingReleaseFacing: number | null = null;
   // Local display-only integration of keyboard turns online (see the module docs).
   const kbTurn = newKeyboardTurnState();
-  // Wire latch for a just-released keyboard turn's final heading; stays armed
-  // until an input send carries it (see the online branch), TTL as backstop.
-  let kbReleaseLatch: number | null = null;
-  let kbReleaseLatchAgeMs = 0;
   function updateCamera(frameDt: number, interpFacing: number): void {
     const mi = input.readMoveInput();
     const clickMoving = !!input.clickMoveTarget && !input.suspendMovement && !movementFrozen();
@@ -2377,32 +2373,42 @@ async function startGame(
       world.player.facing,
       onlineInputEchoMs,
     );
-    // kbReleaseLatch: the final local heading of a just-released keyboard turn
-    // (set below). The server applies a sent facing outright, so it adopts the
-    // exact locally-shown angle; without this its own tick integration lands
-    // up to ~one turn-tick away and the display would have to re-aim a few
-    // degrees moments after every turn. The latch stays ARMED until an input
-    // send actually carries it: sends are rate-limited (>=16ms apart) and the
-    // frame right after the release edge usually falls inside that window, so
-    // a one-shot latch was silently dropped about half the time. Any send
-    // while armed includes the held facing (the 50ms input timer reads it
-    // too), so the age TTL below is a pure backstop.
+    const pe = world.player;
+    const alpha =
+      net.lastSnapAt > 0
+        ? Math.min(1.25, (performance.now() - net.lastSnapAt) / Math.max(20, net.snapInterval))
+        : 1;
+    // facing interp capped at 1 - extrapolating angles past the snapshot oscillates
+    const interpServerFacing =
+      pe.prevFacing + wrapAngle(pe.facing - pe.prevFacing) * Math.min(1, alpha);
     const foreignFacing = movementFacing ?? resolved.facing;
-    if (foreignFacing !== null || resolved.mi.turnLeft || resolved.mi.turnRight) {
-      kbReleaseLatch = null; // superseded by a foreign owner or a new turn
-    }
-    const netFacing = foreignFacing ?? kbReleaseLatch;
+    // Keyboard turns integrate the same TURN_SPEED locally and STREAM the
+    // resulting heading on the facing channel, exactly like mouselook: the
+    // server applies it outright instead of integrating the turn flags one
+    // echo late in 50ms quanta, so there is never a client/server heading
+    // disagreement to reconcile after a turn (the source of every release
+    // stutter this feature has chased). The turn flags are zeroed on the wire
+    // while the local heading owns the channel, or the server would integrate
+    // the turn a second time on top of the streamed facing.
+    const kbFacing = stepKeyboardTurnFacing(kbTurn, {
+      turnLeft: resolved.mi.turnLeft,
+      turnRight: resolved.mi.turnRight,
+      turnAllowed: net.spectating === null && !movementFrozen() && !isStunned(pe),
+      sentFacing: foreignFacing,
+      serverFacing: interpServerFacing,
+      frameDt,
+    });
+    const netFacing = foreignFacing ?? kbFacing;
     Object.assign(net.moveInput, resolved.mi);
+    if (kbFacing !== null) {
+      net.moveInput.turnLeft = false;
+      net.moveInput.turnRight = false;
+    }
     net.setMouselookFacing(netFacing);
     // Online streams facing every frame, so the mouselook release yaw is
     // consumed here; drop it so it is not re-applied next frame.
     pendingReleaseFacing = null;
-    const inputSent = net.flushInput();
-    if (inputSent) perf.markInputSent(performance.now());
-    if (kbReleaseLatch !== null) {
-      kbReleaseLatchAgeMs += frameDt * 1000;
-      if (inputSent || kbReleaseLatchAgeMs > 120) kbReleaseLatch = null;
-    }
+    if (net.flushInput()) perf.markInputSent(performance.now());
     const echoSamples = net.consumeInputEchoSamples();
     for (const sample of echoSamples) {
       if (Number.isFinite(sample) && sample >= 0) {
@@ -2434,41 +2440,12 @@ async function startGame(
     if (net.consumeCosmeticsChanged()) {
       perf.trace('hud.onCosmeticsChanged', () => hud.onCosmeticsChanged());
     }
-    const alpha =
-      net.lastSnapAt > 0
-        ? Math.min(1.25, (performance.now() - net.lastSnapAt) / Math.max(20, net.snapInterval))
-        : 1;
     perf.setNetwork({
       connected: net.connected,
       snapInterval: Math.round(net.snapInterval),
       lastSnapAge: net.lastSnapAt > 0 ? Math.round(performance.now() - net.lastSnapAt) : -1,
       alpha: Math.round(alpha * 100) / 100,
     });
-    const pe = world.player;
-    // facing interp capped at 1 - extrapolating angles past the snapshot oscillates
-    const interpServerFacing =
-      pe.prevFacing + wrapAngle(pe.facing - pe.prevFacing) * Math.min(1, alpha);
-    // Keyboard turns are integrated server-side; mirror the same TURN_SPEED locally
-    // (display only) so the model and camera respond the same frame online.
-    const kbFacing = stepKeyboardTurnFacing(kbTurn, {
-      turnLeft: resolved.mi.turnLeft,
-      turnRight: resolved.mi.turnRight,
-      turnAllowed: net.spectating === null && !movementFrozen() && !isStunned(pe),
-      // Only the FOREIGN heading owners (mouselook, click-move, the mouselook
-      // release latch) clear the module; our own kbReleaseLatch must not, or
-      // the camera would fall back to the still-lagging server facing for the
-      // send frame and jerk.
-      sentFacing: foreignFacing,
-      serverFacing: interpServerFacing,
-      frameDt,
-    });
-    // A turn key was just released: latch the final local heading for the next
-    // frames' input sends, so the server adopts the exact displayed angle.
-    if (kbTurn.releaseFacingToSend !== null) {
-      kbReleaseLatch = kbTurn.releaseFacingToSend;
-      kbReleaseLatchAgeMs = 0;
-      kbTurn.releaseFacingToSend = null;
-    }
     // Display-only self extrapolation (src/render/self_motion.ts). Off while
     // spectating, corpse-frozen, or CC'd (playerImmobilized covers stun/root/
     // incapacitate/polymorph, and fear is a fear_incap incapacitate aura; the
@@ -2483,7 +2460,7 @@ async function startGame(
             !playerImmobilized() &&
             !isDelvePos(pe.pos.x),
           moveInput: resolved.mi,
-          displayFacing: netFacing ?? kbFacing ?? interpServerFacing,
+          displayFacing: netFacing ?? interpServerFacing,
           echoMs: onlineInputEchoMs,
           jitterMs: onlineJitterMs,
           alpha,
@@ -2507,11 +2484,11 @@ async function startGame(
           renderer.sync(
             alpha,
             frameDt,
-            // netFacing (mouselook, click-move, release latch) is applied
-            // server-side the moment it arrives, so the model may show it
-            // immediately; without it the click-move yaw would lag the
-            // predicted position by a round trip and corners would slide.
-            net.spectating === null ? (netFacing ?? kbFacing) : null,
+            // netFacing (mouselook, keyboard turn, click-move, release latch)
+            // is applied server-side the moment it arrives, so the model may
+            // show it immediately; without it the click-move yaw would lag
+            // the predicted position by a round trip and corners would slide.
+            net.spectating === null ? netFacing : null,
             adaptiveSelfAlphaLead(onlineInputEchoMs, onlineJitterMs, net.snapInterval),
             selfMotion,
           ),

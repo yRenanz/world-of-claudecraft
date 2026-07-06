@@ -8,24 +8,17 @@
 // ClientWorld state (the sanctioned display-layer anticipation, see
 // src/net/CLAUDE.md).
 //
-// While a turn key is held the local integration owns the heading and ignores
-// the round-trip-stale server facing (blending mid-turn would drag the model
-// backwards by the echo latency). On release the local facing is HELD, never
-// rewound: the server facing is still one echo behind and converging toward us
-// (both ends integrate the held keys at the same rate for the same duration),
-// so stepping toward its current value would visibly yank the camera backwards
-// and then forwards again on every key release.
-//
-// The release also LATCHES the final local heading for the caller to send on
-// the wire once (releaseFacingToSend, the same channel mouselook streams and
-// the server applies immediately). Without it the server's own integration
-// lands up to one tick of turning away (~9 degrees worst case) and the display
-// would have to adopt that slightly different angle moments later, a visible
-// late re-aim on every turn. With the latch the server adopts the exact local
-// heading, the interpolated server facing converges onto it, and the module
-// hands off the moment it arrives or crosses. The grace-then-gentle-glide
-// correction remains only as the backstop for a latch the server refuses (a
-// corpse) or a genuine misprediction.
+// While engaged, the caller STREAMS the returned heading on the wire facing
+// channel (the one mouselook streams; the server applies it outright) with
+// the turn flags zeroed, so the server never integrates the turn itself: the
+// local heading IS the authoritative heading, continuously, and there is no
+// client/server disagreement to reconcile at release (server-side tick
+// quantization, in-flight overshoot, and every release stutter they caused
+// are gone by construction). On release the local facing is HELD while the
+// mirrored server facing catches up over the last round trip, and the module
+// hands off once it has settled within eps. The grace-then-gentle-glide
+// correction remains only as the backstop for a facing the server refuses
+// (a corpse) or a genuine misprediction.
 
 import { TURN_SPEED } from '../sim/types';
 import { wrapAngle } from './camera_follow';
@@ -45,13 +38,10 @@ const MAX_FRAME_DT = 0.1; // clamp long frames so a hitch cannot over-rotate
 export interface KeyboardTurnState {
   facing: number | null; // null = inactive (the server facing owns the display)
   releaseMs: number; // time spent in the release phase
-  /** Set once on the turning-to-release edge: the final local heading the
-   *  caller should send on the wire (and then clear). Null otherwise. */
-  releaseFacingToSend: number | null;
 }
 
 export function newKeyboardTurnState(): KeyboardTurnState {
-  return { facing: null, releaseMs: 0, releaseFacingToSend: null };
+  return { facing: null, releaseMs: 0 };
 }
 
 function approachAngle(current: number, target: number, maxStep: number): number {
@@ -88,9 +78,8 @@ export function stepKeyboardTurnFacing(
 ): number | null {
   if (args.sentFacing !== null) {
     // A foreign path (mouselook, click-move) owns the heading and streams it
-    // itself; yield without latching.
+    // itself; yield.
     state.facing = null;
-    state.releaseFacingToSend = null;
     return null;
   }
   const dt = Math.min(Math.max(0, args.frameDt), MAX_FRAME_DT);
@@ -100,19 +89,14 @@ export function stepKeyboardTurnFacing(
     const base = state.facing ?? args.serverFacing;
     state.facing = wrapAngle(base + dir * TURN_SPEED * dt);
     state.releaseMs = 0;
-    state.releaseFacingToSend = null;
     return state.facing;
   }
   if (state.facing === null) return null;
 
-  // Release phase: hold the local heading until the server facing SETTLES on
-  // it. The latch (sent by the caller) guarantees the server ends exactly on
-  // our heading, but before the latch lands the server may still be
-  // integrating the in-flight held flags and OVERSHOOT us by up to a tick;
-  // handing off on a mere crossing would ride that overshoot out and back,
-  // a small visible re-aim after every turn. So: eps-arrival only, from
-  // either side.
-  if (state.releaseMs === 0) state.releaseFacingToSend = state.facing;
+  // Release phase: hold the local heading until the mirrored server facing
+  // settles on it (the caller kept streaming it while we held, so the server
+  // is already there; the mirror just needs the last round trip to show it).
+  // Eps-arrival only, from either side: no crossing shortcuts, no rewinds.
   const gap = wrapAngle(args.serverFacing - state.facing);
   if (Math.abs(gap) <= HANDOFF_EPS) {
     state.facing = null;

@@ -1162,6 +1162,18 @@ describe('bankInfoFor read boundary (Phase 3)', () => {
     ]);
   });
 
+  it('at the full 12-expansion ladder the read reports capacity 96 and a null cost', () => {
+    const sim = makeSim();
+    // 72 purchased slots = all 12 expansions bought (6 per tier); the ladder is done,
+    // so the display price goes null (the "cannot be expanded further" arm).
+    meta(sim).bank.purchasedSlots = 72;
+    const info = sim.bankInfoFor(sim.playerId);
+    expect(info).not.toBeNull();
+    expect(info!.capacity).toBe(96); // 24 base + 72 purchased
+    expect(info!.purchasedSlots).toBe(72);
+    expect(info!.nextExpansionCost).toBeNull();
+  });
+
   it('the IWorld bankInfo getter serves the local player through the same read', () => {
     const sim = makeSim();
     sim.addItem('wolf_fang', 3);

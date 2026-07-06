@@ -152,10 +152,15 @@ describe('bank wire round-trip', () => {
     (server as any).broadcastSnapshots();
     expect(lastSnap(fw.sent).self.bank.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
 
-    // 2) deposit the whole remaining stack (3): merges into the bank slot -> 5.
+    // 2) deposit the whole remaining stack (3): merges into the bank slot -> 5, and
+    // the MERGED stack rides the wire (a mis-encode of a merged slot would slip past
+    // the op-1 and op-4 snapshots, which only ever see counts 2 and 3).
     send(server, s, { cmd: 'bank_deposit', slot: wolfFangIndex(sim, pid) });
     expect(meta.bank.inventory).toEqual([{ itemId: 'wolf_fang', count: 5 }]);
     expect(meta.inventory.some((x: any) => x.itemId === 'wolf_fang')).toBe(false);
+    fw.sent.length = 0;
+    (server as any).broadcastSnapshots();
+    expect(lastSnap(fw.sent).self.bank.slots).toEqual([{ itemId: 'wolf_fang', count: 5 }]);
 
     // 3) withdraw a partial count (2): bank -> bags.
     send(server, s, { cmd: 'bank_withdraw', slot: 0, count: 2 });
@@ -212,7 +217,7 @@ describe('bank wire round-trip', () => {
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 4 }]);
   });
 
-  it('leaving a banker encodes the bank as an explicit null', () => {
+  it('leaving a banker encodes an explicit null and the client mirror clears', () => {
     const server = new GameServer();
     const fw = fakeWs();
     const s = joinAt(server, fw, 1, 'Vaultd');
@@ -223,14 +228,27 @@ describe('bank wire round-trip', () => {
 
     fw.sent.length = 0;
     (server as any).broadcastSnapshots();
-    expect(lastSnap(fw.sent).self.bank).not.toBeNull();
+    const snapNear = lastSnap(fw.sent);
+    expect(snapNear.self.bank).not.toBeNull();
+
+    // Mirror a client onto the near-banker snapshot so the clear below is observable.
+    const client = bareClient(pid);
+    (client as any).applySnapshot(snapNear);
+    expect(client.bankInfo).not.toBeNull();
 
     // Move the only nearby banker 1000 yd away: the player is now far from every
     // banker, so the encoder ships an explicit null (the client clears its window).
     banker.pos = { x: p.pos.x + 1000, y: p.pos.y, z: p.pos.z + 1000 };
     fw.sent.length = 0;
     (server as any).broadcastSnapshots();
-    expect(lastSnap(fw.sent).self.bank).toBeNull();
+    const snapFar = lastSnap(fw.sent);
+    expect(snapFar.self.bank).toBeNull();
+
+    // The explicit null must CLEAR the mirror: a truthy decode guard (`if (s.bank)`)
+    // would skip it and leave a stale open bank window after the player walks away,
+    // while still passing the omission test above (undefined is falsy too).
+    (client as any).applySnapshot(snapFar);
+    expect(client.bankInfo).toBeNull();
   });
 
   it('server authority: malformed or out-of-range bank commands move nothing', () => {
@@ -256,9 +274,13 @@ describe('bank wire round-trip', () => {
     expect(meta.bank.inventory).toEqual([]);
     expect(bagCount()).toBe(5);
 
-    // Deposit legitimately so withdraw has something to (fail to) move.
-    send(server, s, { cmd: 'bank_deposit', slot: wolfFangIndex(sim, pid), count: 5 });
+    // A present-but-non-number count is coerced to undefined by the dispatch typeof
+    // gate, which means "deposit the whole stack": the command still succeeds. Pinned
+    // as the documented coercion contract (a dispatch that instead rejected bad
+    // counts would red this); it also stocks the bank for the withdraw refusals below.
+    send(server, s, { cmd: 'bank_deposit', slot: wolfFangIndex(sim, pid), count: 'two' });
     expect(meta.bank.inventory).toEqual([{ itemId: 'wolf_fang', count: 5 }]);
+    expect(bagCount()).toBe(0);
 
     // Wrong-type + missing slot on withdraw: rejected, the bank is untouched.
     send(server, s, { cmd: 'bank_withdraw', slot: 'zero' });

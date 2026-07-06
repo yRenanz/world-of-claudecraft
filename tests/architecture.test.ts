@@ -160,6 +160,7 @@ const UI_PURE_CORES = [
   'src/ui/unit_frame.ts',
   'src/ui/action_bar_view.ts',
   'src/ui/mobile_action_page_view.ts',
+  'src/ui/consumable_bar_view.ts',
   'src/ui/mobile_hud_layout.ts',
   'src/ui/auras_view.ts',
   'src/ui/minimap_markers.ts',

@@ -843,6 +843,162 @@
       transition: opacity 0.12s ease;
     }
   }
+  /* Consumables quick bar: a quiet chevron chip docked right of the top-left
+     trio that expands a row of the carried potions/elixirs/food/drink
+     (auto-populated by consumable_bar_view.ts, painted by the shared action
+     bar painter, so the cd-overlay/count/state classes below mirror the
+     ring's). Collapsed by default and session-only: the row shows only under
+     body.mobile-consumables-open, and empty slots collapse away so the open
+     row is exactly as wide as what the player carries. The left anchor adds
+     the trio's SCALED width (3 columns + 2 gaps) to the trio's own safe-area
+     anchor so a grown --btn-scale never slides the trio under the chip. */
+  body.mobile-touch #mobile-consumables {
+    position: absolute;
+    left: calc(max(12px, env(safe-area-inset-left)) + 198px * var(--btn-scale, 1) + 10px);
+    top: max(8px, env(safe-area-inset-top));
+    /* Right reservation sized for the WORST-CASE visual overhang: flex-wrap
+       decides on the untransformed layout width, but the container then scales
+       by --btn-scale (max 1.3) from left top, so the painted row extends past
+       its layout edge by (scale - 1) x row width. 260px keeps the scaled row
+       clear of everything in #ui above it (buff column at right 98px+, the
+       daily-chest rail, the minimap corner): on an 844px landscape phone,
+       (844 - 260 - left(1.3)) x 1.3 + left(1.3) = 684 = the buff column edge. */
+    right: calc(260px + env(safe-area-inset-right));
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    /* The container spans the top band; only its BUTTONS take touches, so an
+       empty stretch stays camera-draggable (touch_router matches the target's
+       closest #mobile-consumables, which pointer-events: none prevents). */
+    pointer-events: none;
+    transform: scale(var(--btn-scale, 1));
+    transform-origin: left top;
+    z-index: 30;
+  }
+  body.mobile-touch #mobile-consumables-toggle {
+    width: 40px;
+    height: 54px;
+    padding: 0;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    border: 1px solid var(--mobile-glass-border, #cba43d8c);
+    border-radius: 12px;
+    background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
+    -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    color: #d8b98a;
+    cursor: var(--cursor-point);
+    opacity: 0.85;
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 2px 8px #0009;
+  }
+  body.mobile-touch #mobile-consumables-toggle .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    body.mobile-touch #mobile-consumables-toggle .ui-icon {
+      transition: transform 0.12s ease;
+    }
+  }
+  body.mobile-touch.mobile-consumables-open #mobile-consumables-toggle {
+    opacity: 1;
+    border-color: var(--gold-dim);
+    color: #ffdf9c;
+  }
+  body.mobile-touch.mobile-consumables-open #mobile-consumables-toggle .ui-icon {
+    transform: rotate(90deg);
+  }
+  /* The open row drops BELOW the chip line rather than extending along the top
+     band: the top-centre band belongs to the pet bar (pet classes) and #ui
+     (z 80) paints ABOVE #mobile-controls (z 60), so a row up there would sit
+     UNDER the pet command buttons, which would steal its taps. Below the
+     chrome line the band is open world; a crowded row wraps further down. */
+  body.mobile-touch #mobile-consumables-row {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    gap: 8px;
+  }
+  body.mobile-touch.mobile-consumables-open #mobile-consumables-row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  body.mobile-touch .mobile-consumable-slot {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    flex: none;
+    pointer-events: auto;
+    border: 1px solid var(--mobile-glass-border, #cba43d8c);
+    border-radius: 50%;
+    background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
+    -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    color: #eee8ff;
+    cursor: var(--cursor-point);
+    overflow: hidden;
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 2px 8px #0009;
+  }
+  body.mobile-touch .mobile-consumable-slot:active {
+    border-color: var(--gold);
+  }
+  /* Same cd-overlay/count/state structure as the ring buttons (shared painter). */
+  body.mobile-touch .mobile-consumable-slot .icon-label {
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+  }
+  body.mobile-touch .mobile-consumable-slot .cd-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0;
+    border-radius: 0 0 50% 50%;
+    background: #000a;
+    pointer-events: none;
+  }
+  body.mobile-touch .mobile-consumable-slot .cdtext {
+    position: relative;
+    font-size: 13px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+    pointer-events: none;
+  }
+  body.mobile-touch .mobile-consumable-slot .item-count {
+    position: absolute;
+    right: 4px;
+    bottom: 2px;
+    font-size: 11px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+    pointer-events: none;
+  }
+  body.mobile-touch .mobile-consumable-slot .keybind {
+    display: none;
+  }
+  body.mobile-touch .mobile-consumable-slot.empty {
+    display: none;
+  }
+  body.mobile-touch .mobile-consumable-slot.unusable {
+    filter: grayscale(0.6);
+    opacity: 0.6;
+  }
+  body.mobile-touch .mobile-consumable-slot.used {
+    border-color: var(--gold);
+  }
   body.mobile-touch #mobile-extra-controls {
     position: fixed;
     left: 50%;
@@ -862,8 +1018,8 @@
     box-shadow:
       0 8px 28px #000d,
       inset 0 1px 0 #ffffff12;
-    /* Centre-screen modal (the More button lives at top-centre now, so the
-       menu opens under the middle of the screen instead of stacking on the
+    /* Centre-screen modal (the More button lives in the top-left trio now, so
+       the menu opens under the middle of the screen instead of stacking on the
        trigger): cap to the safe viewport so short landscape phones can
        scroll the full menu without hiding rows behind controls or browser chrome.
        No --ui-scale division: this drawer is a <body>-level window OUTSIDE the
@@ -1025,7 +1181,7 @@
     left: 50%;
     /* Centred just above the bottom-centre #player-frame (14px inset + its
        scaled ~48px height + a gap), the classic seat: with Chat/More moved to
-       top-centre the band over the player frame is free again, and the old
+       the top-left trio the band over the player frame is free again, and the old
        left-strip seat now belongs to Jump's hollow seat around the joystick
        (a cast bar rendered behind a button, z 19 vs 30, was unreadable). */
     bottom: calc(68px + env(safe-area-inset-bottom));
@@ -1114,6 +1270,7 @@
      cast bars aren't in this selector list). */
   body.mobile-touch.mobile-chrome-idle #mobile-combat-controls .mobile-btn,
   body.mobile-touch.mobile-chrome-idle #mobile-utility-cluster .mobile-btn,
+  body.mobile-touch.mobile-chrome-idle #mobile-consumables-toggle,
   body.mobile-touch.mobile-chrome-idle #side-buttons {
     opacity: 0.5;
   }
@@ -2333,6 +2490,15 @@
       height: 44px;
       font-size: 16px;
     }
+    /* Portrait trio is 3x42px + 2x6px gaps = 138px wide (native app: web
+       gameplay is landscape-locked); shrink the chip to the 44px button
+       height and re-dock it past the narrower trio. */
+    body.mobile-touch #mobile-consumables {
+      left: calc(max(12px, env(safe-area-inset-left)) + 138px * var(--btn-scale, 1) + 8px);
+    }
+    body.mobile-touch #mobile-consumables-toggle {
+      height: 44px;
+    }
   }
 
   @media (orientation: landscape) {
@@ -2454,6 +2620,12 @@
       top: max(6px, env(safe-area-inset-top));
       grid-template-columns: repeat(3, 54px);
       gap: 10px;
+    }
+    /* Landscape trio is 3x54px + 2x10px gaps = 182px wide; keep the chip docked
+       just past it on the same compressed top line. */
+    body.mobile-touch #mobile-consumables {
+      left: calc(max(12px, env(safe-area-inset-left)) + 182px * var(--btn-scale, 1) + 10px);
+      top: max(6px, env(safe-area-inset-top));
     }
     /* Landscape joystick is 128px and re-anchored (above), so the satellite
        seats follow via the cluster's anchor/radius hooks; the hollow math and

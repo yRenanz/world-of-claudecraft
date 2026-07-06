@@ -759,6 +759,53 @@ describe('client HTML shell', () => {
     );
   });
 
+  it('ships the consumables quick bar in BOTH entries, collapsed by default', () => {
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      expect(entry, name).toContain('id="mobile-consumables"');
+      // aria-label on a role-less div is prohibited ARIA (ignored by screen
+      // readers); the container carries role="group" so the name is exposed.
+      expect(entry, name).toMatch(/id="mobile-consumables" role="group"/);
+      // The chevron chip starts collapsed (aria-expanded false; hud.ts flips it)
+      // and reuses the existing bags-filter key, so the bar adds no i18n keys.
+      expect(entry, name).toMatch(/id="mobile-consumables-toggle"[^>]*aria-expanded="false"/);
+      expect(entry, name).toMatch(/id="mobile-consumables-toggle"[^>]*data-icon="next"/);
+      expect(entry, name).toMatch(
+        /id="mobile-consumables-toggle"[^>]*data-i18n-aria="hudChrome\.bags\.filterConsumable"/,
+      );
+      const slots = [
+        ...entry.matchAll(/class="mobile-consumable-slot"[^>]*data-consumable-index="(\d+)"/g),
+      ];
+      expect(slots, name).toHaveLength(6);
+      expect(slots.map((m) => m[1]).sort(), name).toEqual(['0', '1', '2', '3', '4', '5']);
+    }
+    // The row shows only via the session-only body toggle, and empty slots
+    // collapse away so the open row is as wide as what the player carries.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-consumables-open #mobile-consumables-row {',
+    );
+    expect(hudMobileCss).toContain('body.mobile-touch .mobile-consumable-slot.empty {');
+    // A touch starting on the bar must never double as a camera drag.
+    expect(readFileSync(new URL('../src/game/touch_router.ts', import.meta.url), 'utf8')).toContain(
+      "'#mobile-consumables',",
+    );
+    // The open row drops BELOW the chip line: the top-centre band belongs to
+    // the pet bar, and #ui (z 80) paints above #mobile-controls (z 60), so a
+    // row along the top band would sit UNDER the pet buttons and lose taps.
+    expect(hudMobileCss).toMatch(
+      /#mobile-consumables-row \{\n {4}display: none;\n {4}position: absolute;\n {4}top: calc\(100% \+ 6px\);/,
+    );
+    // The id list is snapshotted at OPEN time and stays frozen while open, so
+    // slots never shift under the thumb the frame a stack depletes: exactly one
+    // consumableBarItems CALL (the toggle handler's snapshot), none per-frame.
+    expect(hudTs.match(/consumableBarItems\(/g) ?? []).toHaveLength(1);
+    expect(hudTs).toContain(
+      'consumableBarItems(this.sim.inventory, (id) => ITEMS[id], this.consumableBarIds);',
+    );
+  });
+
   it('carries identical mobile-action-ring markup in BOTH entries', () => {
     for (const entry of [html, playHtml]) {
       expect(entry).toContain('id="mobile-action-ring"');
@@ -1344,7 +1391,7 @@ describe('client HTML shell', () => {
     expect(marketWindowTs).not.toContain('<select data-market-filter=');
   });
 
-  it('keeps Chat, Social and More alone at top-centre, away from both thumb clusters', () => {
+  it('keeps Chat, Social and More alone at top-left, away from both thumb clusters', () => {
     for (const [name, entry] of [
       ['index.html', html],
       ['play.html', playHtml],
@@ -1357,7 +1404,7 @@ describe('client HTML shell', () => {
       const chat = combatControls.indexOf('id="mobile-chat"');
       const social = combatControls.indexOf('id="mobile-social"');
       const more = combatControls.indexOf('id="mobile-more"');
-      // Chat/Social/More are deliberately the ONLY top-centre buttons:
+      // Chat/Social/More are deliberately the ONLY top-left buttons:
       // everything a thumb needs mid-fight lives in the two bottom corner
       // clusters, so the trio is hard to fat-finger but still one reach away.
       expect(primaryButtons, name).toHaveLength(3);

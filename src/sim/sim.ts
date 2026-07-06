@@ -804,10 +804,6 @@ export interface PlayerMeta {
   companionUpgrades: Record<string, number>;
   delveLoreUnlocked: Set<string>;
   delveDaily: { date: string; firstClearXp: Set<string>; markClears: number };
-  // World-boss daily loot record (persisted in CharacterState). Resets at the UTC
-  // day boundary; holds the boss ids already looted today so a player can take
-  // personal loot from each world boss only once per day. See world_boss.ts.
-  worldBossDaily: WorldBossDaily;
   // Persistent town focus allocation (#1143): component type -> points spent.
   // Set only while standing in a town hub; adds a bonus to that component's
   // #1142 harvest yield, on top of the universal baseline, never below it.
@@ -1470,7 +1466,6 @@ export class Sim {
       companionUpgrades: {},
       delveLoreUnlocked: new Set(),
       delveDaily: { date: '', firstClearXp: new Set(), markClears: 0 },
-      worldBossDaily: emptyWorldBossDaily(),
       townFocus: {},
     };
     // A fresh character sets out provisioned (class-defined starter rations);
@@ -1825,10 +1820,6 @@ export class Sim {
         markClears: meta.delveDaily.markClears,
       },
       mailWelcomed: meta.mailWelcomed,
-      worldBossDaily: {
-        date: meta.worldBossDaily.date,
-        looted: [...meta.worldBossDaily.looted],
-      },
       townFocus: { ...meta.townFocus },
       // World-boss lockouts serialize via raidLockouts (above), not a separate field.
     };

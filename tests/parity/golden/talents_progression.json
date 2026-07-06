@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "74bced36",
+      "state": "73acddaa",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -59,7 +59,8 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -118,7 +119,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "f16c6f5e",
+      "state": "ccbfa112",
       "events": "2856c170",
       "rng": {
         "draws": 0,
@@ -165,7 +166,8 @@
               "war_cruelty": 2
             },
             "spec": "arms"
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -224,7 +226,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "b43fffe5",
+      "state": "90d0cfbb",
       "events": "40479820",
       "rng": {
         "draws": 0,
@@ -268,7 +270,8 @@
             "choices": {},
             "ranks": {},
             "spec": "arms"
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -327,7 +330,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "cfc4da8e",
+      "state": "25027802",
       "events": "a7d95be1",
       "rng": {
         "draws": 0,
@@ -389,7 +392,8 @@
               "war_cruelty": 3
             },
             "spec": "arms"
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -448,7 +452,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "3cb50ba7",
+      "state": "e32a247d",
       "events": "980c682a",
       "rng": {
         "draws": 0,
@@ -510,7 +514,8 @@
               "arms_imp_overpower": 2
             },
             "spec": "arms"
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -569,7 +574,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "6d482d79",
+      "state": "0079ddef",
       "events": "2856c170",
       "rng": {
         "draws": 0,
@@ -629,7 +634,8 @@
             "choices": {},
             "ranks": {},
             "spec": "fury"
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -688,7 +694,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "6d482d79",
+      "state": "0079ddef",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -748,7 +754,8 @@
             "choices": {},
             "ranks": {},
             "spec": "fury"
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [

@@ -830,8 +830,8 @@ export interface AwayStatus {
 }
 
 // ---------------------------------------------------------------------------
-// The World Market — a single shared, server-authoritative auction house run by
-// the Merchant NPC — moved to market.ts (L2). Its types (MarketListing,
+// The World Market (a single shared, server-authoritative auction house run by
+// the Merchant NPC) moved to market.ts (L2). Its types (MarketListing,
 // MarketCollection, MarketSave) and the MARKET_* consts live there now; MarketSave
 // is re-exported from this module (above) for server/db.ts.
 // ---------------------------------------------------------------------------

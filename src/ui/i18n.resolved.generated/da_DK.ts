@@ -313,7 +313,13 @@ export const da_DK: EnTranslations = {
       "hapticsOff": "Haptik fra",
       "toggleHaptics": "Slå haptik til/fra",
       "hotbarPage": "Evner",
-      "hotbarPageAria": "Vis næste sæt evner"
+      "hotbarPageAria": "Vis næste sæt evner",
+      "actionRing": "Combat actions",
+      "actionPageToggle": "Switch action page",
+      "actionPageIndicator": "{page}",
+      "targetCycle": "Swap target",
+      "targetCycleShort": "Target",
+      "spellbookPageLabel": "Page {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Brug bevægelsesstikken til at bevæge dig og træk på skærmen for at se dig omkring. Tag et par skridt for at begynde.",
@@ -420,7 +426,9 @@ export const da_DK: EnTranslations = {
       "itemLevelLine": "Genstandsniveau {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Vis sekundær handlingslinje",
-      "showDailyRewardsChest": "Vis kisten med daglige belønninger"
+      "showDailyRewardsChest": "Vis kisten med daglige belønninger",
+      "mobileCameraJoystick": "Camera joystick",
+      "mobileLeftHanded": "Left-handed layout"
     },
     "controller": {
       "title": "Controller",
@@ -1050,6 +1058,18 @@ export const da_DK: EnTranslations = {
           "hint": "Bed fællesskabet om hjælp"
         }
       }
+    },
+    "crafting": {
+      "title": "Crafting",
+      "close": "Close crafting",
+      "craft": "Craft",
+      "reagentsNeeded": "Requires:",
+      "reagentLine": "{name} x{have}/{required}",
+      "empty": "No recipes known yet.",
+      "resultAria": "Craft {name}",
+      "craftedToast": "Crafted: {name}",
+      "insufficientMaterials": "You do not have the materials for that.",
+      "unknownRecipe": "That recipe does not exist."
     },
     "devBadge": {
       "title": "Udvikler",

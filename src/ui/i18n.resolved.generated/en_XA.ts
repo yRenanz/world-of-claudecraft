@@ -313,7 +313,13 @@ export const en_XA: EnTranslations = {
       "hapticsOff": "[Ĥáþţíçš Óƒƒ]",
       "toggleHaptics": "[Ţóĝĝļé ĥáþţíçš]",
       "hotbarPage": "[Šķíļļš]",
-      "hotbarPageAria": "[Šĥóŵ ñéẋţ šéţ óƒ šķíļļš]"
+      "hotbarPageAria": "[Šĥóŵ ñéẋţ šéţ óƒ šķíļļš]",
+      "actionRing": "[Çóɱƀáţ áçţíóñš]",
+      "actionPageToggle": "[Šŵíţçĥ áçţíóñ þáĝé]",
+      "actionPageIndicator": "[{page}]",
+      "targetCycle": "[Šŵáþ ţáŕĝéţ]",
+      "targetCycleShort": "[Ţáŕĝéţ]",
+      "spellbookPageLabel": "[Þáĝé {page}]"
     },
     "tutorial": {
       "moveBodyTouch": "[Úšé ţĥé ɱóʋéɱéñţ šţíçķ ţó ɱóʋé áñð ðŕáĝ ţĥé šçŕééñ ţó ļóóķ áŕóúñð. Ţáķé á ƒéŵ šţéþš ţó ƀéĝíñ.]",
@@ -420,7 +426,9 @@ export const en_XA: EnTranslations = {
       "itemLevelLine": "[Íţéɱ Ļéʋéļ {level}]",
       "itemScoreLine": "[Šçóŕé {score}]",
       "showSecondaryActionBar": "[Šĥóŵ Šéçóñðáŕý Áçţíóñ Ɓáŕ]",
-      "showDailyRewardsChest": "[Šĥóŵ Ðáíļý Ŕéŵáŕðš Çĥéšţ]"
+      "showDailyRewardsChest": "[Šĥóŵ Ðáíļý Ŕéŵáŕðš Çĥéšţ]",
+      "mobileCameraJoystick": "[Çáɱéŕá ĵóýšţíçķ]",
+      "mobileLeftHanded": "[Ļéƒţ-ĥáñðéð ļáýóúţ]"
     },
     "controller": {
       "title": "[Çóñţŕóļļéŕ]",
@@ -1050,6 +1058,18 @@ export const en_XA: EnTranslations = {
           "hint": "[Ášķ ţĥé çóɱɱúñíţý ƒóŕ ĥéļþ]"
         }
       }
+    },
+    "crafting": {
+      "title": "[Çŕáƒţíñĝ]",
+      "close": "[Çļóšé çŕáƒţíñĝ]",
+      "craft": "[Çŕáƒţ]",
+      "reagentsNeeded": "[Ŕéɋúíŕéš:]",
+      "reagentLine": "[{name} ẋ{have}/{required}]",
+      "empty": "[Ñó ŕéçíþéš ķñóŵñ ýéţ.]",
+      "resultAria": "[Çŕáƒţ {name}]",
+      "craftedToast": "[Çŕáƒţéð: {name}]",
+      "insufficientMaterials": "[Ýóú ðó ñóţ ĥáʋé ţĥé ɱáţéŕíáļš ƒóŕ ţĥáţ.]",
+      "unknownRecipe": "[Ţĥáţ ŕéçíþé ðóéš ñóţ éẋíšţ.]"
     },
     "devBadge": {
       "title": "[Ðéʋéļóþéŕ]",

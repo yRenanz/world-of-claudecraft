@@ -313,7 +313,13 @@ export const ja_JP: EnTranslations = {
       "hapticsOff": "振動オフ",
       "toggleHaptics": "振動を切り替え",
       "hotbarPage": "スキル",
-      "hotbarPageAria": "次のスキルセットを表示"
+      "hotbarPageAria": "次のスキルセットを表示",
+      "actionRing": "戦闘アクション",
+      "actionPageToggle": "行動ページ切替",
+      "actionPageIndicator": "{page}",
+      "targetCycle": "ターゲット切替",
+      "targetCycleShort": "標的",
+      "spellbookPageLabel": "Page {page}"
     },
     "tutorial": {
       "moveBodyTouch": "移動スティックで移動し、画面をドラッグして周囲を見回します。数歩進んで始めましょう。",
@@ -420,7 +426,9 @@ export const ja_JP: EnTranslations = {
       "itemLevelLine": "アイテムレベル {level}",
       "itemScoreLine": "スコア {score}",
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
-      "showDailyRewardsChest": "デイリー報酬の宝箱を表示"
+      "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
+      "mobileCameraJoystick": "カメラスティック",
+      "mobileLeftHanded": "左利き用レイアウト"
     },
     "controller": {
       "title": "コントローラー",
@@ -1050,6 +1058,18 @@ export const ja_JP: EnTranslations = {
           "hint": "コミュニティに助けを求める"
         }
       }
+    },
+    "crafting": {
+      "title": "製作",
+      "close": "製作を閉じる",
+      "craft": "製作",
+      "reagentsNeeded": "必要素材:",
+      "reagentLine": "{name} x{have}/{required}",
+      "empty": "既知のレシピはありません。",
+      "resultAria": "{name}を製作",
+      "craftedToast": "製作しました:{name}",
+      "insufficientMaterials": "材料が不足しています。",
+      "unknownRecipe": "そのレシピは存在しません。"
     },
     "devBadge": {
       "title": "開発者",

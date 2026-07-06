@@ -313,7 +313,13 @@ export const zh_TW: EnTranslations = {
       "hapticsOff": "觸覺回饋已關閉",
       "toggleHaptics": "切換觸覺回饋",
       "hotbarPage": "技能",
-      "hotbarPageAria": "顯示下一組技能"
+      "hotbarPageAria": "顯示下一組技能",
+      "actionRing": "戰鬥動作",
+      "actionPageToggle": "切換動作頁",
+      "actionPageIndicator": "{page}",
+      "targetCycle": "切換目標",
+      "targetCycleShort": "目標",
+      "spellbookPageLabel": "Page {page}"
     },
     "tutorial": {
       "moveBodyTouch": "使用搖桿移動，拖曳螢幕環顧四周。先走幾步開始吧。",
@@ -420,7 +426,9 @@ export const zh_TW: EnTranslations = {
       "itemLevelLine": "物品等級 {level}",
       "itemScoreLine": "評分 {score}",
       "showSecondaryActionBar": "顯示副動作列",
-      "showDailyRewardsChest": "顯示每日獎勵寶箱"
+      "showDailyRewardsChest": "顯示每日獎勵寶箱",
+      "mobileCameraJoystick": "攝影機搖桿",
+      "mobileLeftHanded": "左手配置"
     },
     "controller": {
       "title": "手把",
@@ -1050,6 +1058,18 @@ export const zh_TW: EnTranslations = {
           "hint": "向社群尋求協助"
         }
       }
+    },
+    "crafting": {
+      "title": "製作",
+      "close": "關閉製作",
+      "craft": "製作",
+      "reagentsNeeded": "需要:",
+      "reagentLine": "{name} x{have}/{required}",
+      "empty": "尚無已知配方。",
+      "resultAria": "製作{name}",
+      "craftedToast": "已製作:{name}",
+      "insufficientMaterials": "你沒有足夠的材料。",
+      "unknownRecipe": "該配方不存在。"
     },
     "devBadge": {
       "title": "開發者",

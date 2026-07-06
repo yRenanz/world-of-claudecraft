@@ -311,15 +311,7 @@ export const pl_PL: EnTranslations = {
       "nameplates": "Nazwy",
       "haptics": "Wibracje",
       "hapticsOff": "Wibracje wył.",
-      "toggleHaptics": "Przełącz wibracje",
-      "hotbarPage": "Umiejętności",
-      "hotbarPageAria": "Pokaż następny zestaw umiejętności",
-      "actionRing": "Działania bojowe",
-      "actionPageToggle": "Zmień stronę akcji",
-      "actionPageIndicator": "Str. {page}",
-      "targetCycle": "Zmień cel",
-      "targetCycleShort": "Cel",
-      "spellbookPageLabel": "Strona {page}"
+      "toggleHaptics": "Przełącz wibracje"
     },
     "tutorial": {
       "moveBodyTouch": "Użyj gałki ruchu, aby się poruszać, i przeciągaj ekran, aby się rozglądać. Zrób kilka kroków, by zacząć.",
@@ -426,9 +418,7 @@ export const pl_PL: EnTranslations = {
       "itemLevelLine": "Poziom przedmiotu {level}",
       "itemScoreLine": "Ocena {score}",
       "showSecondaryActionBar": "Pokaż dodatkowy pasek akcji",
-      "showDailyRewardsChest": "Pokaż skrzynię codziennych nagród",
-      "mobileCameraJoystick": "Joystick aparatu",
-      "mobileLeftHanded": "Układ leworęczny"
+      "showDailyRewardsChest": "Pokaż skrzynię codziennych nagród"
     },
     "controller": {
       "title": "Kontroler",

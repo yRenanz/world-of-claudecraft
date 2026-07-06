@@ -311,15 +311,7 @@ export const es_ES: EnTranslations = {
       "nameplates": "Nombres",
       "haptics": "Vibración",
       "hapticsOff": "Vibración desactivada",
-      "toggleHaptics": "Alternar vibración",
-      "hotbarPage": "Habilidades",
-      "hotbarPageAria": "Mostrar el siguiente conjunto de habilidades",
-      "actionRing": "Acciones de combate",
-      "actionPageToggle": "Cambiar página de acción",
-      "actionPageIndicator": "Pág. {page}",
-      "targetCycle": "Cambiar objetivo",
-      "targetCycleShort": "Objetivo",
-      "spellbookPageLabel": "Página {page}"
+      "toggleHaptics": "Alternar vibración"
     },
     "tutorial": {
       "moveBodyTouch": "Usa el joystick de movimiento para moverte y arrastra la pantalla para mirar alrededor. Da unos pasos para empezar.",
@@ -426,9 +418,7 @@ export const es_ES: EnTranslations = {
       "itemLevelLine": "Nivel de objeto {level}",
       "itemScoreLine": "Puntuación {score}",
       "showSecondaryActionBar": "Mostrar barra de acción secundaria",
-      "showDailyRewardsChest": "Mostrar cofre de recompensas diarias",
-      "mobileCameraJoystick": "Palanca de mando de la cámara",
-      "mobileLeftHanded": "Diseño para zurdos"
+      "showDailyRewardsChest": "Mostrar cofre de recompensas diarias"
     },
     "controller": {
       "title": "Mando",

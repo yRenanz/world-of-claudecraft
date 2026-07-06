@@ -10,7 +10,7 @@
 | Phase 2 QA | complete | 2026-07-06 | 2026-07-06 |
 | Phase 3: IWorld + wire | complete | 2026-07-06 | 2026-07-06 |
 | Phase 3 QA | complete | 2026-07-06 | 2026-07-06 |
-| Phase 4: lease + ledger | not started | | |
+| Phase 4: lease + ledger | complete | 2026-07-06 | 2026-07-06 |
 | Phase 4 QA | not started | | |
 | Phase 5: bank window | not started | | |
 | Phase 5 QA | not started | | |
@@ -56,10 +56,10 @@
 - [x] Deliverables and acceptance criteria re-verified independently (pins re-derived from source, delta-guard and dispatch validation traced, wire tokens grepped repo-wide); findings fixed; both should-fix tests mutation-proven
 
 ### Phase 4: lease + ledger
-- [ ] Per-character load lease at join (mechanism decided and recorded in state.md); release on leave; takeover path safe
-- [ ] `bank_ledger` additive DDL (with the container discriminator columns, state.md decision 16) + non-blocking writer for every bank op
-- [ ] `scripts/bank_audit.mjs` offline conservation checker
-- [ ] Tests: lease exclusivity, ledger rows written, audit script on fixture data
+- [x] Per-character load lease at join (lease row + expiry + heartbeat + nonce fence, recorded in state.md decision 11); awaited fenced release on leave; takeover path safe; shutdown sweep; fail-closed refusal reusing the existing 'character already in world' literal (zero new i18n)
+- [x] `bank_ledger` additive DDL (container discriminator columns per decision 16) + non-blocking observational writer (bankInfoFor snapshot diff) for every successful bank op
+- [x] `scripts/bank_audit.mjs` offline conservation checker (per-container grouping; exit 1 on findings), plus `bank_audit.d.mts` for strict-tsc test imports
+- [x] Tests: lease SQL semantics + ws handshake branches + game wiring (24), ledger diff/dispatch/SQL (23+), audit fixtures (4), schema_wiring pins; live dev-Postgres verification of the SQL semantics, the nonce fence, double-boot, and both audit exit paths
 
 ### Phase 4 QA
 - [ ] As Phase 1 QA
@@ -149,6 +149,14 @@
 - Decisiveness: 8-mutation planted-bug pass, all killed (per-command gates, both interact intercepts, ctor push, pid on the emit, radius widening, boundary inclusivity, dead gate).
 - Phase 5 handoffs recorded in state.md: banker discoverability (no minimap marker or role hint yet) and whether to surface the greeting on bank-open; keep passing pid on the bank event.
 - Next: run docs/bank-system/phase-03-iworld-wire.md in a fresh session.
+
+### Phase 4 (2026-07-06)
+
+- Two parallel implementation agents (lease / ledger+audit) on disjoint file regions of db.ts and game.ts converged with zero collisions; the orchestrator pre-locked the lease mechanism (state.md decision 11) and both DDL anchor points before fan-out. Full record in state.md "Phase 4 outcomes".
+- Reviewers: migration-safety PASS (1 should-fix applied), privacy-security-review PASS (1 WARNING applied as the nonce fence + 1 INFO applied as WsAuthDeps DI), qa-checklist READY (1 should-fix + 1 nit applied). All INFO adjudications recorded in state.md; none deferred.
+- Live dev-Postgres verification (not in the packet, kept as a practice): the real db.ts functions were bundled and run against the docker dev DB twice (pre- and post-fence), proving the SQL semantics mocks cannot (upsert refusal arms, nonce fence, advisory-lock double-boot, JSONB round-trip, audit exit codes). It caught one real bug the unit fixtures had modeled wrong (the audit skipped bankless-state characters with ledger activity); fixed and pinned same-session.
+- Commit cadence amended (recorded in state.md): tests split from the scripts commit for conventional-commit hygiene; mock-factory repairs ride the commit that breaks them.
+- Next: run docs/bank-system/phase-04-qa.md in a fresh session.
 
 ### Phase 3 QA (2026-07-06)
 - Verdict: PASS after fixes. 0 blocking + 2 should-fix + 1 nit + 6 INFO across seven audit streams (correctness, test-coverage, dead-code, architecture-reviewer, cross-platform-sync, privacy-security-review, qa-checklist); everything actionable applied same-session as 9e6cc30e1. Full record in state.md "Phase 3 QA outcomes".

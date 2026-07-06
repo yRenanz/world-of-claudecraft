@@ -235,6 +235,132 @@ export const IWORLD_MEMBERS = [
   { name: 'recipeList', kind: 'data' },
   { name: 'lastCraftResult', kind: 'data' },
   { name: 'craftItem', kind: 'method' },
+  { name: 'activeArchetype', kind: 'data' },
+  { name: 'archetypeSwitchCount', kind: 'data' },
+  { name: 'archetypeAmendsProgress', kind: 'data' },
+  { name: 'archetypeAmendsRequired', kind: 'data' },
+  { name: 'acceptArchetypeQuest', kind: 'method' },
+  { name: 'advanceAmendsProgress', kind: 'method' },
+  { name: 'switchArchetype', kind: 'method' },
+  { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
+  { name: 'leaderboard', kind: 'method' }, // async
+  { name: 'guildLeaderboard', kind: 'method' }, // async
+  { name: 'devLeaderboard', kind: 'method' }, // async
+  { name: 'prestige', kind: 'method' },
+  // --- talents & specializations (reads + commands) ---
+  { name: 'talents', kind: 'data' },
+  { name: 'talentSpec', kind: 'data' },
+  { name: 'talentRole', kind: 'data' },
+  { name: 'loadouts', kind: 'data' },
+  { name: 'activeLoadout', kind: 'data' },
+  { name: 'talentPoints', kind: 'method' }, // read-returning (6/6)
+  { name: 'applyTalents', kind: 'method' },
+  { name: 'respec', kind: 'method' },
+  { name: 'setSpec', kind: 'method' },
+  { name: 'saveLoadout', kind: 'method' },
+  { name: 'switchLoadout', kind: 'method' },
+  { name: 'deleteLoadout', kind: 'method' },
+] as const satisfies readonly IWorldMember[];
+
+const DATA_MEMBERS = IWORLD_MEMBERS.filter((m) => m.kind === 'data');
+const METHOD_MEMBERS = IWORLD_MEMBERS.filter((m) => m.kind === 'method');
+
+// --- the two worlds under test: real prototypes + constructed instances ---
+
+const SIM_SEED = 1;
+const PROBE_CLASS: PlayerClass = 'warrior';
+
+// A DOM-less, network-free WebSocket stand-in for the ClientWorld ctor
+// (online.ts:800-823 opens a real `new WebSocket(...)`). No-op send/close; settable
+// on*-handlers, exactly what the ctor assigns.
+class StubWebSocket {
+  static readonly OPEN = 1;
+  onopen: (() => void) | null = null;
+  onmessage: ((ev: { data: unknown }) => void) | null = null;
+  onclose: (() => void) | null = null;
+  readyState = StubWebSocket.OPEN;
+  constructor(public readonly url: string) {}
+  send(): void {
+    /* no-op: the gate never sends */
+  }
+  close(): void {
+    /* no-op: there is no real socket */
+  }
+}
+
+// Run `fn` with `globalThis.WebSocket`/`globalThis.window` stubbed, then restore them.
+// Keeps the construction deterministic and free of real DOM/network/timers.
+function withDomStubs<T>(fn: () => T): T {
+  const g = globalThis as Record<string, unknown>;
+  const prevWebSocket = g.WebSocket;
+  const prevWindow = g.window;
+  g.WebSocket = StubWebSocket as unknown;
+  g.window = { setInterval: () => 0, clearInterval: () => undefined };
+  try {
+    return fn();
+  } finally {
+    g.WebSocket = prevWebSocket;
+    g.window = prevWindow;
+  }
+}
+
+// A real ClientWorld whose FIELD INITIALIZERS have run (a raw
+// `Object.create(ClientWorld.prototype)` bareClient would be missing all 36 data
+// props). Pass a non-empty `base` so the ctor builds a `ws://localhost/ws` URL instead
+// of touching `location`; `.close()` clears the stubbed input timer.
+function makeClientWorld(): ClientWorld {
+  return withDomStubs(() => {
+    const world = new ClientWorld('parity-probe-token', 1, PROBE_CLASS, 'http://localhost');
+    world.close();
+    return world;
+  });
+}
+
+// Resolve an own-or-inherited property descriptor (stop before Object.prototype so we
+// never match `toString`/`valueOf` and friends).
+function resolveDescriptor(proto: object, name: string): PropertyDescriptor | undefined {
+  let cur: object | null = proto;
+  while (cur && cur !== Object.prototype) {
+    const d = Object.getOwnPropertyDescriptor(cur, name);
+    if (d) return d;
+    cur = Object.getPrototypeOf(cur) as object | null;
+  }
+  return undefined;
+}
+
+function assertMethodMember(proto: object, name: string, label: string): void {
+  const d = resolveDescriptor(proto, name);
+  expect(d, `${label}.${name} is missing (IWorld method not implemented)`).toBeDefined();
+  // A getter descriptor for a call-signature member is a kind mismatch, not a method.
+  expect(
+    d?.get,
+    `${label}.${name} is a getter; expected a call-signature method (kind mismatch)`,
+  ).toBeUndefined();
+  expect(typeof d?.value, `${label}.${name} is not function-valued (kind mismatch)`).toBe(
+    'function',
+  );
+}
+
+function assertDataMember(instance: object, name: string, label: string): void {
+  const bag = instance as Record<string, unknown>;
+  expect(name in bag, `${label}.${name} is missing (IWorld data member not present)`).toBe(true);
+  // Reading must not throw: a present-but-throws read (e.g. a stubbed getter) is a drift.
+  // For `Sim` this exercises the getter body; for `ClientWorld` it reads the field.
+  expect(() => {
+    void bag[name];
+  }, `${label}.${name} threw on read (present-but-throws drift)`).not.toThrow();
+}
+
+let sim: Sim;
+let client: ClientWorld;
+
+beforeAll(() => {
+  sim = new Sim({ seed: SIM_SEED, playerClass: PROBE_CLASS });
+  client = makeClientWorld();
+});
+
+describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => {
+  it('pins total / data / method counts', () => {
     expect(IWORLD_MEMBERS.length).toBe(181);
     expect(DATA_MEMBERS.length).toBe(49);
     expect(METHOD_MEMBERS.length).toBe(132);
@@ -949,6 +1075,72 @@ const FACET_PROFESSIONS = [
   'recipeList',
   'lastCraftResult',
   'craftItem',
+  'activeArchetype',
+  'archetypeSwitchCount',
+  'archetypeAmendsProgress',
+  'archetypeAmendsRequired',
+  'acceptArchetypeQuest',
+  'advanceAmendsProgress',
+  'switchArchetype',
+] as const satisfies readonly (keyof IWorldProfessions)[];
+type _ExhaustProfessions = AssertNever<
+  Exclude<keyof IWorldProfessions, (typeof FACET_PROFESSIONS)[number]>
+>;
+
+// The 20-facet partition, keyed by facet for legible failure messages.
+const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
+  entityRoster: FACET_ENTITY_ROSTER,
+  combat: FACET_COMBAT,
+  targeting: FACET_TARGETING,
+  interaction: FACET_INTERACTION,
+  loot: FACET_LOOT,
+  inventory: FACET_INVENTORY,
+  cosmetics: FACET_COSMETICS,
+  quests: FACET_QUESTS,
+  progressionXp: FACET_PROGRESSION_XP,
+  talents: FACET_TALENTS,
+  pet: FACET_PET,
+  party: FACET_PARTY,
+  trade: FACET_TRADE,
+  chat: FACET_CHAT,
+  duelArena: FACET_DUEL_ARENA,
+  socialGraph: FACET_SOCIAL_GRAPH,
+  market: FACET_MARKET,
+  mail: FACET_MAIL,
+  dungeons: FACET_DUNGEONS,
+  delves: FACET_DELVES,
+  telemetry: FACET_TELEMETRY,
+  professions: FACET_PROFESSIONS,
+};
+
+describe('W1: aggregate IWorld member set equals the disjoint union of the 22 facets', () => {
+  it('pins the facet count at 22', () => {
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(22);
+  });
+
+  it('each facet array is non-empty and internally duplicate-free', () => {
+    for (const [name, arr] of Object.entries(FACET_MEMBER_ARRAYS)) {
+      expect(arr.length, `facet ${name} is empty`).toBeGreaterThan(0);
+      expect(new Set(arr).size, `facet ${name} has a duplicate member`).toBe(arr.length);
+    }
+  });
+
+  it('the 22 facet arrays are pairwise disjoint (no member filed in two facets)', () => {
+    const entries = Object.entries(FACET_MEMBER_ARRAYS);
+    const overlaps: string[] = [];
+    for (let i = 0; i < entries.length; i++) {
+      for (let j = i + 1; j < entries.length; j++) {
+        const [aName, a] = entries[i];
+        const [bName, b] = entries[j];
+        const bSet = new Set(b);
+        for (const member of a) {
+          if (bSet.has(member)) overlaps.push(`${member}: in both ${aName} and ${bName}`);
+        }
+      }
+    }
+    expect(overlaps, `members filed in more than one facet:\n${overlaps.join('\n')}`).toEqual([]);
+  });
+
   it('the union of the 22 facets equals the pinned 181-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(181);

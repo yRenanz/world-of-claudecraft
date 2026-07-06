@@ -185,6 +185,4 @@ const ALL_RECIPES: ProfessionRecipeRecord[] = [...COMMON_RECIPES, ...TOOL_RECIPE
 
 export function recipeById(recipeId: string): ProfessionRecipeRecord | undefined {
   return ALL_RECIPES.find((r) => r.id === recipeId);
-export function recipeById(recipeId: string): ProfessionRecipeRecord | undefined {
-  return COMMON_RECIPES.find((r) => r.id === recipeId);
 }

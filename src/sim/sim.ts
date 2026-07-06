@@ -185,7 +185,6 @@ import {
 } from './pathfind';
 import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
-import { type CraftResult, craftItem as craftItemImpl } from './professions/crafting';
 import {
   type ArchetypeState,
   acceptArchetypeQuest as acceptArchetypeQuestImpl,
@@ -817,11 +816,6 @@ export interface PlayerMeta {
   // so the player can page through and filter the WHOLE market a window at a time.
   // Never persisted, resets on login.
   marketQuery: MarketQuery;
-  // Session-only World Market browse filter. The market is capped at
-  // MARKET_WIRE_LIMIT listings per snapshot to bound wire cost, so this
-  // server-side substring filter (matched against item names) is how a player
-  // reaches goods past the cap. Never persisted, resets on login.
-  marketFilter: string;
   // Flat per-craft skill tracking (#1126): one independent, additive-only skill
   // value per craft on the ten-craft ring (see professions/wheel.ts). Persisted
   // in CharacterState.
@@ -871,12 +865,6 @@ export interface CharacterState {
   // Rested XP pool. Optional so pre-rested-XP saves load cleanly (defaults to 0).
   restedXp?: number;
   // Gathering profession proficiency (JSONB; optional so pre-professions saves
-  // load cleanly, defaulting every profession to 0). Key is `professions` (not
-  // `gatheringProficiency`), reserved by the settled professions contract
-  // (src/sim/professions/CLAUDE.md, #1164) parallel to the existing
-  // `delveDaily`/`companionUpgrades` persisted fields. `gatheringProficiency` is
-  // kept as a read-only back-compat alias for saves written before the rename.
-  gatheringProficiency?: Partial<Record<string, number>>;
   // load cleanly, defaulting every profession to 0). `professions` is the legacy
   // pre-rename key, kept for back-compat with old saves; `gatheringProficiency`
   // is the current key both read (preferred) and written going forward.
@@ -1504,7 +1492,6 @@ export class Sim {
       craftSkills: emptyCraftSkills(),
       marketQuery: defaultMarketQuery(),
       mailWelcomed: false,
-      marketFilter: '',
       archetype: emptyArchetypeState(),
       delveMarks: 0,
       delveClears: {},
@@ -1536,8 +1523,6 @@ export class Sim {
       meta.lifetimeXp = s.lifetimeXp ?? xpToReachLevel(player.level) + Math.max(0, s.xp);
       meta.prestigeRank = s.prestigeRank ?? 0;
       meta.restedXp = Math.max(0, s.restedXp ?? 0);
-      meta.gatheringProficiency = normalizeGatheringProficiency(
-        s.professions ?? s.gatheringProficiency,
       // `s.professions` is the legacy pre-rename field (#1119); `s.gatheringProficiency`
       // is the current one. Prefer the current field, fall back to the legacy one so
       // saves from before the rename still load correctly.

@@ -182,10 +182,14 @@ describe('deposit rules', () => {
     m.bank.inventory = gearSlots(24);
     expect(bankCapacity(m.bank)).toBe(24);
     sim.addItem('wolf_fang', 1);
+    const bagBefore = clone(m.inventory);
+    const copperBefore = m.copper;
     sim.drainEvents();
     sim.bankDeposit(m.inventory.findIndex((s) => s.itemId === 'wolf_fang'));
     expect(hasErr(sim.drainEvents(), 'Your bank is full.')).toBe(true);
     expect(m.bank.inventory).toHaveLength(24);
+    expect(m.inventory).toEqual(bagBefore); // the refused item stays in the bags
+    expect(m.copper).toBe(copperBefore);
   });
 
   it('treats out-of-range / non-positive / over-count deposits as SILENT no-ops', () => {
@@ -195,6 +199,7 @@ describe('deposit rules', () => {
     const idx = m.inventory.findIndex((s) => s.itemId === 'wolf_fang');
     const bagBefore = clone(m.inventory);
     const bankBefore = clone(m.bank.inventory);
+    const copperBefore = m.copper;
     sim.drainEvents();
     sim.bankDeposit(-1);
     sim.bankDeposit(999);
@@ -203,6 +208,7 @@ describe('deposit rules', () => {
     expect(sim.drainEvents()).toHaveLength(0);
     expect(m.inventory).toEqual(bagBefore);
     expect(m.bank.inventory).toEqual(bankBefore);
+    expect(m.copper).toBe(copperBefore);
   });
 
   it('un-credits an active collect objective when its counted item is deposited', () => {
@@ -258,10 +264,14 @@ describe('withdraw rules', () => {
     const m = meta(sim);
     m.bank.inventory = [{ itemId: 'wolf_fang', count: 3 }];
     fillBags(sim);
+    const bagBefore = clone(m.inventory);
+    const copperBefore = m.copper;
     sim.drainEvents();
     sim.bankWithdraw(0);
     expect(hasErr(sim.drainEvents(), 'Your bags are full.')).toBe(true);
     expect(m.bank.inventory).toEqual([{ itemId: 'wolf_fang', count: 3 }]);
+    expect(m.inventory).toEqual(bagBefore); // nothing duplicated into the full bags
+    expect(m.copper).toBe(copperBefore);
   });
 
   it('treats malformed withdraw inputs as SILENT no-ops', () => {
@@ -270,6 +280,7 @@ describe('withdraw rules', () => {
     m.bank.inventory = [{ itemId: 'wolf_fang', count: 5 }];
     const bankBefore = clone(m.bank.inventory);
     const bagBefore = clone(m.inventory);
+    const copperBefore = m.copper;
     sim.drainEvents();
     sim.bankWithdraw(-1);
     sim.bankWithdraw(999);
@@ -278,6 +289,7 @@ describe('withdraw rules', () => {
     expect(sim.drainEvents()).toHaveLength(0);
     expect(m.bank.inventory).toEqual(bankBefore);
     expect(m.inventory).toEqual(bagBefore);
+    expect(m.copper).toBe(copperBefore);
   });
 
   it('re-credits an active collect objective when its quest item is withdrawn', () => {
@@ -360,12 +372,21 @@ describe('bonusSlots (Phase 8 seam, respected now)', () => {
     const m = meta(sim);
     m.bank.bonusSlots = 4;
     expect(bankCapacity(m.bank)).toBe(28);
-    m.bank.inventory = gearSlots(28);
+    // 27 entries is ABOVE the 24-slot base: the next deposit only fits if the
+    // deposit path really honors bonusSlots (a base-capacity bank would refuse).
+    m.bank.inventory = gearSlots(27);
     sim.addItem('wolf_fang', 1);
     sim.drainEvents();
     sim.bankDeposit(m.inventory.findIndex((s) => s.itemId === 'wolf_fang'));
+    expect(sim.drainEvents()).toHaveLength(0); // admitted, no refusal
+    expect(m.bank.inventory).toHaveLength(28);
+    expect(m.bank.inventory.some((s) => s.itemId === 'wolf_fang')).toBe(true);
     // 28 entries fills the bonus-expanded bank exactly, so the 29th is refused.
+    sim.addItem('linen_scrap', 1);
+    sim.drainEvents();
+    sim.bankDeposit(m.inventory.findIndex((s) => s.itemId === 'linen_scrap'));
     expect(hasErr(sim.drainEvents(), 'Your bank is full.')).toBe(true);
+    expect(m.bank.inventory).toHaveLength(28);
   });
 });
 
@@ -488,6 +509,8 @@ describe('conservation seed sweeps', () => {
     let sawPurchase = false;
     let sawCapRefusal = false;
     let sawQuestDeny = false;
+    let sawBagsFullRefusal = false;
+    let sawCannotAfford = false;
 
     for (let seed = 1; seed <= 50; seed++) {
       const sim = makeSim(seed);
@@ -499,7 +522,11 @@ describe('conservation seed sweeps', () => {
       pushInstanced(sim, 'worn_sword', { signer: `S${seed}` });
       // Pre-fill the bank to one below base capacity so the sweep meets the full-bank wall.
       m.bank.inventory = gearSlots(23);
-      m.copper = LADDER_TOTAL;
+      // Every 5th seed starts with FULL bags (withdraws refuse bags-full) and every
+      // 7th seed starts too poor for even the first tier (purchases refuse), so the
+      // sweep provably exercises BOTH remaining refusal paths under conservation.
+      if (seed % 5 === 0) fillBags(sim);
+      m.copper = seed % 7 === 0 ? 300 : LADDER_TOTAL;
 
       const startTotal = totalMultiset(m.inventory, m.bank.inventory);
       const startCopper = m.copper;
@@ -529,6 +556,8 @@ describe('conservation seed sweeps', () => {
         const ev = sim.drainEvents();
         if (hasErr(ev, 'Your bank is full.')) sawCapRefusal = true;
         if (hasErr(ev, 'You cannot store quest items in the bank.')) sawQuestDeny = true;
+        if (hasErr(ev, 'Your bags are full.')) sawBagsFullRefusal = true;
+        if (hasErr(ev, 'You cannot afford that bank expansion.')) sawCannotAfford = true;
         const after = bankUnits(m.bank.inventory);
         if (after > before) sawDeposit = true;
         if (after < before) sawWithdraw = true;
@@ -548,6 +577,8 @@ describe('conservation seed sweeps', () => {
     expect(sawPurchase, 'no successful purchase occurred').toBe(true);
     expect(sawCapRefusal, 'no capacity refusal occurred').toBe(true);
     expect(sawQuestDeny, 'no quest-item denial occurred').toBe(true);
+    expect(sawBagsFullRefusal, 'no bags-full withdraw refusal occurred').toBe(true);
+    expect(sawCannotAfford, 'no cannot-afford purchase refusal occurred').toBe(true);
   });
 });
 
@@ -574,7 +605,13 @@ describe('determinism', () => {
       }
       return { state: sim.serializeCharacter(sim.playerId)!, events: texts };
     }
-    expect(run()).toEqual(run());
+    const a = run();
+    // Non-vacuity: the scripted bank ops really executed in the run being compared
+    // (a regression that silently no-ops every op would still deep-equal run()).
+    expect(a.state.bank!.purchasedSlots).toBe(18); // three 6-slot purchases
+    expect(a.state.bank!.inventory.length).toBeGreaterThan(0);
+    expect(a.events).toContain('log:You purchase additional bank slots.');
+    expect(a).toEqual(run());
   });
 });
 
@@ -593,6 +630,7 @@ describe('persistence and back-compat', () => {
       },
     ];
     m.bank.purchasedSlots = 12;
+    m.bank.bonusSlots = 5; // persisted (decision 1): must survive the round-trip
     m.copper = 4242;
 
     const s1 = sim.serializeCharacter(sim.playerId)!;
@@ -603,7 +641,7 @@ describe('persistence and back-compat', () => {
     expect(s2.bank).toEqual({
       inventory: m.bank.inventory,
       purchasedSlots: 12,
-      bonusSlots: 0,
+      bonusSlots: 5,
     });
   });
 
@@ -648,6 +686,16 @@ describe('persistence and back-compat', () => {
     expect(banked.instance!.signer).toBe('Bru');
     expect(banked.instance!.charges!.zap).toBe(3);
     expect(banked.instance!.rolled!.stats!.str).toBe(7);
+    // The return trip: withdraw the banked slot and the FULL payload survives.
+    sim.bankWithdraw(m.bank.inventory.findIndex((s) => s.instance));
+    expect(m.bank.inventory.some((s) => s.instance)).toBe(false);
+    const returned = m.inventory.find((s) => s.itemId === 'worn_sword' && s.instance)!;
+    expect(returned.instance).toEqual({
+      signer: 'Bru',
+      charges: { zap: 3 },
+      rolled: { quality: 'rare', stats: { str: 7 } },
+      boundTo: 7,
+    });
   });
 
   it('loads a legacy save with no bank field, defaulting to an empty bank', () => {
@@ -679,8 +727,11 @@ describe('persistence and back-compat', () => {
     const m2 = meta(sim2, pid);
     expect(m2.bank.inventory).toHaveLength(30); // nothing dropped
     expect(bankCapacity(m2.bank)).toBe(24);
-    // a new deposit is refused (over capacity)
+    // a new deposit is refused (over capacity) and moves/charges nothing
     sim2.addItem('wolf_fang', 1, pid);
+    const bagBefore = clone(m2.inventory);
+    const bankBefore = clone(m2.bank.inventory);
+    const copperBefore = m2.copper;
     sim2.drainEvents();
     sim2.bankDeposit(
       m2.inventory.findIndex((s) => s.itemId === 'wolf_fang'),
@@ -688,9 +739,39 @@ describe('persistence and back-compat', () => {
       pid,
     );
     expect(hasErr(sim2.drainEvents(), 'Your bank is full.')).toBe(true);
+    expect(m2.bank.inventory).toEqual(bankBefore);
+    expect(m2.inventory).toEqual(bagBefore);
+    expect(m2.copper).toBe(copperBefore);
     // ...but a withdraw still works, draining back toward capacity
     sim2.bankWithdraw(0, 1, pid);
     expect(m2.bank.inventory).toHaveLength(29);
+  });
+
+  it('sanitizes a tampered bank through the real addPlayer load path', () => {
+    // The tamper matrix below is unit-tested against sanitizeBankState directly;
+    // this drives ONE tampered save through addPlayer so the load-boundary wiring
+    // (sim.ts: meta.bank = sanitizeBankState(s.bank)) is itself load-bearing.
+    const sim = makeSim();
+    const state = sim.serializeCharacter(sim.playerId)! as { bank?: unknown };
+    state.bank = {
+      inventory: [
+        { itemId: 'worn_sword', count: 5, instance: { signer: 'Ana' } }, // forced to 1
+        { itemId: 'wolf_fang', count: -3 }, // clamped to 1
+        { itemId: 42, count: 1 }, // junk entry: dropped
+      ],
+      purchasedSlots: 7, // floored to the 6-grid
+      bonusSlots: -2, // clamped to 0
+    };
+    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim2.addPlayer('warrior', 'Tampered', { state: state as never });
+    expect(meta(sim2, pid).bank).toEqual({
+      inventory: [
+        { itemId: 'worn_sword', count: 1, instance: { signer: 'Ana' } },
+        { itemId: 'wolf_fang', count: 1 },
+      ],
+      purchasedSlots: 6,
+      bonusSlots: 0,
+    });
   });
 });
 

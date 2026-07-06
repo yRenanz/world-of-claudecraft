@@ -46,6 +46,7 @@ import {
   verifyPassword,
 } from './auth';
 import { configureAuthRuntime } from './auth_routes';
+import { bankLedgerIdle } from './bank_ledger';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
 import { characterSheet, type SheetRank } from './character_sheet';
 import { configureCharactersRuntime } from './characters';
@@ -2357,6 +2358,11 @@ export async function startServer(): Promise<http.Server> {
     await releaseAllCharacterLeases().catch((err) =>
       console.error('lease release-all failed:', err),
     );
+    // Drain any bank_ledger writes still queued on the FIFO tail so a clean
+    // restart loses no audit rows (a crash still can; the offline audit
+    // tolerates that as a transient mismatch). Rejections log inside the
+    // writer, so the drain itself never throws.
+    await bankLedgerIdle();
     await game.chatLog.stop();
     await pool.end();
     process.exit(0);

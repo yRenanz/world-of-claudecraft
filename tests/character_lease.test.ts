@@ -150,9 +150,13 @@ describe('shutdown wiring (source pin)', () => {
     const src = readFileSync(new URL('../server/main.ts', import.meta.url), 'utf8');
     const endSessions = src.indexOf('await game.endAllPlaySessions(');
     const sweep = src.indexOf('await releaseAllCharacterLeases(');
+    const ledgerDrain = src.indexOf('await bankLedgerIdle()');
     const poolEnd = src.indexOf('await pool.end()');
     expect(endSessions).toBeGreaterThan(-1);
     expect(sweep).toBeGreaterThan(endSessions);
-    expect(poolEnd).toBeGreaterThan(sweep);
+    // The bank_ledger FIFO drains before the pool closes, so a clean shutdown
+    // loses no queued audit rows.
+    expect(ledgerDrain).toBeGreaterThan(sweep);
+    expect(poolEnd).toBeGreaterThan(ledgerDrain);
   });
 });

@@ -185,7 +185,6 @@ import {
 } from './pathfind';
 import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
-import { type CraftResult, craftItem as craftItemImpl } from './professions/crafting';
 import {
   type ArchetypeState,
   acceptArchetypeQuest as acceptArchetypeQuestImpl,

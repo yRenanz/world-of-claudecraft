@@ -71,6 +71,14 @@ export function canHarvestMonsterMaterial(toolTier: number, materialTier: number
 // (a future per-tool-instance record, e.g. keyed by playerId+professionId, or
 // a per-node harvest call site) owns and passes in; this module never stores
 // slot state itself, keeping it a pure leaf like the rest of the file.
+// Always-or-prompt-on-use configuration (#1138): a high-value slotted effect
+// spends a charge every use it fires. 'always' preserves #1136's original
+// baseline (fires and spends every use, no gate). 'prompt' means the player
+// must explicitly confirm each use before it is allowed to fire and spend a
+// charge; an unconfirmed use skips the effect entirely (no bonus, no charge
+// spent) while the underlying harvest/craft action still proceeds.
+export type ToolEffectConfirmMode = 'always' | 'prompt';
+
 export interface ToolEffectSlot {
   effectId: ToolEffectId;
   /** Remaining charges. Reaches 0 when the effect is fully depleted. */
@@ -83,6 +91,8 @@ export interface ToolEffectSlot {
    * never gates the base tool or the bonus itself.
    */
   craftedBy?: string;
+  /** How this slot's effect fires. Defaults to 'always' (see slotEffect). */
+  confirmMode: ToolEffectConfirmMode;
 }
 
 // Attaches an effect from the catalog to a tool, at its full starting
@@ -90,9 +100,20 @@ export interface ToolEffectSlot {
 // same as installing a fresh effect. `craftedBy` (#1137) records the player
 // id of the production craft that made this effect, if known; omit it when no
 // identity is available (the slot is then never eligible for the
-// original-crafter recharge discount).
-export function slotEffect(effectId: ToolEffectId, craftedBy?: string): ToolEffectSlot {
-  return { effectId, durability: TOOL_EFFECTS[effectId].startingDurability, craftedBy };
+// original-crafter recharge discount). `confirmMode` (#1138) defaults to
+// 'always' so a caller that never touches the new config gets #1136's exact
+// prior behavior.
+export function slotEffect(
+  effectId: ToolEffectId,
+  craftedBy?: string,
+  confirmMode: ToolEffectConfirmMode = 'always',
+): ToolEffectSlot {
+  return {
+    effectId,
+    durability: TOOL_EFFECTS[effectId].startingDurability,
+    craftedBy,
+    confirmMode,
+  };
 }
 
 // The outcome shape a harvest/craft action produces. `quantity`/`quality` are
@@ -217,15 +238,58 @@ export function rechargeEffect(
   return { success: true, cost };
 }
 
-// INTEGRATION NOTE (#1136): the node-harvest outcome path (#1121) and the
-// recipe-crafting outcome path (#1127) are not present on this branch (this
-// branch is stacked directly on #1135, the crafted-tool-tiers PR), so there is
-// no live call site to wire `applyEffectBonus`/`depleteEffect` into yet. Once
-// either lands, its outcome-producing function should: build the base
-// HarvestOutcome, call `applyEffectBonus(slot, outcome)` to get the bonused
-// result, then call `depleteEffect(slot, rng)` using the SAME `Rng` the caller
-// already draws from (never a fresh one) so the depletion roll takes its place
-// in the one shared draw order. `rechargeEffect` (#1137) has the same
-// no-live-call-site status: once a production/recharge UI action exists, it
-// should deduct `cost.materials` from the recharger's inventory and gate
-// `cost.ticks` as craft time before calling `rechargeEffect`.
+// The outcome of attempting to use a slotted effect for one harvest/craft
+// action, after the always/prompt-on-use gate (#1138) has been applied.
+export interface ToolEffectUseResult {
+  outcome: HarvestOutcome;
+  /** True if depleteEffect actually decremented durability this call. */
+  depleted: boolean;
+  /** False only when a 'prompt' slot was not confirmed, so nothing fired. */
+  applied: boolean;
+}
+
+// The always/prompt-on-use confirmation gate (#1138). This is the ONE call
+// site a harvest/craft outcome path should use to apply a slotted effect: it
+// wraps `applyEffectBonus` + `depleteEffect` behind the slot's `confirmMode`,
+// so callers never need to hand-roll the gate.
+//
+// - `confirmMode: 'always'` (the default from `slotEffect`): behaves EXACTLY
+//   like #1136 before this issue existed. `confirmed` is ignored; the bonus
+//   always applies and `depleteEffect` always rolls, in the same order as
+//   before (`applyEffectBonus` first, then `depleteEffect` on the SAME rng).
+// - `confirmMode: 'prompt'`: the caller must pass `confirmed: true`
+//   (representing the player's explicit confirmation for this one use) or
+//   nothing happens at all. No charge is spent AND no bonus is applied: the
+//   base outcome passes through unchanged, and the base harvest/craft action
+//   itself is unaffected either way (this function never touches it).
+export function resolveToolEffectUse(
+  slot: ToolEffectSlot | undefined,
+  outcome: HarvestOutcome,
+  rng: Rng,
+  confirmed: boolean,
+): ToolEffectUseResult {
+  if (!slot) return { outcome, depleted: false, applied: false };
+  if (slot.confirmMode === 'prompt' && !confirmed) {
+    return { outcome, depleted: false, applied: false };
+  }
+  const bonused = applyEffectBonus(slot, outcome);
+  const depleted = depleteEffect(slot, rng);
+  return { outcome: bonused, depleted, applied: true };
+}
+
+// INTEGRATION NOTE (#1136, extended by #1137 and #1138): the node-harvest
+// outcome path (#1121) and the recipe-crafting outcome path (#1127) are not
+// present on this branch (this branch is stacked directly on #1135, the
+// crafted-tool-tiers PR), so there is no live call site to wire
+// `resolveToolEffectUse`/`rechargeEffect` into yet. Once either lands, its
+// outcome-producing function should: build the base HarvestOutcome, then call
+// `resolveToolEffectUse(slot, outcome, rng, confirmed)` using the SAME `Rng`
+// the caller already draws from (never a fresh one) so the depletion roll
+// (when it fires) takes its place in the one shared draw order. `confirmed`
+// should come from the player's client request for a 'prompt' slot (see the
+// tool/effect UI toggle); a caller with no confirmation flow yet can pass
+// `true` unconditionally, which is equivalent to every slot behaving as
+// 'always'. `rechargeEffect` (#1137) has the same no-live-call-site status:
+// once a production/recharge UI action exists, it should deduct
+// `cost.materials` from the recharger's inventory and gate `cost.ticks` as
+// craft time before calling `rechargeEffect`.

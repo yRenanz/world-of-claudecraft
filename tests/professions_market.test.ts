@@ -194,9 +194,11 @@ vi.mock('pg', () => ({
 }));
 
 describe('save-on-leave atomicity for a profession-item listing (#1146)', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     dbMock.query.mockReset();
     dbMock.connect.mockReset();
+    const { openMarketWriteGate } = await import('../server/db');
+    openMarketWriteGate();
   });
 
   it('writes the escrowed character bags and the market listing in one transaction', async () => {

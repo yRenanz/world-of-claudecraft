@@ -2106,7 +2106,8 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.activeLoadout).toBe(0);
   });
 
-  it('omits all delta keys on a no-op re-broadcast and preserves the prior mirror', () => {    const { server, fc, leader, memberPid } = dirtyEveryDeltaField();
+  it('omits all delta keys on a no-op re-broadcast and preserves the prior mirror', () => {
+    const { server, fc, leader, memberPid } = dirtyEveryDeltaField();
     broadcast(server);
     const client = bareClient(leader.pid);
     (client as any).applySnapshot(lastSnap(fc.sent));

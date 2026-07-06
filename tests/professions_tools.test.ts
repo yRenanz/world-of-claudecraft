@@ -12,7 +12,8 @@ import {
   resolveToolEffectUse,
   slotEffect,
 } from '../src/sim/professions/tools';
-import { Rng } from '../src/sim/rng';import { Sim } from '../src/sim/sim';
+import { Rng } from '../src/sim/rng';
+import { Sim } from '../src/sim/sim';
 import type { ItemDef } from '../src/sim/types';
 
 describe('gathering tool tier gating (#1123)', () => {
@@ -164,7 +165,8 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
       for (let i = 0; i < 1000; i++) {
         // Repeated simulated gathers never mutate or exhaust the item.
         expect(gatherToolTier(item, 'mining')).toBe(tier);
-      }      expect(item).not.toHaveProperty('durability');
+      }
+      expect(item).not.toHaveProperty('durability');
     }
   });
 
@@ -196,7 +198,7 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
       expect(canHarvestMonsterMaterial(commonTier, nodeOrMaterialTier)).toBe(
         canHarvestMonsterMaterial(epicTier, nodeOrMaterialTier),
       );
-    }    // Real vendor (uncommon, tier 3) and crafted (rare, tier 4) tools also
+    } // Real vendor (uncommon, tier 3) and crafted (rare, tier 4) tools also
     // carry different rarities: confirm the rarity difference is real, so the
     // tier-only gating check above is meaningful and not vacuously true.
     expect(ITEMS.mithril_mining_pick.quality).toBe('uncommon');

@@ -127,6 +127,7 @@ export function bankDeposit(
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
+  if (p.dead) return; // the market/mail town-service idiom: dead players bank nothing
   if (!nearBanker(ctx, p)) {
     ctx.error(meta.entityId, 'You are too far from the banker.');
     return;
@@ -164,6 +165,7 @@ export function bankWithdraw(
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
+  if (p.dead) return; // the market/mail town-service idiom: dead players bank nothing
   if (!nearBanker(ctx, p)) {
     ctx.error(meta.entityId, 'You are too far from the banker.');
     return;
@@ -193,6 +195,7 @@ export function bankBuySlots(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
+  if (p.dead) return; // the market/mail town-service idiom: dead players bank nothing
   if (!nearBanker(ctx, p)) {
     ctx.error(meta.entityId, 'You are too far from the banker.');
     return;

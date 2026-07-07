@@ -51,6 +51,7 @@ import {
   healingThreat as healingThreatImpl,
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
+import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
 import { isSpellResisted } from './combat/spell_resist';
 // A3: the augment/power-up content helpers used by the Fiesta match logic
 // (AUGMENTS_BY_ID/AugmentDef/eligibleAugments/POWERUPS/PowerupDef/tierForWave)
@@ -168,6 +169,11 @@ import {
 import { type MailSave, PostOffice } from './mail/post_office';
 import { Market, type MarketListing, type MarketSave } from './market';
 import { defaultMarketQuery, type MarketQuery } from './market_query';
+import {
+  mobCombatProfile as mobCombatProfileFn,
+  mobEffectiveMeleeRange as mobEffectiveMeleeRangeFn,
+  tryMobMeleeSwingInRange as tryMobMeleeSwingInRangeFn,
+} from './mob/combat_profile';
 import * as lifecycle from './mob/lifecycle';
 import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
@@ -176,7 +182,7 @@ import {
   updateMobTarget as updateMobTargetFn,
 } from './mob/targeting';
 import { emitMobYell } from './mob/yells';
-import { combatProfileForMob, effectiveMobMeleeRange, type MobCombatProfile } from './mob_combat';
+import type { MobCombatProfile } from './mob_combat';
 import {
   findPlayerPath,
   PLAYER_BODY_RADIUS,
@@ -303,7 +309,6 @@ import { isStunDrCategory } from './stun_dr';
 import { Targeting } from './targeting';
 import {
   addThreat,
-  clearThreat,
   TAUNT_FORCE_SECONDS,
   threatEntries,
   threatModifier,
@@ -326,7 +331,6 @@ import {
   type DelveModuleDef,
   type DelveRun,
   DT,
-  DUNGEON_LEASH_DISTANCE,
   dist2d,
   type Entity,
   type EquipSlot,
@@ -358,10 +362,12 @@ import {
   type QuestState,
   type RiteIntensity,
   RUN_SPEED,
+  type SetProc,
   type SimConfig,
   type SimEvent,
   type SkinCatalog,
   type SkinRank,
+  steadyAngleTo,
   swingMissChance,
   TURN_SPEED,
   type Vec3,
@@ -1002,7 +1008,8 @@ function freshCounters(): RewardCounters {
 export class Sim {
   // `world` stays optional (a custom map for play-test, else undefined for the
   // built-in world); everything else is defaulted to a concrete value below.
-  cfg: Required<Omit<SimConfig, 'noPlayer' | 'world'>> & Pick<SimConfig, 'world'>;
+  cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap'>> &
+    Pick<SimConfig, 'world' | 'perfLap'>;
   rng: Rng;
   time = 0;
   tickCount = 0;
@@ -1109,6 +1116,7 @@ export class Sim {
       // Carried through so the renderer (which reaches the Sim as IWorld) can read
       // the same custom world via sim.cfg.world. Undefined for the built-in world.
       world: cfg.world,
+      perfLap: cfg.perfLap,
     };
     this.rng = new Rng(cfg.seed);
     // Live server opt-in (worldBossAtBoot): the first world-boss rise is due
@@ -2516,9 +2524,6 @@ export class Sim {
       mobSwing: sim.mobSwing.bind(sim),
       updateRangedPetAttack: sim.updateRangedPetAttack.bind(sim),
       fleeMoveSpeed: sim.fleeMoveSpeed.bind(sim),
-      usesProfiledMobCombat: sim.usesProfiledMobCombat.bind(sim),
-      updateProfiledMobCombat: sim.updateProfiledMobCombat.bind(sim),
-      tryMobMeleeSwingInRange: sim.tryMobMeleeSwingInRange.bind(sim),
       maybeFlee: sim.maybeFlee.bind(sim),
       aggroMob: sim.aggroMob.bind(sim),
       // C3 moved the CC predicates to combat/cc.ts; ctx.isStunned/isRooted (consumed by
@@ -2527,7 +2532,6 @@ export class Sim {
       isRooted: isRooted,
       moveSpeedMult: sim.moveSpeedMult.bind(sim),
       swingIntervalMult: sim.swingIntervalMult.bind(sim),
-      mobEffectiveMeleeRange: sim.mobEffectiveMeleeRange.bind(sim),
       mobCanSwim: sim.mobCanSwim.bind(sim),
       resolveMovePoint: sim.resolveMovePoint.bind(sim),
       // P1a pet AI lives in src/sim/pet/pet_ai.ts; locomotion.updateMob reaches it
@@ -2641,6 +2645,7 @@ export class Sim {
       hasLineOfSight: sim.hasLineOfSight.bind(sim),
       findChargePath: sim.findChargePath.bind(sim),
       runEffects: (p, meta, target, res) => runEffectsImpl(sim.ctx, p, meta, target, res),
+      applySetProcs: sim.applySetProcs.bind(sim),
       // P1a pet-AI seam: the helper the moved updatePet/petRangedAttack/petPickTarget
       // reach back for. syncPetAspect STAYS on Sim (pet-management, P1b owns it eventually);
       // effectiveAttackPower (C4b binding above) + isHostileTo (C4a binding above) are
@@ -2841,26 +2846,41 @@ export class Sim {
     // behavior, so every phase here is byte-identical (the parity gate proves it).
     this.time += DT;
     this.tickCount++;
+    // Optional per-phase timing hook (cfg.perfLap): the host attributes the elapsed
+    // time since its previous mark to the named phase. Undefined offline/headless, so
+    // this is a no-op there; it draws no rng and mutates nothing either way, keeping
+    // the tick deterministic. The server injects it for its on-demand tick profiler.
+    const lap = this.cfg.perfLap;
     this.updatePendingMobRespawns();
+    lap?.('respawns');
     this.updateWorldBosses();
+    lap?.('worldBosses');
     tickGroundAoEs(this.ctx);
+    lap?.('groundAoEs');
 
     runDespawnDecay(this.ctx);
+    lap?.('despawnDecay');
     // Step in-flight projectiles toward their live targets before this tick's casts and
     // swings, so a homing bolt resolves on a fixed, deterministic phase boundary.
     advancePendingProjectiles(this.ctx);
+    lap?.('projectiles');
 
     for (const meta of this.players.values()) {
       const p = this.entities.get(meta.entityId);
       if (!p) continue;
       if (!p.dead) {
         this.updatePlayerMovement(p, meta);
+        lap?.('p.move');
         this.updateDoorTriggers(p);
+        lap?.('p.doors');
         this.updateCasting(p, meta);
+        lap?.('p.casting');
         this.updatePlayerAutoAttack(p, meta);
+        lap?.('p.autoAtk');
         updateRegen(this.ctx, p, meta);
         updateRested(p, meta);
         drainGatheringGrants(meta);
+        lap?.('p.regen');
       } else if (p.ghost) {
         // A released spirit only runs (boosted speed via moveSpeedMult); it does not
         // fight, cast, or regen. It CAN walk into a dungeon/raid door to re-enter its
@@ -2868,16 +2888,20 @@ export class Sim {
         // death model), or resurrect at its corpse / an overworld Spirit Healer.
         this.updatePlayerMovement(p, meta);
         this.updateDoorTriggers(p);
+        lap?.('p.move');
       }
       updateTimers(p);
       updateComboExpiry(this.ctx, p);
       updateAuras(this.ctx, p);
+      lap?.('p.auras');
     }
 
     for (const e of this.entities.values()) {
       if (e.kind === 'mob') {
         this.updateMob(e);
+        lap?.('mob.update');
         updateAuras(this.ctx, e);
+        lap?.('mob.auras');
       } else if (e.kind === 'npc') {
         cleanseFriendlyNpcAuras(this.ctx, e);
       } else if (e.kind === 'object') {
@@ -2887,6 +2911,7 @@ export class Sim {
         }
       }
     }
+    lap?.('ent.misc');
 
     // one pass over the entities collects every player a mob is engaged
     // with, instead of one full scan per player
@@ -2916,21 +2941,32 @@ export class Sim {
       const p = this.entities.get(meta.entityId);
       if (p) p.inCombat = this.engagedPids.has(p.id) || p.combatTimer < 5;
     }
+    lap?.('engaged');
 
     this.updateDuels();
+    lap?.('duels');
     this.updateArena();
+    lap?.('arena');
     this.updateTradesAndInvites();
+    lap?.('trades');
     this.updateLootRolls();
+    lap?.('lootRolls');
     this.updateInstances();
+    lap?.('instances');
     this.updateDelveRuns();
+    lap?.('delves');
     this.market.update();
+    lap?.('market');
     this.postOffice.update();
+    lap?.('postOffice');
     drainDelayedEvents(this.ctx);
+    lap?.('delayedEv');
 
     // movement re-bucketing: queries during the next tick and the server's
     // snapshot broadcast right after this one see fresh cells
     this.grid.refresh(this.entities.values());
     this.playerGrid.refresh(this.playerEntities());
+    lap?.('gridRefresh');
 
     const out = this.events;
     this.events = [];
@@ -3124,7 +3160,7 @@ export class Sim {
     const done = (arrived: boolean): boolean => {
       p.chargeTargetId = null;
       p.chargePath = [];
-      if (target) p.facing = angleTo(p.pos, target.pos);
+      if (target) p.facing = steadyAngleTo(p.pos, target.pos, p.facing);
       if (arrived) this.startAutoAttack(p.id);
       return true;
     };
@@ -3203,7 +3239,7 @@ export class Sim {
       return false;
     }
     // always turn to face the leader, even while held in place
-    p.facing = angleTo(p.pos, t.pos);
+    p.facing = steadyAngleTo(p.pos, t.pos, p.facing);
     if (isStunned(p) || isRooted(p) || d <= FOLLOW_STOP_DIST) return true;
     let speed = RUN_SPEED * this.moveSpeedMult(p);
     if (this.isSwimming(p)) speed *= SWIM_SPEED_MULT;
@@ -3615,6 +3651,10 @@ export class Sim {
     healingThreatImpl(this.ctx, source, target, healed);
   }
 
+  private applySetProcs(source: Entity, target: Entity | null, trigger: SetProc['trigger']): void {
+    applySetProcsImpl(this.ctx, source, target, trigger);
+  }
+
   // Combo points are character-bound (retail-style): building on any target adds
   // to the one pool, and the pool persists across target swaps until spent, the
   // player dies, or COMBO_POINT_DURATION passes without a new point.
@@ -3701,6 +3741,11 @@ export class Sim {
   // it tunnel through in one coarse hop. Returns the yards actually moved (0 if
   // blocked immediately).
   private applyKnockback(source: Entity, target: Entity, distance: number): number {
+    // Knockback resistance (the caster tier-set 2-piece grants 100%) is applied
+    // centrally here so no caller can bypass it: a fully-resisted shove moves 0 yards
+    // and never displaces the victim, so a caster keeps casting through it.
+    distance *= 1 - (target.knockbackResistance ?? 0);
+    if (distance <= 0) return 0;
     let dx = target.pos.x - source.pos.x;
     let dz = target.pos.z - source.pos.z;
     let len = Math.hypot(dx, dz);
@@ -4140,84 +4185,15 @@ export class Sim {
   }
 
   private mobCombatProfile(mob: Entity): MobCombatProfile {
-    return combatProfileForMob(mob.templateId, mob.scale);
+    return mobCombatProfileFn(mob);
   }
 
   private mobEffectiveMeleeRange(mob: Entity): number {
-    const profile = this.mobCombatProfile(mob);
-    const mobMoved = dist2d(mob.pos, mob.prevPos) > 0.05;
-    return effectiveMobMeleeRange(profile, mobMoved);
+    return mobEffectiveMeleeRangeFn(mob);
   }
 
   private tryMobMeleeSwingInRange(mob: Entity, target: Entity): boolean {
-    if (dist2d(mob.pos, target.pos) > this.mobEffectiveMeleeRange(mob)) return false;
-    mob.aiState = 'attack';
-    mob.facing = angleTo(mob.pos, target.pos);
-    if (mob.swingTimer <= 0) {
-      this.mobSwing(mob, target);
-      mob.swingTimer = mob.weapon.speed * this.swingIntervalMult(mob);
-    }
-    return true;
-  }
-
-  private usesProfiledMobCombat(mob: Entity): boolean {
-    const profile = this.mobCombatProfile(mob);
-    return profile.swingWhilePursuing || profile.immediateSwingOnEnterRange || !profile.canLeash;
-  }
-
-  private updateProfiledMobCombat(mob: Entity): void {
-    const profile = this.mobCombatProfile(mob);
-    this.updateMobTarget(mob);
-    const target = mob.aggroTargetId !== null ? this.entities.get(mob.aggroTargetId) : null;
-    if (!target || target.dead) {
-      this.retargetMob(mob);
-      return;
-    }
-    if (this.maybeFlee(mob, target)) return;
-
-    if (profile.canLeash) {
-      const leash = mob.spawnPos.x > DUNGEON_X_THRESHOLD ? DUNGEON_LEASH_DISTANCE : LEASH_DISTANCE;
-      const leashAnchor = mob.leashAnchor ?? mob.spawnPos;
-      if (mob.fleeReturnTimer > 0) {
-        mob.fleeReturnTimer = Math.max(0, mob.fleeReturnTimer - DT);
-        if (dist2d(mob.pos, leashAnchor) <= leash - 1) mob.fleeReturnTimer = 0;
-      }
-      if (dist2d(mob.pos, leashAnchor) > leash && mob.fleeReturnTimer <= 0) {
-        mob.aiState = 'evade';
-        mob.aggroTargetId = null;
-        clearThreat(mob);
-        mob.leashAnchor = null;
-        return;
-      }
-    }
-
-    mob.swingTimer = Math.max(0, mob.swingTimer - DT);
-    if (profile.swingWhilePursuing || mob.aiState === 'attack') {
-      this.tryMobMeleeSwingInRange(mob, target);
-    }
-
-    if (dist2d(mob.pos, target.pos) > profile.desiredRange) {
-      if (!isRooted(mob)) {
-        this.moveToward(
-          mob,
-          target.pos,
-          mob.moveSpeed * profile.chaseSpeedMult * this.moveSpeedMult(mob),
-        );
-      } else {
-        mob.facing = angleTo(mob.pos, target.pos);
-      }
-    } else {
-      mob.facing = angleTo(mob.pos, target.pos);
-    }
-
-    if (
-      profile.immediateSwingOnEnterRange ||
-      profile.swingWhilePursuing ||
-      mob.aiState === 'attack'
-    ) {
-      this.tryMobMeleeSwingInRange(mob, target);
-    }
-    mob.aiState = dist2d(mob.pos, target.pos) <= profile.meleeRange ? 'attack' : 'chase';
+    return tryMobMeleeSwingInRangeFn(this.ctx, mob, target);
   }
 
   aggroMob(mob: Entity, target: Entity, social: boolean): void {
@@ -4388,7 +4364,7 @@ export class Sim {
       pet.swingTimer = Math.max(0, pet.swingTimer - DT);
       return;
     }
-    pet.facing = angleTo(pet.pos, target.pos);
+    pet.facing = steadyAngleTo(pet.pos, target.pos, pet.facing);
     pet.swingTimer -= DT;
     // Emit the projectile + resolve the hit (resisted, not missed: the same
     // semantics as player casts). Shared by the instant path and the windup

@@ -232,6 +232,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // Character-sheet stat tooltips (hudChrome.statInfo.*).
   'hudChrome.statInfo.fromYour': 'あなたの{stat}{value}による効果:',
   'hudChrome.statInfo.names.spellPower': '呪文威力',
+  'hudChrome.statInfo.names.critRating': 'クリティカルレーティング',
+  'hudChrome.statInfo.names.hasteRating': 'ヘイストレーティング',
+  'hudChrome.statInfo.desc.critRating':
+    '装備とセットボーナスによるクリティカルレーティング。クリティカル率が上昇します。約10レーティングで1%クリティカル。',
+  'hudChrome.statInfo.desc.hasteRating':
+    '装備とセットボーナスによるヘイストレーティング。攻撃と詠唱の速度が上昇します。約10レーティングで1%ヘイスト。',
   'hudChrome.statInfo.desc.spellPower':
     '呪文のダメージと回復の効果を高めます。知力1ポイントごとに、装備やバフによる分に加えて、わずかな呪文威力を得られます。',
   'hudChrome.statInfo.sources.header': '内訳:',
@@ -3721,6 +3727,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.questTracker.collapseHint': 'クエストトラッカーを折りたたむ',
   'hudChrome.questTracker.expandHint': 'クエストトラッカーを展開する',
   // Modular bag filtering controls (hudChrome.bags.*).
+  'hudChrome.bags.cannotDestroy': 'このアイテムは破壊できません。',
+  'hudChrome.bags.rightClickDestroy': '右クリックで破壊',
   'hudChrome.bags.filterGroupAria': 'バッグをカテゴリーで絞り込む',
   'hudChrome.bags.filterAll': 'すべて',
   'hudChrome.bags.filterWeapon': '武器',
@@ -5119,32 +5127,55 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.crownforged.bonus2': '攻撃力が40上昇します。',
   'entities.itemSets.crownforged.bonus3':
     '筋力が15、スタミナが15上昇し、攻撃速度と詠唱速度が15%上昇します。',
+  'entities.itemSets.crownforged.bonus4':
+    '武器のクリティカルヒットで対象に「ボーンスプリンター」を刻み、2秒ごとに8ダメージの出血を12秒間与えます。最大3回まで累積します。',
   'entities.itemSets.deathlord.name': 'バロウロードの戦装束',
   'entities.itemSets.deathlord.bonus2': '攻撃力が40上昇します。',
   'entities.itemSets.deathlord.bonus3': '筋力が15、スタミナが15上昇します。',
+  'entities.itemSets.deathlord.bonus4':
+    '武器のクリティカルヒット時に50%の確率で「グレイブマイト」が発動し、攻撃力が10秒間60上昇します。',
   'entities.itemSets.greyjaw_stalker.name': 'グレイジョーの追跡者の装備',
   'entities.itemSets.greyjaw_stalker.bonus3': '攻撃速度と詠唱速度が15%上昇します。',
   'entities.itemSets.necromancers.name': 'モーンウィーヴの法衣',
   'entities.itemSets.necromancers.bonus2': 'ノックバックされなくなります（ノックバック耐性100%）。',
   'entities.itemSets.necromancers.bonus3': '知力が10、スタミナが10上昇します。',
+  'entities.itemSets.necromancers.bonus4':
+    '呪文に10%の確率で「クリアキャスティング」が発動し、次の呪文が無償になります。',
   'entities.itemSets.nighttalon.name': 'ダイアファングの革装束',
   'entities.itemSets.nighttalon.bonus2': '攻撃力が40上昇します。',
   'entities.itemSets.nighttalon.bonus3':
     '敏捷性が15、クリティカル率が2%上昇し、攻撃速度と詠唱速度が15%上昇します。',
+  'entities.itemSets.nighttalon.bonus4':
+    '武器のクリティカルヒットで「裂けた傷」を与え、対象に2秒ごとに6ダメージの出血を12秒間与えます。最大3回まで累積します。',
   'entities.itemSets.soulflame.name': 'レイスファイアの法衣',
   'entities.itemSets.soulflame.bonus2': 'ノックバックされなくなります（ノックバック耐性100%）。',
   'entities.itemSets.soulflame.bonus3':
     '知力が15、精神力が15上昇し、攻撃速度と詠唱速度が15%上昇します。',
+  'entities.itemSets.soulflame.bonus4':
+    '呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間40上昇します。',
   'entities.itemSets.stormcallers.name': 'ゲイルコールの法衣',
   'entities.itemSets.stormcallers.bonus2': 'ノックバックされなくなります（ノックバック耐性100%）。',
   'entities.itemSets.stormcallers.bonus3':
     '知力が15、精神力が15上昇し、攻撃速度と詠唱速度が15%上昇します。',
+  'entities.itemSets.stormcallers.bonus4':
+    '呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間40上昇します。',
   'entities.itemSets.vale_arcanist.name': '谷の秘術師の装束',
   'entities.itemSets.vale_arcanist.bonus3': '攻撃速度と詠唱速度が15%上昇します。',
   'entities.itemSets.wyrmshadow.name': 'ナイトファングの装束',
   'entities.itemSets.wyrmshadow.bonus2': '攻撃力が40上昇します。',
   'entities.itemSets.wyrmshadow.bonus3': '敏捷性が15、クリティカル率が2%上昇します。',
+  'entities.itemSets.wyrmshadow.bonus4':
+    '武器のクリティカルヒット時に50%の確率で「ファングラッシュ」が発動し、攻撃速度が8秒間25%上昇します。',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
+  'hudChrome.itemProc.onMeleeHit': '命中時に確率（{chance}%）：{effect}',
+  'hudChrome.itemProc.onSpellDamage': 'ダメージ呪文で確率（{chance}%）：{effect}',
+  'hudChrome.itemProc.onHeal': '回復時に確率（{chance}%）：{effect}',
+  'hudChrome.itemProc.chainArc':
+    '{school}の{name}（{damage}）で対象を撃ち、近くの敵{jumps}体に減衰しながら連鎖する',
+  'hudChrome.itemProc.attackSlow': '対象の攻撃速度を{pct}%低下させる（{duration}秒）',
+  'hudChrome.itemProc.dot':
+    '{name}を植え付け、{school}の継続ダメージで{duration}秒かけて{total}を与える',
+  'hudChrome.itemProc.hot': '{name}を咲かせ、継続回復で{duration}秒かけて{total}を回復する',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   // Discord integration (two-way login, rewards, relay, in-game flair).

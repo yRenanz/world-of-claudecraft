@@ -40,6 +40,10 @@ import { controlGap, PROFILES } from './lib/overlap_geometry.mjs';
 
 const URL = process.env.URL || 'http://localhost:5173/';
 const GATE = process.argv.includes('--gate');
+// Opt-in full sweep (env MATRIX_ALL=1): Pass B runs EVERY window toggle (and the
+// vendor+bags co-open) at EVERY profile in PROFILES, instead of each window's own
+// short `widths` list. Default (unset) keeps the exact per-window widths below.
+const MATRIX_ALL = process.env.MATRIX_ALL === '1';
 const SHOT_DIR = 'tmp/mobile-hud-audit';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const IGNORED_CONSOLE = /502|Bad Gateway|fetch project stats/i;
@@ -330,7 +334,8 @@ async function populateBuffBar(page) {
   return page.evaluate(() => {
     const sim = window.__game.sim;
     const p = sim.player;
-    if (Array.isArray(p.auras) && !p.auras.some((a) => a.id === 'audit-buff')) {
+    if (!Array.isArray(p.auras)) return false;
+    if (!p.auras.some((a) => a.id === 'audit-buff')) {
       // Idempotent, matching the debuff helper: re-calling per profile must not
       // stack duplicate buff-bar entries (which would grow the bar's width).
       p.auras.push({
@@ -344,7 +349,9 @@ async function populateBuffBar(page) {
         school: 'physical',
       });
     }
-    return true;
+    // Honest result, mirroring the debuff helper: true only if the marker aura
+    // actually sits on the player (a skipped push must not read as populated).
+    return p.auras.some((a) => a.id === 'audit-buff');
   });
 }
 
@@ -355,11 +362,21 @@ async function populateBuffBar(page) {
 // is a single-objective zone1 quest, so counts is a one-element array. Returns the
 // active-quest count on the world after injection.
 async function acceptQuest(page) {
-  return page.evaluate(() => {
-    const ql = window.__game.world.questLog; // === sim.questLog offline
-    ql.set('q_wolves', { questId: 'q_wolves', counts: [0], state: 'active' });
-    return ql.size;
-  });
+  try {
+    return await page.evaluate(() => {
+      const ql = window.__game?.world?.questLog; // === sim.questLog offline
+      // Guarded like the other state helpers: a missing or non-Map questLog must
+      // fail this step cleanly, never throw and abort the whole audit run.
+      if (!ql || typeof ql.set !== 'function' || typeof ql.get !== 'function') return 0;
+      ql.set('q_wolves', { questId: 'q_wolves', counts: [0], state: 'active' });
+      // Meaningful success check: the entry must be retained and active, not
+      // merely have been passed to set().
+      const entry = ql.get('q_wolves');
+      return entry && entry.state === 'active' ? ql.size : 0;
+    });
+  } catch {
+    return 0;
+  }
 }
 
 // Populate the debuff bar: push a synthetic harmful aura onto player.auras. The
@@ -650,8 +667,14 @@ try {
       note(`window ${w.toggle}: method missing on hud; NOT COVERED`);
       continue;
     }
-    for (const width of w.widths) {
-      const prof = PROFILES.find((p) => p.w === width) || PROFILES[0];
+    // Default: the window's own short `widths` list (each resolved to a profile by
+    // width). MATRIX_ALL: sweep the window across every profile in PROFILES, so a
+    // window is opened at all six/seven device landscapes, not just its spot widths.
+    const bProfiles = MATRIX_ALL
+      ? PROFILES
+      : w.widths.map((width) => PROFILES.find((p) => p.w === width) || PROFILES[0]);
+    for (const prof of bProfiles) {
+      const width = prof.w;
       await flipViewport(page, media, width, prof.h, prof.dsf, prof.tier);
       // Open the window through the real hud path.
       const opened = await page.evaluate(
@@ -756,11 +779,17 @@ try {
   // #bags panels render with ZERO geometry (no real width/height), so there is
   // nothing to measure. We require real, laid-out geometry on BOTH panels before
   // claiming coverage; otherwise this is honestly NOT COVERED offline.
-  await flipViewport(page, media, 844, 390, 3, 'hud-mobile-compact');
-  const npcId = await findNpc(page);
-  if (npcId === null) {
-    note('vendor+bags: no npc entity reachable offline; NOT COVERED');
-  } else {
+  // Default: one flip to 844x390. MATRIX_ALL: the co-open pair at every profile.
+  const vendorProfiles = MATRIX_ALL
+    ? PROFILES
+    : [{ name: 'iphone-13-landscape', w: 844, h: 390, dsf: 3, tier: 'hud-mobile-compact' }];
+  for (const vprof of vendorProfiles) {
+    await flipViewport(page, media, vprof.w, vprof.h, vprof.dsf, vprof.tier);
+    const npcId = await findNpc(page);
+    if (npcId === null) {
+      note(`vendor+bags @${vprof.w}: no npc entity reachable offline; NOT COVERED`);
+      continue;
+    }
     const vendorState = await page.evaluate((id) => {
       window.__game.hud.closeAll?.();
       let openErr = null;
@@ -793,27 +822,33 @@ try {
     }, npcId);
     const v = vendorState.vendor;
     const b = vendorState.bags;
-    if (process.env.DEBUG_RECTS) console.log(`vendor state: ${JSON.stringify(vendorState)}`);
+    if (process.env.DEBUG_RECTS)
+      console.log(`vendor state @${vprof.w}: ${JSON.stringify(vendorState)}`);
     // Both panels must be real, laid-out, AND actually overlapping the game area
     // (not a zero-origin degenerate box). Offline, openVendor engages the class but
     // the panels do not paint, so guard on a non-trivial box that starts on-screen.
     const laidOut = (r) => r && r.w >= 80 && r.h >= 80 && r.right > 0 && r.bottom > 0;
     if (!vendorState.vendorOpenClass || vendorState.openErr) {
-      note(`vendor+bags: openVendor did not engage ${JSON.stringify(vendorState)}; NOT COVERED`);
+      note(
+        `vendor+bags @${vprof.w}: openVendor did not engage ` +
+          `${JSON.stringify(vendorState)}; NOT COVERED`,
+      );
     } else if (!laidOut(v) || !laidOut(b)) {
       note(
-        `vendor+bags: panels have no real geometry offline ` +
+        `vendor+bags @${vprof.w}: panels have no real geometry offline ` +
           `(vendor=${v ? `${v.w.toFixed(0)}x${v.h.toFixed(0)}` : 'null'}, ` +
           `bags=${b ? `${b.w.toFixed(0)}x${b.h.toFixed(0)}` : 'null'}); NOT COVERED offline`,
       );
     } else {
       const gap = controlGap('vendor-window', v, 'bags', b, CIRCLE_IDS);
       if (gap < 0) {
-        bViolation(`vendor+bags: #vendor-window overlaps #bags by ${(-gap).toFixed(1)}px`);
+        bViolation(
+          `vendor+bags @${vprof.w}: #vendor-window overlaps #bags by ${(-gap).toFixed(1)}px`,
+        );
       } else {
-        console.log(`vendor+bags: co-open clear (gap ${gap.toFixed(1)}px)`);
+        console.log(`vendor+bags @${vprof.w}: co-open clear (gap ${gap.toFixed(1)}px)`);
       }
-      await page.screenshot({ path: `${SHOT_DIR}/passB_vendor_bags_844.png` });
+      await page.screenshot({ path: `${SHOT_DIR}/passB_vendor_bags_${vprof.w}.png` });
     }
     await page.evaluate(() => window.__game.hud.closeAll?.());
   }

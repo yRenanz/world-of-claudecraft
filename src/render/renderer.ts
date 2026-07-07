@@ -20,10 +20,13 @@ import {
   instanceOrigin,
   isArenaPos,
   isDelvePos,
+  isYumiMazePos,
   MOBS,
   NPCS,
   WORLD_MAX_Z,
   WORLD_MIN_Z,
+  YUMI_MAZE_SLOT_COUNT,
+  yumiMazeOrigin,
   ZONES,
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
@@ -100,6 +103,7 @@ import { TravelSpeedFxPainter } from './travel_speed_fx_painter';
 import { SCHOOL_COLORS, Vfx } from './vfx';
 import { buildWater, type WaterView } from './water';
 import { Weather } from './weather';
+import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 
 // Entities further than this from the player are hidden entirely: their rigs
 // are several draw calls each and read as sub-pixel specks long before this.
@@ -2881,6 +2885,17 @@ export class Renderer {
       case 'delveEntered':
         this.prebuildDelveInteriors(ev.delveId);
         break;
+      case 'yumiTeleport': {
+        // Arcane burst at both ends of the cat's blink (the event is personal
+        // per participant; ignore copies addressed to other local pids so an
+        // offline multi-player sim never double-bursts).
+        if (ev.pid !== undefined && ev.pid !== this.sim.playerId) break;
+        const fromY = groundHeight(ev.fromX, ev.fromZ, this.sim.cfg.seed);
+        const toY = groundHeight(ev.toX, ev.toZ, this.sim.cfg.seed);
+        this.vfx.burst(new THREE.Vector3(ev.fromX, fromY + 1, ev.fromZ), 'arcane', 26, 1.2);
+        this.vfx.burst(new THREE.Vector3(ev.toX, toY + 1, ev.toZ), 'arcane', 26, 1.2);
+        break;
+      }
       case 'delveRitePulse': {
         // The Drowned Reliquary Rite plays its sequence by pulsing each shrine
         // in turn; a school-coloured nova on the shrine entity shows which one
@@ -3595,6 +3610,9 @@ export class Renderer {
   // ---------------------------------------------------------------------
 
   private builtInteriors = new Set<string>();
+  // Protect Yumi maze interiors, one per match slot, built lazily like the
+  // arena copies; their update() anchors the team beacons each frame.
+  private yumiMazeViews = new Map<number, YumiMazeView>();
   // Delve module interiors build asynchronously; track in-flight keys so a
   // per-frame ensureDelveInteriorsNear does not re-schedule a build mid-load.
   private pendingInteriors = new Set<string>();
@@ -3698,6 +3716,18 @@ export class Renderer {
     const pz = this.sim.player.pos.z;
     if (isDelvePos(px)) {
       this.ensureDelveInteriorsNear(px, pz);
+    } else if (inside && isYumiMazePos(px)) {
+      // build the Protect Yumi maze copy the player was matched into; the
+      // update() call each frame lives in sync() (beacon anchors)
+      for (let i = 0; i < YUMI_MAZE_SLOT_COUNT; i++) {
+        if (this.yumiMazeViews.has(i)) continue;
+        const o = yumiMazeOrigin(i);
+        if (Math.abs(px - o.x) < 200 && Math.abs(pz - o.z) < 120) {
+          const view = buildYumiMaze(o, this.sim.cfg.seed);
+          this.scene.add(view.group);
+          this.yumiMazeViews.set(i, view);
+        }
+      }
     } else if (inside && isArenaPos(px)) {
       void ensureDungeonAssets().catch(() => undefined);
       // build the Ashen Coliseum copy the player was matched into
@@ -4576,6 +4606,7 @@ export class Renderer {
     this.updateFiestaRing(dt);
     this.updateFiestaPowerups(dt);
     this.tickFiestaGlows(dt);
+    for (const view of this.yumiMazeViews.values()) view.update(this.sim);
     worldStart = markWorldPhase('vfx', worldStart);
 
     this.updateCamera(selfPos, dt);

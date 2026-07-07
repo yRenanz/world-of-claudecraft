@@ -950,6 +950,10 @@ export const VISUALS: Record<string, VisualDef> = {
 // ---------------------------------------------------------------------------
 
 const MOB_KEYS: Record<string, string> = {
+  // Protect Yumi objective cat: PLACEHOLDER on the small-critter fox rig
+  // (cream entity tint, cat-ish silhouette) until a dedicated cat-familiar
+  // GLB ships (docs/prd/protect-yumi-assets.md lists the Meshy generation).
+  yumi_cat: 'mob_critter',
   emberkin: 'mob_demon',
   gloomshade: 'mob_demon',
   duskborn: 'mob_demon',

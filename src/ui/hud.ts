@@ -4711,6 +4711,11 @@ export class Hud {
             this.hotbarActions = placeItemOnSlot(this.hotbarActions, action.id, slot - 1);
           }
           this.saveSlotMap();
+          // The drop rearranged this slot's contents, but a drop that ends with the
+          // cursor already inside the slot fires no mouseenter, so the tooltip would
+          // keep the pre-drop text (stale "empty slot" / wrong ability). Clear it so
+          // it no longer shows the old slot; the next hover resolves it live (#1485).
+          this.hideTooltip();
         });
         btn.addEventListener('dragend', () => {
           this.dragAction = null;
@@ -5185,6 +5190,9 @@ export class Hud {
         if (targetIndex !== null && targetIndex !== drag.sourceIndex) {
           this.hotbarActions = swapHotbarSlots(this.hotbarActions, drag.sourceIndex, targetIndex);
           this.saveSlotMap();
+          // Match the desktop drop: clear the now-stale tooltip for the rearranged
+          // slot so a long-press peek resolves the new content (#1485).
+          this.hideTooltip();
         }
       }
       this.clearMobileHotbarDrag();

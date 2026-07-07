@@ -116,7 +116,11 @@ const hud = await page.evaluate(() => {
     sub: el?.querySelector('.yh-sub')?.textContent ?? '',
   };
 });
-check('yumi HUD strip visible with both bars', hud.display === 'flex' && hud.fills === 2, JSON.stringify(hud));
+check(
+  'yumi HUD strip visible with both bars',
+  hud.display === 'flex' && hud.fills === 2,
+  JSON.stringify(hud),
+);
 check('HUD title localized', hud.title.length > 0, hud.title);
 await page.screenshot({ path: 'tmp/yumi_match_start.png' });
 
@@ -135,7 +139,11 @@ const contained = await page.evaluate(() => {
   const oz = -1250 + m.slot * 200;
   const lx = sim.player.pos.x - ox;
   const lz = sim.player.pos.z - oz;
-  return { lx: Math.round(lx * 10) / 10, lz: Math.round(lz * 10) / 10, inside: Math.abs(lx) < 30.5 && Math.abs(lz) < 30.5 };
+  return {
+    lx: Math.round(lx * 10) / 10,
+    lz: Math.round(lz * 10) / 10,
+    inside: Math.abs(lx) < 30.5 && Math.abs(lz) < 30.5,
+  };
 });
 check('walls contain real movement', contained.inside, JSON.stringify(contained));
 
@@ -199,7 +207,11 @@ const won = await page.evaluate(() => {
   sim.dealDamage(sim.player, enemyCat, 999999, false, 'physical', null, 'hit');
   return { enemyDead: enemyCat.dead, state: m.state };
 });
-check('enemy cat killed ends the match', won.enemyDead && won.state === 'over', JSON.stringify(won));
+check(
+  'enemy cat killed ends the match',
+  won.enemyDead && won.state === 'over',
+  JSON.stringify(won),
+);
 await sleep(800);
 const banner = await page.evaluate(() => {
   const b = document.querySelector('#banner, .banner, #big-banner');
@@ -217,7 +229,11 @@ const torn = await page.evaluate(() => {
     px: Math.round(sim.player.pos.x),
   };
 });
-check('match torn down and player returned home', torn.match && torn.px < 8000, JSON.stringify(torn));
+check(
+  'match torn down and player returned home',
+  torn.match && torn.px < 8000,
+  JSON.stringify(torn),
+);
 
 // Offline runs have no API server behind the vite proxy: the homepage stats
 // fetch 502s are environmental noise, not a game error.

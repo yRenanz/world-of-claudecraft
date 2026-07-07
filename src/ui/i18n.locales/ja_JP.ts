@@ -6005,7 +6005,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'guide.arenaPage.yumiHeading': 'Yumiを守れ',
-  'guide.arenaPage.yumiBody': 'Protect Yumiは迷路で行うチーム目標モード。各チームは自分の猫の使い魔を守りながら、敵の使い魔を狙います。二匹の猫は時折迷路の別の場所へ転移するため、防衛、追撃、捜索の間で戦況が揺れ動きます。3対3か5対5でキューに参加でき、倒れても少しの間ベンチに下がるだけです。',
+  'guide.arenaPage.yumiBody':
+    'Protect Yumiは迷路で行うチーム目標モード。各チームは自分の猫の使い魔を守りながら、敵の使い魔を狙います。二匹の猫は時折迷路の別の場所へ転移するため、防衛、追撃、捜索の間で戦況が揺れ動きます。3対3か5対5でキューに参加でき、倒れても少しの間ベンチに下がるだけです。',
   'yumi.queue.join': 'Protect Yumiのキューに参加しました。使い魔を守りましょう…',
   'yumi.queue.leave': 'Protect Yumiのキューを離れました。',
   'yumi.queue.teamLeave': 'チームがProtect Yumiのキューを離れました。',

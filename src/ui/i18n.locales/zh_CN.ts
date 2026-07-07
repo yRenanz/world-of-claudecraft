@@ -5676,7 +5676,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'guide.arenaPage.yumiHeading': '守护Yumi',
-  'guide.arenaPage.yumiBody': 'Protect Yumi是一种在迷宫中进行的团队目标模式：每队守护自己的猫咪使魔，同时猎杀对方的。两只猫咪会不时闪现到迷宫的新角落，战斗在防守、追猎与寻回之间不断摇摆。可选择3对3或5对5排队；阵亡只会让你短暂离场。',
+  'guide.arenaPage.yumiBody':
+    'Protect Yumi是一种在迷宫中进行的团队目标模式：每队守护自己的猫咪使魔，同时猎杀对方的。两只猫咪会不时闪现到迷宫的新角落，战斗在防守、追猎与寻回之间不断摇摆。可选择3对3或5对5排队；阵亡只会让你短暂离场。',
   'yumi.queue.join': '你加入了Protect Yumi队列。守好你的使魔……',
   'yumi.queue.leave': '你离开了Protect Yumi队列。',
   'yumi.queue.teamLeave': '你的队伍离开了Protect Yumi队列。',

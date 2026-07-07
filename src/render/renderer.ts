@@ -220,6 +220,13 @@ const IBL_RAW_SCALE = 0.55;
 const DUNGEON_HEMI_INTENSITY = 0.22; // floor of readability — bosses crushed to black at 0.14
 // character rim glow scales up underground so silhouettes split from the murk
 const DUNGEON_RIM_BOOST = 2.4;
+// The Protect Yumi maze is a torch-lit NIGHT ARENA, not a crypt: a moon-key
+// plus a healthy hemisphere keep the whole competitive space readable, with
+// the braziers/torches adding warmth rather than carrying the scene alone.
+const YUMI_MAZE_SUN_INTENSITY = 1.2;
+const YUMI_MAZE_HEMI_INTENSITY = 0.42;
+const YUMI_MAZE_ENV_INTENSITY = 0.28;
+const YUMI_MAZE_RIM_BOOST = 1.7;
 const RENDERER_PHASE_SAMPLE_LIMIT = 720;
 const RENDER_DIAGNOSTICS_SAMPLE_MS = 2000;
 const RENDER_DIAGNOSTICS_IDLE_TIMEOUT_MS = 1000;
@@ -3812,11 +3819,11 @@ export class Renderer {
         fog.far = 74;
       } else if (desired === 'yumiMaze') {
         // the Protect Yumi maze is a COMPETITIVE arena: a lighter night-blue
-        // murk pushed well past the ~61yd footprint, so the plaza braziers +
-        // team beacons read across the maze instead of dissolving at 30yd
-        fog.color.setHex(0x0d1120);
-        fog.near = 24;
-        fog.far = 130;
+        // murk pushed well past the ~90yd footprint, so the torches + team
+        // beacons read across the maze instead of dissolving mid-corridor
+        fog.color.setHex(0x161d31);
+        fog.near = 30;
+        fog.far = 170;
       } else if (desired === 'underwater') {
         fog.color.setHex(0x17506e);
         fog.near = 2;
@@ -3831,18 +3838,32 @@ export class Renderer {
       // underground so the torch point lights own the scene; restore outside.
       // The rim glow cranks up instead — silhouettes must split from the murk.
       if (!this.lowGfx) {
+        const mazeNight = desired === 'yumiMaze';
         const underground =
           desired === 'dungeon' ||
           desired === 'temple' ||
           desired === 'nythraxis' ||
-          desired === 'delve' ||
-          desired === 'yumiMaze';
-        this.sun.intensity = underground ? DUNGEON_SUN_INTENSITY : SUN_INTENSITY;
-        this.hemi.intensity = underground ? DUNGEON_HEMI_INTENSITY : HEMI_INTENSITY;
-        this.scene.environmentIntensity = underground
-          ? DUNGEON_ENV_INTENSITY
-          : this.envOutdoorIntensity;
-        sharedUniforms.uRimBoost.value = underground ? DUNGEON_RIM_BOOST : 1;
+          desired === 'delve';
+        this.sun.intensity = mazeNight
+          ? YUMI_MAZE_SUN_INTENSITY
+          : underground
+            ? DUNGEON_SUN_INTENSITY
+            : SUN_INTENSITY;
+        this.hemi.intensity = mazeNight
+          ? YUMI_MAZE_HEMI_INTENSITY
+          : underground
+            ? DUNGEON_HEMI_INTENSITY
+            : HEMI_INTENSITY;
+        this.scene.environmentIntensity = mazeNight
+          ? YUMI_MAZE_ENV_INTENSITY
+          : underground
+            ? DUNGEON_ENV_INTENSITY
+            : this.envOutdoorIntensity;
+        sharedUniforms.uRimBoost.value = mazeNight
+          ? YUMI_MAZE_RIM_BOOST
+          : underground
+            ? DUNGEON_RIM_BOOST
+            : 1;
       }
       return;
     }

@@ -26,7 +26,7 @@ const BEACON_RADIUS = 0.7;
 // fireLights[], budgetFireLights enables the nearest GFX.maxPointLights).
 // Values mirror the dungeon torches.
 const BRAZIER_LIGHT_INTENSITY = 46;
-const BRAZIER_LIGHT_DISTANCE = 30;
+const BRAZIER_LIGHT_DISTANCE = 36;
 const BRAZIER_LIGHT_Y = 5.4;
 const BRAZIER_FLAME_Y = 1.9;
 const BRAZIER_FLAME_EMISSIVE = 2.2;
@@ -136,7 +136,7 @@ export function buildYumiMaze(
     // Low tier keeps a stronger constructor intensity than the dungeon
     // torches (14 vs 10): the maze rooms are far wider than a crypt aisle,
     // so the same falloff reads darker.
-    const light = new THREE.PointLight(flameColor, 14, BRAZIER_LIGHT_DISTANCE, 2);
+    const light = new THREE.PointLight(flameColor, 16, BRAZIER_LIGHT_DISTANCE, 2);
     if (!lights.lowGfx) light.userData.baseIntensity = BRAZIER_LIGHT_INTENSITY;
     light.position.set(bx, by, bz);
     group.add(light);
@@ -165,17 +165,19 @@ export function buildYumiMaze(
   brazier(inward(layout.yumiStartB.x, 1.8), inward(layout.yumiStartB.z, 1.8), WARM_FLAME);
   brazier(1.4, 1.4, CENTER_GOLD);
 
-  // Wall torches: an angled handle + flame mounted on every other long wall
-  // run, alternating faces, so corridors light from the walls instead of
-  // freestanding posts. Deterministic from the fixed layout (no rng).
+  // Wall torches: an angled handle + flame mounted on EVERY long wall run,
+  // alternating faces, each with its own fire light, so corridors read
+  // torch-lit end to end. The shared budget still caps how many burn at
+  // once (nearest GFX.maxPointLights), so density costs pool entries, not
+  // per-frame lighting work. Deterministic from the fixed layout (no rng).
   const handleGeo = new THREE.CylinderGeometry(0.06, 0.08, 0.95, 5);
   const handleMat = surfaceMat({ color: 0x4a3a28, roughness: 0.95 });
   const torchRuns = layout.walls.filter((w) => Math.max(w.hw, w.hd) >= layout.pitch * 0.9);
   const torchY = YUMI_MAZE_WALL_HEIGHT * 0.55;
-  for (let i = 0; i < torchRuns.length; i += 2) {
+  for (let i = 0; i < torchRuns.length; i++) {
     const w = torchRuns[i];
     const vertical = w.hd > w.hw; // wall runs along z, faces point along x
-    const side = (i >> 1) % 2 === 0 ? 1 : -1;
+    const side = i % 2 === 0 ? 1 : -1;
     const tx = w.x + (vertical ? side * (w.hw + 0.34) : 0);
     const tz = w.z + (vertical ? 0 : side * (w.hd + 0.34));
     const handle = new THREE.Mesh(handleGeo, handleMat);
@@ -191,11 +193,7 @@ export function buildYumiMaze(
     );
     group.add(flame);
     lights.flames.push(flame);
-    // A light on every SECOND torch keeps the shared budget sane; the
-    // in-between flames still glow via their emissive cones.
-    if ((i >> 1) % 2 === 0) {
-      fireLight(tx, torchY + 1.6, tz, WARM_FLAME);
-    }
+    fireLight(tx, torchY + 1.6, tz, WARM_FLAME);
   }
   // The two cat beacons: world-anchored, so they live on the SCENE-space
   // subgroup (the cats' coordinates are world coords, not maze-local).

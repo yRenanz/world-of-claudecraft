@@ -308,6 +308,7 @@ export const vi_VN: EnTranslations = {
       "autorun": "Tự Chạy",
       "jump": "Nhảy",
       "leaderboard": "Xếp Hạng",
+      "dailyRewards": "Rewards",
       "nameplates": "Tên",
       "haptics": "Phản Hồi Rung",
       "hapticsOff": "Tắt Phản Hồi Rung",

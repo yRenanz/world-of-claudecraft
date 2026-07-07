@@ -308,6 +308,7 @@ export const da_DK: EnTranslations = {
       "autorun": "Autoløb",
       "jump": "Hop",
       "leaderboard": "Rangliste",
+      "dailyRewards": "Rewards",
       "nameplates": "Navne",
       "haptics": "Haptik",
       "hapticsOff": "Haptik fra",

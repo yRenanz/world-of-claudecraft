@@ -308,6 +308,7 @@ export const ru_RU: EnTranslations = {
       "autorun": "Автобег",
       "jump": "Прыжок",
       "leaderboard": "Рейтинг",
+      "dailyRewards": "Награды",
       "nameplates": "Имена",
       "haptics": "Вибрация",
       "hapticsOff": "Вибрация выкл.",

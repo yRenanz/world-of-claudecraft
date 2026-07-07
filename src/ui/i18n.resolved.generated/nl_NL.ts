@@ -308,6 +308,7 @@ export const nl_NL: EnTranslations = {
       "autorun": "Autoloop",
       "jump": "Springen",
       "leaderboard": "Ranglijst",
+      "dailyRewards": "Rewards",
       "nameplates": "Namen",
       "haptics": "Haptiek",
       "hapticsOff": "Haptiek uit",

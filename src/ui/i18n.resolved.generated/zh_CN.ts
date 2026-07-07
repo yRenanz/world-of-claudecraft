@@ -308,6 +308,7 @@ export const zh_CN: EnTranslations = {
       "autorun": "自动奔跑",
       "jump": "跳跃",
       "leaderboard": "排行榜",
+      "dailyRewards": "奖励",
       "nameplates": "姓名板",
       "haptics": "震动反馈",
       "hapticsOff": "震动反馈：关",

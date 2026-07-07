@@ -225,6 +225,7 @@ export const hudChromeStrings = {
     autorun: 'Autorun',
     jump: 'Jump',
     leaderboard: 'Ranks',
+    dailyRewards: 'Rewards',
     nameplates: 'Names',
     haptics: 'Haptics',
     hapticsOff: 'Haptics Off',

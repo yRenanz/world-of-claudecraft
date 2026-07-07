@@ -891,12 +891,22 @@ describe('Input touch invert-look', () => {
   it('also inverts the swipe-look delta path', () => {
     const { input } = makeInput();
     const base = input.camPitch;
-    input.applyTouchLookDelta(0, 100);
+    input.applyTouchLookDelta(0, 20);
     const normal = input.camPitch - base;
 
     input.setTouchInvertLook(true);
     input.camPitch = base;
-    input.applyTouchLookDelta(0, 100);
+    input.applyTouchLookDelta(0, 20);
     expect(input.camPitch - base).toBeCloseTo(-normal);
+  });
+
+  it('scales the swipe-drag yaw noticeably above raw look sensitivity', () => {
+    const { input } = makeInput();
+    const baseYaw = input.camYaw;
+    input.applyTouchLookDelta(100, 0);
+    const dragYawDelta = Math.abs(input.camYaw - baseYaw);
+    const rawYawDelta = 100 * 0.0045; // BASE_LOOK_SENS, mirrored here since it is not exported
+
+    expect(dragYawDelta).toBeGreaterThan(rawYawDelta * 1.5);
   });
 });

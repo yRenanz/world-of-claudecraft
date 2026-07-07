@@ -14,6 +14,11 @@ import { clickPickFromMouseGesture, DEFAULT_CLICK_PICK_MAX_MS } from './pointer_
 const BASE_LOOK_SENS = 0.0045;
 const TOUCH_LOOK_YAW_RATE = 3.2;
 const TOUCH_LOOK_PITCH_RATE = 2.2;
+// One-finger swipe-drag on the open canvas (mobile_controls.ts onSwipeLookMove)
+// felt sluggish next to the joystick look path: a full-screen-width swipe barely
+// turned the camera. This multiplier only scales that drag path, not mouselook
+// or the camera joystick, so desktop and the joystick are unaffected.
+const TOUCH_DRAG_SENS_MULT = 2.2;
 const TOUCH_JUMP_LATCH_MS = 220;
 // A keyboard jump press is latched the same way a touch tap is: a fast spacebar
 // tap can be pressed and released entirely between two 20Hz input samples (or
@@ -456,10 +461,11 @@ export class Input {
   }
 
   applyTouchLookDelta(dx: number, dy: number): void {
-    this.camYaw -= dx * this.lookSensitivity;
+    const dragSens = this.lookSensitivity * TOUCH_DRAG_SENS_MULT;
+    this.camYaw -= dx * dragSens;
     this.camPitch = Math.min(
       1.35,
-      Math.max(-0.4, this.camPitch + this.touchPitchSign * dy * this.lookSensitivity),
+      Math.max(-0.4, this.camPitch + this.touchPitchSign * dy * dragSens),
     );
     if (dx !== 0 || dy !== 0) this.noteIntent('look');
   }

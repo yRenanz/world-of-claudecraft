@@ -308,6 +308,7 @@ export const es_ES: EnTranslations = {
       "autorun": "Carrera automática",
       "jump": "Saltar",
       "leaderboard": "Clasificación",
+      "dailyRewards": "Rewards",
       "nameplates": "Nombres",
       "haptics": "Vibración",
       "hapticsOff": "Vibración desactivada",

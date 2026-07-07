@@ -308,6 +308,7 @@ export const ko_KR: EnTranslations = {
       "autorun": "자동 달리기",
       "jump": "점프",
       "leaderboard": "순위",
+      "dailyRewards": "보상",
       "nameplates": "이름표",
       "haptics": "진동",
       "hapticsOff": "진동 꺼짐",

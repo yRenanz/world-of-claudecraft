@@ -3616,6 +3616,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.hotbarPageAria': 'Показать следующий набор навыков',
   'hudChrome.mobile.jump': 'Прыжок',
   'hudChrome.mobile.leaderboard': 'Рейтинг',
+  'hudChrome.mobile.dailyRewards': 'Награды',
   'hudChrome.mobile.nameplates': 'Имена',
   'hudChrome.mobile.targetCycle': 'Сменить цель',
   'hudChrome.mobile.targetCycleShort': 'Цель',

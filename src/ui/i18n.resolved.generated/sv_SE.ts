@@ -308,6 +308,7 @@ export const sv_SE: EnTranslations = {
       "autorun": "Autospring",
       "jump": "Hoppa",
       "leaderboard": "Ranking",
+      "dailyRewards": "Rewards",
       "nameplates": "Namn",
       "haptics": "Haptik",
       "hapticsOff": "Haptik av",

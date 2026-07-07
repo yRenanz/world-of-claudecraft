@@ -225,6 +225,7 @@ import {
   parseHotbarActions,
   placeAbilityOnSlot,
   placeItemOnSlot,
+  resolveMobileHotbarDrop,
   shouldSeedFormBar,
   swapHotbarSlots,
   syncHotbarActions,
@@ -1236,6 +1237,9 @@ export class Hud {
   private lastHudMediumAt = 0;
   private lastHudSlowAt = 0;
   private dailyRewardsButtonEl: HTMLButtonElement | null = null;
+  // Mobile More-tray entry mirroring the desktop chest button's hidden/spin-ready
+  // state (folded off the top-right rail so it never overlaps the buff/debuff bars).
+  private mobileDailyRewardsButtonEl: HTMLButtonElement | null = null;
   private dailyRewardsLauncherSeq = 0;
   private lastDailyRewardsLauncherRefreshAt = 0;
   // Per-element tier cadence stamps (graphics-tier knobs). Each gates a non-self /
@@ -1416,11 +1420,16 @@ export class Hud {
     const dailyRewardsButton = document.getElementById(
       'daily-rewards-button',
     ) as HTMLButtonElement | null;
+    const mobileDailyRewardsButton = document.getElementById(
+      'mobile-daily-rewards',
+    ) as HTMLButtonElement | null;
     if (!this.dailyRewardsEnabled()) {
       dailyRewardsButton?.setAttribute('hidden', '');
+      mobileDailyRewardsButton?.setAttribute('hidden', '');
       $('#daily-rewards-window').style.display = 'none';
     } else if (dailyRewardsButton) {
       this.dailyRewardsButtonEl = dailyRewardsButton;
+      this.mobileDailyRewardsButtonEl = mobileDailyRewardsButton;
       dailyRewardsButton.innerHTML =
         '<img class="daily-rewards-icon" src="/ui/daily-rewards/treasure_chest.webp" alt="" draggable="false" decoding="async">';
       dailyRewardsButton.classList.remove('spin-ready');
@@ -1912,7 +1921,17 @@ export class Hud {
   }
 
   private placeNewWindow(el: HTMLElement): void {
-    if (el.dataset.windowMoved === '1' || el.id === 'loot-window' || el.id === 'confirm-dialog')
+    // Desktop-only cascade: mobile windows are full-screen/modal (see
+    // src/styles/hud.mobile.css), so the pixel-offset cascade here would hijack
+    // their inset:0 CSS with an inline top/left/right:auto/bottom:auto that
+    // never gets reset, breaking the full-screen layout for the rest of the
+    // session (issue 1577 char/talents redo).
+    if (
+      document.body.classList.contains('mobile-touch') ||
+      el.dataset.windowMoved === '1' ||
+      el.id === 'loot-window' ||
+      el.id === 'confirm-dialog'
+    )
       return;
     if (
       document.body.classList.contains('vendor-open') &&
@@ -5201,6 +5220,14 @@ export class Hud {
     });
     slotBtns.forEach((btn, i) => {
       bindTouchTap(btn, () => {
+        // A tap that ends a long-press drag (even one released back on its own
+        // slot, a cancel) must not also cast: bindMobileRingDrag arms this flag
+        // on release from an active drag, same as the desktop drag's click guard.
+        if (this.suppressNextActionClick) {
+          this.suppressNextActionClick = false;
+          btn.blur();
+          return;
+        }
         if (this.peekGuard.consume()) {
           this.hideTooltip();
           btn.blur();
@@ -5210,6 +5237,7 @@ export class Hud {
         this.castSlot(sourceSlotForMobileButton(this.mobileActionPage, i));
         btn.blur();
       });
+      this.bindMobileRingDrag(btn, i);
     });
     bindTouchTap(pageToggle, () => {
       if (this.peekGuard.consume()) {
@@ -5443,10 +5471,23 @@ export class Hud {
   }
 
   private clearActionDropTargets(): void {
-    // Both action rows (#actionbar and #actionbar2) hold .action-btn slots.
-    document.querySelectorAll('.action-btn.drop-target').forEach((el) => {
-      el.classList.remove('drop-target');
-    });
+    // Both action rows (#actionbar and #actionbar2) hold .action-btn slots; the
+    // mobile action ring's paged slots are .mobile-action-slot instead.
+    document
+      .querySelectorAll('.action-btn.drop-target, .mobile-action-slot.drop-target')
+      .forEach((el) => {
+        el.classList.remove('drop-target');
+      });
+  }
+
+  private mobileRingSlotFromPoint(x: number, y: number): number | null {
+    const el = document
+      .elementFromPoint(x, y)
+      ?.closest?.('.mobile-action-slot') as HTMLElement | null;
+    const raw = el?.dataset.mobileIndex;
+    if (!raw) return null;
+    const idx = Number(raw);
+    return Number.isInteger(idx) && idx >= 0 && idx < this.mobileRingSlotBtns.length ? idx : null;
   }
 
   private actionButtonSlotFromPoint(x: number, y: number): number | null {
@@ -5464,16 +5505,22 @@ export class Hud {
     if (drag) window.clearTimeout(drag.timer);
     this.mobileHotbarDrag = null;
     document.body.classList.remove('mobile-hotbar-dragging');
-    document.querySelectorAll('.action-btn.mobile-drag-source').forEach((el) => {
-      el.classList.remove('mobile-drag-source');
-    });
+    document
+      .querySelectorAll('.action-btn.mobile-drag-source, .mobile-action-slot.mobile-drag-source')
+      .forEach((el) => {
+        el.classList.remove('mobile-drag-source');
+        el.removeAttribute('aria-grabbed');
+      });
     this.clearActionDropTargets();
   }
 
   private bindMobileActionDrag(btn: HTMLButtonElement, slot: number): void {
     btn.addEventListener('pointerdown', (e) => {
       if (!document.body.classList.contains('mobile-touch') || e.pointerType !== 'touch') return;
-      if (this.actionForSlot(slot)?.type !== 'ability') return;
+      // Any populated slot (ability or item) can be picked up and swapped by
+      // touch, matching desktop drag-and-drop which does not special-case
+      // items either.
+      if (!this.actionForSlot(slot)) return;
       this.clearMobileHotbarDrag();
       const sourceIndex = slot - 1;
       const drag: MobileHotbarDrag = {
@@ -5492,6 +5539,7 @@ export class Hud {
           document.body.classList.add('mobile-hotbar-dragging');
           btn.classList.add('mobile-drag-source');
           btn.classList.add('drop-target');
+          btn.setAttribute('aria-grabbed', 'true');
           this.hideTooltip();
           try {
             btn.setPointerCapture?.(e.pointerId);
@@ -5530,11 +5578,105 @@ export class Hud {
       if (wasActive) {
         e.preventDefault();
         this.suppressNextActionClick = true;
-        if (targetIndex !== null && targetIndex !== drag.sourceIndex) {
-          this.hotbarActions = swapHotbarSlots(this.hotbarActions, drag.sourceIndex, targetIndex);
+        const resolvedTarget = resolveMobileHotbarDrop(drag.sourceIndex, targetIndex);
+        if (resolvedTarget !== null) {
+          this.hotbarActions = swapHotbarSlots(
+            this.hotbarActions,
+            drag.sourceIndex,
+            resolvedTarget,
+          );
           this.saveSlotMap();
           // Match the desktop drop: clear the now-stale tooltip for the rearranged
           // slot so a long-press peek resolves the new content (#1485).
+          this.hideTooltip();
+        }
+      }
+      this.clearMobileHotbarDrag();
+    };
+    btn.addEventListener('pointerup', finish);
+    btn.addEventListener('pointercancel', finish);
+  }
+
+  // Touch swap for the mobile action ring, the one bar actually visible on a
+  // touch device (the desktop #actionbar/#actionbar2 rows bindMobileActionDrag
+  // wires above are display:none under body.mobile-touch, so without this the
+  // ring had no rearrange path at all). Same long-press-then-drag gesture as
+  // bindMobileActionDrag, sharing the one mobileHotbarDrag field (only one
+  // drag can be live at a time) and the pure resolveMobileHotbarDrop/
+  // swapHotbarSlots helpers; only the point-to-slot hit test differs, since
+  // ring buttons are .mobile-action-slot, not .action-btn, and a ring
+  // position's underlying bar slot depends on the current paged page.
+  private bindMobileRingDrag(btn: HTMLButtonElement, ringIndex: number): void {
+    btn.addEventListener('pointerdown', (e) => {
+      if (!document.body.classList.contains('mobile-touch') || e.pointerType !== 'touch') return;
+      const sourceSlot = sourceSlotForMobileButton(this.mobileActionPage, ringIndex);
+      if (!this.actionForSlot(sourceSlot)) return;
+      this.clearMobileHotbarDrag();
+      const sourceIndex = sourceSlot - 1;
+      const drag: MobileHotbarDrag = {
+        pointerId: e.pointerId,
+        sourceIndex,
+        startX: e.clientX,
+        startY: e.clientY,
+        active: false,
+        targetIndex: null,
+        timer: window.setTimeout(() => {
+          const current = this.mobileHotbarDrag;
+          if (!current || current.pointerId !== e.pointerId) return;
+          current.active = true;
+          current.targetIndex = sourceIndex;
+          document.body.classList.add('mobile-hotbar-dragging');
+          btn.classList.add('mobile-drag-source', 'drop-target');
+          btn.setAttribute('aria-grabbed', 'true');
+          this.hideTooltip();
+          try {
+            btn.setPointerCapture?.(e.pointerId);
+          } catch {
+            /* pointer already released */
+          }
+        }, 320),
+      };
+      this.mobileHotbarDrag = drag;
+    });
+
+    btn.addEventListener('pointermove', (e) => {
+      const drag = this.mobileHotbarDrag;
+      if (!drag || drag.pointerId !== e.pointerId) return;
+      const moved = Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY);
+      if (!drag.active && moved > 9) {
+        this.clearMobileHotbarDrag();
+        return;
+      }
+      if (!drag.active) return;
+      e.preventDefault();
+      const targetRingIndex = this.mobileRingSlotFromPoint(e.clientX, e.clientY);
+      const targetIndex =
+        targetRingIndex !== null
+          ? sourceSlotForMobileButton(this.mobileActionPage, targetRingIndex) - 1
+          : null;
+      drag.targetIndex = targetIndex;
+      this.clearActionDropTargets();
+      const targetBtn = targetRingIndex !== null ? this.mobileRingSlotBtns[targetRingIndex] : null;
+      if (targetBtn) targetBtn.classList.add('drop-target');
+      btn.classList.add('mobile-drag-source');
+    });
+
+    const finish = (e: PointerEvent) => {
+      const drag = this.mobileHotbarDrag;
+      if (!drag || drag.pointerId !== e.pointerId) return;
+      const wasActive = drag.active;
+      const targetIndex = drag.targetIndex;
+      if (wasActive) {
+        e.preventDefault();
+        this.suppressNextActionClick = true;
+        const resolvedTarget = resolveMobileHotbarDrop(drag.sourceIndex, targetIndex);
+        if (resolvedTarget !== null) {
+          this.hotbarActions = swapHotbarSlots(
+            this.hotbarActions,
+            drag.sourceIndex,
+            resolvedTarget,
+          );
+          this.saveSlotMap();
           this.hideTooltip();
         }
       }
@@ -5914,6 +6056,11 @@ export class Hud {
     const visible = this.dailyRewardsEnabled() && show;
     button.toggleAttribute('hidden', !visible);
     if (!visible) button.classList.remove('spin-ready');
+    // The mobile More-tray entry is a menu row, not floating chrome: it stays
+    // reachable whenever the feature itself is on, regardless of the
+    // showDailyRewardsChestButton preference (which only declutters the rail).
+    if (!this.dailyRewardsEnabled())
+      this.mobileDailyRewardsButtonEl?.classList.remove('spin-ready');
   }
 
   private setDailyRewardsChestButtonPreference(show: boolean): void {
@@ -5932,6 +6079,8 @@ export class Hud {
   private applyDailyRewardsLauncherStatus(status: DailyRewardStatus): void {
     if (!this.dailyRewardsEnabled()) return;
     const button = this.dailyRewardsButtonEl;
+    const spinReady = !status.eligibility.eligible || !status.spin.claimed;
+    this.mobileDailyRewardsButtonEl?.classList.toggle('spin-ready', spinReady);
     if (!button) return;
     if (!this.showDailyRewardsChestButton()) {
       button.hidden = true;
@@ -5939,7 +6088,7 @@ export class Hud {
       return;
     }
     button.hidden = false;
-    button.classList.toggle('spin-ready', !status.eligibility.eligible || !status.spin.claimed);
+    button.classList.toggle('spin-ready', spinReady);
   }
 
   private refreshDailyRewardsLauncher(force = false): void {

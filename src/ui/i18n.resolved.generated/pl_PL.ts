@@ -308,6 +308,7 @@ export const pl_PL: EnTranslations = {
       "autorun": "Autobieg",
       "jump": "Skok",
       "leaderboard": "Rankingi",
+      "dailyRewards": "Rewards",
       "nameplates": "Nazwy",
       "haptics": "Wibracje",
       "hapticsOff": "Wibracje wył.",

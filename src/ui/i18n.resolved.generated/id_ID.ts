@@ -308,6 +308,7 @@ export const id_ID: EnTranslations = {
       "autorun": "Lari Otomatis",
       "jump": "Lompat",
       "leaderboard": "Peringkat",
+      "dailyRewards": "Rewards",
       "nameplates": "Nama",
       "haptics": "Haptik",
       "hapticsOff": "Haptik Nonaktif",

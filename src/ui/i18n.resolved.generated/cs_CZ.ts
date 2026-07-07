@@ -308,6 +308,7 @@ export const cs_CZ: EnTranslations = {
       "autorun": "Automatický běh",
       "jump": "Skok",
       "leaderboard": "Žebříčky",
+      "dailyRewards": "Rewards",
       "nameplates": "Jména",
       "haptics": "Haptika",
       "hapticsOff": "Haptika vypnuta",

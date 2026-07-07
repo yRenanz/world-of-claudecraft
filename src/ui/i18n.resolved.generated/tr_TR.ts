@@ -308,6 +308,7 @@ export const tr_TR: EnTranslations = {
       "autorun": "Otomatik Koşu",
       "jump": "Zıpla",
       "leaderboard": "Sıralama",
+      "dailyRewards": "Rewards",
       "nameplates": "İsimler",
       "haptics": "Dokunsal Geri Bildirim",
       "hapticsOff": "Dokunsal Kapalı",

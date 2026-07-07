@@ -14,8 +14,8 @@
 | Phase 4 QA | complete | 2026-07-06 | 2026-07-06 |
 | Phase 5: bank window | complete | 2026-07-06 | 2026-07-06 |
 | Phase 5 QA | complete | 2026-07-06 | 2026-07-06 |
-| Phase 6: deposit + search | not started | | |
-| Phase 6 QA | not started | | |
+| Phase 6: deposit + search | complete | 2026-07-06 | 2026-07-06 |
+| Phase 6 QA | complete | 2026-07-06 | 2026-07-06 |
 | Phase 7: mobile + a11y | not started | | |
 | Phase 7 QA | not started | | |
 | Phase 8: bonus slots | not started | | |
@@ -74,13 +74,13 @@
 - [x] Deliverables and acceptance criteria re-verified independently (adversarially-verified finder workflow + fresh qa-checklist + both smokes + a new escape peel probe); all should-fix applied, 4-mutation decisiveness pass all killed; full record in state.md
 
 ### Phase 6: deposit + search
-- [ ] Deposit mode inserted into BagMode + bagItemAction + bagTooltipHintKey together; deps flag on BagsWindowDeps
-- [ ] Deposit-all-materials button; shift-click partial deposits
-- [ ] Bank search/category/sort (bag_filter model; localStorage persistence)
-- [ ] View-core and painter tests
+- [x] Deposit mode inserted into BagMode + bagItemAction + bagTooltipHintKey together; deps flag on BagsWindowDeps
+- [x] Deposit-all-materials button; shift-click partial deposits
+- [x] Bank search/category/sort (bag_filter model; localStorage persistence)
+- [x] View-core and painter tests
 
 ### Phase 6 QA
-- [ ] As Phase 1 QA
+- [x] As Phase 1 QA
 
 ### Phase 7: mobile + a11y
 - [ ] Mobile 50/50 split with bags, safe areas, 40x40 tap targets, 16px inputs, pan-y grid scrolling, long-press tooltip peek behavior
@@ -193,6 +193,17 @@
 - Search/category/sort reuse the bag_filter vocabulary through a sibling pure bank_filter.ts that preserves original slot indices and matches the LOCALIZED name via an injected resolver (the recorded bags divergence); deposit-all is a pure planner over the sim's own moveBetweenContainers on clones, descending indices, one click-time snapshot, an in-flight double-click guard, and an in-window aria-live summary.
 - Two live bugs found and fixed same-session: the slow-band repaint stealing search focus mid-typing (render() now carries focus + caret across full rebuilds) and the dead depositPartialHint key (wired as the withdraw twin). qa-checklist READY 0 blocking; every finding applied; offline smoke 21/21 (probe gotcha: smoke character names must be letters-only or the game silently never starts).
 - Next: run docs/bank-system/phase-06-qa.md in a fresh session.
+
+### Phase 6 QA (2026-07-06)
+
+- Verdict: PASS after fixes. 0 blocking + 3 should-fix + 2 nits + 6 INFO across four audit streams (correctness, test-coverage-auditor, dead-code, the independent qa-checklist gate: READY); every should-fix and nit applied same-session (3b841b432). Full record in state.md "Phase 6 QA outcomes".
+- Preceded by the release/v0.23.0 merge 1288d70f1 (professions signed-materials epic #1207): ZERO conflicts, release-merge-audit CLEAN; the bank was already instance-aware end to end, and a new integration test now drives a signed material through the real sim.bankDeposit (moves whole, never merges).
+- The phase 6 handoff ONLINE smoke: 22/22 PASS against the authoritative server (deposit click, quest deny, shift-click partial prompt with Enter submit, search focus + caret, chip persistence, deposit-all with the in-flight guard observed disabled at send and the plan applying completely).
+- One pre-existing product bug found via that smoke and fixed in its own commit (fe642f515): the first-spawn intro cinematic honored only the in-game reduceMotion switch, not the OS prefers-reduced-motion query (against the documented effective-flag model), and while running it inline-hides #ui so HUD focus() calls silently drop; the first online-smoke run failed 4 checks, all artifacts of this.
+- Test hardening applied: the resolveDepositSubmit maxCount arm pinned with a grown-live-stack case; the deposit-all summary arm choice extracted into the pure depositAllSummaryKey and pinned per-arm; DEPOSIT_STATUS_MS = 4_000 pinned as a literal; the bagFilterIsDefault twins consolidated into one bag_filter.ts export.
+- Shared-tree incident: a concurrent session flipped the worktree to release/v0.23.0 mid-QA; all four audit streams detected it and re-based on commit objects or throwaway worktrees; the branch was restored and the game-server bundle REBUILT before the online smoke (the esbuild bundle snapshots the checkout at server start).
+- Battery: tsc, six bank/bags suites + architecture + S3, ci:changed, i18n:gen zero-diff, offline smoke 21/21, online smoke 22/22, and the full npm run gate, all green.
+- Next: run docs/bank-system/phase-07-mobile-a11y.md in a fresh session.
 
 ### Phase 4 QA (2026-07-06)
 

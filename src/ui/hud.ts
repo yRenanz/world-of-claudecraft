@@ -7780,7 +7780,9 @@ export class Hud {
               t(
                 ev.reason === 'unknown_recipe'
                   ? 'hudChrome.crafting.unknownRecipe'
-                  : 'hudChrome.crafting.insufficientMaterials',
+                  : ev.reason === 'combo_requirement_unmet'
+                    ? 'hudChrome.crafting.comboRequirementUnmet'
+                    : 'hudChrome.crafting.insufficientMaterials',
               ),
               '#ff6b6b',
             );
@@ -10090,7 +10092,7 @@ export class Hud {
   private renderCrafting(): void {
     renderCraftingWindow(
       $('#crafting-window'),
-      buildCraftingView(this.sim.recipeList, this.sim.inventory, ITEMS),
+      buildCraftingView(this.sim.recipeList, this.sim.inventory, ITEMS, this.sim.craftSkills),
       {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),

@@ -1125,9 +1125,27 @@ describe('client HTML shell', () => {
     expect(shellCss).toContain(
       'body.mobile-touch #charselect-panel #charselect-class-details .details-spells-list {\n      display: grid;\n      grid-template-columns: minmax(0, 1fr);',
     );
+    // charselect's columns stay overflow:hidden (their #char-list and
+    // #charselect-class-details CHILDREN scroll); charcreate's columns hold a
+    // single tall flow with no inner scroll container, so THEY scroll instead
+    // (overflow-y: auto), or the Create button clips off with no way to reach it.
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel .cs-list-col,\n    body.mobile-touch #charselect-panel .cs-detail-col,\n    body.mobile-touch #charcreate-panel .cs-create-col,\n    body.mobile-touch #charcreate-panel .cs-detail-col {\n      min-height: 0;\n      height: 100%;\n      overflow: hidden;',
+      'body.mobile-touch #charselect-panel .cs-list-col,\n    body.mobile-touch #charselect-panel .cs-detail-col {\n      min-height: 0;\n      height: 100%;\n      overflow: hidden;',
     );
+    expect(shellCss).toContain(
+      'body.mobile-touch #charcreate-panel .cs-create-col,\n    body.mobile-touch #charcreate-panel .cs-detail-col {\n      min-height: 0;\n      height: 100%;\n      overflow-y: auto;',
+    );
+    // No body.mobile-touch charcreate column rule may declare overflow:hidden
+    // (that was the clip bug). Guard both column selectors against a hidden
+    // regression, tolerating either selector order.
+    for (const col of ['.cs-create-col', '.cs-detail-col']) {
+      const rule = shellCss.match(
+        new RegExp(`body\\.mobile-touch #charcreate-panel \\${col}[^{]*\\{([^}]*)\\}`),
+      );
+      expect(rule, `charcreate ${col} mobile column rule should exist`).not.toBeNull();
+      expect(rule![1]).toMatch(/overflow-y:\s*auto/);
+      expect(rule![1]).not.toMatch(/overflow:\s*hidden/);
+    }
     expect(shellCss).toContain(
       'body.mobile-touch #charselect-panel .cs-list-actions {\n      position: absolute;\n      top: 28px;\n      right: 0;',
     );

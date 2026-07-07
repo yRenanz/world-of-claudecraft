@@ -51,9 +51,9 @@ describe('bank_window: load-bearing behaviors preserved', () => {
     expect(painter).not.toContain('applyBagFilter(');
   });
 
-  it('captures and reapplies the .bank-grid scroll offset across a rebuild', () => {
-    expect(painter).toContain(".bank-grid')?.scrollTop");
-    expect(painter).toContain('grid.scrollTop = prevScrollTop');
+  it('captures and reapplies the .bank-scroll scroll offset across a rebuild', () => {
+    expect(painter).toContain(".bank-scroll')?.scrollTop");
+    expect(painter).toContain('scroll.scrollTop = prevScrollTop');
   });
 
   it('closes itself after a grace window once bankInfo goes null (walked away)', () => {
@@ -270,7 +270,10 @@ describe('bank_window: Phase 6 search / sort / deposit-all', () => {
     expect(refreshBody).toContain('private refreshGrid');
     expect(refreshBody).not.toContain('private buildBuyRow');
     expect(refreshBody).toContain(".bank-grid')");
-    expect(refreshBody).toContain('grid.scrollTop = prevScrollTop');
+    // The offset lives on the wrapper: emptying the grid collapses the wrapper's
+    // scroll height (clamping scrollTop to 0), so it must capture + reapply.
+    expect(refreshBody).toContain(".bank-scroll')");
+    expect(refreshBody).toContain('if (scroll) scroll.scrollTop = prevScrollTop');
   });
 
   it('carries the ORIGINAL slotIndex through the filtered grid to the click handler', () => {
@@ -501,17 +504,25 @@ describe('bank_window: Phase 7 keyboard a11y (non-modal activation + prompt Ente
 });
 
 describe('bank_window: Phase 8 bonus-slot breakdown footer', () => {
-  it('appends the bonus section immediately AFTER the buy row in render()', () => {
-    // The footer rides directly after buildBuyRow. Moving the append above the buy
-    // row (or dropping it) reds this ordering pin.
+  it('rides the bonus section as the tail of the shared .bank-scroll region', () => {
+    // Order pin: grid into the scroll wrapper, bonus after it (the tail), the wrapper
+    // into the window, and the transactional buy row pinned AFTER the wrapper so it
+    // stays visible while the region scrolls (the 360px-phone budget: a fixed footer
+    // below the buy row crushed the grid or clipped itself, found live in Phase 8 QA).
     const renderBody = painter.slice(
       painter.indexOf('render(): void {'),
       painter.indexOf('refreshIfChanged(): void {'),
     );
-    const buyIdx = renderBody.indexOf('el.appendChild(this.buildBuyRow(model.buy));');
+    const gridIdx = renderBody.indexOf('scroll.appendChild(grid);');
     const bonusIdx = renderBody.indexOf('this.buildBonusSection(model.bonus)');
-    expect(buyIdx).toBeGreaterThan(0);
-    expect(bonusIdx).toBeGreaterThan(buyIdx);
+    const bonusAppendIdx = renderBody.indexOf('scroll.appendChild(bonus);');
+    const scrollIdx = renderBody.indexOf('el.appendChild(scroll);');
+    const buyIdx = renderBody.indexOf('el.appendChild(this.buildBuyRow(model.buy));');
+    expect(gridIdx).toBeGreaterThan(0);
+    expect(bonusIdx).toBeGreaterThan(gridIdx);
+    expect(bonusAppendIdx).toBeGreaterThan(bonusIdx);
+    expect(scrollIdx).toBeGreaterThan(bonusAppendIdx);
+    expect(buyIdx).toBeGreaterThan(scrollIdx);
   });
 
   it('builds a labelled group section and SKIPS an unknown source id (forward compat)', () => {
@@ -575,5 +586,26 @@ describe('bank_window: Phase 8 bonus-slot breakdown footer', () => {
     const bonusCss = components.slice(start, end);
     const hex = bonusCss.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [];
     expect(hex, `bonus CSS must use tokens: ${hex.join(', ')}`).toEqual([]);
+  });
+
+  it('the .bank-scroll wrapper owns the scroll (two-row floor); the grid does not', () => {
+    // Found live at 740x360 (Phase 8 QA): a rigid flex:none footer below the buy row
+    // crushed the grid to a 4px sliver and clipped its own rows past the window
+    // bottom. The contract: ONE scroll region (grid + bonus tail) with a two-row
+    // floor, so cells and bonus copy are both reachable on every viewport.
+    const scroll = components.slice(
+      components.indexOf('.bank-scroll {'),
+      components.indexOf('.bank-grid {'),
+    );
+    expect(scroll).toContain('flex: 1 1 auto;');
+    expect(scroll).toContain('min-height: 92px;');
+    expect(scroll).toContain('overflow-y: auto;');
+    expect(scroll).toContain('touch-action: pan-y;');
+    const grid = components.slice(
+      components.indexOf('.bank-grid {'),
+      components.indexOf('.bank-item {'),
+    );
+    expect(grid).not.toContain('overflow-y');
+    expect(grid).not.toContain('min-height');
   });
 });

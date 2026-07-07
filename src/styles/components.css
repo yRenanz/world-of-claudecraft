@@ -3208,18 +3208,26 @@
     font-family: var(--ui-font);
     font-size: 12px;
   }
-  .bank-grid {
+  /* The shared scroll region: the cell grid plus the bonus breakdown as its tail.
+     At a 360px-tall phone the rigid chrome (title, capacity, toolbar, buy row)
+     leaves under one cell row of flex space, so a fixed footer below the buy row
+     either crushed the grid or clipped itself (found live in Phase 8 QA); scrolling
+     one region reaches both. The two-row floor (2 x 40px cells + gap + padding)
+     keeps the region usable before the window itself would overflow. */
+  .bank-scroll {
     flex: 1 1 auto;
-    min-height: 0;
+    min-height: 92px;
+    overflow-y: auto;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  .bank-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
     gap: 4px;
     padding: 2px;
     align-content: start;
-    overflow-y: auto;
-    touch-action: pan-y;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
   }
   .bank-item {
     position: relative;
@@ -3327,12 +3335,11 @@
     font-size: 12px;
   }
   /* Bonus-slot breakdown footer (Phase 8, online only): a compact non-interactive
-     text block under the buy row advertising the account-link and referral bonuses.
-     Tokens only (no hex): borders are a translucent gold-dim mix, text uses the muted
-     token. The rows wrap so the footer stays short and the grid keeps scroll priority
-     on a short phone (it is flex:none, the grid is flex:1 with min-height:0). */
+     text block advertising the account-link and referral bonuses, riding as the TAIL
+     of the .bank-scroll region (scrolling past the last cells reaches it on every
+     viewport; a rigid below-the-buy-row footer clipped at 360px-tall phones). Tokens
+     only (no hex): borders are a translucent gold-dim mix, text uses the muted token. */
   .bank-bonus {
-    flex: none;
     margin-top: 8px;
     padding-top: 7px;
     border-top: 1px solid color-mix(in srgb, var(--gold-dim) 35%, transparent);

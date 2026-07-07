@@ -2028,8 +2028,9 @@
     z-index: 95;
   }
   /* Bank LEFT: unlike the vendor (a display:block window that scrolls as a whole),
-     #bank-window is a flex column whose .bank-grid is the internal scroll container,
-     so the panel itself stays overflow:hidden and the grid scrolls, mirroring #bags. */
+     #bank-window is a flex column whose .bank-scroll region (grid + bonus tail) is
+     the internal scroll container, so the panel itself stays overflow:hidden and
+     the region scrolls, mirroring #bags. */
   body.mobile-touch.bank-open #bank-window {
     left: max(10px, env(safe-area-inset-left));
     right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);

@@ -277,10 +277,10 @@ export class BankWindow {
     }
     this.deps.hideTooltip();
     markDialogRoot(el, { label: t('hudChrome.bank.title') });
-    // .bank-grid (not #bank-window) is the scroll container; it is recreated on every
-    // rebuild, so capture its scroll offset and reapply it to the fresh grid, else a
-    // withdraw snaps the list back to the top (the bags idiom).
-    const prevScrollTop = el.querySelector('.bank-grid')?.scrollTop ?? 0;
+    // .bank-scroll (not #bank-window) is the scroll container; it is recreated on
+    // every rebuild, so capture its scroll offset and reapply it to the fresh one,
+    // else a withdraw snaps the list back to the top (the bags idiom).
+    const prevScrollTop = el.querySelector('.bank-scroll')?.scrollTop ?? 0;
     const model = buildBankView(this.deps.world().bankInfo, (id) => ITEMS[id]);
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('hudChrome.bank.title'))} <span class="panel-subtitle">${esc(t('hudChrome.bank.subtitle'))}</span></span>` +
@@ -307,16 +307,25 @@ export class BankWindow {
     el.appendChild(this.buildFilterBar(model.empty));
     const status = this.buildDepositStatus();
     if (status) el.appendChild(status);
+    // One shared scroll region holds the grid plus the bonus breakdown as its tail:
+    // at a 360px-tall phone the rigid chrome (title, capacity, toolbar, buy row)
+    // leaves less than one cell row of flex space, so a fixed below-the-buy-row
+    // footer either crushed the grid or clipped itself (found live in Phase 8 QA).
+    // Scrolling past the last cells reaches the bonus copy on every viewport, and
+    // the transactional buy row stays pinned below, always visible.
+    const scroll = document.createElement('div');
+    scroll.className = 'bank-scroll';
     const grid = document.createElement('div');
     grid.className = 'bank-grid';
     this.fillGrid(grid, model.slots, model.emptyCells, model.empty);
-    el.appendChild(grid);
-    grid.scrollTop = prevScrollTop;
-    el.appendChild(this.buildBuyRow(model.buy));
-    // The bonus-slot breakdown rides directly after the buy footer. Present only
-    // online (bonusSources is [] offline), it advertises what account links earn.
+    scroll.appendChild(grid);
+    // The bonus-slot breakdown is present only online (bonusSources is [] offline);
+    // it advertises what account links earn.
     const bonus = this.buildBonusSection(model.bonus);
-    if (bonus) el.appendChild(bonus);
+    if (bonus) scroll.appendChild(bonus);
+    el.appendChild(scroll);
+    scroll.scrollTop = prevScrollTop;
+    el.appendChild(this.buildBuyRow(model.buy));
     if (searchFocus) {
       const fresh = el.querySelector('.bag-search') as HTMLInputElement | null;
       if (fresh) {
@@ -453,10 +462,14 @@ export class BankWindow {
     if (!info) return; // walked away; refreshIfChanged owns the grace-close
     const model = buildBankView(info, (id) => ITEMS[id]);
     if (model.kind !== 'bank') return;
-    const prevScrollTop = grid.scrollTop;
+    // The offset lives on the .bank-scroll wrapper; emptying the grid momentarily
+    // collapses the wrapper's scroll height (clamping scrollTop to 0), so capture
+    // and reapply around the refill.
+    const scroll = this.deps.root().querySelector('.bank-scroll') as HTMLElement | null;
+    const prevScrollTop = scroll?.scrollTop ?? 0;
     grid.innerHTML = '';
     this.fillGrid(grid, model.slots, model.emptyCells, model.empty);
-    grid.scrollTop = prevScrollTop;
+    if (scroll) scroll.scrollTop = prevScrollTop;
   }
 
   // The category-chip + sort + search toolbar, plus the deposit-all-materials button.

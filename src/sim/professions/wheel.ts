@@ -163,8 +163,11 @@ export function materialCostMultiplier(skills: CraftSkillState, craftId: string)
  * composes with when that crafter is also specialized in `craftId`: 1 (no
  * additional discount) when not specialized, or `1 - rechargeDiscountPct`
  * once specialized. `tools.ts` multiplies this into its existing
- * original-crafter discount rather than replacing it, so a specialized
- * recharger always pays strictly less than a merely-original one.
+ * original-crafter discount rather than replacing it: the tick-cost half
+ * always drops strictly, but the material half is an integer ceil, so with
+ * today's placeholder constants a small base material cost can floor at the
+ * same integer as the plain original-crafter discount (see the recharge test
+ * for the material-cost bound actually asserted).
  */
 export function rechargeDiscountMultiplier(skills: CraftSkillState, craftId: string): number {
   if (!isSpecialized(skills, craftId)) return 1;

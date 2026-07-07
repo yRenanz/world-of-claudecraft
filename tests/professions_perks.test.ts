@@ -76,21 +76,34 @@ describe('material-cost discount when crafting (#1134, crafting.ts)', () => {
   };
 
   it('a non-specialized player pays the full listed material cost', () => {
-    expect(requiredReagentCount(undefined, { itemId: 'x', count: 10 }, {}, CRAFT_ID)).toBe(10);
-    expect(requiredReagentCount(undefined, { itemId: 'x', count: 1 }, {}, CRAFT_ID)).toBe(1);
+    expect(requiredReagentCount(undefined, { itemId: 'x', count: 10 }, {}, CRAFT_ID).count).toBe(
+      10,
+    );
+    expect(requiredReagentCount(undefined, { itemId: 'x', count: 1 }, {}, CRAFT_ID).count).toBe(1);
   });
 
   it('a specialized player sees a reduced quantity, floored, with a minimum of 1', () => {
     const skills = { [CRAFT_ID]: THRESHOLD };
     const discountPct = PERK_THRESHOLDS[CRAFT_ID].materialDiscountPct;
-    expect(requiredReagentCount(undefined, { itemId: 'x', count: 10 }, skills, CRAFT_ID)).toBe(
-      Math.max(1, Math.floor(10 * (1 - discountPct))),
-    );
     expect(
-      requiredReagentCount(undefined, { itemId: 'x', count: 10 }, skills, CRAFT_ID),
+      requiredReagentCount(undefined, { itemId: 'x', count: 10 }, skills, CRAFT_ID).count,
+    ).toBe(Math.max(1, Math.floor(10 * (1 - discountPct))));
+    expect(
+      requiredReagentCount(undefined, { itemId: 'x', count: 10 }, skills, CRAFT_ID).count,
     ).toBeLessThan(10);
     // The 1-qty ingredient floors at the minimum of 1, never drops to 0.
-    expect(requiredReagentCount(undefined, { itemId: 'x', count: 1 }, skills, CRAFT_ID)).toBe(1);
+    expect(requiredReagentCount(undefined, { itemId: 'x', count: 1 }, skills, CRAFT_ID).count).toBe(
+      1,
+    );
+  });
+
+  it('selfSignedBonusApplied reflects the self-signed step alone, not the composed specialization discount', () => {
+    const skills = { [CRAFT_ID]: THRESHOLD };
+    // No self-signed instance (meta undefined): the count still drops from the
+    // specialization discount, but selfSignedBonusApplied must stay false.
+    const result = requiredReagentCount(undefined, { itemId: 'x', count: 10 }, skills, CRAFT_ID);
+    expect(result.count).toBeLessThan(10);
+    expect(result.selfSignedBonusApplied).toBe(false);
   });
 
   it('resolveCraftForRecipe succeeds when discounted materials are available, consuming exactly the discounted amount', () => {

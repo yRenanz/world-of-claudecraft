@@ -99,8 +99,6 @@ export interface ToolEffectDef {
   bonus: number;
   /** Charges the effect starts with when freshly slotted onto a tool. */
   startingDurability: number;
-  /** Chance per use that this effect's durability decrements by 1 (0 to 1). */
-  depletionChance: number;
   /**
    * Which craft on the CRAFT_RING produces this effect (#1134). All three
    * starter tool effects are Enchanter work, so they share `'enchanting'`;
@@ -121,7 +119,6 @@ export const TOOL_EFFECTS: Record<ToolEffectId, ToolEffectDef> = {
     kind: 'quantity',
     bonus: 1,
     startingDurability: 20,
-    depletionChance: 0.5,
     craftId: 'enchanting',
   },
   artisans_eye: {
@@ -132,7 +129,6 @@ export const TOOL_EFFECTS: Record<ToolEffectId, ToolEffectDef> = {
     kind: 'quality',
     bonus: 1,
     startingDurability: 20,
-    depletionChance: 0.5,
     craftId: 'enchanting',
   },
   quickening_charm: {
@@ -143,7 +139,6 @@ export const TOOL_EFFECTS: Record<ToolEffectId, ToolEffectDef> = {
     kind: 'respawnSpeed',
     bonus: 1,
     startingDurability: 20,
-    depletionChance: 0.5,
     craftId: 'enchanting',
   },
 };

@@ -79,6 +79,14 @@ function hasSelfSignedInstance(meta: PlayerMeta, itemId: string): boolean {
   return meta.inventory.some((s) => s.itemId === itemId && s.instance?.signer === meta.name);
 }
 
+/** The result of resolving one reagent's required quantity: the final count
+ *  after both discounts compose, plus whether the #1145 self-signed
+ *  reduction specifically (not the composed total) actually lowered it. */
+export interface RequiredReagentResult {
+  count: number;
+  selfSignedBonusApplied: boolean;
+}
+
 /**
  * The quantity of one reagent actually required from `pid`, after both
  * discounts compose: `reagent.count` is first reduced by one (floored at 1,
@@ -86,20 +94,25 @@ function hasSelfSignedInstance(meta: PlayerMeta, itemId: string): boolean {
  * (#1145), then that result is multiplied by `materialCostMultiplier` for
  * `professionId` (#1134), floored, with a minimum of 1. A non-specialized
  * crafter with no self-signed material always gets back the listed `count`
- * unchanged.
+ * unchanged. `selfSignedBonusApplied` reflects the self-signed step alone, so
+ * it stays accurate even when the #1134 specialization discount also lowers
+ * the composed count.
  */
 export function requiredReagentCount(
   meta: PlayerMeta | undefined,
   reagent: ProfessionReagent,
   craftSkills: CraftSkillState,
   professionId: string,
-): number {
+): RequiredReagentResult {
   const afterSelfSigned =
     meta && hasSelfSignedInstance(meta, reagent.itemId)
       ? Math.max(1, reagent.count - 1)
       : reagent.count;
   const multiplier = materialCostMultiplier(craftSkills, professionId);
-  return Math.max(1, Math.floor(afterSelfSigned * multiplier));
+  return {
+    count: Math.max(1, Math.floor(afterSelfSigned * multiplier)),
+    selfSignedBonusApplied: afterSelfSigned < reagent.count,
+  };
 }
 
 /** Whether the given player currently holds every reagent a recipe requires,
@@ -116,7 +129,7 @@ export function hasRecipeMaterials(
   return recipe.reagents.every(
     (r) =>
       ctx.countItem(r.itemId, pid) >=
-      requiredReagentCount(meta, r, craftSkills, recipe.professionId),
+      requiredReagentCount(meta, r, craftSkills, recipe.professionId).count,
   );
 }
 
@@ -146,8 +159,8 @@ export function resolveCraftForRecipe(
   let selfSignedBonusApplied = false;
   for (const reagent of recipe.reagents) {
     const required = requiredReagentCount(meta, reagent, craftSkills, recipe.professionId);
-    if (required < reagent.count) selfSignedBonusApplied = true;
-    ctx.removeItem(reagent.itemId, required, pid);
+    if (required.selfSignedBonusApplied) selfSignedBonusApplied = true;
+    ctx.removeItem(reagent.itemId, required.count, pid);
   }
   const skill = meta ? (meta.craftSkills[recipe.professionId] ?? 0) : 0;
   const quality = rollMaterialRarity(skill, ctx.rng);

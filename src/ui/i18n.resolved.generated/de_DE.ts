@@ -1060,18 +1060,6 @@ export const de_DE: EnTranslations = {
         }
       }
     },
-    "crafting": {
-      "title": "Basteln",
-      "close": "Enges Basteln",
-      "craft": "Handwerk",
-      "reagentsNeeded": "Erfordert:",
-      "reagentLine": "{name}: {have}/{required}",
-      "empty": "Noch keine Rezepte bekannt.",
-      "resultAria": "Basteln {name}",
-      "craftedToast": "Hergestellt: {name}",
-      "insufficientMaterials": "Dafür fehlen Ihnen die Materialien.",
-      "unknownRecipe": "Dieses Rezept existiert nicht."
-    },
     "devBadge": {
       "title": "Entwickler",
       "tiers": {
@@ -1229,6 +1217,19 @@ export const de_DE: EnTranslations = {
       "enchanting": "Enchanter",
       "tailoring": "Tailor",
       "leatherworking": "Leathercrafter"
+    },
+    "crafting": {
+      "title": "Basteln",
+      "close": "Enges Basteln",
+      "craft": "Handwerk",
+      "reagentsNeeded": "Erfordert:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "Noch keine Rezepte bekannt.",
+      "resultAria": "Basteln {name}",
+      "craftedToast": "Hergestellt: {name}",
+      "insufficientMaterials": "Dafür fehlen Ihnen die Materialien.",
+      "unknownRecipe": "Dieses Rezept existiert nicht.",
+      "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe."
     }
   },
   "apiError": {

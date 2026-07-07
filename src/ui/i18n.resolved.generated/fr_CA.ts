@@ -1060,18 +1060,6 @@ export const fr_CA: EnTranslations = {
         }
       }
     },
-    "crafting": {
-      "title": "Artisanat",
-      "close": "Fermer la fabrication",
-      "craft": "Artisanat",
-      "reagentsNeeded": "Nécessite$1",
-      "reagentLine": "{name}: {have}/{required}",
-      "empty": "Aucune recette connue pour l'instant.",
-      "resultAria": "Artisanat {name}",
-      "craftedToast": "Fabriqué$1 {name}",
-      "insufficientMaterials": "Vous n'avez pas le matériel pour cela.",
-      "unknownRecipe": "Cette recette n'existe pas."
-    },
     "devBadge": {
       "title": "Développeur",
       "tiers": {
@@ -1229,6 +1217,19 @@ export const fr_CA: EnTranslations = {
       "enchanting": "Enchanter",
       "tailoring": "Tailor",
       "leatherworking": "Leathercrafter"
+    },
+    "crafting": {
+      "title": "Artisanat",
+      "close": "Fermer la fabrication",
+      "craft": "Artisanat",
+      "reagentsNeeded": "Nécessite$1",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "Aucune recette connue pour l'instant.",
+      "resultAria": "Artisanat {name}",
+      "craftedToast": "Fabriqué$1 {name}",
+      "insufficientMaterials": "Vous n'avez pas le matériel pour cela.",
+      "unknownRecipe": "Cette recette n'existe pas.",
+      "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe."
     }
   },
   "apiError": {

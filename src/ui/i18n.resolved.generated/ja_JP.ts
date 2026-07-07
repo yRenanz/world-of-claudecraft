@@ -1060,18 +1060,6 @@ export const ja_JP: EnTranslations = {
         }
       }
     },
-    "crafting": {
-      "title": "製作",
-      "close": "製作を閉じる",
-      "craft": "製作",
-      "reagentsNeeded": "必要素材:",
-      "reagentLine": "{name}: {have}/{required}",
-      "empty": "既知のレシピはありません。",
-      "resultAria": "{name}を製作",
-      "craftedToast": "製作しました:{name}",
-      "insufficientMaterials": "材料が不足しています。",
-      "unknownRecipe": "そのレシピは存在しません。"
-    },
     "devBadge": {
       "title": "開発者",
       "tiers": {
@@ -1229,6 +1217,19 @@ export const ja_JP: EnTranslations = {
       "enchanting": "エンチャンター",
       "tailoring": "仕立て屋",
       "leatherworking": "皮革職人"
+    },
+    "crafting": {
+      "title": "製作",
+      "close": "製作を閉じる",
+      "craft": "製作",
+      "reagentsNeeded": "必要素材:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "既知のレシピはありません。",
+      "resultAria": "{name}を製作",
+      "craftedToast": "製作しました:{name}",
+      "insufficientMaterials": "材料が不足しています。",
+      "unknownRecipe": "そのレシピは存在しません。",
+      "comboRequirementUnmet": "その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。"
     }
   },
   "apiError": {

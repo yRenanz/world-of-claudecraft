@@ -1060,18 +1060,6 @@ export const en_XA: EnTranslations = {
         }
       }
     },
-    "crafting": {
-      "title": "[Çŕáƒţíñĝ]",
-      "close": "[Çļóšé çŕáƒţíñĝ]",
-      "craft": "[Çŕáƒţ]",
-      "reagentsNeeded": "[Ŕéɋúíŕéš:]",
-      "reagentLine": "[{name} ẋ{have}/{required}]",
-      "empty": "[Ñó ŕéçíþéš ķñóŵñ ýéţ.]",
-      "resultAria": "[Çŕáƒţ {name}]",
-      "craftedToast": "[Çŕáƒţéð: {name}]",
-      "insufficientMaterials": "[Ýóú ðó ñóţ ĥáʋé ţĥé ɱáţéŕíáļš ƒóŕ ţĥáţ.]",
-      "unknownRecipe": "[Ţĥáţ ŕéçíþé ðóéš ñóţ éẋíšţ.]"
-    },
     "devBadge": {
       "title": "[Ðéʋéļóþéŕ]",
       "tiers": {
@@ -1229,6 +1217,19 @@ export const en_XA: EnTranslations = {
       "enchanting": "[Éñçĥáñţéŕ]",
       "tailoring": "[Ţáíļóŕ]",
       "leatherworking": "[Ļéáţĥéŕçŕáƒţéŕ]"
+    },
+    "crafting": {
+      "title": "[Çŕáƒţíñĝ]",
+      "close": "[Çļóšé çŕáƒţíñĝ]",
+      "craft": "[Çŕáƒţ]",
+      "reagentsNeeded": "[Ŕéɋúíŕéš:]",
+      "reagentLine": "[{name} ẋ{have}/{required}]",
+      "empty": "[Ñó ŕéçíþéš ķñóŵñ ýéţ.]",
+      "resultAria": "[Çŕáƒţ {name}]",
+      "craftedToast": "[Çŕáƒţéð: {name}]",
+      "insufficientMaterials": "[Ýóú ðó ñóţ ĥáʋé ţĥé ɱáţéŕíáļš ƒóŕ ţĥáţ.]",
+      "unknownRecipe": "[Ţĥáţ ŕéçíþé ðóéš ñóţ éẋíšţ.]",
+      "comboRequirementUnmet": "[Ýóú ðó ñóţ ĥáʋé ƀóţĥ ŕéɋúíŕéð çŕáƒţš áţ ţĥé ŕéɋúíŕéð ţíéŕ ƒóŕ ţĥáţ ŕéçíþé.]"
     }
   },
   "apiError": {

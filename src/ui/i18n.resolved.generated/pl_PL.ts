@@ -1060,18 +1060,6 @@ export const pl_PL: EnTranslations = {
         }
       }
     },
-    "crafting": {
-      "title": "Rzemiosło",
-      "close": "Zamknij rzemiosło",
-      "craft": "Rzemiosło",
-      "reagentsNeeded": "Wymaga:",
-      "reagentLine": "{name}: {have}/{required}",
-      "empty": "Nie są jeszcze znane żadne przepisy.",
-      "resultAria": "Craft {name}",
-      "craftedToast": "Wykonane: {name}",
-      "insufficientMaterials": "Nie masz na to materiałów.",
-      "unknownRecipe": "Ten przepis nie istnieje."
-    },
     "devBadge": {
       "title": "Deweloper",
       "tiers": {
@@ -1229,6 +1217,19 @@ export const pl_PL: EnTranslations = {
       "enchanting": "Enchanter",
       "tailoring": "Tailor",
       "leatherworking": "Leathercrafter"
+    },
+    "crafting": {
+      "title": "Rzemiosło",
+      "close": "Zamknij rzemiosło",
+      "craft": "Rzemiosło",
+      "reagentsNeeded": "Wymaga:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "Nie są jeszcze znane żadne przepisy.",
+      "resultAria": "Craft {name}",
+      "craftedToast": "Wykonane: {name}",
+      "insufficientMaterials": "Nie masz na to materiałów.",
+      "unknownRecipe": "Ten przepis nie istnieje.",
+      "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe."
     }
   },
   "apiError": {

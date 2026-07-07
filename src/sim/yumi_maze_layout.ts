@@ -24,10 +24,10 @@ export const YUMI_MAZE_SEED = 0xca7f00d;
 
 export const YUMI_MAZE_COLS = 13;
 export const YUMI_MAZE_ROWS = 13;
-export const YUMI_MAZE_PITCH = 4.5; // yd per cell (3.5 clear + 1 wall)
+export const YUMI_MAZE_PITCH = 6.75; // yd per cell (5.75 clear + 1 wall; the 1.5x playtest scale)
 export const YUMI_MAZE_WALL_HALF = 0.5; // wall half thickness
 /** Visual wall height (renderer reads this; movement/LoS ignore height). */
-export const YUMI_MAZE_WALL_HEIGHT = 5;
+export const YUMI_MAZE_WALL_HEIGHT = 7.5;
 /**
  * Minimum separation between the two Yumis' teleport destinations, in yards.
  * Per design they MAY land near each other (a brawl is welcome), they just

@@ -489,7 +489,7 @@ export const YUMI_BAND_X_MIN = 8000; // x at/after this = a yumi maze instance
 export const YUMI_MAZE_X = 8400; // maze instances share this x; slots stack along z
 export const YUMI_MAZE_SLOT_COUNT = 4; // concurrent Protect Yumi matches
 const YUMI_MAZE_Z0 = -1250;
-const YUMI_MAZE_SLOT_SPACING = 200; // > the ~61u maze footprint so slots never overlap
+const YUMI_MAZE_SLOT_SPACING = 200; // > the ~90u maze footprint so slots never overlap
 
 export function yumiMazeOrigin(slot: number): { x: number; z: number } {
   return { x: YUMI_MAZE_X, z: YUMI_MAZE_Z0 + slot * YUMI_MAZE_SLOT_SPACING };

@@ -188,7 +188,8 @@ await page.keyboard.up('w');
 const contained = await page.evaluate(() => {
   const sim = window.__game.sim;
   const m = sim.arenaMatchFor(sim.playerId);
-  // maze origin: slot along z at x 8400; footprint half extent 30.25
+  // maze origin: slot along z at x 8400; footprint half extent
+  // 13 cells * 6.75yd / 2 + shell = ~44.9 (mirror of yumiMazeLayout)
   const ox = 8400;
   const oz = -1250 + m.slot * 200;
   const lx = sim.player.pos.x - ox;
@@ -196,7 +197,7 @@ const contained = await page.evaluate(() => {
   return {
     lx: Math.round(lx * 10) / 10,
     lz: Math.round(lz * 10) / 10,
-    inside: Math.abs(lx) < 30.5 && Math.abs(lz) < 30.5,
+    inside: Math.abs(lx) < 45.2 && Math.abs(lz) < 45.2,
   };
 });
 check('walls contain real movement', contained.inside, JSON.stringify(contained));

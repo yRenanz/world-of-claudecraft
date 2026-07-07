@@ -115,38 +115,45 @@ export function buildYumiMaze(
   accent(spawnACenter.x, spawnACenter.z, TEAM_BLUE);
   accent(spawnBCenter.x, spawnBCenter.z, TEAM_RED);
 
-  // Braziers: one per plaza (team-colored flames at the spawns) plus four
-  // mid-corridor posts so no run of the maze sits in the dark. The lights
-  // join the renderer's shared budget, so tiers cap how many burn at once
-  // while the flame cones always show (readability, not gameplay info).
+  // Plaza braziers: a proper bowl-on-pedestal at each of the five plazas
+  // (team-colored flames at the spawns). Corridors are lit by wall torches
+  // below, not freestanding posts. Every light joins the renderer's shared
+  // budget, so tiers cap how many burn while the flames always show.
   const flameGeo = new THREE.ConeGeometry(0.24, 0.7, 6);
-  const pedestalGeo = new THREE.CylinderGeometry(0.32, 0.42, 1.3, 8);
+  const brazierFlameGeo = new THREE.ConeGeometry(0.38, 1.0, 7);
+  const pedestalGeo = new THREE.CylinderGeometry(0.28, 0.52, 1.15, 8);
+  const bowlGeo = new THREE.CylinderGeometry(0.62, 0.34, 0.42, 8);
   const pedestalMat = surfaceMat({ color: WALL_COLOR, roughness: 0.9 });
+  const flameMat = (flameColor: number) =>
+    new THREE.MeshLambertMaterial({
+      color: flameColor,
+      emissive: flameColor,
+      emissiveIntensity: lights.lowGfx ? 1.6 : BRAZIER_FLAME_EMISSIVE,
+      transparent: true,
+      opacity: 0.92,
+    });
+  const fireLight = (bx: number, by: number, bz: number, flameColor: number) => {
+    // Low tier keeps a stronger constructor intensity than the dungeon
+    // torches (14 vs 10): the maze rooms are far wider than a crypt aisle,
+    // so the same falloff reads darker.
+    const light = new THREE.PointLight(flameColor, 14, BRAZIER_LIGHT_DISTANCE, 2);
+    if (!lights.lowGfx) light.userData.baseIntensity = BRAZIER_LIGHT_INTENSITY;
+    light.position.set(bx, by, bz);
+    group.add(light);
+    lights.fireLights.push(light);
+  };
   const brazier = (bx: number, bz: number, flameColor: number) => {
     const pedestal = new THREE.Mesh(pedestalGeo, pedestalMat);
-    pedestal.position.set(bx, 0.65, bz);
+    pedestal.position.set(bx, 0.58, bz);
     group.add(pedestal);
-    const flame = new THREE.Mesh(
-      flameGeo,
-      new THREE.MeshLambertMaterial({
-        color: flameColor,
-        emissive: flameColor,
-        emissiveIntensity: lights.lowGfx ? 1.6 : BRAZIER_FLAME_EMISSIVE,
-        transparent: true,
-        opacity: 0.92,
-      }),
-    );
+    const bowl = new THREE.Mesh(bowlGeo, pedestalMat);
+    bowl.position.set(bx, 1.3, bz);
+    group.add(bowl);
+    const flame = new THREE.Mesh(brazierFlameGeo, flameMat(flameColor));
     flame.position.set(bx, BRAZIER_FLAME_Y, bz);
     group.add(flame);
     lights.flames.push(flame);
-    // Low tier keeps a stronger constructor intensity than the dungeon
-    // torches (14 vs 10): the maze plazas are 13.5yd wide, not a 3.5yd
-    // corridor, so the same falloff reads darker there.
-    const light = new THREE.PointLight(flameColor, 14, BRAZIER_LIGHT_DISTANCE, 2);
-    if (!lights.lowGfx) light.userData.baseIntensity = BRAZIER_LIGHT_INTENSITY;
-    light.position.set(bx, BRAZIER_LIGHT_Y, bz);
-    group.add(light);
-    lights.fireLights.push(light);
+    fireLight(bx, BRAZIER_LIGHT_Y, bz, flameColor);
   };
   // Every brazier sits OFF the cell centers (teleport destinations) and
   // clear of the corridor wall faces; the offsets keep the pedestal inside
@@ -156,12 +163,40 @@ export function buildYumiMaze(
   brazier(inward(spawnBCenter.x, 1.8), inward(spawnBCenter.z, 1.8), TEAM_RED);
   brazier(inward(layout.yumiStartA.x, 1.8), inward(layout.yumiStartA.z, 1.8), WARM_FLAME);
   brazier(inward(layout.yumiStartB.x, 1.8), inward(layout.yumiStartB.z, 1.8), WARM_FLAME);
-  brazier(1.0, 1.0, CENTER_GOLD);
-  const mid = layout.pitch * 4; // four cells out on each axis, always an open cell
-  brazier(mid + 1.0, 1.0, WARM_FLAME);
-  brazier(-mid + 1.0, 1.0, WARM_FLAME);
-  brazier(1.0, mid + 1.0, WARM_FLAME);
-  brazier(1.0, -mid + 1.0, WARM_FLAME);
+  brazier(1.4, 1.4, CENTER_GOLD);
+
+  // Wall torches: an angled handle + flame mounted on every other long wall
+  // run, alternating faces, so corridors light from the walls instead of
+  // freestanding posts. Deterministic from the fixed layout (no rng).
+  const handleGeo = new THREE.CylinderGeometry(0.06, 0.08, 0.95, 5);
+  const handleMat = surfaceMat({ color: 0x4a3a28, roughness: 0.95 });
+  const torchRuns = layout.walls.filter((w) => Math.max(w.hw, w.hd) >= layout.pitch * 0.9);
+  const torchY = YUMI_MAZE_WALL_HEIGHT * 0.55;
+  for (let i = 0; i < torchRuns.length; i += 2) {
+    const w = torchRuns[i];
+    const vertical = w.hd > w.hw; // wall runs along z, faces point along x
+    const side = (i >> 1) % 2 === 0 ? 1 : -1;
+    const tx = w.x + (vertical ? side * (w.hw + 0.34) : 0);
+    const tz = w.z + (vertical ? 0 : side * (w.hd + 0.34));
+    const handle = new THREE.Mesh(handleGeo, handleMat);
+    handle.position.set(tx, torchY - 0.28, tz);
+    handle.rotation.z = vertical ? side * 0.35 : 0;
+    handle.rotation.x = vertical ? 0 : -side * 0.35;
+    group.add(handle);
+    const flame = new THREE.Mesh(flameGeo, flameMat(WARM_FLAME));
+    flame.position.set(
+      tx + (vertical ? side * 0.18 : 0),
+      torchY + 0.28,
+      tz + (vertical ? 0 : side * 0.18),
+    );
+    group.add(flame);
+    lights.flames.push(flame);
+    // A light on every SECOND torch keeps the shared budget sane; the
+    // in-between flames still glow via their emissive cones.
+    if ((i >> 1) % 2 === 0) {
+      fireLight(tx, torchY + 1.6, tz, WARM_FLAME);
+    }
+  }
   const ring = new THREE.Mesh(
     new THREE.RingGeometry(2.4, 3.2, 40),
     surfaceMat({

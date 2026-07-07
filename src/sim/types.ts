@@ -86,8 +86,9 @@ export function isPetClass(cls: PlayerClass): boolean {
 }
 // '1v1'/'2v2' are the ranked Ashen Coliseum ladders; 'fiesta' is the
 // dopamine-maxxed 2v2 party mode (score-based, respawns, augments, a shrinking
-// ring) — see docs/design and the Fiesta region of sim.ts.
-export type ArenaFormat = '1v1' | '2v2' | 'fiesta';
+// ring) — see docs/design and the Fiesta region of sim.ts. yumi3/yumi5 are the
+// Protect Yumi maze objective brackets (3v3 / 5v5, unranked; social/yumi.ts).
+export type ArenaFormat = '1v1' | '2v2' | 'fiesta' | 'yumi3' | 'yumi5';
 
 export interface ArenaStanding {
   rating: number;
@@ -1904,6 +1905,27 @@ export type SimEvent = { pid?: number } & (
       n?: number;
     }
   | { type: 'fiestaDown'; seconds: number }
+  // Protect Yumi maze objective mode (social/yumi.ts). `yumiTeleport` is a
+  // world-visible relocation cue (renderer snap + VFX at both ends);
+  // `yumiDown` is your personal 10s bench countdown; `yumiSuddenDeath` fires
+  // once when teleports freeze and the bleed ramp starts; `yumiStatus` is the
+  // once-per-second personal scoreboard heartbeat (the arena wire field is
+  // rate-limited and the enemy cat can sit outside interest range, so the
+  // live bars ride the event queue like fiesta's dynamics do).
+  | { type: 'yumiTeleport'; catId: number; fromX: number; fromZ: number; toX: number; toZ: number }
+  | { type: 'yumiDown'; seconds: number }
+  | { type: 'yumiSuddenDeath' }
+  | {
+      type: 'yumiStatus';
+      myHp: number;
+      myMax: number;
+      enemyHp: number;
+      enemyMax: number;
+      teleportIn: number;
+      suddenDeath: boolean;
+      mult: number;
+      team: 'A' | 'B';
+    }
   | { type: 'augmentOffer'; tier: 'silver' | 'gold' | 'prismatic'; wave: number; choices: string[] }
   | { type: 'augmentChosen'; augmentId: string; byPid: number; byName: string; mine: boolean }
   // A fighter grabbed a ring power-up (world event so everyone sees the glow).

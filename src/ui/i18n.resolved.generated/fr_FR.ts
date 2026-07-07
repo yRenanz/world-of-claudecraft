@@ -3340,6 +3340,20 @@ export const fr_FR: EnTranslations = {
       "flavor": "Les morts ont cédé ce dont ils pouvaient se passer."
     }
   },
+  "yumi": {
+    "queue": {
+      "join": "You join the Protect Yumi queue. Guard your familiar…",
+      "leave": "You leave the Protect Yumi queue.",
+      "teamLeave": "Your team leaves the Protect Yumi queue."
+    },
+    "error": {
+      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
+      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+    },
+    "log": {
+      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+    }
+  },
   "fiesta": {
     "bracket": "Fiesta",
     "enterQueue": "Rejoignez la Fiesta !",

@@ -5674,4 +5674,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '草药学',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  // Protect Yumi locale fill (M16 wordy-key floor).
+  'yumi.queue.join': '你加入了Protect Yumi队列。守好你的使魔……',
+  'yumi.queue.leave': '你离开了Protect Yumi队列。',
+  'yumi.queue.teamLeave': '你的队伍离开了Protect Yumi队列。',
+  'yumi.error.partyTooBig3': 'Protect Yumi 3v3最多允许三人小队。',
+  'yumi.error.partyTooBig5': 'Protect Yumi 5v5最多允许五人小队。',
+  'yumi.log.start': 'Protect Yumi！保卫你的使魔，猎杀敌方的使魔。',
 };

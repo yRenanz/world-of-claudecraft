@@ -5675,4 +5675,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '藥草學',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  // Protect Yumi locale fill (M16 wordy-key floor).
+  'yumi.queue.join': '你加入了Protect Yumi佇列。守好你的使魔……',
+  'yumi.queue.leave': '你離開了Protect Yumi佇列。',
+  'yumi.queue.teamLeave': '你的隊伍離開了Protect Yumi佇列。',
+  'yumi.error.partyTooBig3': 'Protect Yumi 3v3最多允許三人隊伍。',
+  'yumi.error.partyTooBig5': 'Protect Yumi 5v5最多允許五人隊伍。',
+  'yumi.log.start': 'Protect Yumi！保衛你的使魔，獵殺敵方的使魔。',
 };

@@ -6119,4 +6119,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': 'Травничество',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  // Protect Yumi locale fill (M16 wordy-key floor).
+  'yumi.queue.join': 'Вы встаёте в очередь Protect Yumi. Берегите своего фамильяра…',
+  'yumi.queue.leave': 'Вы покидаете очередь Protect Yumi.',
+  'yumi.queue.teamLeave': 'Ваша команда покидает очередь Protect Yumi.',
+  'yumi.error.partyTooBig3': 'В Protect Yumi 3 на 3 группа может быть не больше трёх игроков.',
+  'yumi.error.partyTooBig5': 'В Protect Yumi 5 на 5 группа может быть не больше пяти игроков.',
+  'yumi.log.start': 'Protect Yumi! Защищайте своего фамильяра и охотьтесь на чужого.',
 };

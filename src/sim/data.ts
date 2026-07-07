@@ -58,6 +58,7 @@ import {
   TEMPLE_QUESTS,
 } from './content/temple';
 import { WARLOCK_PET_MOBS } from './content/warlock_pets';
+import { YUMI_MOBS } from './content/yumi';
 import {
   GRAVEYARD_POS,
   LAKE,
@@ -167,6 +168,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...TEMPLE_MOBS,
   ...TEMPLE_DUNGEON_MOBS,
   ...DELVE_MOBS,
+  ...YUMI_MOBS,
 };
 
 export const NPCS: Record<string, NpcDef> = {

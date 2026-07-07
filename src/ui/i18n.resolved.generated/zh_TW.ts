@@ -3340,6 +3340,20 @@ export const zh_TW: EnTranslations = {
       "flavor": "亡者已交出他們所能割捨之物。"
     }
   },
+  "yumi": {
+    "queue": {
+      "join": "你加入了Protect Yumi佇列。守好你的使魔……",
+      "leave": "你離開了Protect Yumi佇列。",
+      "teamLeave": "你的隊伍離開了Protect Yumi佇列。"
+    },
+    "error": {
+      "partyTooBig3": "Protect Yumi 3v3最多允許三人隊伍。",
+      "partyTooBig5": "Protect Yumi 5v5最多允許五人隊伍。"
+    },
+    "log": {
+      "start": "Protect Yumi！保衛你的使魔，獵殺敵方的使魔。"
+    }
+  },
   "fiesta": {
     "bracket": "Fiesta",
     "enterQueue": "加入Fiesta！",

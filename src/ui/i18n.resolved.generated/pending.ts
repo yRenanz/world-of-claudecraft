@@ -9,24 +9,122 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "yumi.error.partyTooBig3",
+    "yumi.error.partyTooBig5",
+    "yumi.log.start",
+    "yumi.queue.join",
+    "yumi.queue.leave",
+    "yumi.queue.teamLeave"
+  ],
+  "es_ES": [
+    "yumi.error.partyTooBig3",
+    "yumi.error.partyTooBig5",
+    "yumi.log.start",
+    "yumi.queue.join",
+    "yumi.queue.leave",
+    "yumi.queue.teamLeave"
+  ],
+  "fr_FR": [
+    "yumi.error.partyTooBig3",
+    "yumi.error.partyTooBig5",
+    "yumi.log.start",
+    "yumi.queue.join",
+    "yumi.queue.leave",
+    "yumi.queue.teamLeave"
+  ],
+  "fr_CA": [
+    "yumi.error.partyTooBig3",
+    "yumi.error.partyTooBig5",
+    "yumi.log.start",
+    "yumi.queue.join",
+    "yumi.queue.leave",
+    "yumi.queue.teamLeave"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "yumi.error.partyTooBig3",
+    "yumi.error.partyTooBig5",
+    "yumi.log.start",
+    "yumi.queue.join",
+    "yumi.queue.leave",
+    "yumi.queue.teamLeave"
+  ],
+  "de_DE": [
+    "yumi.error.partyTooBig3",
+    "yumi.error.partyTooBig5",
+    "yumi.log.start",
+    "yumi.queue.join",
+    "yumi.queue.leave",
+    "yumi.queue.teamLeave"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "yumi.error.partyTooBig3",
+    "yumi.error.partyTooBig5",
+    "yumi.log.start",
+    "yumi.queue.join",
+    "yumi.queue.leave",
+    "yumi.queue.teamLeave"
+  ],
   "ru_RU": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "nl_NL": [
+    "yumi.error.partyTooBig3",
+    "yumi.error.partyTooBig5",
+    "yumi.log.start",
+    "yumi.queue.join",
+    "yumi.queue.leave",
+    "yumi.queue.teamLeave"
+  ],
+  "pl_PL": [
+    "yumi.error.partyTooBig3",
+    "yumi.error.partyTooBig5",
+    "yumi.log.start",
+    "yumi.queue.join",
+    "yumi.queue.leave",
+    "yumi.queue.teamLeave"
+  ],
+  "id_ID": [
+    "yumi.error.partyTooBig3",
+    "yumi.error.partyTooBig5",
+    "yumi.log.start",
+    "yumi.queue.join",
+    "yumi.queue.leave",
+    "yumi.queue.teamLeave"
+  ],
+  "tr_TR": [
+    "yumi.error.partyTooBig3",
+    "yumi.error.partyTooBig5",
+    "yumi.log.start",
+    "yumi.queue.join",
+    "yumi.queue.leave",
+    "yumi.queue.teamLeave"
+  ],
+  "sv_SE": [
+    "yumi.error.partyTooBig3",
+    "yumi.error.partyTooBig5",
+    "yumi.log.start",
+    "yumi.queue.join",
+    "yumi.queue.leave",
+    "yumi.queue.teamLeave"
+  ],
+  "vi_VN": [
+    "yumi.error.partyTooBig3",
+    "yumi.error.partyTooBig5",
+    "yumi.log.start",
+    "yumi.queue.join",
+    "yumi.queue.leave",
+    "yumi.queue.teamLeave"
+  ],
+  "da_DK": [
+    "yumi.error.partyTooBig3",
+    "yumi.error.partyTooBig5",
+    "yumi.log.start",
+    "yumi.queue.join",
+    "yumi.queue.leave",
+    "yumi.queue.teamLeave"
+  ]
 };

@@ -5993,4 +5993,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '약초학',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  // Protect Yumi locale fill (M16 wordy-key floor).
+  'yumi.queue.join': 'Protect Yumi 대기열에 참가했습니다. 소환수를 지키세요…',
+  'yumi.queue.leave': 'Protect Yumi 대기열에서 나갑니다.',
+  'yumi.queue.teamLeave': '팀이 Protect Yumi 대기열에서 나갑니다.',
+  'yumi.error.partyTooBig3': 'Protect Yumi 3대3은 최대 3인 파티까지 참가할 수 있습니다.',
+  'yumi.error.partyTooBig5': 'Protect Yumi 5대5는 최대 5인 파티까지 참가할 수 있습니다.',
+  'yumi.log.start': 'Protect Yumi! 아군 소환수를 지키고 적의 소환수를 사냥하세요.',
 };

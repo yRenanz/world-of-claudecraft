@@ -3340,6 +3340,20 @@ export const ja_JP: EnTranslations = {
       "flavor": "死者たちが、譲れるものを差し出した。"
     }
   },
+  "yumi": {
+    "queue": {
+      "join": "Protect Yumiのキューに参加しました。使い魔を守りましょう…",
+      "leave": "Protect Yumiのキューを離れました。",
+      "teamLeave": "チームがProtect Yumiのキューを離れました。"
+    },
+    "error": {
+      "partyTooBig3": "Protect Yumi 3v3のパーティは最大3人までです。",
+      "partyTooBig5": "Protect Yumi 5v5のパーティは最大5人までです。"
+    },
+    "log": {
+      "start": "Protect Yumi！自分の使い魔を守り、敵の使い魔を狙え。"
+    }
+  },
   "fiesta": {
     "bracket": "Fiesta",
     "enterQueue": "Fiestaに参加！",

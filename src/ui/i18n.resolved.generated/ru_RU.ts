@@ -3340,6 +3340,20 @@ export const ru_RU: EnTranslations = {
       "flavor": "Мёртвые отдали то, без чего могут обойтись."
     }
   },
+  "yumi": {
+    "queue": {
+      "join": "Вы встаёте в очередь Protect Yumi. Берегите своего фамильяра…",
+      "leave": "Вы покидаете очередь Protect Yumi.",
+      "teamLeave": "Ваша команда покидает очередь Protect Yumi."
+    },
+    "error": {
+      "partyTooBig3": "В Protect Yumi 3 на 3 группа может быть не больше трёх игроков.",
+      "partyTooBig5": "В Protect Yumi 5 на 5 группа может быть не больше пяти игроков."
+    },
+    "log": {
+      "start": "Protect Yumi! Защищайте своего фамильяра и охотьтесь на чужого."
+    }
+  },
   "fiesta": {
     "bracket": "Fiesta",
     "enterQueue": "Присоединиться к Fiesta!",

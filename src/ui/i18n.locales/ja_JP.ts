@@ -6003,4 +6003,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '薬草学',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  // Protect Yumi locale fill (M16 wordy-key floor).
+  'yumi.queue.join': 'Protect Yumiのキューに参加しました。使い魔を守りましょう…',
+  'yumi.queue.leave': 'Protect Yumiのキューを離れました。',
+  'yumi.queue.teamLeave': 'チームがProtect Yumiのキューを離れました。',
+  'yumi.error.partyTooBig3': 'Protect Yumi 3v3のパーティは最大3人までです。',
+  'yumi.error.partyTooBig5': 'Protect Yumi 5v5のパーティは最大5人までです。',
+  'yumi.log.start': 'Protect Yumi！自分の使い魔を守り、敵の使い魔を狙え。',
 };

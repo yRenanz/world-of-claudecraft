@@ -1529,8 +1529,6 @@ export class Sim {
       meta.gatheringProficiency = normalizeGatheringProficiency(
         s.gatheringProficiency ?? s.professions,
       );
-      meta.gatheringProficiency = normalizeGatheringProficiency(s.professions);
-      meta.gatheringProficiency = normalizeGatheringProficiency(s.gatheringProficiency);
       if (s.unlockedMilestones)
         for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
       meta.copper = s.copper;

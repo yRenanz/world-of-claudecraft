@@ -337,6 +337,26 @@ describe('self-gathered crafting bonus (#1145)', () => {
     expect(result.selfSignedBonusApplied).toBeUndefined();
   });
 
+  it('a self-signed instance never waives the last required unit (floored at 1, not 0)', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = (sim as any).players.get(pid);
+    const recipe = recipeById('recipe_tough_jerky')!; // needs spider_leg x1
+    sim.addItemInstance('spider_leg', { signer: meta.name }, pid);
+
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+
+    expect(result.ok).toBe(true);
+    // count 1 minus the bonus would floor to 0; the fix floors at 1 instead so
+    // the signed instance is actually consumed, not retained for infinite crafts.
+    expect(result.selfSignedBonusApplied).toBe(false);
+    expect(sim.countItem('spider_leg', pid)).toBe(0);
+
+    // A second craft attempt fails: the signed instance was consumed, not retained.
+    const second = resolveCraft((sim as any).ctx, pid, recipe.id);
+    expect(second.ok).toBe(false);
+  });
+
   it('an unsigned (plain fungible) material grants no bonus', () => {
     const sim = makeSim();
     const pid = sim.playerId;

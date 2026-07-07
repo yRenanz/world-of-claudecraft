@@ -66,10 +66,11 @@ function hasSelfSignedInstance(meta: PlayerMeta, itemId: string): boolean {
 }
 
 /** The quantity of `reagent.itemId` this craft actually requires from `pid`:
- *  `reagent.count`, minus one (floored at 0) if `pid` holds a self-signed
- *  instance of that material (#1145 bonus). */
+ *  `reagent.count`, minus one (floored at 1, never fully waived, so a
+ *  signed instance is always consumed rather than retained forever) if
+ *  `pid` holds a self-signed instance of that material (#1145 bonus). */
 function requiredCountFor(meta: PlayerMeta | undefined, reagent: ProfessionReagent): number {
-  if (meta && hasSelfSignedInstance(meta, reagent.itemId)) return Math.max(0, reagent.count - 1);
+  if (meta && hasSelfSignedInstance(meta, reagent.itemId)) return Math.max(1, reagent.count - 1);
   return reagent.count;
 }
 

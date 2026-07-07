@@ -420,10 +420,6 @@ export class MobileControls {
     this.bindButton('mobile-jump', () => this.callbacks.onJump(), { pressFirst: true });
     this.bindButton('mobile-interact', () => this.callbacks.onInteract());
     this.bindChatButton('mobile-chat');
-    // Reply affordance inside the chat log (issue 1577 round 2 (8)): opening chat
-    // shows the log in a read state; this raises the keyboard and expands the
-    // composer only when the player chooses to reply.
-    this.bindButton('mobile-chat-reply', () => this.enterChatReply());
     this.bindButton('mobile-menu', () => this.callbacks.onMenu());
     this.bindButton('mobile-social', () => this.callbacks.onSocial());
     this.bindButton('mobile-discord', () => this.callbacks.onDiscord());
@@ -588,7 +584,7 @@ export class MobileControls {
       if (!this.active) return;
       e.preventDefault();
       cancel();
-      if (!this.chatLongFired) this.toggleChat();
+      if (!this.chatLongFired) this.tapChat();
     });
     button.addEventListener('pointercancel', cancel);
     button.addEventListener('pointerleave', cancel);
@@ -603,20 +599,37 @@ export class MobileControls {
     }
   }
 
+  /** The single top-left Chat button now owns the whole open/read/reply cycle
+   * (issue 1577 uiux-overlap: the separate in-log reply pill overlapped the
+   * chatbox, so it was removed). A tap steps through: closed -> open in a
+   * read state -> reply mode (raises the keyboard) -> closed again. */
+  private tapChat(): void {
+    const open = document.body.classList.contains('mobile-chat-open');
+    const replying = document.body.classList.contains('mobile-chat-reply');
+    if (!open) {
+      this.toggleChat();
+    } else if (!replying) {
+      this.enterChatReply();
+    } else {
+      this.toggleChat();
+    }
+  }
+
   private toggleChat(): void {
     document.body.classList.remove('mobile-chatlog-peek');
     document.body.classList.toggle('mobile-chat-open');
     if (document.body.classList.contains('mobile-chat-open')) {
       // Open the log in a read state, NOT the composer: the keyboard only rises
-      // once the player taps the in-log reply button (issue 1577 round 2 (8)).
+      // once the player taps the Chat button again to enter reply mode.
       // The composer stays hidden until enterChatReply focuses it.
     } else {
       this.exitChatReply();
     }
   }
 
-  /** Enter reply mode from the in-log reply button: raise the keyboard and show
-   *  the composer via the shared onChat path. */
+  /** Enter reply mode: raise the keyboard and show the composer via the shared
+   *  onChat path. Reached by tapping the Chat button again while the log is
+   *  already open in its read state. */
   private enterChatReply(): void {
     if (!document.body.classList.contains('mobile-chat-open')) {
       document.body.classList.add('mobile-chat-open');

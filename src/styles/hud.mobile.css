@@ -1300,6 +1300,13 @@
   body.mobile-touch #community-hud {
     display: none;
   }
+  /* Issue uiux-overlap: the chatbox's .panel border reads as clutter on the
+     small touch viewport, so mobile drops it while keeping the desktop rule
+     (base.css .panel) untouched. */
+  body.mobile-touch #chatlog-frame {
+    border: none;
+    outline: none;
+  }
   body.mobile-touch #chatlog-wrap {
     left: max(10px, env(safe-area-inset-left));
     bottom: calc(160px + env(safe-area-inset-bottom));
@@ -1361,45 +1368,6 @@
   body.mobile-touch.mobile-keyboard-open.mobile-chat-open #chat-input {
     top: calc(var(--mobile-keyboard-visible-vh, 100vh) * 0.5 + 30px);
     bottom: auto;
-  }
-  /* Issue 1577 round 2 (8): the in-log reply button. Desktop and other entries
-     never show it (no body.mobile-touch); on touch it appears only while the
-     chat log is open in the read state (not the peek, not once reply mode is
-     active), pinned to the log's bottom-right corner as a small compose pill. */
-  #mobile-chat-reply {
-    display: none;
-  }
-  body.mobile-touch.mobile-chat-open:not(.mobile-chatlog-peek):not(.mobile-chat-reply)
-    #mobile-chat-reply {
-    display: inline-flex;
-    position: absolute;
-    right: 6px;
-    bottom: 6px;
-    align-items: center;
-    gap: 5px;
-    min-height: 34px;
-    padding: 0 12px;
-    border: 1px solid var(--mobile-glass-border, #cba43d8c);
-    border-radius: 17px;
-    background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
-    -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
-    backdrop-filter: blur(var(--mobile-glass-blur, 8px));
-    color: #ffdf9c;
-    font-family: var(--ui-font);
-    font-size: 12px;
-    box-shadow:
-      inset 0 1px 0 #ffffff14,
-      0 2px 8px #0009;
-    pointer-events: auto;
-    z-index: 2;
-  }
-  body.mobile-touch #mobile-chat-reply:active {
-    border-color: var(--gold);
-    color: #fff;
-  }
-  body.mobile-touch #mobile-chat-reply .ui-icon {
-    width: 15px;
-    height: 15px;
   }
   /* Issue 1577 round 2 (8): while actively replying with the keyboard open,
      expand the composer to a comfortable multi-line box (it recenters above the
@@ -2680,7 +2648,11 @@
       padding-bottom: max(8px, env(safe-area-inset-bottom));
     }
     body.mobile-touch[data-start-panel="charselect-panel"] #homepage-views-container,
-    body.mobile-touch[data-start-panel="charcreate-panel"] #homepage-views-container {
+    body.mobile-touch[data-start-panel="charcreate-panel"] #homepage-views-container,
+    body.mobile-touch[data-start-panel="login-panel"] #homepage-views-container,
+    body.mobile-touch[data-start-panel="discord-choice-panel"] #homepage-views-container,
+    body.mobile-touch[data-start-panel="realm-panel"] #homepage-views-container,
+    body.mobile-touch[data-start-panel="offline-select"] #homepage-views-container {
       padding-top: max(8px, env(safe-area-inset-top));
       padding-bottom: max(8px, env(safe-area-inset-bottom));
     }
@@ -2692,12 +2664,24 @@
       min-height: calc(var(--app-vh) - 96px);
     }
     body.mobile-touch[data-start-panel="charselect-panel"] #hero-view,
-    body.mobile-touch[data-start-panel="charcreate-panel"] #hero-view {
+    body.mobile-touch[data-start-panel="charcreate-panel"] #hero-view,
+    body.mobile-touch[data-start-panel="login-panel"] #hero-view,
+    body.mobile-touch[data-start-panel="discord-choice-panel"] #hero-view,
+    body.mobile-touch[data-start-panel="realm-panel"] #hero-view,
+    body.mobile-touch[data-start-panel="offline-select"] #hero-view {
       justify-content: flex-start;
       min-height: calc(var(--app-vh) - 86px);
     }
+    /* Same treatment as charselect/charcreate above: on a short landscape
+       phone viewport the marketing lockup costs more height than these
+       auth/roster panels can spare, so it drops entirely rather than just
+       shrinking (issue uiux-overlap fix 4). */
     body.mobile-touch[data-start-panel="charselect-panel"] #title-logo,
-    body.mobile-touch[data-start-panel="charcreate-panel"] #title-logo {
+    body.mobile-touch[data-start-panel="charcreate-panel"] #title-logo,
+    body.mobile-touch[data-start-panel="login-panel"] #title-logo,
+    body.mobile-touch[data-start-panel="discord-choice-panel"] #title-logo,
+    body.mobile-touch[data-start-panel="realm-panel"] #title-logo,
+    body.mobile-touch[data-start-panel="offline-select"] #title-logo {
       display: none;
     }
     body.mobile-touch[data-start-panel="mode-select"] #title-logo {

@@ -3448,6 +3448,57 @@
     margin-top: 8px;
   }
 
+  /* Issue uiux-overlap: the block above only tightened the login/realm panels for
+     the native-app wrapper. A plain mobile-touch WEB session hit the same
+     landscape overflow (the panel's own overflow-y:auto from the earlier
+     "pre-game chrome compaction" rule masked it as a scroll instead of fixing
+     it), so extend the same two-column compaction to every mobile-touch session
+     and to the two panels the native-app block did not cover
+     (discord-choice-panel, offline-select). */
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel,
+  body.mobile-touch[data-start-panel="discord-choice-panel"] #discord-choice-panel,
+  body.mobile-touch[data-start-panel="realm-panel"] #realm-panel,
+  body.mobile-touch[data-start-panel="offline-select"] #offline-select {
+    width: min(680px, calc(100vw - 72px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+    max-width: none;
+    max-height: calc(var(--app-vh) - 40px);
+    padding: 14px 20px;
+    overflow-y: auto;
+  }
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 18px;
+    align-items: end;
+  }
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-title,
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel #btn-login-discord,
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel #auth-or-divider,
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel #cf-turnstile-container,
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel #login-error,
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-actions,
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-switch {
+    grid-column: 1 / -1;
+  }
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-title {
+    margin-bottom: 4px;
+    font-size: 20px;
+  }
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-field {
+    margin-bottom: 8px;
+  }
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-actions-row {
+    margin-top: 2px;
+  }
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-switch {
+    margin-top: 6px;
+  }
+  body.mobile-touch[data-start-panel="discord-choice-panel"] #discord-choice-panel .auth-title,
+  body.mobile-touch[data-start-panel="offline-select"] #offline-select .auth-title {
+    margin-bottom: 4px;
+    font-size: 20px;
+  }
+
   .password-wrapper {
     width: 100%;
     position: relative;
@@ -6107,10 +6158,110 @@
        field stays reachable instead of clipped. */
     body.mobile-touch #login-panel,
     body.mobile-touch #discord-choice-panel,
-    body.mobile-touch #realm-panel,
-    body.mobile-touch #offline-select {
+    body.mobile-touch #realm-panel {
       max-height: calc(var(--app-vh) - 24px);
       overflow-y: auto;
+    }
+
+    /* offline-select is #offline-select.cs-wow, a 9-class roster that overflowed
+       even the internal-scroll fallback above (the scroll container clipped
+       the last classes and the action buttons off entirely). Give it the same
+       two-column charselect-panel/charcreate-panel treatment instead of just
+       capping it: a compact left column (name, class grid, actions) beside a
+       right column (preview + details), so the whole primary flow fits with
+       no scroll at all. Only the supplementary class-details blurb keeps its
+       own internal scroll, matching the charselect-panel precedent above. */
+    body.mobile-touch #offline-select {
+      width: min(
+        1040px,
+        calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right))
+      );
+      height: calc(var(--app-vh) - 90px);
+      max-height: calc(var(--app-vh) - 90px);
+      min-height: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding: 8px 14px;
+    }
+    body.mobile-touch #offline-select .auth-title {
+      font-size: 15px;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+    body.mobile-touch #offline-select .charselect-layout {
+      display: grid;
+      grid-template-columns: minmax(220px, 0.85fr) minmax(260px, 1.15fr);
+      gap: 10px;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+    body.mobile-touch #offline-select .charselect-col-left,
+    body.mobile-touch #offline-select .charselect-col-right {
+      min-height: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    body.mobile-touch #offline-select .char-create {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 0;
+      gap: 3px;
+    }
+    body.mobile-touch #offline-select .auth-label {
+      font-size: 11px;
+      margin-bottom: 2px;
+    }
+    body.mobile-touch #offline-select .char-input-group {
+      margin: 0;
+      max-width: none;
+    }
+    body.mobile-touch #offline-select .char-input-group input {
+      min-height: 30px;
+      padding: 4px 8px;
+      font-size: 13px;
+    }
+    body.mobile-touch #offline-select .mini-class-row {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4px;
+    }
+    body.mobile-touch #offline-select .mini-class {
+      min-height: 24px;
+      padding: 2px 4px;
+      font-size: 9.5px;
+      gap: 5px;
+    }
+    body.mobile-touch #offline-select .mini-class-portrait {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+    }
+    body.mobile-touch #offline-select .skin-row {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 3px;
+      margin-top: 3px;
+    }
+    body.mobile-touch #offline-select .auth-actions {
+      margin-top: auto;
+      padding-top: 4px;
+      gap: 6px;
+    }
+    body.mobile-touch #offline-select .auth-actions .btn {
+      min-height: 30px;
+      padding: 5px 8px;
+      font-size: 11.5px;
+    }
+    body.mobile-touch #offline-select .char-preview-container {
+      height: 100px;
+      min-height: 0;
+      flex-shrink: 0;
+    }
+    body.mobile-touch #offline-select .class-details-panel {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      margin-top: 6px;
     }
   }
 

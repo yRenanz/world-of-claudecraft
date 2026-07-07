@@ -1,5 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Input, TouchMoveInput } from '../src/game/input';
+import { CHROME_FADE_IDLE_CLASS, CHROME_FADE_IDLE_MS } from '../src/game/mobile_chrome_fade';
 import {
   CHAT_LONG_PRESS_MS,
   HAPTICS_STORE_KEY,
@@ -1385,5 +1386,52 @@ describe('MobileControls pointer lifecycle', () => {
       }),
     );
     expect(lookActive).toEqual([true, false, false]);
+  });
+});
+
+describe('MobileControls chrome idle-fade lifecycle', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+    setInterfaceMode('auto');
+  });
+
+  const noopInput = () =>
+    ({
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    }) as unknown as Input;
+
+  it('dims chrome after idle in touch mode, un-dims on the flip to desktop, and re-arms un-dimmed back in touch', () => {
+    // startChromeFade reads the global setTimeout at call time, so install fake
+    // timers before start() arms the fade.
+    vi.useFakeTimers();
+    installMobileControlDom();
+
+    const controls = new MobileControls(noopInput(), mobileCallbacks());
+    // The fake matchMedia reports matches:true, so auto resolves to touch: start()
+    // arms the idle-fade against document.body.
+    controls.start();
+
+    // Idle long enough for the fade to dim the body chrome.
+    vi.advanceTimersByTime(CHROME_FADE_IDLE_MS);
+    expect(document.body.classList.contains(CHROME_FADE_IDLE_CLASS)).toBe(true);
+
+    // Flip to the desktop interface: the dim must be cleared, not stranded.
+    setInterfaceMode('desktop');
+    controls.refreshInterfaceMode();
+    expect(document.body.classList.contains(CHROME_FADE_IDLE_CLASS)).toBe(false);
+
+    // And it must not creep back: no timer survives to re-dim in desktop mode.
+    vi.advanceTimersByTime(CHROME_FADE_IDLE_MS * 2);
+    expect(document.body.classList.contains(CHROME_FADE_IDLE_CLASS)).toBe(false);
+
+    // Flip back to touch: the fade re-arms un-dimmed, then dims again after idle.
+    setInterfaceMode('touch');
+    controls.refreshInterfaceMode();
+    expect(document.body.classList.contains(CHROME_FADE_IDLE_CLASS)).toBe(false);
+    vi.advanceTimersByTime(CHROME_FADE_IDLE_MS);
+    expect(document.body.classList.contains(CHROME_FADE_IDLE_CLASS)).toBe(true);
   });
 });

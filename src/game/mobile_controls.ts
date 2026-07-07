@@ -319,8 +319,12 @@ export class MobileControls {
     // Idle-fade: dims the action row + minimap quick-access rail after a stretch
     // of no touch, brightens instantly on the next one. Body-scoped (CSS decides
     // which chrome selectors respond) so it works regardless of which control the
-    // player actually touches.
-    this.chromeFade = startChromeFade(document.body);
+    // player actually touches. The handle's lifecycle is owned by setActive (the
+    // above setActive call already armed it when in touch mode), so a flip to the
+    // desktop interface disposes it and un-dims the body instead of stranding the
+    // idle class. This document-level forwarder is bound once and reads
+    // this.chromeFade dynamically, guarding on this.active, so it is a no-op while
+    // the handle is null (desktop mode).
     document.addEventListener('pointerdown', () => {
       if (this.active) this.chromeFade?.touch();
     });
@@ -484,8 +488,17 @@ export class MobileControls {
       this.releaseCamera();
       this.releasePinch();
       this.touchOwners.releaseAll();
+      // Dispose the idle-fade so the chrome un-dims and the timer stops: without
+      // this a fade left in its dimmed state leaks past the flip to the desktop
+      // interface (dispose() clears the mobile-chrome-idle class).
+      this.chromeFade?.dispose();
+      this.chromeFade = null;
     } else {
       document.body.classList.remove('mobile-chat-open', 'mobile-chat-reply');
+      // Reset any composer left open before flipping to touch (null-safe).
+      this.exitChatReply();
+      // Arm the idle-fade once for this activation (idempotent via ??=).
+      this.chromeFade ??= startChromeFade(document.body);
     }
   }
 

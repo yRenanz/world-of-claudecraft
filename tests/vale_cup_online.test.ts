@@ -21,6 +21,12 @@ vi.mock('../server/db', () => ({
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   walletForAccount: vi.fn(async () => null),
+  // The character-lease surface game.leave/the autosave loop call (this mock was
+  // authored on the release branch, before the bank branch's lease system).
+  acquireCharacterLease: vi.fn(async () => true),
+  releaseCharacterLease: vi.fn(async () => {}),
+  heartbeatCharacterLeases: vi.fn(async () => {}),
+  releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
 import { dailyRewardService } from '../server/daily_rewards';

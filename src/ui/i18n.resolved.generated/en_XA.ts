@@ -918,6 +918,15 @@ export const en_XA: EnTranslations = {
         "tusk": "[Ţúšķ]"
       }
     },
+    "townFocus": {
+      "title": "[Ţóŵñ Ƒóçúš]",
+      "hint": "[Ƒóçúš þóíñţš áðð á ƀóñúš óñ ţóþ óƒ éʋéŕý çóɱþóñéñţ'š ƀášéļíñé ýíéļð. Úñƒóçúšéð çóɱþóñéñţš šţáý áţ ƀášéļíñé.]",
+      "budgetLabel": "[Þóíñţš ŕéɱáíñíñĝ: {remaining} / {budget}]",
+      "saveButton": "[Šáʋé Ƒóçúš]",
+      "notInTownHint": "[Ýóú ɱúšţ ƀé íñ ţóŵñ ţó šéţ ýóúŕ ƒóçúš.]",
+      "increaseAria": "[Íñçŕéášé ƒóçúš óñ {component}]",
+      "decreaseAria": "[Ðéçŕéášé ƒóçúš óñ {component}]"
+    },
     "party": {
       "promoteLeader": "[Þŕóɱóţé ţó Ļéáðéŕ]",
       "inviteUsage": "[Íñʋíţé ŵĥóɱ? Úšáĝé: /íñʋíţé <ñáɱé>.]"

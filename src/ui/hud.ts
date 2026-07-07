@@ -241,6 +241,11 @@ import { ReannounceMarker } from './live_region_reannounce';
 import { PICK_ACTION_HOTKEYS } from './lockpick_panel';
 import { LockpickWindow } from './lockpick_window';
 import { reconcileLootRolls as computeLootRollReconcile } from './loot_roll_reconcile';
+import {
+  computeLootRollStatusRows,
+  type LootRollStatusRow,
+  lootRollStatusFingerprint,
+} from './loot_roll_status_view';
 import { lootSettingsView } from './loot_settings_view';
 import { renderLootSettingsWindow } from './loot_settings_window';
 import { lowHealthVignette } from './low_health';
@@ -1040,6 +1045,16 @@ export class Hud {
   // later absence from the mirror means the server resolved them (retire), not
   // that the mirror simply has not caught up to a just-shown event yet.
   private confirmedLootRolls = new Set<number>();
+  // Group vote strip (the XLoot-style monitor): the authoritative per-candidate
+  // choices on every open roll, polled from IWorld.lootRollGroupStatus and
+  // re-rendered only when the fingerprint changes. A status row with no local
+  // prompt renders as a watch-only row, which is what keeps the roll frame up
+  // after the player answers until the server resolves the roll.
+  private lootRollStatusRows: LootRollStatusRow[] = [];
+  private lootRollStatusFp = '';
+  // rollId -> receivedAt for the watch-only rows' countdown bar (a prompt row
+  // keeps its own receivedAt; a watch row starts timing at first sight).
+  private lootRollWatchTimers = new Map<number, number>();
   // Master-loot assignment prompts, shown only to the master looter alongside
   // the loot-roll rail. Same lifetime/expiry as a need/greed roll.
   private activeMasterRolls = new Map<
@@ -5717,6 +5732,7 @@ export class Hud {
     this.lockpickWindow.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
     this.reconcileLootRolls();
+    this.reconcileLootRollStatus(now);
     this.updateLootRollTimers(now);
     if (slowHud) this.updateRaidLockoutBadge();
     if (slowHud) this.refreshDailyRewardsLauncher();
@@ -9835,8 +9851,37 @@ export class Hud {
     this.renderLootRolls();
   }
 
+  // Poll the authoritative group vote state and re-render the roll rail only
+  // when it actually changes (the view core's fingerprint). Also owns the watch
+  // timers: a watch-only row starts its countdown at first sight and is dropped
+  // the moment the server stops listing the roll (resolution/expiry).
+  private reconcileLootRollStatus(now: number): void {
+    const statuses = this.sim.lootRollGroupStatus();
+    if (statuses.length === 0 && this.lootRollStatusRows.length === 0) return;
+    const rows = computeLootRollStatusRows(
+      statuses,
+      [...this.activeLootRolls.keys()],
+      this.sim.playerId,
+    );
+    const fp = lootRollStatusFingerprint(rows);
+    if (fp === this.lootRollStatusFp) return;
+    this.lootRollStatusFp = fp;
+    this.lootRollStatusRows = rows;
+    const live = new Set(rows.map((row) => row.rollId));
+    for (const rollId of this.lootRollWatchTimers.keys())
+      if (!live.has(rollId)) this.lootRollWatchTimers.delete(rollId);
+    for (const row of rows)
+      if (!this.lootRollWatchTimers.has(row.rollId)) this.lootRollWatchTimers.set(row.rollId, now);
+    this.renderLootRolls();
+  }
+
   private updateLootRollTimers(now: number): void {
-    if (this.activeLootRolls.size === 0 && this.activeMasterRolls.size === 0) return;
+    if (
+      this.activeLootRolls.size === 0 &&
+      this.activeMasterRolls.size === 0 &&
+      this.lootRollStatusRows.length === 0
+    )
+      return;
     let changed = false;
     for (const [rollId, roll] of this.activeLootRolls) {
       if (now - roll.receivedAt >= roll.durationMs) {
@@ -9856,6 +9901,15 @@ export class Hud {
     if (!root) return;
     for (const row of root.querySelectorAll<HTMLElement>('.loot-roll')) {
       const rollId = Number(row.dataset.rollId);
+      if (row.dataset.watch) {
+        // Watch-only rows time against first sight; the row itself lives and
+        // dies with the server's group status, the bar is purely cosmetic.
+        const receivedAt = this.lootRollWatchTimers.get(rollId);
+        if (receivedAt === undefined) continue;
+        const remaining = Math.max(0, 1 - (now - receivedAt) / 60_000);
+        row.style.setProperty('--loot-roll-frac', remaining.toFixed(3));
+        continue;
+      }
       const roll = row.dataset.master
         ? this.activeMasterRolls.get(rollId)
         : this.activeLootRolls.get(rollId);
@@ -9884,15 +9938,37 @@ export class Hud {
     this.renderLootRolls();
   }
 
+  // The per-candidate vote strip (the XLoot-style monitor): one chip per
+  // candidate showing their live need/greed/pass choice, or an empty chip while
+  // they are still deciding. Roll numbers are never shown here; the sim
+  // broadcasts them as loot chat lines at resolution.
+  private lootRollVotesHtml(status: LootRollStatusRow): string {
+    const votes = status.entries
+      .map(
+        (entry) => `
+        <span class="loot-roll-vote${entry.self ? ' self' : ''}">
+          <span class="loot-roll-vote-name">${esc(entry.name)}</span>
+          <span class="loot-roll-vote-chip ${entry.choice ?? 'undecided'}">${entry.choice ? esc(t(`itemUi.lootRoll.${entry.choice}`)) : ''}</span>
+        </span>`,
+      )
+      .join('');
+    return `<div class="loot-roll-votes">${votes}</div>`;
+  }
+
   private renderLootRolls(): void {
     const root = this.lootRollRoot();
-    if (this.activeLootRolls.size === 0 && this.activeMasterRolls.size === 0) {
+    if (
+      this.activeLootRolls.size === 0 &&
+      this.activeMasterRolls.size === 0 &&
+      this.lootRollStatusRows.length === 0
+    ) {
       root.style.display = 'none';
       root.innerHTML = '';
       return;
     }
     root.style.display = 'flex';
     root.innerHTML = '';
+    const statusByRoll = new Map(this.lootRollStatusRows.map((row) => [row.rollId, row]));
     for (const [rollId, roll] of this.activeMasterRolls)
       this.renderMasterLootRow(root, rollId, roll.event);
     for (const [rollId, roll] of this.activeLootRolls) {
@@ -9900,6 +9976,7 @@ export class Hud {
       const item = ITEMS[ev.itemId];
       const itemName = item ? itemDisplayName(item) : ev.itemName;
       const quality = item?.quality ?? ev.quality ?? 'common';
+      const status = statusByRoll.get(rollId);
       const row = document.createElement('div');
       row.className = 'loot-roll panel';
       row.dataset.rollId = String(rollId);
@@ -9913,6 +9990,7 @@ export class Hud {
           </div>
         </div>
         <div class="loot-roll-timer" aria-hidden="true"><span></span></div>
+        ${status ? this.lootRollVotesHtml(status) : ''}
         <div class="loot-roll-actions">
           <button type="button" class="loot-roll-btn need" data-choice="need">${esc(t('itemUi.lootRoll.need'))}</button>
           <button type="button" class="loot-roll-btn greed" data-choice="greed">${esc(t('itemUi.lootRoll.greed'))}</button>
@@ -9927,6 +10005,36 @@ export class Hud {
         btn.setAttribute('aria-label', t(`itemUi.lootRoll.${choice}Aria`, { item: itemName }));
         btn.addEventListener('click', () => this.submitLootRoll(rollId, choice));
       });
+      root.appendChild(row);
+    }
+    // Watch-only rows: open rolls this player is not (or no longer) answering,
+    // kept up so the whole group can follow the votes until the server resolves
+    // the roll and drops it from the group status.
+    for (const status of this.lootRollStatusRows) {
+      if (this.activeLootRolls.has(status.rollId) || this.activeMasterRolls.has(status.rollId))
+        continue;
+      const item = ITEMS[status.itemId];
+      const itemName = item ? itemDisplayName(item) : status.itemName;
+      const quality = item?.quality ?? status.quality ?? 'common';
+      const row = document.createElement('div');
+      row.className = 'loot-roll panel watch';
+      row.dataset.rollId = String(status.rollId);
+      row.dataset.watch = '1';
+      row.style.setProperty('--loot-roll-frac', '1');
+      row.innerHTML = `
+        <div class="loot-roll-item">
+          ${item ? this.itemIcon(item) : `<img class="item-icon q-${quality}" src="${iconDataUrl('item', status.itemId)}" alt="" draggable="false">`}
+          <div class="loot-roll-copy">
+            <div class="loot-roll-title">${esc(t('itemUi.lootRoll.title'))}</div>
+            <div class="loot-roll-name" style="color:${QUALITY_COLOR[quality] ?? '#fff'}">${esc(itemName)}</div>
+          </div>
+        </div>
+        <div class="loot-roll-timer" aria-hidden="true"><span></span></div>
+        ${this.lootRollVotesHtml(status)}`;
+      if (item)
+        this.attachTooltip(row.querySelector('.loot-roll-item') as HTMLElement, () =>
+          this.itemTooltip(item),
+        );
       root.appendChild(row);
     }
   }

@@ -542,6 +542,28 @@ export interface LootRollPrompt {
   expiresAt: number;
 }
 
+// One candidate's live vote on an open need-greed roll, as the whole group sees
+// it: the choice only. The 1-100 roll number stays server-side until resolution,
+// when every roll is broadcast as loot chat lines.
+export interface LootRollStatusEntry {
+  pid: number;
+  name: string;
+  choice: LootRollChoice | null;
+}
+
+// Group-visible mirror of an open need-greed roll: every party member (candidate
+// or not) sees who has answered and how while the window runs, so the HUD can
+// keep the roll frame up with a per-player choice strip until the server
+// resolves the roll.
+export interface LootRollGroupStatus {
+  rollId: number;
+  itemId: string;
+  itemName: string;
+  quality: ItemDef['quality'];
+  expiresAt: number;
+  entries: LootRollStatusEntry[];
+}
+
 // Master loot intercepts roll-worthy drops at/above a quality threshold and hands
 // the assignment decision to a single designated looter (the leader, or 0 = leader).
 export type MasterLootThreshold = 'uncommon' | 'rare' | 'epic';

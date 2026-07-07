@@ -3635,6 +3635,10 @@ export class GameServer {
     // missed the transient lootRoll event re-shows the prompt from state. Stays
     // per-tick (it's interactive state that appears from others' actions).
     maybe('lroll', this.sim.activeLootRolls(anchorSession.pid));
+    // group-visible choices on those rolls (who has answered need/greed/pass),
+    // so every party member's roll frame shows the live vote strip and stays up
+    // after they answer. Per-tick for the same reason as lroll.
+    maybe('lrollg', this.sim.lootRollGroupStatus(anchorSession.pid));
     maybe('drun', this.sim.delveRunWire(anchorSession.pid));
     maybe('dcompanion', this.sim.delveCompanionWire(anchorSession.pid));
     maybe('dmarks', this.sim.delveMarksFor(anchorSession.pid));

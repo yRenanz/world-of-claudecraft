@@ -1,6 +1,6 @@
 // W0c: the IWorld structural-parity gate.
 //
-// `IWorld` (src/world_api.ts, 181 members) is the ONE seam render/ui depend
+// `IWorld` (src/world_api.ts, 182 members) is the ONE seam render/ui depend
 // on. `tsc` already proves both the offline `Sim` and the online `ClientWorld` satisfy
 // it structurally, but the interface is erased at build: there is NO runtime member
 // list, so nothing catches a present-but-throws stub or a kind flip (method vs read).
@@ -9,7 +9,7 @@
 // IWORLD_MEMBERS below is the hand-maintained member list, the W0c analog of the
 // append-only CALLBACK_KEYS in tests/sim_context.test.ts. It is APPEND-ONLY WITH THE
 // INTERFACE: whenever a future slice adds (or removes/renames) a member on `IWorld`,
-// it lands the matching edit here in the SAME commit. The count pins (181 / 49 / 132)
+// it lands the matching edit here in the SAME commit. The count pins (182 / 49 / 133)
 // plus the sorted-name `toEqual` snapshots (modeled on the anti-loosening exclude-set
 // pin in tests/parity/harness.test.ts:131-162) are what force that: a dropped or
 // renamed member reddens deliberately, never silently.
@@ -66,8 +66,8 @@ interface IWorldMember {
   readonly kind: IWorldMemberKind;
 }
 
-// The 181 members of `interface IWorld`, in interface order (world_api.ts).
-// Partition: 49 `data` + 132 `method` (read-returning + command-void + async).
+// The 182 members of `interface IWorld`, in interface order (world_api.ts).
+// Partition: 49 `data` + 133 `method` (read-returning + command-void + async).
 // biome-ignore lint/suspicious/noExportsInTest: IWORLD_MEMBERS is the W0c pinned structural-parity contract (the authoritative IWorld member list)
 export const IWORLD_MEMBERS = [
   // --- core world / player roster + economy reads (data) ---
@@ -111,6 +111,7 @@ export const IWORLD_MEMBERS = [
   { name: 'harvestCorpse', kind: 'method' },
   { name: 'submitLootRoll', kind: 'method' },
   { name: 'activeLootRolls', kind: 'method' }, // read-returning (2/6)
+  { name: 'lootRollGroupStatus', kind: 'method' }, // read-returning
   { name: 'pickUpObject', kind: 'method' },
   { name: 'acceptQuest', kind: 'method' },
   { name: 'turnInQuest', kind: 'method' },
@@ -361,9 +362,9 @@ beforeAll(() => {
 
 describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => {
   it('pins total / data / method counts', () => {
-    expect(IWORLD_MEMBERS.length).toBe(181);
+    expect(IWORLD_MEMBERS.length).toBe(182);
     expect(DATA_MEMBERS.length).toBe(49);
-    expect(METHOD_MEMBERS.length).toBe(132);
+    expect(METHOD_MEMBERS.length).toBe(133);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -372,7 +373,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
 
   // Sorted-name `toEqual` snapshots: a dropped, renamed, or kind-flipped member reddens
   // these deliberately, forcing a reviewed edit. NOT length-only.
-  it('the full sorted member set is exactly the pinned 181', () => {
+  it('the full sorted member set is exactly the pinned 182', () => {
     expect(IWORLD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
@@ -473,6 +474,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'lockpickEngage',
       'lockpickState',
       'lootCorpse',
+      'lootRollGroupStatus',
       'mailDelete',
       'mailInfo',
       'mailMarkRead',
@@ -612,7 +614,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     ]);
   });
 
-  it('the sorted method-kind set is exactly the pinned 132', () => {
+  it('the sorted method-kind set is exactly the pinned 133', () => {
     expect(METHOD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
@@ -686,6 +688,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'lockpickAction',
       'lockpickEngage',
       'lootCorpse',
+      'lootRollGroupStatus',
       'mailDelete',
       'mailMarkRead',
       'mailSend',
@@ -852,6 +855,7 @@ type _ExhaustInteraction = AssertNever<
 const FACET_LOOT = [
   'submitLootRoll',
   'activeLootRolls',
+  'lootRollGroupStatus',
 ] as const satisfies readonly (keyof IWorldLoot)[];
 type _ExhaustLoot = AssertNever<Exclude<keyof IWorldLoot, (typeof FACET_LOOT)[number]>>;
 
@@ -1140,10 +1144,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 22 fa
     expect(overlaps, `members filed in more than one facet:\n${overlaps.join('\n')}`).toEqual([]);
   });
 
-  it('the union of the 22 facets equals the pinned 181-member IWORLD_MEMBERS set', () => {
+  it('the union of the 22 facets equals the pinned 182-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(181);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(181);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(182);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(182);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

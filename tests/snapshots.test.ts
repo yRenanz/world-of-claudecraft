@@ -1864,9 +1864,9 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 31 `maybe(...)` delta keys, sorted. Cross-checked below
+// The pinned set of the 32 `maybe(...)` delta keys, sorted. Cross-checked below
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
-// 32nd unregistered delta key reddens this gate.
+// 33rd unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
   'arena',
   'bags',
@@ -1886,6 +1886,7 @@ const ALL_DELTA_KEYS = [
   'inv',
   'lockouts',
   'lroll',
+  'lrollg',
   'mail',
   'mailU',
   'market',
@@ -1925,6 +1926,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   inv: 'inventory',
   lockouts: 'selfLockouts',
   lroll: 'lootRollPrompts',
+  lrollg: 'lootRollGroup',
   lxp: 'lifetimeXp',
   mail: 'mailInfo',
   mailU: 'mailUnread',
@@ -2055,6 +2057,7 @@ function dirtyEveryDeltaField(): {
     quality: 'common',
     expiresAt: 9999,
     candidates: [lp],
+    partyMembers: [lp, mp],
     choices: new Map(),
   });
 
@@ -2118,6 +2121,17 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.arenaInfo).not.toBeNull(); // arena -> arenaInfo
     expect(client.marketInfo).not.toBeNull(); // market -> marketInfo
     expect(client.activeLootRolls().map((r) => r.rollId)).toEqual([1]); // lroll -> lootRollPrompts
+    // lrollg -> lootRollGroup, via the lootRollGroupStatus() accessor
+    expect(client.lootRollGroupStatus()).toEqual([
+      {
+        rollId: 1,
+        itemId: 'baked_bread',
+        itemName: 'Baked Bread',
+        quality: 'common',
+        expiresAt: 9999,
+        entries: [{ pid: leader.pid, name: 'Alld', choice: null }],
+      },
+    ]);
     expect(client.delveRun).not.toBeNull(); // drun -> delveRun
     expect(client.companionState?.companionId).toBe('companion_tessa'); // dcompanion -> companionState
     expect(client.delveMarks).toBe(7); // dmarks -> delveMarks
@@ -2179,9 +2193,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 31 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(31);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(31);
+  it('ALL_DELTA_KEYS contains exactly 32 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(32);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(32);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2193,7 +2207,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(31);
+    expect(scraped.size).toBe(32);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

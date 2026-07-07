@@ -827,6 +827,54 @@
   .loot-roll-btn:hover {
     filter: brightness(1.2);
   }
+  .loot-roll-votes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin: 0 0 7px;
+  }
+  .loot-roll-vote {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+  }
+  .loot-roll-vote-name {
+    font-size: 11px;
+    color: #cbbd9d;
+    text-shadow: 1px 1px 1px #000;
+    overflow-wrap: anywhere;
+  }
+  .loot-roll-vote.self .loot-roll-vote-name {
+    color: #ffe3a5;
+  }
+  .loot-roll-vote-chip {
+    font-family: var(--title-font);
+    font-size: 10px;
+    line-height: 1;
+    padding: 3px 5px;
+    border-radius: 3px;
+    border: 1px solid #3b2e19;
+    background: #090806;
+    text-shadow: 1px 1px 1px #000;
+  }
+  .loot-roll-vote-chip.undecided {
+    min-width: 14px;
+    min-height: 8px;
+    opacity: 0.55;
+  }
+  .loot-roll-vote-chip.need {
+    border-color: #339449;
+    color: #c9ffd0;
+  }
+  .loot-roll-vote-chip.greed {
+    border-color: #b18a32;
+    color: #ffe3a5;
+  }
+  .loot-roll-vote-chip.pass {
+    border-color: #8f3a3a;
+    color: #ffc6c6;
+  }
   .loot-roll-btn:focus-visible {
     outline: 3px solid var(--color-border-focus) !important;
     outline-offset: 2px !important;

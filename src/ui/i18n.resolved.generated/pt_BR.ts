@@ -1974,6 +1974,8 @@ export const pt_BR: EnTranslations = {
       "waveGoldBody": "A onda do meio: combos de dois gumes onde sua build começa a tomar forma e a brilhar.",
       "wavePrismaticTitle": "Prismático",
       "wavePrismaticBody": "A onda final: picos que definem a build e derretem a tela, feitos para parecer ridículos no melhor sentido.",
+      "yumiHeading": "Protect Yumi",
+      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
       "powerupsTitle": "Power-ups na arena",
       "powerupsBody": "Orbes brilhantes também caem na arena no meio da luta, livres para quem alcançá-los primeiro. Eles são deliberadamente exagerados e duram só um instante: Demônio da Velocidade para um lampejo de ritmo alucinante, Colosso para inchar até virar um gigante pesado, Botas Lunares para um salto saltitante de baixa gravidade, e Berserker para uma súbita explosão de fúria.",
       "ladderHeading": "Subindo no ranking",

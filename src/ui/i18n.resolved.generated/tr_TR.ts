@@ -1974,6 +1974,8 @@ export const tr_TR: EnTranslations = {
       "waveGoldBody": "Orta dalga: kurgunun şekillenmeye ve uyum tutturmaya başladığı iki yönlü kombolar.",
       "wavePrismaticTitle": "Prizmatik",
       "wavePrismaticBody": "Son dalga: kurguyu belirleyen, ekran eriten, en güzel anlamda saçma hissettirmesi amaçlanan sıçramalar.",
+      "yumiHeading": "Protect Yumi",
+      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
       "powerupsTitle": "Ringdeki takviyeler",
       "powerupsBody": "Parlayan küreler de dövüşün ortasında arenaya düşer, kim önce ulaşırsa onun olur. Bilerek abartılıdırlar ve yalnızca kısa bir süre dayanırlar: bir göz kırpımlık göz kamaştırıcı hız için Hız İblisi, hantal bir deve dönüşmek için Devasa, zıplayan, düşük yerçekimli bir sıçrama için Ay Botları, ve ani bir öfke dalgası için Cinnet.",
       "ladderHeading": "Merdiveni tırmanmak",

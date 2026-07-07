@@ -6120,6 +6120,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
   // Protect Yumi locale fill (M16 wordy-key floor).
+  'guide.arenaPage.yumiHeading': 'Защитите Yumi',
+  'guide.arenaPage.yumiBody': 'Protect Yumi: командный режим с целью, который разыгрывается в лабиринте. Каждая команда защищает свою кошку-фамильяра и охотится на чужую. Время от времени обе кошки переносятся в новые углы лабиринта, и бой качается между защитой, охотой и поиском. Очередь на 3 на 3 или 5 на 5; павший лишь ненадолго садится на скамью.',
   'yumi.queue.join': 'Вы встаёте в очередь Protect Yumi. Берегите своего фамильяра…',
   'yumi.queue.leave': 'Вы покидаете очередь Protect Yumi.',
   'yumi.queue.teamLeave': 'Ваша команда покидает очередь Protect Yumi.',

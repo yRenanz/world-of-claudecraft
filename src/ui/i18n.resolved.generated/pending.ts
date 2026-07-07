@@ -11,6 +11,8 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.mobs.yumi_cat.name",
+    "guide.arenaPage.yumiBody",
+    "guide.arenaPage.yumiHeading",
     "yumi.banner.sudden",
     "yumi.banner.teleport",
     "yumi.bracket3",
@@ -35,6 +37,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "es_ES": [
     "entities.mobs.yumi_cat.name",
+    "guide.arenaPage.yumiBody",
+    "guide.arenaPage.yumiHeading",
     "yumi.banner.sudden",
     "yumi.banner.teleport",
     "yumi.bracket3",
@@ -59,6 +63,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_FR": [
     "entities.mobs.yumi_cat.name",
+    "guide.arenaPage.yumiBody",
+    "guide.arenaPage.yumiHeading",
     "yumi.banner.sudden",
     "yumi.banner.teleport",
     "yumi.bracket3",
@@ -83,6 +89,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_CA": [
     "entities.mobs.yumi_cat.name",
+    "guide.arenaPage.yumiBody",
+    "guide.arenaPage.yumiHeading",
     "yumi.banner.sudden",
     "yumi.banner.teleport",
     "yumi.bracket3",
@@ -108,6 +116,8 @@ export const pending: Record<string, readonly string[]> = {
   "en_CA": [],
   "it_IT": [
     "entities.mobs.yumi_cat.name",
+    "guide.arenaPage.yumiBody",
+    "guide.arenaPage.yumiHeading",
     "yumi.banner.sudden",
     "yumi.banner.teleport",
     "yumi.bracket3",
@@ -132,6 +142,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "de_DE": [
     "entities.mobs.yumi_cat.name",
+    "guide.arenaPage.yumiBody",
+    "guide.arenaPage.yumiHeading",
     "yumi.banner.sudden",
     "yumi.banner.teleport",
     "yumi.bracket3",
@@ -168,6 +180,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pt_BR": [
     "entities.mobs.yumi_cat.name",
+    "guide.arenaPage.yumiBody",
+    "guide.arenaPage.yumiHeading",
     "yumi.banner.sudden",
     "yumi.banner.teleport",
     "yumi.bracket3",
@@ -195,6 +209,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "nl_NL": [
     "entities.mobs.yumi_cat.name",
+    "guide.arenaPage.yumiBody",
+    "guide.arenaPage.yumiHeading",
     "yumi.banner.sudden",
     "yumi.banner.teleport",
     "yumi.bracket3",
@@ -219,6 +235,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pl_PL": [
     "entities.mobs.yumi_cat.name",
+    "guide.arenaPage.yumiBody",
+    "guide.arenaPage.yumiHeading",
     "yumi.banner.sudden",
     "yumi.banner.teleport",
     "yumi.bracket3",
@@ -243,6 +261,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "id_ID": [
     "entities.mobs.yumi_cat.name",
+    "guide.arenaPage.yumiBody",
+    "guide.arenaPage.yumiHeading",
     "yumi.banner.sudden",
     "yumi.banner.teleport",
     "yumi.bracket3",
@@ -267,6 +287,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "tr_TR": [
     "entities.mobs.yumi_cat.name",
+    "guide.arenaPage.yumiBody",
+    "guide.arenaPage.yumiHeading",
     "yumi.banner.sudden",
     "yumi.banner.teleport",
     "yumi.bracket3",
@@ -291,6 +313,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "sv_SE": [
     "entities.mobs.yumi_cat.name",
+    "guide.arenaPage.yumiBody",
+    "guide.arenaPage.yumiHeading",
     "yumi.banner.sudden",
     "yumi.banner.teleport",
     "yumi.bracket3",
@@ -315,6 +339,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "vi_VN": [
     "entities.mobs.yumi_cat.name",
+    "guide.arenaPage.yumiBody",
+    "guide.arenaPage.yumiHeading",
     "yumi.banner.sudden",
     "yumi.banner.teleport",
     "yumi.bracket3",
@@ -339,6 +365,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "da_DK": [
     "entities.mobs.yumi_cat.name",
+    "guide.arenaPage.yumiBody",
+    "guide.arenaPage.yumiHeading",
     "yumi.banner.sudden",
     "yumi.banner.teleport",
     "yumi.bracket3",

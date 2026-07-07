@@ -6667,10 +6667,23 @@ export class Hud {
     // minimapMode (the minimap_markers core) is the single source of truth for the
     // delve-vs-overworld branch (the same isDelvePos + delveRun guard, lifted into the
     // core so hud and the painters never duplicate it).
-    if (minimapMode(this.sim) === 'delve') {
+    const mode = minimapMode(this.sim);
+    if (mode === 'delve') {
       // The delve painter owns the '#zone-label' text (written through the
       // write-elision facet) and the full minimap schematic render.
       this.delvePainter.paintMinimapDelve(ctx, this.sim, $('#zone-label'), MINIMAP_SIZE);
+      return;
+    }
+    if (mode === 'yumiMaze') {
+      // Protect Yumi: the overworld marker set over the cached maze-wall
+      // raster; the strip title stands in for the zone label.
+      this.minimapPainter.paintYumiMaze(
+        ctx,
+        this.sim,
+        $('#zone-label'),
+        this.minimapZoom,
+        t('yumi.hud.title'),
+      );
       return;
     }
     // The overworld minimap: a pure marker core (minimap_markers) + the thin canvas
@@ -7780,6 +7793,9 @@ export class Hud {
           }
           if (ev.format === 'yumi3' || ev.format === 'yumi5') {
             // Unranked objective mode; sudden death guarantees no draws.
+            // Personal per participant: keep only the local player's copy
+            // (offline the sim hands every fighter's copy to the one HUD).
+            if (ev.pid !== undefined && ev.pid !== sim.playerId) break;
             this.yumiPainter.reset();
             if (ev.won) {
               this.showBanner(t('yumi.end.win'));
@@ -7845,19 +7861,27 @@ export class Hud {
           }
           break;
         }
+        // The yumi events are personal per participant; offline the sim hands
+        // EVERY player's copy to the one local HUD, so each arm keeps only the
+        // local player's (the same reason the renderer arm filters).
         case 'yumiStatus':
-          this.yumiPainter.onStatus(ev);
+          if (ev.pid === sim.playerId) this.yumiPainter.onStatus(ev);
           break;
         case 'yumiDown':
-          this.yumiPainter.onDown(ev.seconds);
-          audio.fiestaDown();
+          if (ev.pid === sim.playerId) {
+            this.yumiPainter.onDown(ev.seconds);
+            audio.fiestaDown();
+          }
           break;
         case 'yumiSuddenDeath':
-          this.showBanner(t('yumi.banner.sudden'));
-          this.combatLog(t('yumi.banner.sudden'), '#ff7a6a');
-          audio.fiestaWave();
+          if (ev.pid === sim.playerId) {
+            this.showBanner(t('yumi.banner.sudden'));
+            this.combatLog(t('yumi.banner.sudden'), '#ff7a6a');
+            audio.fiestaWave();
+          }
           break;
         case 'yumiTeleport': {
+          if (ev.pid !== sim.playerId) break;
           // Two events per relocation (one per cat); cue once, on my team's cat.
           const y = this.sim.arenaInfo?.match?.yumi;
           const myCat = y ? (y.team === 'A' ? y.yumiA.entityId : y.yumiB.entityId) : -1;

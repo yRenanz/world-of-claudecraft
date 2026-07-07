@@ -1974,6 +1974,8 @@ export const nl_NL: EnTranslations = {
       "waveGoldBody": "De middelste golf: tweesnijdende combo's waar je build vorm begint te krijgen en gaat zingen.",
       "wavePrismaticTitle": "Prismatisch",
       "wavePrismaticBody": "De laatste golf: build-bepalende, schermversmeltende pieken bedoeld om belachelijk aan te voelen op de beste manier.",
+      "yumiHeading": "Protect Yumi",
+      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
       "powerupsTitle": "Power-ups in de ring",
       "powerupsBody": "Gloeiende bollen vallen ook middenin het gevecht in de arena, gratis voor wie ze als eerste bereikt. Ze zijn opzettelijk over de top en duren maar even: Speed Demon voor een flits van verblindend tempo, Colossus om uit te dijen tot een logge reus, Moon Boots voor een stuiterende sprong met lage zwaartekracht, en Berserker voor een plotselinge golf van razernij.",
       "ladderHeading": "De ladder beklimmen",

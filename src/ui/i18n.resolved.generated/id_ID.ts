@@ -1974,6 +1974,8 @@ export const id_ID: EnTranslations = {
       "waveGoldBody": "Gelombang tengah: kombo bermata dua tempat rakitanmu mulai terbentuk dan berpadu.",
       "wavePrismaticTitle": "Prismatik",
       "wavePrismaticBody": "Gelombang terakhir: lonjakan penentu-rakitan yang melelehkan layar, dirancang terasa konyol dengan cara terbaik.",
+      "yumiHeading": "Protect Yumi",
+      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
       "powerupsTitle": "Penguat di dalam arena",
       "powerupsBody": "Bola bercahaya juga jatuh ke arena di tengah pertarungan, bebas bagi siapa pun yang meraihnya lebih dulu. Sengaja dibuat berlebihan dan hanya bertahan sebentar: Speed Demon untuk laju membutakan sekejap, Colossus untuk membengkak menjadi raksasa lamban, Moon Boots untuk lompatan memantul gravitasi rendah, dan Berserker untuk lonjakan amarah mendadak.",
       "ladderHeading": "Menaiki tangga peringkat",

@@ -5994,6 +5994,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
   // Protect Yumi locale fill (M16 wordy-key floor).
+  'guide.arenaPage.yumiHeading': 'Yumi를 지켜라',
+  'guide.arenaPage.yumiBody': 'Protect Yumi는 미로에서 펼쳐지는 팀 목표 모드입니다. 각 팀은 아군 고양이 소환수를 지키면서 상대의 소환수를 사냥합니다. 두 고양이는 이따금 미로의 새 구석으로 순간이동하므로 전투는 수비, 추격, 수색 사이를 오갑니다. 3대3 또는 5대5로 참가할 수 있으며, 쓰러져도 잠시 벤치에 앉을 뿐입니다.',
   'yumi.queue.join': 'Protect Yumi 대기열에 참가했습니다. 소환수를 지키세요…',
   'yumi.queue.leave': 'Protect Yumi 대기열에서 나갑니다.',
   'yumi.queue.teamLeave': '팀이 Protect Yumi 대기열에서 나갑니다.',

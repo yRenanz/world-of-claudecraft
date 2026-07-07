@@ -1974,6 +1974,8 @@ export const pl_PL: EnTranslations = {
       "waveGoldBody": "Środkowa fala: obosieczne kombinacje, w których twój build zaczyna nabierać kształtu i rozbrzmiewać.",
       "wavePrismaticTitle": "Pryzmatyczny",
       "wavePrismaticBody": "Ostatnia fala: definiujące build, rozsadzające ekran skoki mocy, które mają wydawać się absurdalne w najlepszym tego słowa znaczeniu.",
+      "yumiHeading": "Protect Yumi",
+      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
       "powerupsTitle": "Wzmocnienia na ringu",
       "powerupsBody": "Na arenę w trakcie walki spadają też świecące kule, dostępne dla tego, kto pierwszy do nich dotrze. Są celowo przesadne i działają tylko przez chwilę: Demon Prędkości dla mgnienia oślepiającego tempa, Kolos, by rozrosnąć się w ociężałego giganta, Księżycowe Buty dla skocznego susu w niskiej grawitacji oraz Berserker dla nagłego przypływu furii.",
       "ladderHeading": "Wspinaczka po drabinie rankingowej",

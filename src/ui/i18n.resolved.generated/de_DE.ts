@@ -1974,6 +1974,8 @@ export const de_DE: EnTranslations = {
       "waveGoldBody": "Die mittlere Welle: zweischneidige Kombinationen, in denen dein Build allmählich Gestalt annimmt und zu glänzen beginnt.",
       "wavePrismaticTitle": "Prismatisch",
       "wavePrismaticBody": "Die letzte Welle: build-prägende, bildschirmschmelzende Ausschläge, die sich auf die beste Art lächerlich anfühlen sollen.",
+      "yumiHeading": "Protect Yumi",
+      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
       "powerupsTitle": "Powerups im Ring",
       "powerupsBody": "Mitten im Kampf fallen außerdem leuchtende Kugeln in die Arena, frei für den, der sie zuerst erreicht. Sie sind absichtlich völlig übertrieben und halten nur kurz an: Geschwindigkeitsdämon für einen Wimpernschlag blendenden Tempos, Koloss, um dich zu einem schwerfälligen Riesen anschwellen zu lassen, Mondstiefel für einen federnden Sprung bei niedriger Schwerkraft und Berserker für einen plötzlichen Schub an Raserei.",
       "ladderHeading": "Die Rangleiter erklimmen",

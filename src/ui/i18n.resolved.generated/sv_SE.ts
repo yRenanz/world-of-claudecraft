@@ -1974,6 +1974,8 @@ export const sv_SE: EnTranslations = {
       "waveGoldBody": "Den mellersta vågen: tveeggade kombinationer där ditt bygge börjar ta form och sjunga.",
       "wavePrismaticTitle": "Prismatisk",
       "wavePrismaticBody": "Den sista vågen: byggesdefinierande, skärmsmältande toppar avsedda att kännas löjliga på bästa sätt.",
+      "yumiHeading": "Protect Yumi",
+      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
       "powerupsTitle": "Kraftuppladdningar i ringen",
       "powerupsBody": "Glödande klot faller också ner i arenan mitt i striden, fria för den som når dem först. De är medvetet överdrivna och håller bara en kort stund: Fartdemon för en blinkning av bländande fart, Koloss för att svälla upp till en lufsande jätte, Månstövlar för ett studsande hopp med låg gravitation, och Bärsärk för en plötslig våg av ursinne.",
       "ladderHeading": "Klättra på rankingstegen",

@@ -1974,6 +1974,8 @@ export const fr_FR: EnTranslations = {
       "waveGoldBody": "La manche intermédiaire : des combos à double tranchant où votre panoplie commence à prendre forme et à chanter.",
       "wavePrismaticTitle": "Prismatique",
       "wavePrismaticBody": "La dernière manche : des pics dévastateurs qui définissent votre panoplie, faits pour paraître ridicules dans le meilleur sens du terme.",
+      "yumiHeading": "Protect Yumi",
+      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
       "powerupsTitle": "Les bonus de l'arène",
       "powerupsBody": "Des orbes lumineux tombent aussi dans l'arène en pleine bataille, libres pour celui qui les atteint en premier. Ils sont volontairement démesurés et ne durent qu'un court instant : Démon de vitesse pour un éclair de cadence aveuglante, Colosse pour enfler en géant pataud, Bottes lunaires pour un bond rebondissant en gravité réduite, et Berserker pour un soudain accès de furie.",
       "ladderHeading": "Gravir l'échelle",

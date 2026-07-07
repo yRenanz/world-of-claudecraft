@@ -1974,6 +1974,8 @@ export const da_DK: EnTranslations = {
       "waveGoldBody": "Den midterste bølge: tveæggede kombinationer hvor din build begynder at tage form og synge.",
       "wavePrismaticTitle": "Prismatisk",
       "wavePrismaticBody": "Den sidste bølge: build-definerende, skærm-smeltende spidser der skal føles latterlige på den bedste måde.",
+      "yumiHeading": "Protect Yumi",
+      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
       "powerupsTitle": "Power-ups i ringen",
       "powerupsBody": "Glødende kugler falder også ned i arenaen midt i kampen, gratis for den der når dem først. De er bevidst overdrevne og varer kun et kort øjeblik: Speed Demon for et glimt af blændende fart, Colossus for at svulme op til en kluntet kæmpe, Moon Boots for et hoppende, lavtyngdekrafts-hop, og Berserker for et pludseligt udbrud af raseri.",
       "ladderHeading": "At klatre op ad rangstigen",

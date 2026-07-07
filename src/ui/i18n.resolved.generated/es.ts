@@ -1974,6 +1974,8 @@ export const es: EnTranslations = {
       "waveGoldBody": "La oleada intermedia: combinaciones de doble filo donde tu construcción empieza a tomar forma y a lucirse.",
       "wavePrismaticTitle": "Prismático",
       "wavePrismaticBody": "La oleada final: picos que definen tu construcción y derriten la pantalla, pensados para sentirse ridículos en el mejor de los sentidos.",
+      "yumiHeading": "Protect Yumi",
+      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
       "powerupsTitle": "Potenciadores en el ruedo",
       "powerupsBody": "Esferas brillantes también caen en la arena en mitad del combate, libres para quien las alcance primero. Son deliberadamente exageradas y duran solo un instante: Demonio de Velocidad para un parpadeo de paso cegador, Coloso para hincharte hasta volverte un gigante torpe, Botas Lunares para un salto rebotante de baja gravedad y Berserker para una repentina oleada de furia.",
       "ladderHeading": "Ascender en la clasificación",

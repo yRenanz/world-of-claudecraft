@@ -2528,7 +2528,21 @@ async function startGame(
     input.camDist = pose.dist;
     if (pose.done) finishIntro(false);
   };
-  if (playIntro && !introSeen && world.player.level <= 1 && !settings.get('reduceMotion')) {
+  // "Reduce motion" is the EFFECTIVE flag (the OS prefers-reduced-motion query OR the
+  // in-game switch, the ui_effects_profile model): the intro is exactly the kind of
+  // sweeping camera glide that contract exists for, and checking only the in-game
+  // switch left OS-level reduce-motion players watching it (it also hid #ui from
+  // them, silently dropping any focus() into the HUD while it ran).
+  const osReducedMotion =
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (
+    playIntro &&
+    !introSeen &&
+    world.player.level <= 1 &&
+    !settings.get('reduceMotion') &&
+    !osReducedMotion
+  ) {
     intro = {
       cinematic: spawnCinematicFor({
         yaw: input.camYaw,

@@ -197,6 +197,16 @@ describe('ws auth character load lease', () => {
 
   it('recomputes the bank bonus BEFORE acquiring the lease and stamps it into the join meta', async () => {
     const { deps, acquireSpy, joinSpy, bankBonusSpy } = makeDeps();
+    // A NON-ZERO grant: the join meta must carry the recompute's actual result,
+    // not a zero default stamped independently of bankBonusForAccount.
+    const grant = {
+      bonusSlots: 4,
+      sources: [
+        { id: 'email', slots: 2, maxSlots: 2 },
+        { id: 'discord', slots: 2, maxSlots: 2 },
+      ],
+    };
+    bankBonusSpy.mockResolvedValueOnce(grant);
     const { ws } = fakeWs();
 
     await createWsAuth(deps).authenticateWebSocket(ws, authFrame(7), fakeReq());
@@ -211,7 +221,7 @@ describe('ws auth character load lease', () => {
     );
     // The grant rides the join meta bag (8th arg), so addPlayer stamps it at load.
     const joinMeta = joinSpy.mock.calls[0][7] as any;
-    expect(joinMeta.bankBonus).toEqual({ bonusSlots: 0, sources: [] });
+    expect(joinMeta.bankBonus).toEqual(grant);
   });
 
   it('never recomputes the bank bonus on a linkdead resume (session exists)', async () => {

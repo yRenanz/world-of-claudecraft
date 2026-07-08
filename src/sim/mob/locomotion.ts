@@ -588,6 +588,10 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.fleeReturnTimer = 0;
   mob.hasFled = false;
   clearThreat(mob);
+  // A full evade-home reset ends the pull: loot rights die with it, so the
+  // world-boss damager roster clears alongside the hate table (a raider from
+  // a wiped pull must not receive a personal slot from a later kill).
+  mob.bossDamagers.clear();
   ctx.despawnSummonedAdds(mob);
   mob.firedSummons = 0;
   mob.enraged = false;

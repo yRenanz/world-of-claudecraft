@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { MOBS } from '../src/sim/data';
+import { respawnMob } from '../src/sim/mob/lifecycle';
+import { resetEvadingMob } from '../src/sim/mob/locomotion';
 import { combatProfileForMob, scaledDefaultMobMeleeRange } from '../src/sim/mob_combat';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
@@ -459,6 +461,50 @@ describe('world boss loot roster survives contributor death and grouping', () =>
     const owners = (boss.loot?.items ?? []).flatMap((s) => s.personalFor ?? []);
     expect(owners).toContain(p1);
     expect(owners).toContain(p2);
+  });
+
+  it('clears the damager roster on a full evade-home reset: a wiped pull ends loot rights', () => {
+    const sim = makeSim();
+    sim.utcDay = DAY;
+    const p1 = sim.addPlayer('warrior', 'WipedRaiderA');
+    const p2 = sim.addPlayer('mage', 'FreshRaiderB');
+    const { boss } = spawnBossNow(sim);
+    const e1 = (sim as any).entities.get(p1) as Entity;
+    const e2 = (sim as any).entities.get(p2) as Entity;
+
+    // Pull A: p1 lands a hit and goes on the roster, then the raid wipes and the
+    // boss evades home to full (the same entity survives: only the scheduler
+    // makes a new one, and only after a real kill).
+    (sim as any).dealDamage(e1, boss, 10, false, 'physical', 'Chip', 'hit', true);
+    expect(boss.bossDamagers.has(p1)).toBe(true);
+    resetEvadingMob((sim as any).ctx, boss);
+    expect(boss.hp).toBe(boss.maxHp);
+    expect(boss.bossDamagers.size).toBe(0);
+
+    // Pull B: only p2 fights. The pull-A raider must NOT land on the kill roster.
+    (sim as any).dealDamage(e2, boss, 10, false, 'physical', 'Chip', 'hit', true);
+    (sim as any).dealDamage(e2, boss, 999_999, false, 'physical', 'Finisher', 'hit', true);
+    expect(boss.dead).toBe(true);
+    const owners = (boss.loot?.items ?? []).flatMap((s) => s.personalFor ?? []);
+    expect(owners).toContain(p2);
+    expect(owners).not.toContain(p1);
+  });
+
+  it('clears the damager roster on respawn: loot rights never carry across lives', () => {
+    const sim = makeSim();
+    sim.utcDay = DAY;
+    const p1 = sim.addPlayer('warrior', 'Ada');
+    const { boss } = spawnBossNow(sim);
+    const e1 = (sim as any).entities.get(p1) as Entity;
+    (sim as any).dealDamage(e1, boss, 999_999, false, 'physical', 'Finisher', 'hit', true);
+    expect(boss.dead).toBe(true);
+    expect(boss.bossDamagers.has(p1)).toBe(true); // the kill snapshot already rolled loot
+    respawnMob((sim as any).ctx, boss);
+    expect(boss.bossDamagers.size).toBe(0);
+  });
+
+  it('the lootable corpse window always fits inside the spawn cadence (never overlaps)', () => {
+    expect(WORLD_BOSS_CORPSE_SECONDS).toBeLessThan(WORLD_BOSS_INTERVAL_SECONDS);
   });
 
   it('lets a slain world boss corpse linger far longer than a normal corpse', () => {

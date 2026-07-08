@@ -5050,19 +5050,19 @@ export const sv_SE: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "Eldregn",
-        "description": "Låter ett eldregn falla över målområdet och bränner fiender för {damage} Eldskada."
+        "description": "Låter ett eldregn falla över målområdet i 4 sek och bränner fiender för {damage} eldskada varje sekund."
       },
       "volley": {
         "name": "Pilregn",
-        "description": "Låter pilar regna över målområdet och vållar {damage} skada på fiender i det."
+        "description": "Låter pilar regna över målområdet i 3 sek och vållar {damage} skada var 0.5 sek på fiender som fångas i det."
       },
       "hurricane": {
         "name": "Orkan",
-        "description": "Släpper lös en orkan över målområdet och slår fiender för {damage} Naturskada."
+        "description": "Släpper lös en orkan över målområdet i 6 sek och slår fiender för {damage} naturskada varje sekund."
       },
       "earthquake": {
         "name": "Jordbävning",
-        "description": "Skakar målområdet och slår fiender för {damage} Naturskada."
+        "description": "Skakar målområdet i 6 sek och slår fiender för {damage} naturskada var 1.5 sek."
       },
       "heroic_strike": {
         "name": "Plundrarhugg",
@@ -5070,15 +5070,15 @@ export const sv_SE: EnTranslations = {
       },
       "battle_shout": {
         "name": "Järnvrål",
-        "description": "Ökar din attackkraft med 20 i 2 min."
+        "description": "Ökar din attackkraft med {buff} i 2 min."
       },
       "commanding_shout": {
         "name": "Stärkande rop",
-        "description": "Ökar din uthållighet med 6 i 2 min."
+        "description": "Ökar din uthållighet med {buff} i 2 min."
       },
       "demoralizing_shout": {
         "name": "Fasans tjut",
-        "description": "Utstöter ett skräckinjagande rop som sänker anfallskraften hos alla närliggande fiender med 30 i 30 sek."
+        "description": "Utstöter ett skräckinjagande rop som sänker anfallskraften hos alla närliggande fiender med {buff} i 30 sek."
       },
       "charge": {
         "name": "Anstormning",
@@ -5086,7 +5086,7 @@ export const sv_SE: EnTranslations = {
       },
       "rend": {
         "name": "Djup skåra",
-        "description": "Sårar målet och får det att blöda för {damage} skada under 9 sek."
+        "description": "Sårar målet och får det att blöda för {damage} skada över {duration} sek."
       },
       "thunder_clap": {
         "name": "Skälvande slag",
@@ -5094,7 +5094,7 @@ export const sv_SE: EnTranslations = {
       },
       "hamstring": {
         "name": "Haltande hugg",
-        "description": "Stympar fienden för 5 skada och saktar dess förflyttning med 50 % i 15 sek."
+        "description": "Stympar fienden för {damage} skada och saktar dess förflyttning med 50 % i 15 sek."
       },
       "bloodrage": {
         "name": "Blodstull",
@@ -5102,7 +5102,7 @@ export const sv_SE: EnTranslations = {
       },
       "overpower": {
         "name": "Rödhand",
-        "description": "Omedelbart anfall för vapenskada +5. Endast användbart efter att målet väjt undan. Kan inte väjas undan."
+        "description": "Omedelbart anfall för vapenskada plus {damage}. Endast användbart efter att målet väjt undan. Kan inte väjas undan."
       },
       "execute": {
         "name": "Tidig grav",
@@ -5122,7 +5122,7 @@ export const sv_SE: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Rustningsklipp",
-        "description": "Sunders the target's armor, reducing it by 2% per application. Stacks up to 5 times (10% at full stacks). Generates a high amount of threat."
+        "description": "Sunders the target's armor, reducing it by {damage}% per application. Stacks up to 5 times. Generates a high amount of threat."
       },
       "taunt": {
         "name": "Egga",
@@ -5134,11 +5134,11 @@ export const sv_SE: EnTranslations = {
       },
       "frost_armor": {
         "name": "Rimfrostmantel",
-        "description": "Omsluter dig i frost och ökar rustningen med 30 i 30 min."
+        "description": "Omsluter dig i frost och ökar rustningen med {buff} i 30 min."
       },
       "arcane_intellect": {
         "name": "Eterinsikt",
-        "description": "Ökar intellekt med 2 i 30 min."
+        "description": "Ökar intellekt med {buff} i 30 min."
       },
       "frostbolt": {
         "name": "Rimlans",
@@ -5162,7 +5162,7 @@ export const sv_SE: EnTranslations = {
       },
       "polymorph": {
         "name": "Förhäxa",
-        "description": "Förvandlar fienden till en padda i upp till 15 sek. Paddan vandrar omkring och läks snabbt. All skada bryter effekten. Endast bestar och humanoider."
+        "description": "Förvandlar fienden till en padda i upp till {duration} sek. Paddan vandrar omkring och läks snabbt. All skada bryter effekten. Endast bestar och humanoider."
       },
       "frost_nova": {
         "name": "Isbindning",
@@ -5182,7 +5182,7 @@ export const sv_SE: EnTranslations = {
       },
       "ice_barrier": {
         "name": "Frostslöja",
-        "description": "Skyddar dig i is och absorberar 130 skada i 60 sek."
+        "description": "Skyddar dig i is och absorberar {damage} skada i 60 sek."
       },
       "sinister_strike": {
         "name": "Ondsint hugg",
@@ -5190,7 +5190,7 @@ export const sv_SE: EnTranslations = {
       },
       "eviscerate": {
         "name": "Sista vilan",
-        "description": "Avslutande manöver som vållar skada per kombopoäng."
+        "description": "Avslutande manöver som vållar {damage}."
       },
       "backstab": {
         "name": "Feg stöt",
@@ -5198,7 +5198,7 @@ export const sv_SE: EnTranslations = {
       },
       "gouge": {
         "name": "Ögonstöt",
-        "description": "Slår till målet och gör det stridsodugligt i 4 sek. All skada bryter effekten. Ger 1 kombopoäng."
+        "description": "Slår till målet för {damage} skada och gör det stridsodugligt i 4 sek. All skada bryter effekten. Ger 1 kombopoäng."
       },
       "evasion": {
         "name": "Spökfot",
@@ -5230,11 +5230,11 @@ export const sv_SE: EnTranslations = {
       },
       "garrote": {
         "name": "Strupvajer",
-        "description": "Stryper fienden, vållar skada nu och får den att blöda för {damage} över 18 sek. Måste vara i smyg. Ger 1 kombopoäng."
+        "description": "Stryper fienden, vållar {damage} skada nu och får den att blöda för {overTime} över 18 sek. Måste vara i smyg. Ger 1 kombopoäng."
       },
       "cheap_shot": {
         "name": "Magslag",
-        "description": "Slå målet och bedöva det i 4 sek. Måste vara smygande. Ger 2 kombopoäng."
+        "description": "Slå målet för {damage} skada och bedöva det i 4 sek. Måste vara smygande. Ger 2 kombopoäng."
       },
       "sap": {
         "name": "Klubba ner",
@@ -5246,7 +5246,7 @@ export const sv_SE: EnTranslations = {
       },
       "expose_armor": {
         "name": "Rustningsbräsch",
-        "description": "Avslutande manöver som blottar målet och sänker dess rustning. Fler förbrukade kombopoäng ger ett djupare snitt."
+        "description": "Avslutande manöver som blottar målet och sänker dess rustning med {damage} i 30 sek."
       },
       "rupture": {
         "name": "Förblöda",
@@ -5270,7 +5270,7 @@ export const sv_SE: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "Edsbrand",
-        "description": "Fyller dig med helig kraft i 30 sek, vilket får vart och ett av dina närstridsslag att göra 4 extra helig skada. Släpp loss den med Verdict."
+        "description": "Fyller dig med helig kraft i 30 sek, vilket får vart och ett av dina närstridsslag att göra {damage} extra helig skada. Släpp loss den med domslut."
       },
       "holy_light": {
         "name": "Lagande ljus",
@@ -5278,7 +5278,7 @@ export const sv_SE: EnTranslations = {
       },
       "devotion_aura": {
         "name": "Ståndaktig aura",
-        "description": "Ökar din rustning med 40 i 30 min."
+        "description": "Ökar din rustning med {buff} i 30 min."
       },
       "judgement": {
         "name": "Utslag",
@@ -5286,19 +5286,19 @@ export const sv_SE: EnTranslations = {
       },
       "blessing_of_might": {
         "name": "Järnets ed",
-        "description": "Lägger en välsignelse på ett vänligt mål och ökar attackkraften med 15 i 5 min."
+        "description": "Lägger en välsignelse på ett vänligt mål och ökar attackkraften med {buff} i 5 min."
       },
       "divine_protection": {
         "name": "Trons värn",
-        "description": "En skyddande värn absorberar 50 skada i 10 sek."
+        "description": "Ett heligt värn absorberar {damage} skada i 10 sek."
       },
       "hammer_of_justice": {
         "name": "Klyvande domarklubba",
-        "description": "Bedövar målet i 3 sek."
+        "description": "Bedövar målet i {duration} sek."
       },
       "lay_on_hands": {
         "name": "Sista smörjelsen",
-        "description": "En massiv våg av läkning: återställer 250 hälsa. 10 min nedkylning."
+        "description": "En massiv våg av läkning: återställer {damage} hälsa. 10 min nedkylning."
       },
       "flash_of_light": {
         "name": "Ljuslagning",
@@ -5310,7 +5310,7 @@ export const sv_SE: EnTranslations = {
       },
       "consecration": {
         "name": "Helig mark",
-        "description": "Inviger marken under dig och svedjar närliggande fiender för {damage} helig skada."
+        "description": "Inviger marken under dig och svedjar närliggande fiender för {damage} helig skada varannan sek i 10 sek."
       },
       "righteous_fury": {
         "name": "Brinnande ed",
@@ -5330,11 +5330,11 @@ export const sv_SE: EnTranslations = {
       },
       "raptor_strike": {
         "name": "Uppsprättande hugg",
-        "description": "Ett kraftfullt närstridsanfall som ökar skadan med 5. Aktiveras vid ditt nästa hugg."
+        "description": "Ett kraftfullt närstridsanfall som ökar skadan med {damage}. Aktiveras vid ditt nästa hugg."
       },
       "aspect_of_the_hawk": {
         "name": "Kärrhökens skepnad",
-        "description": "Anta kärrhökens skepnad och öka attackkraften med 20 i 30 min."
+        "description": "Anta kärrhökens skepnad och öka attackkraften med {buff} i 30 min."
       },
       "serpent_sting": {
         "name": "Gifthulling",
@@ -5346,15 +5346,15 @@ export const sv_SE: EnTranslations = {
       },
       "concussive_shot": {
         "name": "Skakande skott",
-        "description": "Omtöcknar målet och saktar förflyttningen med 50 % i 4 sek."
+        "description": "Omtöcknar målet för {damage} skada och saktar förflyttningen med 50 % i 4 sek."
       },
       "mongoose_bite": {
         "name": "Mothugg",
-        "description": "Motanfall efter att målet väjt undan för vapenskada plus 12. Kan inte väjas undan."
+        "description": "Motanfall efter att målet väjt undan för vapenskada plus {damage}. Kan inte väjas undan."
       },
       "wing_clip": {
         "name": "Fjättrande hugg",
-        "description": "Tillfogar ett sår som saktar ner fienden med 40 % i 10 sek."
+        "description": "Tillfogar ett sår för {damage} skada och saktar ner fienden med 40 % i 10 sek."
       },
       "aspect_of_the_monkey": {
         "name": "Mårdens skepnad",
@@ -5382,7 +5382,7 @@ export const sv_SE: EnTranslations = {
       },
       "power_word_fortitude": {
         "name": "Beslutsamhetens litania",
-        "description": "Ökar målets uthållighet med 3 i 30 min."
+        "description": "Ökar målets uthållighet med {buff} i 30 min."
       },
       "shadow_word_pain": {
         "name": "Förruttnelsens klagosång",
@@ -5390,7 +5390,7 @@ export const sv_SE: EnTranslations = {
       },
       "power_word_shield": {
         "name": "Värnpsalm",
-        "description": "Skyddar målet och absorberar 48 skada i 30 sek."
+        "description": "Skyddar målet och absorberar {damage} skada i 30 sek."
       },
       "renew": {
         "name": "Dröjande nåd",
@@ -5418,7 +5418,7 @@ export const sv_SE: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stenbundet vapen",
-        "description": "Genomsyrar ditt vapen med stenens raseri: varje slag gör 5 extra skada under 5 min."
+        "description": "Genomsyrar ditt vapen med stenens raseri: varje slag gör {damage} extra skada i 5 min."
       },
       "healing_wave": {
         "name": "Lagande vatten",
@@ -5430,15 +5430,15 @@ export const sv_SE: EnTranslations = {
       },
       "lightning_shield": {
         "name": "Åskvärn",
-        "description": "Omger dig med knastrande blixtar: närstridsanfallare tar 13 naturskada."
+        "description": "Omger dig med knastrande blixtar: närstridsanfallare tar {buff} naturskada, upp till 3 laddningar och högst en gång var 5 sek."
       },
       "flame_shock": {
         "name": "Glödstöt",
-        "description": "Sveder målet med eld för 25 skada plus {damage} över 12 sek."
+        "description": "Sveder målet med eld för {damage} skada plus {overTime} över 12 sek."
       },
       "flametongue_weapon": {
         "name": "Pyrobrandsvapen",
-        "description": "Förlänar ditt vapen elementarisk eld: varje hugg vållar 8 extra eldskada i 5 min."
+        "description": "Förlänar ditt vapen elementarisk eld: varje hugg vållar {damage} extra eldskada i 5 min."
       },
       "frost_shock": {
         "name": "Rimstöt",
@@ -5446,7 +5446,7 @@ export const sv_SE: EnTranslations = {
       },
       "frostbrand_weapon": {
         "name": "Rimbundet vapen",
-        "description": "Förlänar ditt vapen bitande frost: varje hugg vållar 8 extra skada i 5 min."
+        "description": "Förlänar ditt vapen bitande frost: varje hugg vållar {damage} extra skada i 5 min."
       },
       "ghost_wolf": {
         "name": "Shadewolf",
@@ -5462,11 +5462,11 @@ export const sv_SE: EnTranslations = {
       },
       "demon_skin": {
         "name": "Djävulshud",
-        "description": "Demonisk hud ökar din rustning med 30 i 30 min."
+        "description": "Demonisk hud ökar din rustning med {buff} i 30 min."
       },
       "immolate": {
         "name": "Brinnande pakt",
-        "description": "Bränner fienden för 11 eldskada och ytterligare {damage} över 15 sek."
+        "description": "Bränner fienden för {damage} eldskada och ytterligare {overTime} över 15 sek."
       },
       "corruption": {
         "name": "Svartröta",
@@ -5474,7 +5474,7 @@ export const sv_SE: EnTranslations = {
       },
       "life_tap": {
         "name": "Hårt köpslag",
-        "description": "Omvandlar 30 hälsa till 30 mana."
+        "description": "Omvandlar {damage} hälsa till {damage} mana."
       },
       "curse_of_agony": {
         "name": "Våndans häxkonst",
@@ -5506,7 +5506,7 @@ export const sv_SE: EnTranslations = {
       },
       "mark_of_the_wild": {
         "name": "Wildward",
-        "description": "Placerar Wildward på ett vänligt mål och ökar rustningen med 25 i 30 min."
+        "description": "Placerar Wildward på ett vänligt mål och ökar rustningen med {buff} i 30 min."
       },
       "moonfire": {
         "name": "Månstorm",
@@ -5518,7 +5518,7 @@ export const sv_SE: EnTranslations = {
       },
       "thorns": {
         "name": "Törnvärn",
-        "description": "Törnen skjuter ut ur målet: närstridsanfallare tar 3 naturskada."
+        "description": "Törnen skjuter ut ur målet: närstridsanfallare tar {buff} naturskada."
       },
       "entangling_roots": {
         "name": "Gripande rötter",
@@ -5526,7 +5526,7 @@ export const sv_SE: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruinform",
-        "description": "Skiftar gestalt till en björn: rustning +65 %, attackkraft +15, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform."
+        "description": "Skiftar gestalt till en björn: rustning +90 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform."
       },
       "maul": {
         "name": "Benkross",
@@ -5546,7 +5546,7 @@ export const sv_SE: EnTranslations = {
       },
       "ferocious_bite": {
         "name": "Blodsbett",
-        "description": "Avslutande manöver som vållar skada per kombopoäng. Endast i vargform."
+        "description": "Avslutande manöver som vållar {damage}. Endast i vargform."
       },
       "swipe": {
         "name": "Svepande klor",
@@ -5578,7 +5578,7 @@ export const sv_SE: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Häxljus",
-        "description": "Sänker målets rustning med 35 i 40 sek."
+        "description": "Sänker målets rustning med 35 i 30 sek."
       },
       "hibernate": {
         "name": "Slummer",
@@ -5602,7 +5602,7 @@ export const sv_SE: EnTranslations = {
       },
       "rip": {
         "name": "Riv upp",
-        "description": "Avslutande manöver som tillfogar blödningsskada under 12 sek. Förbrukar kombopoäng. Endast vargform."
+        "description": "Avslutande manöver som tillfogar {damage} blödningsskada över 12 sek. Förbrukar kombopoäng. Endast vargform."
       },
       "mortal_strike": {
         "name": "Stympande hugg",
@@ -5610,11 +5610,11 @@ export const sv_SE: EnTranslations = {
       },
       "bloodthirst": {
         "name": "Åderlåtning",
-        "description": "Attackera omedelbart i ett blodsraseri för {damage}. (Fury-signatur)"
+        "description": "Attackera omedelbart i ett blodsraseri för 60 % vapenskada plus {damage}. (Raserisignatur)"
       },
       "shield_slam": {
         "name": "Sköldkross",
-        "description": "Slå målet med din sköld för {damage} och enormt hot. (Skyddssignatur)"
+        "description": "Slå målet med din sköld för 50 % vapenskada plus {damage} och enormt hot. (Skyddssignatur)"
       },
       "whirlwind": {
         "name": "Klingvirvel",

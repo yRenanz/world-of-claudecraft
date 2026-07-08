@@ -23,6 +23,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { HEROIC_BOSS_LOOT } from '../content/heroic_loot';
 import { ITEMS, MOBS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
 import { effectiveMasterLooter, meetsMasterThreshold } from '../loot_master';
@@ -64,6 +65,10 @@ export interface PendingLootRoll {
   itemName: string;
   quality: ItemDef['quality'];
   candidates: number[];
+  // Full party/raid membership snapshot captured when the roll opened. Whole-group
+  // loot broadcasts target this, NOT the live party of a candidate: a snapshot stays
+  // anchored to the roll's own party even if a member re-groups during the window.
+  partyMembers: number[];
   choices: Map<number, { choice: LootRollChoice; roll: number | null }>;
   expiresAt: number;
   // When set, this is a master-loot assignment (not a need/greed vote): only the
@@ -96,6 +101,14 @@ export function partyLootCandidatesForMob(ctx: SimContext, mob: Entity): PlayerM
     if (candidate && e && dist2d(e.pos, mob.pos) <= PARTY_XP_RANGE) candidates.push(candidate);
   }
   return candidates;
+}
+
+// The full party/raid membership behind a roll (for whole-group broadcasts), vs
+// partyLootCandidatesForMob which is only the in-range, loot-eligible subset. Read
+// from the creation-time snapshot; falls back to the candidate set for any roll that
+// predates the snapshot (defensive, since partyMembers is set at every creation site).
+function partyMembersForRoll(roll: PendingLootRoll): number[] {
+  return roll.partyMembers.length > 0 ? roll.partyMembers : roll.candidates;
 }
 
 function effectiveCurrencyLootStrategy(ctx: SimContext, mob: Entity): CurrencyLootStrategy {
@@ -171,6 +184,37 @@ export function rollLoot(
       copper += ctx.rng.int(Math.ceil(entry.copper * 0.6), Math.ceil(entry.copper * 1.4));
     if (entry.itemId) items.push({ itemId: entry.itemId, count: 1 });
   }
+  // Heroic-only drops: when the mob's claimed instance is heroic and it has a
+  // heroic drop table (the final bosses), roll those entries into the SAME
+  // corpse item list so party need/greed applies unchanged. These rng draws
+  // happen ONLY for a heroic claim, so the normal loot trace and the parity
+  // goldens are byte-identical. rollGroup names never overlap the base
+  // table's, so sharing `rolledGroups` is safe.
+  const heroicEntries = HEROIC_BOSS_LOOT[mob.templateId];
+  if (heroicEntries) {
+    const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
+    if (inst?.difficulty === 'heroic') {
+      for (const entry of heroicEntries) {
+        if (entry.rollGroup) {
+          if (rolledGroups.has(entry.rollGroup)) continue;
+          rolledGroups.add(entry.rollGroup);
+          const group = heroicEntries.filter((l) => l.rollGroup === entry.rollGroup);
+          const roll = ctx.rng.next();
+          let cumulative = 0;
+          for (const g of group) {
+            cumulative += g.chance;
+            if (roll < cumulative) {
+              if (g.itemId) items.push({ itemId: g.itemId, count: 1 });
+              break;
+            }
+          }
+          continue;
+        }
+        if (!ctx.rng.chance(entry.chance)) continue;
+        if (entry.itemId) items.push({ itemId: entry.itemId, count: 1 });
+      }
+    }
+  }
   if (copper > 0 || items.length > 0) {
     mob.loot = { copper, items };
     mob.lootable = true;
@@ -222,6 +266,8 @@ function startNeedGreedRoll(ctx: SimContext, itemId: string, mob: Entity): boole
   if (candidates.length <= 1) return false;
   const def = ITEMS[itemId];
   const itemName = def?.name ?? itemId;
+  const party = mob.tappedById !== null ? ctx.partyOf(mob.tappedById) : null;
+  const partyMembers = party ? [...party.members] : candidates.map((cand) => cand.entityId);
   const roll: PendingLootRoll = {
     id: ctx.nextLootRollId++,
     mobId: mob.id,
@@ -229,6 +275,7 @@ function startNeedGreedRoll(ctx: SimContext, itemId: string, mob: Entity): boole
     itemName,
     quality: def?.quality,
     candidates: candidates.map((candidate) => candidate.entityId),
+    partyMembers,
     choices: new Map(),
     expiresAt: ctx.time + LOOT_ROLL_TIMEOUT,
   };
@@ -245,6 +292,8 @@ function startNeedGreedRoll(ctx: SimContext, itemId: string, mob: Entity): boole
       pid: candidate.entityId,
     });
   }
+  for (const pid of partyMembers)
+    ctx.emit({ type: 'loot', text: `Rolling for [[i:${itemId}]].`, pid });
   return true;
 }
 
@@ -271,6 +320,7 @@ function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): bool
     itemName,
     quality: def?.quality,
     candidates: candidates.map((candidate) => candidate.entityId),
+    partyMembers: [...party.members],
     choices: new Map(),
     expiresAt: ctx.time + MASTER_LOOT_TIMEOUT,
     masterLooter: looterPid,
@@ -291,14 +341,41 @@ function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): bool
   return true;
 }
 
+// Rotates a common/junk drop over the kill-time eligible party members
+// (`partyLootCandidatesForMob`, backed by `mob.lootRecipientIds`), never the
+// loot-time in-range set: that is the fairness point. Mirrors
+// tryAwardCopperByFairSplit's shape (strategy check, candidate-count guard,
+// party lookup) but advances a per-party cursor instead of a Fisher-Yates split.
+function tryAwardItemByRoundRobin(ctx: SimContext, itemId: string, mob: Entity): boolean {
+  if (effectiveItemLootStrategy(ctx, itemId, mob) !== 'round-robin') return false;
+  const candidates = partyLootCandidatesForMob(ctx, mob);
+  if (candidates.length <= 1) return false;
+  const party = mob.tappedById !== null ? ctx.partyOf(mob.tappedById) : null;
+  if (!party) return false;
+  const winner = candidates[party.lootTurn % candidates.length];
+  party.lootTurn++;
+  ctx.addItem(itemId, 1, winner.entityId);
+  return true;
+}
+
+// Returns true when the item was consumed off the corpse (a roll started, a
+// round-robin winner took it, or it landed in the looter's bags); false when
+// the looter-takes-all direct grant found the looter's bags full, so the
+// caller leaves it on the corpse. The roll and round-robin paths are not
+// capacity-gated: those grants force-add (items are never destroyed, and the
+// looter cannot free space on the winner's behalf).
 export function awardSharedLootItem(
   ctx: SimContext,
   itemId: string,
   mob: Entity,
   looter: PlayerMeta,
-): void {
-  if (startMasterLootRoll(ctx, itemId, mob)) return;
-  if (!startNeedGreedRoll(ctx, itemId, mob)) ctx.addItem(itemId, 1, looter.entityId);
+): boolean {
+  if (startMasterLootRoll(ctx, itemId, mob)) return true;
+  if (startNeedGreedRoll(ctx, itemId, mob)) return true;
+  if (tryAwardItemByRoundRobin(ctx, itemId, mob)) return true;
+  if (!ctx.canAddItem(itemId, 1, looter.entityId)) return false;
+  ctx.addItem(itemId, 1, looter.entityId);
+  return true;
 }
 
 // Open need-greed rolls the given player may still answer. Mirrors the
@@ -371,12 +448,11 @@ export function assignMasterLoot(
   if (targets.length === 1) {
     if (!ctx.pendingLootRolls.delete(roll.id)) return;
     const targetName = ctx.players.get(targets[0])?.name ?? 'Unknown';
-    const recipients = new Set([...roll.candidates, roll.masterLooter]);
-    for (const recipient of recipients)
+    for (const pid of partyMembersForRoll(roll))
       ctx.emit({
         type: 'loot',
-        text: `${r.meta.name} assigned ${roll.itemName} to ${targetName}.`,
-        pid: recipient,
+        text: `${r.meta.name} assigned [[i:${roll.itemId}]] to ${targetName}.`,
+        pid,
       });
     ctx.addItem(roll.itemId, 1, targets[0]);
     return;
@@ -430,18 +506,24 @@ export function setPartyLootMaster(
     return;
   }
   const looterPid = looter !== 0 && party.members.includes(looter) ? looter : 0;
-  party.lootStrategies.master = { enabled, looter: looterPid, threshold };
+  const prev = party.lootStrategies.master;
+  const next = { enabled, looter: looterPid, threshold };
+  party.lootStrategies.master = next;
   const looterName =
     ctx.players.get(looterPid === 0 ? party.leader : looterPid)?.name ?? 'the leader';
-  for (const member of party.members) {
-    ctx.emit({
-      type: 'log',
-      text: enabled
-        ? `Loot method set to master loot. Master looter: ${looterName}.`
-        : 'Loot method set to group loot.',
-      pid: member,
-    });
+  const messages: string[] = [];
+  if (prev.enabled !== next.enabled) {
+    messages.push(
+      next.enabled
+        ? `Loot method set to Master Loot. Master Looter: ${looterName}.`
+        : 'Loot method set to Group Loot.',
+    );
+  } else if (next.enabled) {
+    if (prev.looter !== next.looter) messages.push(`Master Looter is now ${looterName}.`);
+    if (prev.threshold !== next.threshold) messages.push(`Loot threshold set to ${threshold}.`);
   }
+  for (const member of party.members)
+    for (const text of messages) ctx.emit({ type: 'log', text, pid: member });
 }
 
 export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
@@ -464,8 +546,8 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
     needers.length > 0 ? needers : entries.filter((entry) => entry.result.choice === 'greed');
   if (contenders.length === 0) {
     returnLootRollItemToCorpse(ctx, roll);
-    for (const pid of roll.candidates)
-      ctx.emit({ type: 'loot', text: `Everyone passed on ${roll.itemName}.`, pid });
+    for (const pid of partyMembersForRoll(roll))
+      ctx.emit({ type: 'loot', text: `Everyone passed on [[i:${roll.itemId}]].`, pid });
     return;
   }
   const highestRoll = Math.max(...contenders.map((contender) => contender.result.roll ?? 0));
@@ -474,10 +556,10 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
     tiedWinners.length === 1 ? tiedWinners[0] : tiedWinners[ctx.rng.int(0, tiedWinners.length - 1)];
   const winnerMeta = ctx.players.get(winner.pid);
   const winnerName = winnerMeta?.name ?? 'Unknown';
-  for (const pid of roll.candidates) {
+  for (const pid of partyMembersForRoll(roll)) {
     ctx.emit({
       type: 'loot',
-      text: `${winnerName} wins ${roll.itemName} (${winner.result.roll ?? 0})`,
+      text: `${winnerName} wins [[i:${roll.itemId}]] (${winner.result.roll ?? 0})`,
       pid,
     });
   }

@@ -7,6 +7,7 @@ vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
   walletForAccount: vi.fn(async () => null),
@@ -22,6 +23,8 @@ import { DELVES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { absorbTotal } from '../src/ui/absorb_bar';
+import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { isAuraDebuff } from '../src/ui/auras_view';
 
 const DELTA_KEYS = [
@@ -37,6 +40,7 @@ const DELTA_KEYS = [
   'party',
   'trade',
   'duel',
+  'corpse',
 ];
 
 interface FakeClient {
@@ -89,6 +93,8 @@ function bareClient(pid: number): ClientWorld {
   c.ownPlayerId = pid;
   c.ownPlayerClass = 'warrior';
   c.spectating = null;
+  c.cupInfo = null;
+  c.sportRole = null;
   c.moveInput = {};
   c.inventory = [];
   c.vendorBuyback = [];
@@ -101,10 +107,12 @@ function bareClient(pid: number): ClientWorld {
   c.questsDone = new Set();
   c.pendingQuestCommands = new Map();
   c.partyInfo = null;
+  c.selectedDungeonDifficulty = 'normal';
   c.tradeInfo = null;
   c.duelInfo = null;
   c.lastSnapAt = 0;
   c.snapInterval = 50;
+  c.serverTickHz = null;
   c.missingSince = new Map();
   c.pendingFacingDelta = 0;
   c.connected = true;
@@ -120,6 +128,38 @@ function bareClient(pid: number): ClientWorld {
   c.pendingSpectateFacing = null;
   return c;
 }
+
+describe('self stat wire round-trip', () => {
+  it('mirrors crit/haste rating from the self snapshot onto the paper-doll entity', () => {
+    const client = bareClient(1);
+    const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
+    internals.applySnapshot({
+      t: 'snap',
+      ents: [],
+      self: {
+        id: 1,
+        k: 'player',
+        tid: 'mage',
+        nm: 'Caster',
+        lv: 20,
+        x: 0,
+        y: 0,
+        z: 0,
+        f: 0,
+        hp: 100,
+        mhp: 100,
+        res: 0,
+        mres: 100,
+        rtype: 'mana',
+        crat: 20,
+        hrat: 150,
+      },
+    });
+    // Without the wire fields these read the blankEntity default 0 (the bug this guards).
+    expect(client.player.critRating).toBe(20);
+    expect(client.player.hasteRating).toBe(150);
+  });
+});
 
 describe('spectate client POV', () => {
   it('follows observed self, aligns on entry and respawn, then restores identity', () => {
@@ -192,6 +232,38 @@ describe('spectate client POV', () => {
     expect(client.player.name).toBe('Moderator');
     expect(client.cfg.playerClass).toBe('warrior');
     expect(client.consumeSpectateFacing()).toBeNull();
+  });
+});
+
+describe('per-session isolation in the broadcast loop', () => {
+  it('keeps broadcasting to healthy sessions when one session throws', () => {
+    // Regression: the broadcast loop iterated every session unguarded, so a throw
+    // while building one player's snapshot unwound the whole call and starved every
+    // other session of its snapshot that tick (server/CLAUDE.md: one socket must
+    // not crash the loop). forEachGuarded must isolate the bad session.
+    const server = new GameServer();
+    const before = fakeWs();
+    const bad = fakeWs();
+    const after = fakeWs();
+    joinServer(server, before, 1, 'Before');
+    const badSession = joinServer(server, bad, 2, 'Broken');
+    // 'After' joins last, so it is iterated AFTER the throwing session: the real
+    // regression is that this one used to be starved when 'Broken' threw.
+    joinServer(server, after, 3, 'After');
+
+    // Force a throw only while serializing the bad session's self payload.
+    const original = (server as any).selfWireJson.bind(server);
+    vi.spyOn(server as any, 'selfWireJson').mockImplementation((session: any, ...rest: any[]) => {
+      if (session.pid === badSession.pid) throw new Error('corrupt self state');
+      return original(session, ...rest);
+    });
+
+    expect(() => broadcast(server)).not.toThrow();
+    // Both healthy sessions, on either side of the throw, still got a snapshot;
+    // only the broken one was skipped.
+    expect(lastSnap(before.sent)).not.toBeNull();
+    expect(lastSnap(after.sent)).not.toBeNull();
+    expect(lastSnap(bad.sent)).toBeNull();
   });
 });
 
@@ -321,7 +393,7 @@ describe('delta snapshots', () => {
     const snap = lastSnap(fc.sent);
     expect(snap).not.toBeNull();
     // a fresh session has an empty lastSent, so EVERY maybe() delta key rides the
-    // first snapshot (even the null-valued ones like party/trade); widened to all 25
+    // first snapshot (even the null-valued ones like party/trade/bank); all 35 of them
     for (const key of ALL_DELTA_KEYS) {
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
     }
@@ -384,7 +456,7 @@ describe('delta snapshots', () => {
     const snap = lastSnap(fc.sent);
     // This single-tick test stays on the decay-safe subset: cds and the timer-backed
     // keys (delve/arena timers, delveDaily) can re-emit after a real sim.tick(), so the
-    // widened all-25 omission is proven by the no-op re-broadcast test instead.
+    // widened all-27 omission is proven by the no-op re-broadcast test instead.
     for (const key of DELTA_KEYS) {
       expect(snap.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
     }
@@ -446,7 +518,7 @@ describe('delta snapshots', () => {
     expect(row.auras).toContainEqual(
       expect.objectContaining({
         id: 'travel_form',
-        name: 'Travel Form',
+        name: 'Fleet Form',
         kind: 'form_travel',
         value: 1.4,
       }),
@@ -493,7 +565,11 @@ describe('delta snapshots', () => {
     expect(server.sim.countItem('widow_venom_sac', session.pid)).toBe(4);
     expect(meta.questLog.get('q_widows')).toMatchObject({ counts: [10, 4], state: 'active' });
     const snap = lastSnap(fc.sent);
-    expect(snap.self.inv).toEqual([{ itemId: 'widow_venom_sac', count: 4 }]);
+    // The wire mirrors the whole inventory (starter rations included); pin the
+    // discarded stack's mirrored count.
+    expect(snap.self.inv.filter((s: { itemId: string }) => s.itemId === 'widow_venom_sac')).toEqual(
+      [{ itemId: 'widow_venom_sac', count: 4 }],
+    );
     expect(snap.self.qlog).toEqual([{ questId: 'q_widows', counts: [10, 4], state: 'active' }]);
   });
 
@@ -734,7 +810,7 @@ describe('delta snapshots', () => {
     joinServer(server, fc2, 2, 'Testb');
     broadcast(server);
     const snapNew = lastSnap(fc2.sent);
-    // a fresh session always receives the full self state: all 25 delta keys
+    // a fresh session always receives the full self state: every registered delta key
     for (const key of ALL_DELTA_KEYS) {
       expect(snapNew.self, `self.${key} missing for fresh session`).toHaveProperty(key);
     }
@@ -792,6 +868,65 @@ describe('raid party wire', () => {
     expect(client.partyInfo).not.toBeNull();
     expect(client.partyInfo?.raid).toBe(true);
     expect(client.partyInfo?.members.find((m) => m.pid === member.pid)?.group).toBe(2);
+  });
+});
+
+describe('dungeon difficulty wire', () => {
+  it('ships the selected dungeon difficulty and ClientWorld mirrors it', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Hero');
+    server.sim.setDungeonDifficulty('heroic', session.pid);
+
+    broadcast(server);
+
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.ddiff).toBe('heroic');
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.dungeonDifficulty()).toBe('heroic');
+  });
+
+  it('dispatches set_dungeon_difficulty through the wire and rejects invalid values', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Hero');
+
+    const send = (difficulty: unknown) =>
+      server.handleMessage(
+        session,
+        JSON.stringify({ t: 'cmd', cmd: 'set_dungeon_difficulty', difficulty }),
+      );
+
+    send('heroic');
+    expect(server.sim.dungeonDifficulty(session.pid)).toBe('heroic');
+
+    // isDungeonDifficulty guards the dispatch arm: junk values change nothing.
+    send('mythic');
+    expect(server.sim.dungeonDifficulty(session.pid)).toBe('heroic');
+    send(7);
+    expect(server.sim.dungeonDifficulty(session.pid)).toBe('heroic');
+    send(undefined);
+    expect(server.sim.dungeonDifficulty(session.pid)).toBe('heroic');
+
+    send('normal');
+    expect(server.sim.dungeonDifficulty(session.pid)).toBe('normal');
+  });
+
+  it('dispatches heroic_buy through the wire and validates the itemId', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Hero');
+    const send = (itemId: unknown) =>
+      server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'heroic_buy', itemId }));
+
+    // Junk payloads never reach the sim handler (typeof string guard).
+    send(7);
+    send(undefined);
+    // A valid string flows through; far from the quartermaster the sim refuses
+    // with an error event rather than granting anything.
+    send('seal_of_the_nine_oaths');
+    expect(server.sim.countItem('seal_of_the_nine_oaths', session.pid)).toBe(0);
   });
 });
 
@@ -1220,7 +1355,7 @@ describe('client-side delta merge', () => {
     }
   });
 
-  it('reconstructs stacking-debuff stack counts from the wire (Sunder Armor)', () => {
+  it('reconstructs stacking-debuff stack counts from the wire (Armor Shear)', () => {
     const client = bareClient(1);
     (client as any).applySnapshot({
       ents: [
@@ -1239,7 +1374,7 @@ describe('client-side delta merge', () => {
           auras: [
             {
               id: 'sunder_armor',
-              name: 'Sunder Armor',
+              name: 'Armor Shear',
               kind: 'sunder',
               rem: 30,
               dur: 30,
@@ -1253,7 +1388,7 @@ describe('client-side delta merge', () => {
     expect(aura?.stacks, 'client should mirror the wire stack count').toBe(3);
   });
 
-  it('reconstructs charge-limited aura charges from the wire (Lightning Shield)', () => {
+  it('reconstructs charge-limited aura charges from the wire (Thunder Ward)', () => {
     const client = bareClient(1);
     (client as any).applySnapshot({
       ents: [
@@ -1272,7 +1407,7 @@ describe('client-side delta merge', () => {
           auras: [
             {
               id: 'lightning_shield',
-              name: 'Lightning Shield',
+              name: 'Thunder Ward',
               kind: 'thorns',
               rem: 600,
               dur: 600,
@@ -1284,6 +1419,55 @@ describe('client-side delta merge', () => {
     });
     const aura = client.entities.get(3)?.auras.find((a) => a.id === 'lightning_shield');
     expect(aura?.charges, 'client should mirror the wire charge count').toBe(2);
+  });
+
+  it('round-trips the aura caster id (src) so own-aura prominence works online', () => {
+    // Drives the REAL server emit (wireEntity) into the REAL client mirror: a
+    // regression that drops either the `src` emission or the online.ts decode
+    // would silently decode every online aura to sourceId 0, degrading the
+    // target strip's ownFirst dot/hot prominence online while offline keeps it
+    // (the stacks/charges sibling pins above follow the same pattern).
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
+    const e = sim.entities.get(sim.playerId)!;
+    e.auras.push(
+      {
+        id: 'rend',
+        name: 'Rend',
+        kind: 'dot',
+        remaining: 9,
+        duration: 9,
+        value: 5,
+        sourceId: 42,
+        school: 'physical',
+      },
+      {
+        id: 'battle_shout',
+        name: 'Battle Shout',
+        kind: 'buff_ap',
+        remaining: 120,
+        duration: 120,
+        value: 20,
+        sourceId: 0,
+        school: 'physical',
+      },
+    );
+    const w = wireEntity(e) as { auras: { id: string; src?: number }[] };
+    expect(w.auras.find((a) => a.id === 'rend')?.src, 'server ships the caster id').toBe(42);
+    expect(
+      'src' in (w.auras.find((a) => a.id === 'battle_shout') ?? {}),
+      'a sourceless aura omits src to stay lean',
+    ).toBe(false);
+
+    const client = bareClient(e.id + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [w] });
+    const mirrored = client.entities.get(e.id)?.auras;
+    expect(mirrored?.find((a) => a.id === 'rend')?.sourceId, 'client mirrors the caster id').toBe(
+      42,
+    );
+    expect(
+      mirrored?.find((a) => a.id === 'battle_shout')?.sourceId,
+      'an omitted src decodes to 0',
+    ).toBe(0);
   });
 
   it('snaps the interpolation anchor on a teleport but tweens normal moves', () => {
@@ -1781,24 +1965,27 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // ---------------------------------------------------------------------------
 // W0a: full self-snapshot delta round-trip gate.
 //
-// `selfWireJson` (server/game.ts) emits 25 heavy "delta" fields through a
+// `selfWireJson` (server/game.ts) emits its heavy "delta" fields through a
 // `maybe(key, value)` closure that ships a key only when its serialized form
 // changed since this session last received it; `applySnapshot` (src/net/
 // online.ts) mirrors each with `if (s.X !== undefined)` (or the inline
 // `s.X ?? e.X` form for `stats`/`weapon`). This is the single most fragile codec
-// in the workstream, so we pin: (a) the exact 25-key set against drift, (b) the
+// in the workstream, so we pin: (a) the exact registered key set against drift, (b) the
 // terse-key -> IWorld-name rename map, (c) that every dirtied value round-trips
-// onto the correct decode target, and (d) that a no-op re-broadcast omits all 25
+// onto the correct decode target, and (d) that a no-op re-broadcast omits all registered keys
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 25 `maybe(...)` delta keys, sorted. Cross-checked below
+// The pinned set of the 35 `maybe(...)` delta keys, sorted. Cross-checked below
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
-// 26th unregistered delta key reddens this gate.
+// 36th unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
   'arena',
+  'bags',
+  'bank',
   'buyback',
   'cds',
+  'corpse',
   'cosmetics',
   'dclears',
   'dcomp',
@@ -1808,18 +1995,25 @@ const ALL_DELTA_KEYS = [
   'drun',
   'duel',
   'equip',
+  'gprof',
   'inv',
   'lockouts',
   'lroll',
+  'mail',
+  'mailU',
   'market',
   'marks',
   'milestones',
   'party',
+  'prof',
   'qdone',
   'qlog',
+  'sport',
   'stats',
   'tal',
+  'tfocus',
   'trade',
+  'vcup',
   'weapon',
 ] as const;
 
@@ -1832,6 +2026,8 @@ const ALL_DELTA_KEYS = [
 // keep their name; tal fans out to several members and is asserted directly).
 const TERSE_TO_IWORLD: Record<string, string> = {
   arena: 'arenaInfo',
+  bags: 'bags',
+  bank: 'bankInfo',
   buyback: 'vendorBuyback',
   cds: 'cooldowns',
   cosmetics: 'accountCosmetics',
@@ -1842,30 +2038,37 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   drun: 'delveRun',
   duel: 'duelInfo',
   equip: 'equipment',
+  gprof: 'gatheringProficiency',
   inv: 'inventory',
   lockouts: 'selfLockouts',
   lroll: 'lootRollPrompts',
   lxp: 'lifetimeXp',
+  mail: 'mailInfo',
+  mailU: 'mailUnread',
   market: 'marketInfo',
   marks: 'markers',
   milestones: 'unlockedMilestones',
   mres: 'maxResource',
   party: 'partyInfo',
   prk: 'prestigeRank',
+  prof: 'professionsState',
   qdone: 'questsDone',
   qlog: 'questLog',
   res: 'resource',
   rtype: 'resourceType',
   rxp: 'restedXp',
+  sport: 'sportRole',
+  tfocus: 'townFocus',
+  vcup: 'cupInfo',
 };
 
 // Year ~2223 in epoch ms. Beats selfWireJson's `until > Date.now()` lockout
 // filter without a wall-clock read in test scaffolding.
 const FAR_FUTURE_MS = 8_000_000_000_000;
 
-// Dirty every one of the 25 `maybe()` delta fields with a distinguishable,
+// Dirty every one of the registered `maybe()` delta fields with a distinguishable,
 // non-default value so the round-trip + no-op-omission assertions are meaningful
-// (a fresh session carries all 25 on snapshot #1 regardless, since lastSent is
+// (a fresh session carries all of them on snapshot #1 regardless, since lastSent is
 // empty). Most fields are set on their real PlayerMeta/Entity/session source;
 // for the few whose authentic setup is mutually exclusive in one player state we
 // poke the exact source field the encoder reads, per the brief (the gate asserts
@@ -1910,8 +2113,18 @@ function dirtyEveryDeltaField(): {
   run.companion = { companionId: 'companion_tessa', entityId: mp };
   const party = (sim as any).partyOf(lp);
   (sim as any).targeting.partyMarkers.set(party.id, new Map([[mp, 3]]));
-  const merchant = sim.entities.get(sim.market.merchantId);
+  const merchant = sim.entities.get(sim.market.merchantIds[0]);
   if (merchant) merchant.pos = { ...p.pos };
+  // `mail`: mailInfoFor is null unless near a mailbox, so relocate one onto the
+  // player. `mailU` is already non-zero: every fresh character got the one-time
+  // Ravenpost welcome letter (delay 0) at join.
+  const mailbox = sim.entities.get(sim.postOffice.mailboxIds[0]);
+  if (mailbox) mailbox.pos = { ...p.pos };
+  // `bank`: bankInfoFor is null unless near a banker, so relocate a bursar onto the
+  // player; a stocked bank slot makes the mirrored contents distinguishable.
+  const banker = sim.entities.get(sim.bankerIds[0]);
+  if (banker) banker.pos = { ...p.pos };
+  meta.bank.inventory = [{ itemId: 'wolf_fang', count: 2 }];
 
   // Direct PlayerMeta fields.
   meta.inventory = [{ itemId: 'baked_bread', count: 3 }];
@@ -1927,8 +2140,11 @@ function dirtyEveryDeltaField(): {
   meta.delveMarks = 7;
   meta.delveClears = { 'collapsed_reliquary:heroic': 1 };
   meta.companionUpgrades = { companion_tessa: 2 };
+  meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0 };
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
   meta.talents = { spec: 'arms', ranks: {}, choices: {} };
+  // the Vale Cup sport kit swap ('sport' heavy key) and queue readout ('vcup')
+  meta.sportRole = 'keeper';
   meta.talentMods.spec = 'arms';
   meta.loadouts = [{ name: 'PvP', alloc: { spec: 'arms', ranks: {}, choices: {} }, bar: [] }];
   meta.activeLoadout = 0;
@@ -1945,6 +2161,9 @@ function dirtyEveryDeltaField(): {
   p.weapon = { ...p.weapon, min: 999 };
   p.resource = 42;
   p.maxResource = 150;
+  // corpse: the ghost-run body marker (self-only delta). Non-null = a ghost with a
+  // body to run back to; the encoder reads p.corpsePos via maybe('corpse', ...).
+  p.corpsePos = { x: p.pos.x, y: p.pos.y, z: p.pos.z };
 
   // Trade / duel / loot-roll: poke the exact collections the encoder reads.
   sim.trades.set(lp, {
@@ -1970,7 +2189,7 @@ function dirtyEveryDeltaField(): {
 }
 
 describe('full self-state snapshot delta fixture', () => {
-  it('carries every one of the 25 dirtied delta keys on the first snapshot', () => {
+  it('carries every one of the dirtied delta keys on the first snapshot', () => {
     const { server, fc } = dirtyEveryDeltaField();
     broadcast(server);
     const snap = lastSnap(fc.sent);
@@ -2025,11 +2244,21 @@ describe('full self-state snapshot delta fixture', () => {
     expect((client.duelInfo as any)?.state).toBe('countdown'); // duel -> duelInfo
     expect(client.arenaInfo).not.toBeNull(); // arena -> arenaInfo
     expect(client.marketInfo).not.toBeNull(); // market -> marketInfo
+    expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
+    expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
     expect(client.activeLootRolls().map((r) => r.rollId)).toEqual([1]); // lroll -> lootRollPrompts
     expect(client.delveRun).not.toBeNull(); // drun -> delveRun
     expect(client.companionState?.companionId).toBe('companion_tessa'); // dcompanion -> companionState
     expect(client.delveMarks).toBe(7); // dmarks -> delveMarks
     expect(client.companionUpgrades).toEqual({ companion_tessa: 2 }); // dcomp -> companionUpgrades
+    expect(client.gatheringProficiency).toEqual({ mining: 6, logging: 0, herbalism: 0 }); // gprof -> gatheringProficiency
+    expect(client.professionsState).toEqual({
+      skills: [
+        { professionId: 'mining', skill: 6, maxSkill: 300 },
+        { professionId: 'logging', skill: 0, maxSkill: 300 },
+        { professionId: 'herbalism', skill: 0, maxSkill: 300 },
+      ],
+    }); // prof -> professionsState
     expect(client.delveClears).toEqual({ 'collapsed_reliquary:heroic': 1 }); // dclears -> delveClears
     expect(client.delveDaily).toMatchObject({ markClears: 4 }); // delveDaily
     // tal -> talents / talentSpec / loadouts / activeLoadout
@@ -2041,7 +2270,7 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.activeLoadout).toBe(0);
   });
 
-  it('omits all 25 delta keys on a no-op re-broadcast and preserves the prior mirror', () => {
+  it('omits all delta keys on a no-op re-broadcast and preserves the prior mirror', () => {
     const { server, fc, leader, memberPid } = dirtyEveryDeltaField();
     broadcast(server);
     const client = bareClient(leader.pid);
@@ -2056,7 +2285,7 @@ describe('full self-state snapshot delta fixture', () => {
     const delveRunRef = client.delveRun;
 
     // a second broadcast with NO intervening sim.tick() and no state mutation: the
-    // maybe() closure sees byte-identical JSON for all 25 and omits every one
+    // maybe() closure sees byte-identical JSON for every registered key and omits every one
     fc.sent.length = 0;
     broadcast(server);
     const snap2 = lastSnap(fc.sent);
@@ -2080,21 +2309,21 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 25 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(25);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(25);
+  it('ALL_DELTA_KEYS contains exactly 35 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(35);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(35);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
   it('ALL_DELTA_KEYS equals the maybe(...) keys scraped from server/game.ts (multi-line lockouts incl.)', () => {
     const src = readFileSync(resolve(process.cwd(), 'server/game.ts'), 'utf8');
     // tolerate whitespace/newline between `(` and the quote so the multi-line
-    // maybe('lockouts', ...) call (game.ts ~2166-2169) is captured, not undercounted to 24
+    // maybe('lockouts', ...) call (game.ts ~2166-2169) is captured, not undercounted
     const re = /\bmaybe\(\s*['"](\w+)['"]/g;
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(25);
+    expect(scraped.size).toBe(35);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2130,16 +2359,16 @@ describe('delta-key contract pins (anti-drift)', () => {
   });
 });
 
-// A negative-value buff_* aura (a stat-sap: an intellect-draining curse on buff_int, an
-// attack-power drain on buff_ap) reads as a DEBUFF via auras_view.isAuraDebuff's
-// `value < 0` branch. That branch can only fire online if the wire carries the value. The
-// serializer sends `value` SPARSELY: only when it is negative (the sole case that flips the
-// classification), so an ordinary buff and the positive absorb shield stay off the wire and
-// decode to 0 exactly as before (no absorb-overlay regression; see target_frame.test.ts).
-// The client decode reads `a.value ?? 0`, so an old server that never sends it still decodes
-// to 0 (backward compatible). This drives a real Sim aura through the real serializer
-// (wireEntity) and the real client decode (ClientWorld.applySnapshot).
-describe('aura value over the wire (stat-sap debuff parity)', () => {
+// Buff/debuff hover tooltips read an aura's magnitude (src/ui/aura_effect.ts: flat stat amount,
+// slow/haste multiplier, dot/hot per-tick, absorb remaining, imbue range, ...), so the wire must
+// carry it or the tooltip reads 0 online (the reported "Increases attack power by 0" bug). The
+// serializer now sends `value` whenever it is nonzero (raw, so a negative stat-sap's sign and its
+// isAuraDebuff classification survive), plus value2/value3 (imbue), tickInterval (dot/hot), and a
+// non-physical school. The client decode reads `a.value ?? 0` and `a.school ?? 'physical'`, so a
+// value-0 aura or an old server still decodes to the defaults (backward compatible). This drives a
+// real Sim aura through the real serializer (wireEntity) and the real client decode
+// (ClientWorld.applySnapshot).
+describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
   function roundTrip(aura: Aura): { wire: Record<string, unknown>; mirror: Aura } {
     const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Sapped');
@@ -2187,19 +2416,19 @@ describe('aura value over the wire (stat-sap debuff parity)', () => {
     expect(isAuraDebuff(mirror)).toBe(true);
   });
 
-  it('does NOT send a POSITIVE buff value (sparse): a real buff stays a buff in both worlds', () => {
-    const buff: Aura = { ...sapInt(40), id: 'arcane_intellect', name: 'Arcane Intellect' };
+  it('sends a POSITIVE buff value so its tooltip shows the real magnitude, still a buff in both worlds', () => {
+    const buff: Aura = { ...sapInt(40), id: 'arcane_intellect', name: 'Aether Insight' };
     const { wire, mirror } = roundTrip(buff);
-    expect('value' in wireAura(wire, 'arcane_intellect')).toBe(false); // omitted on the wire
-    expect(mirror.value).toBe(0); // decodes to 0 (?? 0)
-    expect(isAuraDebuff(buff)).toBe(false);
+    expect(wireAura(wire, 'arcane_intellect').value).toBe(40); // rides the wire now (was omitted)
+    expect(mirror.value).toBe(40); // client mirrors the real magnitude (not the old hardcoded 0)
+    expect(isAuraDebuff(buff)).toBe(false); // positive value -> still a buff, online and off
     expect(isAuraDebuff(mirror)).toBe(false);
   });
 
-  it('does NOT send a POSITIVE absorb value: the shield overlay stays offline-only (no regression)', () => {
+  it('sends a POSITIVE absorb value so the shield overlay and tooltip work online too', () => {
     const shield: Aura = {
       id: 'power_word_shield',
-      name: 'Power Word: Shield',
+      name: 'Psalm of Warding',
       kind: 'absorb',
       remaining: 12,
       duration: 12,
@@ -2208,19 +2437,21 @@ describe('aura value over the wire (stat-sap debuff parity)', () => {
       school: 'holy',
     };
     const { wire, mirror } = roundTrip(shield);
-    expect('value' in wireAura(wire, 'power_word_shield')).toBe(false);
-    // online absorb is still 0, so the shield overlay remains offline-only (target_frame parity).
-    expect(mirror.value).toBe(0);
+    expect(wireAura(wire, 'power_word_shield').value).toBe(250);
+    expect(wireAura(wire, 'power_word_shield').school).toBe('holy'); // non-physical school rides
+    expect(mirror.value).toBe(250); // client mirrors the remaining absorb...
+    expect(mirror.school).toBe('holy');
+    // ...so the unit-frame shield overlay now derives online exactly as offline.
+    expect(absorbTotal([mirror])).toBe(250);
   });
 
-  it('does NOT send a NEGATIVE value for a non-buff_ aura (kind-gated): fear keeps its kind classification', () => {
-    // The emit mirrors isAuraDebuff's value branch (buff_* only), so a negative-value
-    // non-buff aura -- e.g. an incapacitate (fear) carrying a random facing angle that is
-    // negative about half the time -- never ships its value. It stays a debuff via its KIND,
-    // identically in both worlds, and no inert value rides the wire.
+  it('classifies a non-buff_ aura (fear) as a debuff by KIND, not value, across the wire', () => {
+    // An incapacitate (fear) stores a random facing angle in value; it now rides the wire like
+    // any nonzero value, but the incapacitate tooltip reads NO number, so the inert angle is
+    // harmless. Classification stays KIND-based (DEBUFF_AURA_KINDS), identical in both worlds.
     const fear: Aura = {
       id: 'fear',
-      name: 'Fear',
+      name: 'Harrow',
       kind: 'incapacitate',
       remaining: 4,
       duration: 4,
@@ -2229,10 +2460,84 @@ describe('aura value over the wire (stat-sap debuff parity)', () => {
       school: 'shadow',
     };
     const { wire, mirror } = roundTrip(fear);
-    expect('value' in wireAura(wire, 'fear')).toBe(false); // negative, but not buff_ -> omitted
-    expect(mirror.value).toBe(0);
+    expect(wireAura(wire, 'fear').value).toBe(-1.5); // nonzero value rides raw (sign preserved)
+    expect(mirror.value).toBe(-1.5);
+    expect(auraEffectDescriptor(fear)?.nums).toBeUndefined(); // incapacitate shows no number
     expect(isAuraDebuff(fear)).toBe(true); // debuff via kind, in both worlds
     expect(isAuraDebuff(mirror)).toBe(true);
+  });
+
+  it("round-trips Harrier's Guise so its tooltip shows the real attack power, not 0 (the bug)", () => {
+    // The reported bug: online, Harrier's Guise read "Increases attack power by 0" because the
+    // positive buff_ap magnitude never rode the wire. It now does, so offline == online.
+    const hawk: Aura = {
+      id: 'aspect_of_the_hawk',
+      name: "Harrier's Guise",
+      kind: 'buff_ap',
+      remaining: 1800,
+      duration: 1800,
+      value: 20,
+      sourceId: 0,
+      school: 'physical',
+    };
+    const { wire, mirror } = roundTrip(hawk);
+    expect(wireAura(wire, 'aspect_of_the_hawk').value).toBe(20);
+    expect(mirror.value).toBe(20);
+    // end to end: the mirrored aura drives the tooltip descriptor to the real number.
+    const desc = auraEffectDescriptor(mirror);
+    expect(desc?.key).toBe('hudChrome.auraEffect.increase.ap');
+    expect(desc?.nums?.value).toBe(20); // "Increases attack power by 20", never 0
+  });
+
+  it('round-trips a dot magnitude, tick cadence, and non-physical school for its tooltip', () => {
+    const dot: Aura = {
+      id: 'corruption',
+      name: 'Blackrot',
+      kind: 'dot',
+      remaining: 12,
+      duration: 12,
+      value: 15,
+      tickInterval: 3,
+      sourceId: 0,
+      school: 'shadow',
+    };
+    const { wire, mirror } = roundTrip(dot);
+    expect(wireAura(wire, 'corruption').value).toBe(15);
+    expect(wireAura(wire, 'corruption').tickInterval).toBe(3);
+    expect(wireAura(wire, 'corruption').school).toBe('shadow');
+    expect(mirror.value).toBe(15);
+    expect(mirror.tickInterval).toBe(3);
+    expect(mirror.school).toBe('shadow');
+    const desc = auraEffectDescriptor(mirror);
+    expect(desc?.key).toBe('hudChrome.auraEffect.dot');
+    expect(desc?.nums?.value).toBe(15);
+    expect(desc?.nums?.interval).toBe(3);
+    expect(desc?.school).toBe('shadow');
+  });
+
+  it('round-trips the imbue judgement range (value2/value3), value omitted when 0', () => {
+    const imbue: Aura = {
+      id: 'holy_might',
+      name: 'Holy Might',
+      kind: 'imbue',
+      remaining: 300,
+      duration: 300,
+      value: 0, // imbue carries its numbers in value2/value3, so value stays 0...
+      value2: 8,
+      value3: 12,
+      sourceId: 0,
+      school: 'holy',
+    };
+    const { wire, mirror } = roundTrip(imbue);
+    expect('value' in wireAura(wire, 'holy_might')).toBe(false); // ...and is omitted (decodes 0)
+    expect(wireAura(wire, 'holy_might').value2).toBe(8);
+    expect(wireAura(wire, 'holy_might').value3).toBe(12);
+    expect(mirror.value2).toBe(8);
+    expect(mirror.value3).toBe(12);
+    const desc = auraEffectDescriptor(mirror);
+    expect(desc?.key).toBe('hudChrome.auraEffect.imbueRange');
+    expect(desc?.nums?.min).toBe(8);
+    expect(desc?.nums?.max).toBe(12);
   });
 
   it('tolerates an old-server wire aura with no value (backward compatible -> 0)', () => {
@@ -2257,5 +2562,260 @@ describe('aura value over the wire (stat-sap debuff parity)', () => {
     });
     const mirror = client.entities.get(2)!.auras.find((a) => a.kind === 'buff_int')!;
     expect(mirror.value).toBe(0);
+  });
+});
+
+describe('aura decode reuses records across snapshots (allocation fast path)', () => {
+  function wolfWire(sim: Sim, mobId: number): Record<string, unknown> {
+    return JSON.parse(JSON.stringify(wireEntity(sim.entities.get(mobId)!)));
+  }
+
+  function makeMobWithAura(): { sim: Sim; mobId: number } {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Poker');
+    const mob = [...sim.entities.values()].find((e) => e.kind === 'mob')!;
+    void pid;
+    mob.auras.push({
+      id: 'corruption',
+      name: 'Blackrot',
+      kind: 'dot',
+      remaining: 12,
+      duration: 12,
+      value: 15,
+      tickInterval: 3,
+      sourceId: 0,
+      school: 'shadow',
+    });
+    return { sim, mobId: mob.id };
+  }
+
+  it('keeps the same array and record objects while only fields change', () => {
+    const { sim, mobId } = makeMobWithAura();
+    const client = bareClient(999);
+    (client as any).applySnapshot({ t: 'snap', ents: [wolfWire(sim, mobId)] });
+    const firstArr = client.entities.get(mobId)!.auras;
+    const firstRec = firstArr[0];
+    expect(firstRec.remaining).toBe(12);
+
+    // same aura set, only the remaining ticked down: the mirror must update the
+    // SAME objects in place (no per-snapshot churn) with the new field values
+    sim.entities.get(mobId)!.auras[0].remaining = 7.5;
+    (client as any).applySnapshot({ t: 'snap', ents: [wolfWire(sim, mobId)] });
+    const secondArr = client.entities.get(mobId)!.auras;
+    expect(secondArr).toBe(firstArr);
+    expect(secondArr[0]).toBe(firstRec);
+    expect(firstRec.remaining).toBe(7.5);
+    expect(firstRec.value).toBe(15);
+    expect(firstRec.school).toBe('shadow');
+  });
+
+  it('rebuilds the list when the aura composition changes', () => {
+    const { sim, mobId } = makeMobWithAura();
+    const client = bareClient(999);
+    (client as any).applySnapshot({ t: 'snap', ents: [wolfWire(sim, mobId)] });
+    const firstArr = client.entities.get(mobId)!.auras;
+
+    sim.entities.get(mobId)!.auras.push({
+      id: 'venom_bite',
+      name: 'Venom Bite',
+      kind: 'dot',
+      remaining: 6,
+      duration: 6,
+      value: 4,
+      tickInterval: 2,
+      sourceId: 0,
+      school: 'nature',
+    });
+    (client as any).applySnapshot({ t: 'snap', ents: [wolfWire(sim, mobId)] });
+    const secondArr = client.entities.get(mobId)!.auras;
+    expect(secondArr).not.toBe(firstArr); // composition changed: fresh build
+    expect(secondArr.map((a) => a.id)).toEqual(['corruption', 'venom_bite']);
+    expect(secondArr[1].value).toBe(4);
+
+    // and dropping back to one aura rebuilds again (length mismatch path)
+    sim.entities.get(mobId)!.auras.pop();
+    (client as any).applySnapshot({ t: 'snap', ents: [wolfWire(sim, mobId)] });
+    expect(client.entities.get(mobId)!.auras.map((a) => a.id)).toEqual(['corruption']);
+  });
+});
+
+describe('aura decode fast-path guards (composition edge cases)', () => {
+  function client2(sim: Sim, mobId: number) {
+    const client = bareClient(999);
+    const apply = () =>
+      (client as any).applySnapshot({
+        t: 'snap',
+        ents: [JSON.parse(JSON.stringify(wireEntity(sim.entities.get(mobId)!)))],
+      });
+    return { client, apply };
+  }
+
+  function makeMobWithTwoAuras(): { sim: Sim; mobId: number } {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    sim.addPlayer('warrior', 'Poker');
+    const mob = [...sim.entities.values()].find((e) => e.kind === 'mob')!;
+    mob.auras.push(
+      {
+        id: 'corruption',
+        name: 'Blackrot',
+        kind: 'dot',
+        remaining: 12,
+        duration: 12,
+        value: 15,
+        sourceId: 0,
+        school: 'shadow',
+      },
+      {
+        id: 'weakness',
+        name: 'Weakness',
+        kind: 'buff_ap',
+        remaining: 9,
+        duration: 9,
+        value: -5,
+        sourceId: 0,
+        school: 'physical',
+      },
+    );
+    return { sim, mobId: mob.id };
+  }
+
+  it('a same-length REORDER rebuilds instead of smearing fields across records', () => {
+    const { sim, mobId } = makeMobWithTwoAuras();
+    const { client, apply } = client2(sim, mobId);
+    apply();
+    const mob = sim.entities.get(mobId)!;
+    // swap the two auras: same ids, same length, different order
+    mob.auras.reverse();
+    apply();
+    const mirrored = client.entities.get(mobId)!.auras;
+    expect(mirrored.map((a) => a.id)).toEqual(['weakness', 'corruption']);
+    // each record carries ITS aura's fields, not the other slot's
+    expect(mirrored[0].value).toBe(-5);
+    expect(mirrored[1].value).toBe(15);
+    expect(mirrored[1].school).toBe('shadow');
+  });
+
+  it('the in-place path clears optional sub-fields the wire stops sending', () => {
+    const { sim, mobId } = makeMobWithTwoAuras();
+    const mob = sim.entities.get(mobId)!;
+    mob.auras[0].stacks = 3;
+    mob.auras[0].value2 = 8;
+    const { client, apply } = client2(sim, mobId);
+    apply();
+    const rec = client.entities.get(mobId)!.auras[0];
+    expect(rec.stacks).toBe(3);
+    expect(rec.value2).toBe(8);
+    // same aura set (fast path), but the optionals dropped off the wire
+    mob.auras[0].stacks = undefined;
+    mob.auras[0].value2 = undefined;
+    apply();
+    expect(client.entities.get(mobId)!.auras[0]).toBe(rec); // fast path taken
+    expect(rec.stacks).toBeUndefined(); // not a stale 3
+    expect(rec.value2).toBeUndefined(); // not a stale 8
+  });
+});
+
+describe('entity-anchored world event scoping', () => {
+  it('delivers delveRitePulse to sessions near its entityId anchor and not to far ones', () => {
+    // The rite pulse is a world event with no pid; eventAnchor must resolve its
+    // entityId to the shrine position and interest-scope delivery (EVENT_RADIUS).
+    // Pre-fix the field was shrineId, which eventAnchor did not recognize, so
+    // the pulse broadcast realm-wide and closed rite popups in unrelated runs.
+    const server = new GameServer();
+    const near = fakeWs();
+    const far = fakeWs();
+    const sNear = joinServer(server, near, 1, 'Nearena');
+    const sFar = joinServer(server, far, 2, 'Faraway');
+    const nearEnt = server.sim.entities.get(sNear.pid)!;
+    const farEnt = server.sim.entities.get(sFar.pid)!;
+    farEnt.pos.x = nearEnt.pos.x + 500;
+    farEnt.pos.z = nearEnt.pos.z + 500;
+    near.sent.length = 0;
+    far.sent.length = 0;
+    // Anchor on the near player's own entity: eventAnchor only reads a live
+    // entity's position, so any resolvable id pins the scoping semantics.
+    (server as any).routeEvents([
+      { type: 'delveRitePulse', entityId: nearEnt.id, shrineKind: 'rite_shrine_bell' },
+    ]);
+    const pulses = (fc: ReturnType<typeof fakeWs>) =>
+      fc.sent
+        .flatMap((msg) => (msg.t === 'events' ? msg.list : []))
+        .filter((ev: { type: string }) => ev.type === 'delveRitePulse');
+    expect(pulses(near)).toHaveLength(1);
+    expect(pulses(far)).toHaveLength(0);
+  });
+});
+
+describe('server tick rate on the snap head', () => {
+  it('omits tickHz while the meter warms up, then reports the measured rate', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    joinServer(server, fc, 1, 'Ticky');
+    broadcast(server);
+    // fresh server: nothing measured yet, so the head omits the field entirely
+    // and the ops profile reports null rather than a fake number
+    expect(lastSnap(fc.sent).tickHz).toBeUndefined();
+    expect(server.perfProfile().tickHz).toBeNull();
+    // Drive the meter the way start() does (one record per callback against
+    // wall ms); the loop timer itself cannot run under vitest without flaking.
+    const internals = server as any;
+    internals.tickRateMeter.record(0, 1);
+    for (let t = 50; t <= 3000; t += 50) internals.tickRateMeter.record(t, 1);
+    internals.tickHz = internals.tickRateMeter.rate(3000);
+    fc.sent.length = 0;
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    // parsed by JSON.parse in fakeWs, so this also proves the head stays valid JSON
+    expect(snap.tickHz).toBeCloseTo(20, 1);
+    expect(snap.tick).toBeTypeOf('number');
+    // the same reading rides the ops /api/perf payload (both dispatch arms
+    // share perfProfile), rounded for the wire
+    expect(server.perfProfile().tickHz).toBeCloseTo(20, 1);
+  });
+
+  it('throttles tickHz on the head, re-emitting once the interval elapses', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    joinServer(server, fc, 1, 'Ticky');
+    const internals = server as any;
+    internals.tickRateMeter.record(0, 1);
+    for (let t = 50; t <= 3000; t += 50) internals.tickRateMeter.record(t, 1);
+    internals.tickHz = internals.tickRateMeter.rate(3000);
+    // first head after warm-up carries the value
+    broadcast(server);
+    expect(lastSnap(fc.sent).tickHz).toBeCloseTo(20, 1);
+    // a second head within the throttle window (no sim.time advance) omits it,
+    // so the slow-moving scalar does not ride every 20 Hz snapshot. The client
+    // holds its last reading across that gap (see the mirror test below).
+    fc.sent.length = 0;
+    broadcast(server);
+    expect(lastSnap(fc.sent).tickHz).toBeUndefined();
+    // once sim.time advances past the interval, the next head carries it again
+    for (let i = 0; i < 20; i++) server.sim.tick(); // ~1s of sim time
+    fc.sent.length = 0;
+    broadcast(server);
+    expect(lastSnap(fc.sent).tickHz).toBeCloseTo(20, 1);
+  });
+});
+
+describe('client mirror of the server tick rate', () => {
+  it('mirrors tickHz from the snap head and keeps the last value when omitted', () => {
+    const client = bareClient(1);
+    expect(client.serverTickHz).toBeNull();
+    (client as any).applySnapshot({ t: 'snap', tickHz: 19.6, ents: [] });
+    expect(client.serverTickHz).toBe(19.6);
+    // a warm-up-era head omits the field: the mirror holds the last reading
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.serverTickHz).toBe(19.6);
+  });
+
+  it('rejects junk tickHz values instead of poisoning the mirror', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', tickHz: 20, ents: [] });
+    // Infinity is the one value only Number.isFinite rejects (typeof passes, > 0 passes)
+    for (const junk of ['20', Number.NaN, Number.POSITIVE_INFINITY, -1, 0, null]) {
+      (client as any).applySnapshot({ t: 'snap', tickHz: junk, ents: [] });
+    }
+    expect(client.serverTickHz).toBe(20);
   });
 });

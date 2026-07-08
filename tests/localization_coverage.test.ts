@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { QUEST_LETTERS } from '../src/sim/content/letters';
 import {
   ABILITIES,
   CLASSES,
@@ -22,6 +23,7 @@ import {
   tEntity,
 } from '../src/ui/entity_i18n';
 import {
+  cs_CZ,
   da_DK,
   de_DE,
   en,
@@ -74,6 +76,7 @@ const locales: Record<string, typeof en> = {
   ja_JP,
   pt_BR,
   ru_RU,
+  cs_CZ,
   nl_NL,
   pl_PL,
   id_ID,
@@ -355,6 +358,7 @@ describe('i18n Localization Key Coverage', () => {
     item: 'Rough Bracers',
     key: 'K',
     kind: 'Weapon',
+    slots: 14,
     label: 'Wolf',
     level: 10,
     losses: 4,
@@ -538,6 +542,13 @@ describe('i18n Localization Key Coverage', () => {
         field: entry.field as 'name' | 'enterText' | 'leaveText',
       };
     }
+    if (entry.kind === 'letter') {
+      return {
+        kind: 'letter',
+        id: entry.id,
+        field: entry.field as 'sender' | 'subject' | 'body',
+      };
+    }
     throw new Error(`Unexpected entity kind: ${entry.kind}`);
   }
 
@@ -630,6 +641,7 @@ describe('i18n Localization Key Coverage', () => {
       'ja_JP',
       'pt_BR',
       'ru_RU',
+      'cs_CZ',
       'nl_NL',
       'pl_PL',
       'id_ID',
@@ -852,7 +864,10 @@ describe('i18n Localization Key Coverage', () => {
         const rendered = tEntity(itemRequest(entry));
         expect(rendered.trim().length, `${lang}.${entry.key}`).toBeGreaterThan(0);
         expect(rendered, `${lang}.${entry.key}`).not.toBe(entry.key);
-        if (lang !== 'en' && lang !== 'en_CA') {
+        // RELEASE-TIER ONLY: a sparse/English-only overlay renders the English fill
+        // for an untranslated item name, which is legal on a PR (a `pending` row)
+        // and blocked only at the release gate (matches the world-content check below).
+        if (RELEASE_TIER && lang !== 'en' && lang !== 'en_CA') {
           expect(
             rendered,
             `${lang}.${entry.key} should not copy canonical English item text`,
@@ -877,7 +892,10 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should track item-set names and bonus text in the entity catalog', async () => {
     const itemSetEntries = entityTranslationManifest().filter((entry) => entry.group === 'itemSet');
-    expect(itemSetEntries).toHaveLength(7 * 3);
+    // 7 raid/dungeon families with name+bonus2+bonus3+bonus4 (every epic family
+    // carries a 4-piece proc tier), plus 3 leveling haste kits carrying a
+    // single 3-piece tier (name+bonus3 only).
+    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
 
     for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {
@@ -942,7 +960,9 @@ describe('i18n Localization Key Coverage', () => {
       ZONES.length * 2 +
       ZONES.reduce((sum, zone) => sum + zone.pois.length, 0) +
       Object.keys(DUNGEONS).length * 3 +
-      Object.keys(DELVES).length * 3;
+      Object.keys(DELVES).length * 3 +
+      // Ravenpost authored letters: welcome + quest letters, 3 fields each.
+      (1 + Object.keys(QUEST_LETTERS).length) * 3;
     expect(worldEntries).toHaveLength(expectedWorldCount);
 
     for (const lang of supportedLanguages) {
@@ -1500,23 +1520,7 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should expose all supported hreflang alternates in index.html', () => {
     const html = fs.readFileSync(path.resolve(process.cwd(), 'index.html'), 'utf8');
-    const expectedHreflang = [
-      'en',
-      'es',
-      'es-ES',
-      'fr-FR',
-      'fr-CA',
-      'en-CA',
-      'it-IT',
-      'de-DE',
-      'zh-CN',
-      'zh-TW',
-      'ko-KR',
-      'ja-JP',
-      'pt-BR',
-      'ru-RU',
-      'x-default',
-    ];
+    const expectedHreflang = [...supportedLanguages.map((lang) => languageTag(lang)), 'x-default'];
     for (const hreflang of expectedHreflang) {
       expect(html, `missing hreflang ${hreflang}`).toContain(`hreflang="${hreflang}"`);
     }
@@ -1531,8 +1535,16 @@ describe('i18n Localization Key Coverage', () => {
     expect(html).toContain('data-i18n-aria="hud.core.mobileControls"');
     expect(html).toContain('data-i18n="hud.core.mobileMove"');
     expect(html).toContain('data-i18n="hud.core.mobileCamera"');
-    expect(html).toContain('data-i18n="hud.core.mobileAttack"');
-    expect(html).toContain('data-i18n="hud.core.mobileTarget"');
+    // #mobile-target-cycle is the ring's Target swap helper (it replaced the
+    // Target Closest button when acquire-nearest moved onto the ring's own
+    // #mobile-action-attack toggle), so its copy lives at
+    // hudChrome.mobile.targetCycleShort.
+    expect(html).toContain('data-i18n="hudChrome.mobile.targetCycleShort"');
+    // The old bottom-centre Target button stays removed (the ring's Target
+    // swap is the one target-cycling helper); hud.core.mobileTarget stays in
+    // the catalog (the hudKeys existence list above) but no longer appears in
+    // the markup.
+    expect(html).not.toContain('data-i18n="hud.core.mobileTarget"');
     expect(html).toContain('data-i18n="hud.core.mobileChat"');
     expect(html).toContain('data-i18n="hud.core.mobileMore"');
     expect(html).toContain('data-i18n="hud.core.mobileSocial"');

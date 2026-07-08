@@ -10,145 +10,60 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "entities.mobs.training_dummy.name",
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "entities.mobs.training_dummy.name"
   ],
   "es_ES": [
-    "entities.mobs.training_dummy.name",
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "entities.mobs.training_dummy.name"
   ],
   "fr_FR": [
-    "entities.mobs.training_dummy.name",
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "entities.mobs.training_dummy.name"
   ],
   "fr_CA": [
-    "entities.mobs.training_dummy.name",
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "entities.mobs.training_dummy.name"
   ],
   "en_CA": [],
   "it_IT": [
-    "entities.mobs.training_dummy.name",
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "entities.mobs.training_dummy.name"
   ],
   "de_DE": [
-    "entities.mobs.training_dummy.name",
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "entities.mobs.training_dummy.name"
   ],
-  "zh_CN": [
-    "hudChrome.keybinds.discord"
-  ],
-  "zh_TW": [
-    "hudChrome.keybinds.discord"
-  ],
-  "ko_KR": [
-    "hudChrome.keybinds.discord"
-  ],
-  "ja_JP": [
-    "hudChrome.keybinds.discord"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
-    "entities.mobs.training_dummy.name",
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "entities.mobs.training_dummy.name"
   ],
-  "ru_RU": [
-    "hudChrome.keybinds.discord"
+  "ru_RU": [],
+  "cs_CZ": [
+    "entities.items.arcanite_bar.name",
+    "entities.items.ashwood_log.name",
+    "entities.items.elderwood_log.name",
+    "entities.items.goldleaf_herb.name",
+    "entities.items.sunpetal_herb.name",
+    "entities.items.thorium_ore.name",
+    "entities.mobs.training_dummy.name"
   ],
   "nl_NL": [
-    "entities.mobs.training_dummy.name",
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader",
-    "hudChrome.plurals.playersMatching.few",
-    "hudChrome.plurals.playersMatching.many",
-    "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
+    "entities.mobs.training_dummy.name"
   ],
   "pl_PL": [
-    "entities.mobs.training_dummy.name",
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader",
-    "hudChrome.plurals.playersMatching.few",
-    "hudChrome.plurals.playersMatching.many",
-    "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
+    "entities.mobs.training_dummy.name"
   ],
   "id_ID": [
-    "entities.mobs.training_dummy.name",
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader",
-    "hudChrome.plurals.playersMatching.few",
-    "hudChrome.plurals.playersMatching.many",
-    "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
+    "entities.mobs.training_dummy.name"
   ],
   "tr_TR": [
-    "entities.mobs.training_dummy.name",
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader",
-    "hudChrome.plurals.playersMatching.few",
-    "hudChrome.plurals.playersMatching.many",
-    "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
+    "entities.mobs.training_dummy.name"
   ],
   "sv_SE": [
-    "entities.mobs.training_dummy.name",
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader",
-    "hudChrome.plurals.playersMatching.few",
-    "hudChrome.plurals.playersMatching.many",
-    "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
+    "entities.mobs.training_dummy.name"
   ],
   "vi_VN": [
-    "entities.mobs.training_dummy.name",
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader",
-    "hudChrome.plurals.playersMatching.few",
-    "hudChrome.plurals.playersMatching.many",
-    "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
+    "entities.mobs.training_dummy.name"
   ],
   "da_DK": [
-    "entities.mobs.training_dummy.name",
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader",
-    "hudChrome.plurals.playersMatching.few",
-    "hudChrome.plurals.playersMatching.many",
-    "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
+    "entities.mobs.training_dummy.name"
   ]
 };

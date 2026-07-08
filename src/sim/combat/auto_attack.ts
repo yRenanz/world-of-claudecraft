@@ -27,7 +27,7 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the shared
 // `ctx.rng` stream, drawn in the exact pre-move positions.
 
-import { CLASSES, MOBS } from '../data';
+import { CLASSES, isArenaPos, MOBS } from '../data';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -45,8 +45,19 @@ import {
 } from '../types';
 import { spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isStunned } from './cc';
+import { consumeNextAttackCrit } from './empower_next';
+import { runWeaponProcs } from './equip_procs';
 import { baseSwingSpeed } from './form_swing';
+import { rangedShotProfile } from './ranged_shot';
 import { applyThornsReaction } from './thorns_charge';
+
+// Fraction of the mainhand weapon's damage a hunter's Auto Shot deals. There is no
+// dedicated ranged-weapon slot, so the mainhand doubles as the "bow"; a full melee
+// weapon's damage on ranged would push a fully geared hunter's white DPS well past
+// the melee classes (measured ~+30%), so only part of it carries to the shot. The
+// agility-driven ranged attack-power term is unaffected, and wands (the caster
+// sidearm, fixed class damage) are exempt.
+const RANGED_WEAPON_COEFF = 0.6;
 
 export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
@@ -61,13 +72,21 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   if (p.sitting) ctx.standUp(p);
   p.autoAttack = true;
   r.meta.lastActiveTick = ctx.tickCount; // starting auto-attack is a deliberate action
+  // Engaging MELEE auto-attack seeds aggro at once, because the swing lands almost
+  // immediately. Ranged auto-attack (wand / auto shot, up to 30-35yd) must NOT pre-aggro
+  // at engage: its threat comes from the shot LANDING (rangedSwing schedules a projectile
+  // whose impact aggros, like the spell it accompanies). Otherwise the "Attack on Ability
+  // Use" QoL, which engages auto-attack when you cast a damaging spell, pulls a distant
+  // mob the instant the cast starts, before anything lands.
   const d = dist2d(p.pos, t.pos);
-  const ranged = CLASSES[r.meta.cls].ranged;
-  const inAutoAttackRange = ranged
-    ? d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange) && ctx.hasLineOfSight(p, t)
-    : d <= MELEE_RANGE;
+  // The melee seed is additionally gated on no cast in progress: the swing loop is
+  // paused while casting (updatePlayerAutoAttack bails on castingAbility), so a
+  // mid-cast Attack press must not aggro an untouched mob (the aggro-before-damage
+  // bug, #1324). The toggle still arms autoAttack above; once the cast resolves, the
+  // first landed swing (or the spell's own damage) aggros the target legitimately.
   if (
-    inAutoAttackRange &&
+    d <= MELEE_RANGE &&
+    !p.castingAbility &&
     t.kind === 'mob' &&
     t.hostile &&
     t.ownerId === null &&
@@ -107,11 +126,21 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   if (ranged && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange)) {
     if (!ctx.hasLineOfSight(p, t)) return;
     ctx.breakGhostWolf(p);
-    rangedSwing(ctx, p, t, ranged);
-    p.swingTimer = ranged.speed * ctx.swingIntervalMult(p);
+    // Hunters shoot with their equipped weapon (damage range + speed), casters
+    // with their fixed class wand; the shot then fires at that resolved profile.
+    const shot = rangedShotProfile(ranged, p.weapon);
+    rangedSwing(ctx, p, t, { ...ranged, min: shot.min, max: shot.max, speed: shot.speed });
+    // The weapon's speed sets the cadence; ranged haste (item-set bonus) then
+    // shortens the auto-shot interval.
+    p.swingTimer = (shot.speed * ctx.swingIntervalMult(p)) / (1 + p.rangedHaste);
     return;
   }
   if (d > MELEE_RANGE) return;
+  // Melee normally skips line of sight (it's always point-blank), but the
+  // arena's thin enclosing walls sit inside MELEE_RANGE: without this a
+  // combatant pressed against a wall could swing through it. See sibling
+  // logic in Sim.abilityNeedsLineOfSight.
+  if (isArenaPos(p.pos.x) && !ctx.hasLineOfSight(p, t)) return;
   ctx.breakGhostWolf(p);
 
   let bonus = 0;
@@ -122,8 +151,9 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     const queued = ctx.resolvedAbility(p.queuedOnSwing, p.id);
     if (queued) {
       const eff = queued.effects.find((e) => e.type === 'weaponDamage');
-      if (p.resource >= queued.cost && eff && eff.type === 'weaponDamage') {
-        spendResource(p, queued.cost);
+      const queuedCost = p.queuedOnSwingFree === true ? 0 : queued.cost;
+      if (p.resource >= queuedCost && eff && eff.type === 'weaponDamage') {
+        spendResource(p, queuedCost);
         // on-next-swing abilities (e.g. Raptor Strike) resolve here rather than
         // in castAbility, so their cooldown must be applied on the swing too (#56)
         if (queued.def.cooldown > 0) p.cooldowns.set(queued.def.id, queued.def.cooldown);
@@ -134,11 +164,13 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       }
     }
     p.queuedOnSwing = null;
+    delete p.queuedOnSwingFree;
   }
   meleeSwing(ctx, p, t, bonus, abilityName, { threatFlat, threatMult });
   // Wolf Form swings at the rogue's fixed feral cadence, not the carried weapon's
-  // speed (see combat/form_swing.ts); everyone else uses their weapon speed.
-  p.swingTimer = baseSwingSpeed(p) * ctx.swingIntervalMult(p);
+  // speed (see combat/form_swing.ts); everyone else uses their weapon speed. Melee
+  // haste (item-set bonus) then shortens whatever base interval that yields.
+  p.swingTimer = (baseSwingSpeed(p) * ctx.swingIntervalMult(p)) / (1 + p.meleeHaste);
 }
 
 export function rangedSwing(
@@ -174,14 +206,23 @@ export function rangedSwing(
       ctx.enterCombat(atk, tgt);
       return;
     }
-    let dmg = ctx.rng.range(ranged.min, ranged.max) + (atk.rangedPower / 14) * ranged.speed;
+    // Only part of a melee weapon's roll carries to a hunter's Auto Shot (see
+    // RANGED_WEAPON_COEFF); a wand deals its full fixed damage. The ranged AP term
+    // (agility) is unaffected either way.
+    const weaponRoll = ctx.rng.range(ranged.min, ranged.max);
+    let dmg =
+      (ranged.wand ? weaponRoll : weaponRoll * RANGED_WEAPON_COEFF) +
+      (atk.rangedPower / 14) * ranged.speed;
     // ranged white hits suffer the same higher-level crit suppression as melee
     const critChance = Math.max(0.005, atk.critChance - Math.max(0, tgt.level - atk.level) * 0.002);
-    const crit = ctx.rng.chance(critChance);
+    const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, atk) ? 1 : critChance);
     if (crit) dmg *= 2;
     // wand bolts are magic — armor doesn't apply; physical auto shot is mitigated
     if (!ranged.wand) dmg *= 1 - armorReduction(ctx.effectiveArmor(tgt), atk.level);
     ctx.dealDamage(atk, tgt, Math.max(1, Math.round(dmg)), crit, school, label, 'hit');
+    // 4-piece set procs keyed to weapon crits (ranged arm). Gated on setProcs
+    // inside applySetProcs, so proc-less players draw no rng.
+    if (crit && atk.kind === 'player') ctx.applySetProcs(atk, tgt, 'weaponCrit');
   });
 }
 
@@ -253,7 +294,7 @@ export function meleeSwing(
     0.005,
     attacker.critChance - Math.max(0, target.level - attacker.level) * 0.002,
   );
-  const crit = ctx.rng.chance(critChance);
+  const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, attacker) ? 1 : critChance);
   if (crit) dmg *= 2;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
   ctx.dealDamage(
@@ -267,6 +308,10 @@ export function meleeSwing(
     false,
     { flat: opts.threatFlat ?? 0, mult: opts.threatMult ?? 1 },
   );
+  // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND
+  // the weaponStrike ability path, which resolves through this shell). Gated on
+  // setProcs inside applySetProcs, so proc-less players draw no rng.
+  if (crit && attacker.kind === 'player') ctx.applySetProcs(attacker, target, 'weaponCrit');
   // thorns / lightning shield: melee attackers take damage back. Charge-limited
   // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.
   if (!attacker.dead) {
@@ -288,5 +333,8 @@ export function meleeSwing(
       );
     }
   }
+  // Legendary on-hit weapon procs (e.g. Thronebane's Chain Arc). No-op (no rng
+  // draw) unless the attacker wields a proc weapon with a meleeHit proc.
+  runWeaponProcs(ctx, attacker, target, 'meleeHit');
   return true;
 }

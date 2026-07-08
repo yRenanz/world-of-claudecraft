@@ -135,7 +135,11 @@ class Client {
       );
     const reg = await api(
       '/api/register',
-      { username: `load_${this.index}_${uniq}`, password: 'hunter22' },
+      {
+        username: `load_${this.index}_${uniq}`,
+        password: 'hunter22',
+        email: `load_${this.index}_${uniq}@example.com`,
+      },
       null,
       this.ip,
     );
@@ -394,7 +398,7 @@ async function main() {
     const ph = perf.phases;
     const cols = ['total', 'tick', 'broadcast', 'bcastSelf', 'bcastGrid', 'events', 'social'];
     console.log(
-      `SERVER tick p95/max (ms): ${cols.map((n) => `${n}=${ph[n]?.p95 ?? 0}/${ph[n]?.max ?? 0}`).join(' ')} (samples=${perf.samples}, ents=${perf.simEntities})`,
+      `SERVER tick p95/max (ms): ${cols.map((n) => `${n}=${ph[n]?.p95 ?? 0}/${ph[n]?.max ?? 0}`).join(' ')} (samples=${perf.samples}, ents=${perf.simEntities}, tickHz=${perf.tickHz ?? 'n/a'})`,
     );
   }
   if (JSON_OUT) {

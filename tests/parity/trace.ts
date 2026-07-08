@@ -195,7 +195,11 @@ export const META_EXCLUDE: ReadonlySet<string> = new Set([
   'lastActiveTick', // session-only
   'away', // session-only presence
   'lastWhisperFrom', // session-only
-  'marketFilter', // session-only browse filter
+  'marketQuery', // session-only browse query (search + filters + page)
+  // Server-stamped display breakdown behind bank.bonusSlots; session-only, never
+  // persisted, never sim-mutated. The bonus CAPACITY it explains IS pinned (the
+  // sampled meta.bank.bonusSlots), so excluding the rows loses no gameplay net.
+  'bankBonusSources',
   'known', // derived from class/level/talents
   'talentMods', // derived from talents (recomputed)
   'fiestaMods', // derived from talentMods + augments

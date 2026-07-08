@@ -58,6 +58,8 @@ function makeInput() {
     onTargetFriendly: vi.fn(),
     onCycleFriendly: vi.fn(),
     onAbility: vi.fn(),
+    onAbilityDown: vi.fn(),
+    onAbilityUp: vi.fn(),
     onUiKey: vi.fn(),
     onEmoteWheel: vi.fn(),
     onClickPick: vi.fn(),
@@ -120,11 +122,11 @@ describe('Input autorun', () => {
     input.toggleAutorun();
     expect(input.readMoveInput().forward).toBe(true);
 
-    input.suspendMovement = true; // mirrors main.ts setting it while the game menu is open
+    input.setSuspendMovement(true); // mirrors main.ts setting it while the game menu is open
     expect(input.autorun).toBe(true); // latch untouched by the menu
     expect(input.readMoveInput().forward).toBe(true); // keeps running while suspended
 
-    input.suspendMovement = false; // menu closed
+    input.setSuspendMovement(false); // menu closed
     expect(input.autorun).toBe(true);
     expect(input.readMoveInput().forward).toBe(true); // still running
   });
@@ -137,9 +139,41 @@ describe('Input autorun', () => {
     windowListeners.get('keydown')!({ code: 'KeyW', repeat: false }); // hold forward
     expect(input.readMoveInput().forward).toBe(true);
 
-    input.suspendMovement = true; // game menu / chat open
+    input.setSuspendMovement(true); // game menu / chat open
     expect(input.autorun).toBe(false);
     expect(input.readMoveInput().forward).toBe(false); // held key is suppressed
+  });
+
+  it('drops stale held forward and jump state when movement suspension begins', () => {
+    const { input, windowListeners } = makeInput();
+    let now = 1000;
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
+    windowListeners.get('keydown')!({ code: 'Space', repeat: false, preventDefault: vi.fn() });
+    expect(input.readMoveInput().forward).toBe(true);
+    expect(input.readMoveInput().jump).toBe(true);
+
+    input.setSuspendMovement(true);
+    input.setSuspendMovement(false);
+    now += 1;
+
+    expect(input.debugState().keys).toEqual([]);
+    expect(input.readMoveInput().forward).toBe(false);
+    expect(input.readMoveInput().jump).toBe(false);
+  });
+
+  it('keeps autorun latched when suspension clears stale held key state', () => {
+    const { input, windowListeners } = makeInput();
+    input.toggleAutorun();
+    windowListeners.get('keydown')!({ code: 'Space', repeat: false, preventDefault: vi.fn() });
+
+    input.setSuspendMovement(true);
+    input.setSuspendMovement(false);
+
+    expect(input.autorun).toBe(true);
+    expect(input.readMoveInput().forward).toBe(true);
+    expect(input.debugState().keys).toEqual([]);
   });
 });
 
@@ -537,6 +571,16 @@ describe('Input Escape handling', () => {
     expect(cb.onUiKey).toHaveBeenCalledTimes(1);
     expect(cb.onUiKey).toHaveBeenCalledWith('escape');
   });
+
+  it('ignores repeated Escape keydown events so holding the menu key cannot retoggle', () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'Escape', repeat: false });
+    windowListeners.get('keydown')!({ code: 'Escape', repeat: true });
+
+    expect(cb.onUiKey).toHaveBeenCalledTimes(1);
+    expect(cb.onUiKey).toHaveBeenCalledWith('escape');
+  });
 });
 
 describe('Input Discord keybind', () => {
@@ -706,17 +750,51 @@ describe('Input emote wheel hold', () => {
 
     expect(cb.onEmoteWheel).toHaveBeenLastCalledWith(false);
   });
+
+  it('stays open when its own modal state suspends movement', () => {
+    // Regression (v0.20.0): the open emote wheel counts toward hud.isModalOpen(),
+    // which main.ts feeds into setSuspendMovement every frame. The stale-input
+    // clear then closed the wheel one frame after the bound key opened it, so
+    // the X hotkey wheel flashed and vanished. Held wheel keys are never stale:
+    // onKeyUp is not modal-gated and releaseCapture covers focus loss.
+    const { cb, input, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyX', repeat: false, preventDefault: vi.fn() });
+    expect(cb.onEmoteWheel).toHaveBeenCalledWith(true);
+
+    input.setSuspendMovement(true); // mirrors the frame loop reacting to the open wheel
+    expect(cb.onEmoteWheel).not.toHaveBeenCalledWith(false); // wheel stays open
+
+    windowListeners.get('keyup')!({ code: 'KeyX', preventDefault: vi.fn() });
+    expect(cb.onEmoteWheel).toHaveBeenCalledWith(false); // release still closes it
+  });
+
+  it('resumes held movement after the wheel closes instead of going stale', () => {
+    // Classic flow: run with W held, flick X to emote, keep running. The
+    // wheel-caused suspension must not clear the still-held movement keys.
+    const { input, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
+    windowListeners.get('keydown')!({ code: 'KeyX', repeat: false, preventDefault: vi.fn() });
+    input.setSuspendMovement(true); // the open wheel is the modal that suspends
+    expect(input.readMoveInput().forward).toBe(false); // movement frozen while the wheel is up
+
+    windowListeners.get('keyup')!({ code: 'KeyX', preventDefault: vi.fn() });
+    input.setSuspendMovement(false); // wheel closed, modal gone
+
+    expect(input.readMoveInput().forward).toBe(true); // W never went stale
+  });
 });
 
 describe('Input modifier combos', () => {
   it('fires the bare action-bar slot, but not when a modifier is held', () => {
     const { windowListeners, cb } = makeInput();
     windowListeners.get('keydown')!({ code: 'Digit1', repeat: false }); // slot0 = Attack
-    expect(cb.onAbility).toHaveBeenLastCalledWith(0);
-    cb.onAbility.mockClear();
+    expect(cb.onAbilityDown).toHaveBeenLastCalledWith(0);
+    cb.onAbilityDown.mockClear();
     // Shift+1 is a distinct, unbound chord — it must NOT fire bare slot 0.
     windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, shiftKey: true });
-    expect(cb.onAbility).not.toHaveBeenCalled();
+    expect(cb.onAbilityDown).not.toHaveBeenCalled();
   });
 
   it('dispatches a slot bound to Shift+1 only on the Shift chord', () => {
@@ -725,11 +803,11 @@ describe('Input modifier combos', () => {
     expect(kb.bind('slot5', 0, 'Shift+Digit1')).toBe(true);
     const { windowListeners, cb } = makeInput();
     windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, shiftKey: true });
-    expect(cb.onAbility).toHaveBeenLastCalledWith(5);
-    cb.onAbility.mockClear();
+    expect(cb.onAbilityDown).toHaveBeenLastCalledWith(5);
+    cb.onAbilityDown.mockClear();
     // bare 1 still drives its own slot, unaffected by the modified binding
     windowListeners.get('keydown')!({ code: 'Digit1', repeat: false });
-    expect(cb.onAbility).toHaveBeenLastCalledWith(0);
+    expect(cb.onAbilityDown).toHaveBeenLastCalledWith(0);
   });
 
   it('keeps movement working while a modifier is held (Shift+W still walks)', () => {
@@ -741,7 +819,7 @@ describe('Input modifier combos', () => {
   it('ignores a lone modifier keypress', () => {
     const { input, cb, windowListeners } = makeInput();
     windowListeners.get('keydown')!({ code: 'ShiftLeft', repeat: false });
-    expect(cb.onAbility).not.toHaveBeenCalled();
+    expect(cb.onAbilityDown).not.toHaveBeenCalled();
     expect(cb.onUiKey).not.toHaveBeenCalled();
     expect(input.readMoveInput().forward).toBe(false);
   });
@@ -770,7 +848,7 @@ describe('Input modifier combos', () => {
       preventDefault: vi.fn(),
     });
     expect(cb.onEmoteWheel).toHaveBeenLastCalledWith(true); // held fired
-    expect(cb.onAbility).toHaveBeenLastCalledWith(3); // edge chord fired
+    expect(cb.onAbilityDown).toHaveBeenLastCalledWith(3); // edge chord fired
   });
 
   it('folds Cmd/Meta into the chord, so Cmd+1 does not fire bare slot 0', () => {
@@ -780,11 +858,11 @@ describe('Input modifier combos', () => {
     expect(kb.bind('slot7', 0, 'Meta+Digit1')).toBe(true);
     const { windowListeners, cb } = makeInput();
     windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, metaKey: true });
-    expect(cb.onAbility).toHaveBeenLastCalledWith(7);
-    cb.onAbility.mockClear();
+    expect(cb.onAbilityDown).toHaveBeenLastCalledWith(7);
+    cb.onAbilityDown.mockClear();
     // bare 1 still drives slot 0, unaffected by the Cmd binding
     windowListeners.get('keydown')!({ code: 'Digit1', repeat: false });
-    expect(cb.onAbility).toHaveBeenLastCalledWith(0);
+    expect(cb.onAbilityDown).toHaveBeenLastCalledWith(0);
   });
 });
 
@@ -813,12 +891,22 @@ describe('Input touch invert-look', () => {
   it('also inverts the swipe-look delta path', () => {
     const { input } = makeInput();
     const base = input.camPitch;
-    input.applyTouchLookDelta(0, 100);
+    input.applyTouchLookDelta(0, 20);
     const normal = input.camPitch - base;
 
     input.setTouchInvertLook(true);
     input.camPitch = base;
-    input.applyTouchLookDelta(0, 100);
+    input.applyTouchLookDelta(0, 20);
     expect(input.camPitch - base).toBeCloseTo(-normal);
+  });
+
+  it('scales the swipe-drag yaw noticeably above raw look sensitivity', () => {
+    const { input } = makeInput();
+    const baseYaw = input.camYaw;
+    input.applyTouchLookDelta(100, 0);
+    const dragYawDelta = Math.abs(input.camYaw - baseYaw);
+    const rawYawDelta = 100 * 0.0045; // BASE_LOOK_SENS, mirrored here since it is not exported
+
+    expect(dragYawDelta).toBeGreaterThan(rawYawDelta * 1.5);
   });
 });

@@ -14,18 +14,21 @@ command calls**. DOM/WebAudio-only; runs in `main.ts`.
 | `keybinds.ts` | `Keybinds` + `BIND_ACTIONS`: the classic remappable layout (pure, no DOM). |
 | `interactions.ts` | `handlePickedEntity`: the **only** file here that calls `IWorld`; routes a click-pick to target/loot/quest/enter-dungeon via injected `PickInteractionWorld`/`PickInteractionHud`. |
 | `mobile_controls.ts` | `MobileControls`: touch joysticks to `input.setTouchMove`/`setTouchLook`. |
+| `touch_router.ts` | Pure, DOM-free touch ownership router: `getTouchOwner`/`isInteractiveHudElement`/`isCameraDragAllowedAt` + a per-pointer `TouchOwnerLedger`, consumed by `mobile_controls.ts` to keep move/combat/camera/menu touches from fighting over the same finger. |
 | `audio.ts` | `GameAudio` (`audio` singleton): procedural SFX. |
 | `music.ts` | `MusicDirector` (`music` singleton): procedural zone/combat soundtrack. |
 | `sfx.ts` / `voice.ts` | `sfx` / `voice` singletons: play pre-rendered clips from `public/audio/` (spatial 3D SFX + NPC voice lines) via their `*_manifest.generated.ts`. |
 | `settings.ts` | `Settings`: persisted Esc-menu options. |
 | `click_move.ts` / `pointer_pick.ts` / `camera_follow.ts` | pure, DOM-free input/camera math extracted from the render loop so they unit-test in isolation |
+| `keyboard_turn_facing.ts` / `self_alpha_lead.ts` | pure online-feel math: local TURN_SPEED integration for keyboard turns, streamed as the authoritative wire facing (mouselook-style; `main.ts` zeroes the turn flags while it owns the channel); the echo-driven adaptive self render lead |
 | `perf_doctor.ts` | pure perf-snapshot analyzer producing `PerfSuggestion[]` (no DOM); `perf_reporter.ts` is the telemetry reporter; `perf.ts` is the overlay/trace harness |
 | `cursors.ts` | hover-cursor PNGs |
 
 ## Local invariants
 - **Never mutate sim state directly.** `input.ts` only records intent and fires
-  callbacks; only `interactions.ts` touches the world, and only through the
-  `IWorld`-shaped interfaces passed to it. Do not import `Sim`/`ClientWorld` here.
+  callbacks; only `interactions.ts` and `autoloot.ts` touch the world, and only
+  through the `IWorld`-shaped interfaces passed to them. Do not import
+  `Sim`/`ClientWorld` here.
 - **`audio.ts`/`music.ts` synthesize everything**, every procedural SFX and music
   note is built in code via WebAudio, with nothing to load. **`sfx.ts`/`voice.ts`
   are the exception:** they play pre-rendered clips under `public/audio/` (spatial
@@ -42,7 +45,7 @@ command calls**. DOM/WebAudio-only; runs in `main.ts`.
 - **Keybinds:** `Escape` is reserved (`isReservedCode`) and never bindable, it
   always toggles the game menu. A code lives on at most one action (rebinding
   steals it). Up to 2 codes/action (primary + secondary). The default layout is
-  vanilla-fidelity-critical and is covered by `tests/keybinds.test.ts`; keep it
+  classic-fidelity-critical and is covered by `tests/keybinds.test.ts`; keep it
   green. `mobile_controls.ts`/`settings.ts` have tests too.
 - **i18n (root `t()` rules apply), 3 local facts:** the one dynamic control label here,
   the mobile haptics toggle, is keyed (`t('hudChrome.mobile.haptics'/'…hapticsOff')` in

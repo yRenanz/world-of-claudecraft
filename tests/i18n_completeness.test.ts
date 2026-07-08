@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import {
+  cs_CZ,
   da_DK,
   de_DE,
   en,
@@ -52,6 +53,7 @@ const TABLES: Record<SupportedLanguage, unknown> = {
   ja_JP,
   pt_BR,
   ru_RU,
+  cs_CZ,
   nl_NL,
   pl_PL,
   id_ID,
@@ -163,6 +165,8 @@ describe('i18n whole-catalog completeness', () => {
       'hudChrome.discord.panelTitle', // "World of ClaudeCraft" - brand
       'hudChrome.discord.linkedTitle', // "Discord: {name}" - brand + player name
       'hudChrome.keybinds.discord', // "Discord" - brand (Key Bindings action label)
+      'desktop.crash.title', // "World of ClaudeCraft" - brand (desktop crash dialog title)
+      'auth.emailPlaceholder', // "you@example.com" - RFC 2606 example address, kept verbatim
     ]);
     const wordy = (v: string) => /[a-z]{4,}/.test(v.replace(/\{[^}]*\}/g, ''));
     const nonLatin: SupportedLanguage[] = ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'];

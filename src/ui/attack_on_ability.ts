@@ -24,6 +24,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   weaponDamage: 'damage',
   weaponStrike: 'damage',
   directDamage: 'damage',
+  interrupt: 'other',
   finisherDamage: 'damage',
   dot: 'damage',
   aoeDamage: 'damage',
@@ -56,6 +57,14 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   dismissPet: 'other',
   summonPet: 'other',
   summonDemon: 'other',
+  // Vale Cup sport moves (docs/prd/vale-cup.md): no-damage, harvest-truce
+  // utility. None of them should engage auto-attack on use (the paired stun on
+  // Shoulder is non-breaking CC, and nothing on the pitch deals damage).
+  ballKick: 'other',
+  ballPass: 'other',
+  ballShoot: 'other',
+  sportDash: 'other',
+  sportShove: 'other',
 };
 
 /**
@@ -90,4 +99,18 @@ export function abilityStartsAutoAttack(effects: AbilityEffect[]): boolean {
  */
 export function hasAutoAttackTarget(target: Entity | null | undefined): boolean {
   return !!target && !target.dead && target.hostile;
+}
+
+/**
+ * Whether the auto-attack engage must WAIT for the cast to finish instead of
+ * firing at cast start. Starting auto-attack aggros the target immediately
+ * (sim startAutoAttack: aggroMob + threat + combat), so engaging at the START
+ * of a timed cast (Smite, Fireball, ...) pulled the mob before any damage
+ * existed, an aggro-before-damage bug. A timed cast therefore defers the
+ * engage to its successful castStop (the moment its damage lands, when aggro
+ * is legitimate); an instant ability keeps engaging at once, since its damage
+ * applies in the same tick anyway.
+ */
+export function deferAutoAttackUntilCastEnd(castTime: number): boolean {
+  return castTime > 0;
 }

@@ -10,14 +10,14 @@
     "base mobSwing (mob swings the player)",
     "rollLoot via mob death (L1, ~5876/6036)"
   ],
-  "draws": 171,
-  "drawDigest": "aaf5d249",
+  "draws": 172,
+  "drawDigest": "ae90daa0",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "969c1dc9",
+      "nextId": 406,
+      "state": "d150c678",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -27,23 +27,43 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -51,13 +71,14 @@
           "aiState": "idle",
           "attackPower": 46,
           "combatTimer": 99,
+          "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 389,
+          "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -100,9 +121,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 391,
-      "state": "8fde0580",
-      "events": "e13dee2f",
+      "nextId": 407,
+      "state": "d65ef2b3",
+      "events": "f6df06c1",
       "rng": {
         "draws": 6,
         "digest": "93f0e12e"
@@ -111,8 +132,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 391,
-      "state": "93dd6e69",
+      "nextId": 407,
+      "state": "ac12d176",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -122,9 +143,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 391,
-      "state": "2cedb635",
-      "events": "5f90d6fb",
+      "nextId": 407,
+      "state": "7f5959e6",
+      "events": "2ff6ef10",
       "rng": {
         "draws": 98,
         "digest": "92f0a886"
@@ -133,20 +154,28 @@
     {
       "tick": 72,
       "time": 3.6,
-      "nextId": 391,
-      "state": "d0fdbebb",
-      "events": "9384d879",
+      "nextId": 407,
+      "state": "0ab58537",
+      "events": "2840086f",
       "rng": {
-        "draws": 153,
-        "digest": "5d6b4ea1"
+        "draws": 154,
+        "digest": "8ab416f5"
       },
       "label": "kill",
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -154,24 +183,37 @@
             "damageTaken": 11,
             "kills": 1
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27600,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
         {
           "aiState": "idle",
           "attackPower": 82,
+          "comboUntil": -1,
           "critChance": 0.0645,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0645,
@@ -179,7 +221,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
           "hp": 49989,
-          "id": 389,
+          "id": 405,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -213,7 +255,7 @@
             "str": 41
           },
           "swingTimer": 0.45,
-          "targetId": 390,
+          "targetId": 406,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -223,6 +265,7 @@
         },
         {
           "aiState": "dead",
+          "comboUntil": -1,
           "corpseTimer": 60,
           "critChance": 0.05,
           "dead": true,
@@ -232,7 +275,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 390,
+          "id": 406,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -246,7 +289,7 @@
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
-            389
+            405
           ],
           "lootable": true,
           "maxHp": 6000,
@@ -270,8 +313,8 @@
             "armor": 10
           },
           "swingTimer": 0.45,
-          "tappedById": 389,
-          "targetId": 389,
+          "tappedById": 405,
+          "targetId": 405,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,
@@ -284,20 +327,28 @@
     {
       "tick": 76,
       "time": 3.8,
-      "nextId": 391,
-      "state": "f788fa07",
+      "nextId": 407,
+      "state": "1ea0b767",
       "events": "741638a5",
       "rng": {
-        "draws": 171,
-        "digest": "aaf5d249"
+        "draws": 172,
+        "digest": "ae90daa0"
       },
       "label": "final",
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -305,18 +356,30 @@
             "damageTaken": 11,
             "kills": 1
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27600,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -324,6 +387,7 @@
           "aiState": "idle",
           "attackPower": 82,
           "combatTimer": 0.2,
+          "comboUntil": -1,
           "critChance": 0.0645,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0645,
@@ -331,7 +395,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102.8,
           "hp": 49989,
-          "id": 389,
+          "id": 405,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -365,7 +429,7 @@
             "str": 41
           },
           "swingTimer": 0.25,
-          "targetId": 390,
+          "targetId": 406,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -375,6 +439,7 @@
         },
         {
           "aiState": "dead",
+          "comboUntil": -1,
           "corpseTimer": 59.8,
           "critChance": 0.05,
           "dead": true,
@@ -384,7 +449,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 390,
+          "id": 406,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -398,7 +463,7 @@
           },
           "lootFfaTimer": 59.8,
           "lootRecipientIds": [
-            389
+            405
           ],
           "lootable": true,
           "maxHp": 6000,
@@ -422,8 +487,8 @@
             "armor": 10
           },
           "swingTimer": 0.45,
-          "tappedById": 389,
-          "targetId": 389,
+          "tappedById": 405,
+          "targetId": 405,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,

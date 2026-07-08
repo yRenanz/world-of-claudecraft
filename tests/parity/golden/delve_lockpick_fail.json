@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "c2464a3c",
+      "nextId": 406,
+      "state": "e9e0f0d9",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -26,23 +26,43 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 405,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -50,13 +70,14 @@
           "aiState": "idle",
           "attackPower": 42,
           "combatTimer": 99,
+          "comboUntil": -1,
           "critChance": 0.0625,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 389,
+          "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -101,9 +122,9 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 401,
-      "state": "64360645",
-      "events": "d05e7b58",
+      "nextId": 417,
+      "state": "2f7e2b95",
+      "events": "2758fde1",
       "rng": {
         "draws": 3,
         "digest": "ad960248"
@@ -112,9 +133,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 401,
-      "state": "acdcffb5",
-      "events": "741638a5",
+      "nextId": 417,
+      "state": "63b3a075",
+      "events": "9cfda0e2",
       "rng": {
         "draws": 3,
         "digest": "ad960248"
@@ -123,8 +144,8 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 401,
-      "state": "a6d4fca3",
+      "nextId": 417,
+      "state": "b4b832ab",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -134,8 +155,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 401,
-      "state": "6bbe5489",
+      "nextId": 417,
+      "state": "3ff58305",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -145,8 +166,8 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 401,
-      "state": "becf3fcb",
+      "nextId": 417,
+      "state": "0030a787",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -156,8 +177,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 401,
-      "state": "f9f8b045",
+      "nextId": 417,
+      "state": "082e6919",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -167,9 +188,9 @@
     {
       "tick": 69,
       "time": 3.45,
-      "nextId": 402,
-      "state": "307a0223",
-      "events": "41e38ae0",
+      "nextId": 418,
+      "state": "646d8cab",
+      "events": "b6936edd",
       "rng": {
         "draws": 3,
         "digest": "ad960248"
@@ -178,9 +199,17 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
@@ -188,18 +217,30 @@
             "kills": 1,
             "xpGained": 198
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 405,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11398,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
+          "townFocus": {},
           "xp": 198
         }
       ],
@@ -208,12 +249,13 @@
           "aiState": "idle",
           "attackPower": 66,
           "combatTimer": 3.45,
+          "comboUntil": -1,
           "critChance": 0.0715,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
           "fiveSecondRule": 102.45,
           "hp": 50000,
-          "id": 389,
+          "id": 405,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -256,13 +298,14 @@
         {
           "aiState": "idle",
           "combatTimer": 99,
+          "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 400,
+          "id": 416,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -295,8 +338,8 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 402,
-      "state": "0d81649f",
+      "nextId": 418,
+      "state": "f17b3f5b",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -306,8 +349,8 @@
     {
       "tick": 71,
       "time": 3.55,
-      "nextId": 402,
-      "state": "2cd39df3",
+      "nextId": 418,
+      "state": "9fa53447",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -317,9 +360,17 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
@@ -327,18 +378,30 @@
             "kills": 1,
             "xpGained": 198
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 405,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11398,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
+          "townFocus": {},
           "xp": 198
         }
       ],
@@ -347,12 +410,13 @@
           "aiState": "idle",
           "attackPower": 66,
           "combatTimer": 3.55,
+          "comboUntil": -1,
           "critChance": 0.0715,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
           "fiveSecondRule": 102.55,
           "hp": 50000,
-          "id": 389,
+          "id": 405,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -395,13 +459,14 @@
         {
           "aiState": "idle",
           "combatTimer": 99,
+          "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 400,
+          "id": 416,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",

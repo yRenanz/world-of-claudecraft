@@ -29,6 +29,7 @@ export const guideStrings = {
     bestiary: 'Bestiary',
     models: '3D Models',
     gear: 'Gear & Items',
+    professions: 'Professions',
     economy: 'Economy & Trade',
     social: 'Social & Groups',
     stats: 'Character & Stats',
@@ -39,9 +40,11 @@ export const guideStrings = {
     delves: 'Delves',
     reference: 'Reference',
     controls: 'Controls',
+    settings: 'Settings & Performance',
     combat: 'Combat',
     talents: 'Talents',
     arena: 'Arena & PvP',
+    valeCup: 'Vale Cup',
     glossary: 'Glossary',
     wishIKnew: 'Things I Wish I Knew',
     faq: 'FAQ',
@@ -144,7 +147,7 @@ export const guideStrings = {
       valeName: 'Eastbrook Vale',
       valeBlurb: 'Green hills and old woods where every adventure begins.',
       marshName: 'Mirefen Marsh',
-      marshBlurb: 'Sunken fens and tide-worn ruins, home to murlocs and worse.',
+      marshBlurb: 'Sunken fens and tide-worn ruins, home to mudfins and worse.',
       peaksName: 'Thornpeak Heights',
       peaksBlurb: "Wind-scoured ridges climbing toward the realm's coldest dangers.",
     },
@@ -170,14 +173,14 @@ export const guideStrings = {
       q2: 'Do I need a crypto wallet?',
       a2: 'No. The game is fully playable without one. The optional community token only unlocks cosmetic flair and never affects power.',
       q3: 'Can I play offline?',
-      a3: 'Yes. There is an instant single-player mode in your browser, plus the shared online realm.',
+      a3: 'Yes. There is an instant single-player mode in your browser, plus the shared online world.',
       q4: 'How long to reach max level?',
       a4: 'The cap is level {cap}, reached across three zones of quests, dungeons, and exploration.',
     },
 
     // Community call to action.
     community: {
-      heading: 'Join the realm',
+      heading: 'Join the world',
       body: 'Jump in now, or come say hello. The world is better with company.',
       play: 'Play Now',
       discord: 'Join the Discord',
@@ -226,7 +229,7 @@ export const guideStrings = {
       'Invite others to a party to share quest credit and take on dungeons. Most of the world is soloable, so grouping is a choice, not a chore.',
     onlineTitle: 'Online or offline',
     onlineBody:
-      'Play the shared online realm with everyone else, or start an instant offline world in your browser to learn the ropes.',
+      'Play the shared online world with everyone else, or start an instant offline world in your browser to learn the ropes.',
     reassure:
       'Talents unlock at level 10 and can be reset at any time, so your early choices are never permanent. Experiment freely.',
     controlsLink: 'See the full controls reference',
@@ -256,6 +259,93 @@ export const guideStrings = {
       'Gamepads work too, and controller support is on by default. The left stick moves, the right stick aims the camera, and the face and shoulder buttons cover your abilities, jumping, and interacting. Open any window to bring up an on-screen pointer for menus. You can remap the buttons and adjust stick deadzone, camera speed, vibration, and inverted look from the controller settings in the options.',
   },
 
+  // Settings & Performance reference. Option and value NAMES reuse the game's own
+  // hud.options.* / hudChrome.* keys (already localized); only the surrounding prose
+  // lives here. Plain-language behavior and costs, no engine jargon or internals.
+  settingsPage: {
+    heading: 'Settings & Performance',
+    intro:
+      'Make the game look its best or run its fastest. Three ready-made loadouts, plus what every graphics option really does.',
+    wherePath:
+      'Everything on this page lives in the game: press Esc and look in Graphics, Interface, and Performance Overlay.',
+    fairnessTitle: 'Fair by design',
+    fairnessBody:
+      'No option here trades beauty for power. Lower settings shed cosmetic polish only, never information you fight with: your debuffs, cast bars, party health, and damage numbers are identical from Low to Ultra. Playing on a modest machine is never a handicap.',
+    loadoutsHeading: 'Three ready-made loadouts',
+    loadoutsIntro:
+      'Start from the loadout that sounds like your machine, then adjust one option at a time until it feels right.',
+    recommended: 'Recommended',
+    whyLabel: 'Why it works:',
+    tagReload: 'after reload',
+    fpsTitle: 'Best FPS',
+    fpsTagline: 'For older laptops, integrated graphics, and battery play.',
+    fpsWhy:
+      'Graphics Quality is the master switch, and Render Quality is the strongest slider: at 70% the world draws roughly half the pixels while the interface stays perfectly sharp.',
+    balancedTitle: 'Balanced',
+    balancedTagline: 'The sweet spot for most machines, and our default advice.',
+    balancedWhy:
+      'Medium brings real shadows and full materials; High adds ambient occlusion and bloom. Below Ultra a built-in safety net absorbs sudden dips in busy fights, so Balanced stays smooth without babysitting.',
+    visualsTitle: 'Best Visuals',
+    visualsTagline: 'Screenshot mode for powerful desktop machines.',
+    visualsWhy:
+      'Ultra renders at the highest resolution your display offers with the richest lighting. It also switches the safety net off, and it is desktop-only: phones and the app top out at High.',
+    value50to70: '50 to 70%',
+    value90to100: '90 to 100%',
+    value100: '100%',
+    valueHighOrMedium: 'High on a gaming PC, Medium on a laptop',
+    valueOnOptional: 'On (optional)',
+    howHeading: 'How the options behave',
+    factDetectTitle: 'The game tunes itself first',
+    factDetectBody:
+      'On your first launch the game reads your device and picks a sensible tier, from Low on a modest phone to Ultra on a strong desktop. Any choice you make yourself always wins.',
+    factReloadTitle: 'Two kinds of options',
+    factReloadBody:
+      'Graphics Quality and the Advanced pickers take effect after a reload, and the panel offers a Reload Now button when needed. Every other option applies the moment you change it.',
+    factGovernorTitle: 'A built-in safety net',
+    factGovernorBody:
+      'On every tier below Ultra, the game quietly thins grass, effects, and lighting for a moment when a big fight spikes, then restores them. Choosing Ultra tells it you would rather keep every detail.',
+    advancedHeading: 'The Advanced preset: mix your own',
+    advancedBody:
+      'Advanced starts from the High tier and unlocks four extra pickers, so you can spend your frames where you actually notice them: Terrain Detail, Foliage Density, Effects & Lighting, and Shadow Quality. Like Graphics Quality, they apply after a reload.',
+    advancedMixes:
+      'Two favorite mixes: keep Shadow Quality on High and set Effects & Lighting to Low for a crisp, glow-free look that runs light, or do the reverse to keep the bloom and soften the shadows.',
+    tableHeading: 'Every option, explained',
+    colSetting: 'Setting',
+    colDoes: 'What it does',
+    colImpact: 'FPS impact',
+    impactNone: 'None',
+    impactLight: 'Light',
+    impactModerate: 'Moderate',
+    impactHeavy: 'Heavy',
+    rowGraphicsQuality:
+      'The master switch. Each step changes resolution, shadows, materials, foliage, and lighting effects together. The biggest single difference you can make.',
+    rowRenderQuality:
+      'Draws the 3D world at a lower internal resolution and scales it up; the interface stays sharp. The strongest instant slider on weaker machines and high-resolution screens.',
+    rowFieldOfView:
+      'How much of the world fits on screen, from a zoomed 55 to a sweeping 100 degrees. A comfort choice; wider views draw slightly more.',
+    rowBrightness: 'Scene exposure, darker or brighter. Pure preference.',
+    rowWeather:
+      'Ambient rain and snow. Atmosphere only, and switching it off saves a little during storms.',
+    rowBrowserEffects:
+      'How fancy the interface itself is allowed to be: glass blur, glow, animated menus. Auto matches your browser; the 3D world is untouched either way.',
+    rowTerrainDetail: 'Rich, blended ground textures versus a simpler, faster terrain look.',
+    rowFoliageDensity: 'How far and how thick the grass grows around your character.',
+    rowEffectsQuality:
+      'Bloom, ambient occlusion, and how many torches and spells cast real light. The single biggest saving among the Advanced pickers.',
+    rowShadowQuality: 'Shadow crispness. Low keeps shadows but softens their edges.',
+    rowFrostedPanels:
+      'A frosted-glass blur behind windows. Pretty, and exactly the kind of effect a weaker browser feels; leave it off for the classic crisp look.',
+    rowReduceMotion:
+      'Removes interface animations so windows appear instantly. An accessibility option first, with a small performance bonus.',
+    rowPerfOverlay:
+      'An on-screen readout of FPS, frame time, and more. Turn it on while you tune this page, then hide it again.',
+    tableFoot:
+      'Looking for a draw-distance slider or an FPS cap? There is nothing to hunt for: view distance is part of each quality tier, and frame pacing follows your display.',
+    mobileTitle: 'On phones and tablets',
+    mobileBody:
+      'Mobile manages more for you: the game picks the tier, holds resolution a touch lower to protect battery and heat, and keeps the highest tiers desktop-only. The loadouts above still apply; phones simply top out at High.',
+  },
+
   // Combat overview. Deliberately high level: concepts, not formulas or numbers, so
   // there is nothing here to min-max or exploit.
   combat: {
@@ -278,7 +368,7 @@ export const guideStrings = {
     effectsBody:
       'Many abilities apply an effect that lingers. Helpful ones (buffs) raise your stats, shield you, or heal you a little at a time; harmful ones (debuffs) drain your health with damage over time or weaken you. Watch the small icons near your action bar to see what is on you and how long it lasts.',
     ccBody:
-      'Crowd control is a special kind of debuff that limits what a target can do: stuns, roots and slows, silences that stop spellcasting, disarms, fears, and polymorph that turns a foe harmless for a moment. Some of these, like roots, fears, and polymorph, lose their hold when they are reapplied too quickly, so they cannot be chained forever.',
+      'Crowd control is a special kind of debuff that limits what a target can do: stuns, roots and slows, silences that stop spellcasting, disarms, fears, and transformations that turn a foe harmless for a moment. Some of these, like roots, fears, and transforms, lose their hold when they are reapplied too quickly, so they cannot be chained forever.',
     // Death and recovery: light penalty, no lost progress.
     deathTitle: 'When you fall',
     deathBody:
@@ -457,12 +547,12 @@ export const guideStrings = {
     charge: 'Rushes a distant enemy to open the fight with a brief stun.',
     rend: 'Opens a bleed that wears the target down over time.',
     thunder_clap: 'Hits everything around you and slows their attacks.',
-    seal_of_righteousness: 'Imbues your swings with Holy damage, then spend it with Judgement.',
+    seal_of_righteousness: 'Imbues your swings with Holy damage, then spend it with Verdict.',
     holy_light: 'A steady, sizable heal for topping off an ally or yourself.',
     devotion_aura: 'A lasting self-buff that raises armor so hits land softer.',
     judgement: 'Spends your active Seal to strike an enemy from short range.',
     blessing_of_might: "Raises a friendly target's attack power, good to cast before a pull.",
-    divine_protection: 'A quick holy shield to soak damage when things get rough.',
+    divine_protection: 'A quick protective ward to soak damage when things get rough.',
     raptor_strike: 'A hard melee swing for when something closes the gap on you.',
     aspect_of_the_hawk: 'A stance you keep up to sharpen your ranged attack power.',
     serpent_sting: 'Lands a venom that bleeds nature damage over time.',
@@ -495,7 +585,7 @@ export const guideStrings = {
     conjure_water: 'Conjures drinks that restore mana, so you can refill between pulls.',
     conjure_food: 'Conjures food that restores health when you sit down to eat.',
     shadow_bolt: 'A bolt of shadow you cast at a target, your go-to nuke.',
-    summon_imp: 'Calls up an imp that flings firebolts at enemies from range.',
+    summon_imp: 'Calls up an Emberkin that flings firebolts at enemies from range.',
     demon_skin: 'A lasting self-buff that toughens your skin and adds armor.',
     immolate: 'Sets a target alight for an opening hit and a burn that lingers.',
     corruption: 'Rots a target with shadow that ticks while you do other things.',
@@ -510,13 +600,13 @@ export const guideStrings = {
 
   // Warlock demon roster flavor, keyed by pet id.
   petHook: {
-    imp: 'A ranged firebolt demon that chips at enemies from a safe distance.',
-    voidwalker: 'A sturdy demon that taunts and soaks hits so you can cast in peace.',
-    succubus: 'A fast melee demon that hits hard but folds under pressure.',
-    felhunter: 'A shadow skirmisher that hounds enemy casters.',
-    felguard: 'A durable melee bruiser, the all-rounder once you can summon it.',
-    infernal: 'A hulking juggernaut with crushing melee, summoned for raw power.',
-    doomguard: 'An elite caster that rains heavy shadow from afar.',
+    emberkin: 'A ranged firebolt demon that chips at enemies from a safe distance.',
+    gloomshade: 'A sturdy demon that taunts and soaks hits so you can cast in peace.',
+    duskborn: 'A fast melee demon that hits hard but folds under pressure.',
+    spellhound: 'A shadow skirmisher that hounds enemy casters.',
+    warfiend: 'A durable melee bruiser, the all-rounder once you can summon it.',
+    pyre_colossus: 'A hulking juggernaut with crushing melee, summoned for raw power.',
+    wraithborn: 'An elite caster that rains heavy shadow from afar.',
   },
 
   // Bestiary.
@@ -542,7 +632,7 @@ export const guideStrings = {
       // add now filtered out): the line is still translated in every locale overlay, and the
       // bestiary renders flavor only for creatures it lists, so an unused entry is harmless.
       mirejaw_frenzy:
-        'A marsh murloc that whips itself into a thrashing frenzy mid-fight, the loudest thing in a loud, territorial pack.',
+        'A marsh mudfin that whips itself into a thrashing frenzy mid-fight, the loudest thing in a loud, territorial pack.',
       gravecaller_cultist:
         'Robed servants of the death-cult whose work fouls the graves from the Vale to the peaks. Where they gather, the dead do not rest.',
     },
@@ -556,13 +646,13 @@ export const guideStrings = {
       name: 'Spiders',
       desc: 'Web-spinners and venomous lurkers that nest in dark, tangled places. Hunters can tame them, the same as beasts.',
     },
-    murloc: {
-      name: 'Murlocs',
+    mudfin: {
+      name: 'Mudfins',
       desc: 'Amphibious marsh-dwellers that swarm the shallows in noisy, territorial packs.',
     },
-    kobold: {
-      name: 'Kobolds',
-      desc: 'Candle-headed diggers that infest mines and burrows, fiercely guarding their ore.',
+    burrower: {
+      name: 'Burrowers',
+      desc: 'Dirt-caked diggers that infest mines and burrows, fiercely guarding their ore.',
     },
     humanoid: {
       name: 'Humanoids',
@@ -604,7 +694,7 @@ export const guideStrings = {
     valeBlurb:
       'The green starting valley, where new heroes cut their teeth on wolves and bandits around the town of Eastbrook.',
     marshBlurb:
-      'A drowned country of fog and ruins. Murlocs swarm the shallows and something older stirs beneath the water, watched from the bridge-town of Fenbridge.',
+      'A drowned country of fog and ruins. Mudfins swarm the shallows and something older stirs beneath the water, watched from the bridge-town of Fenbridge.',
     peaksBlurb:
       "Wind-scoured ridges and old mine-works climbing to the realm's coldest, highest dangers, held by the outpost of Highwatch.",
 
@@ -621,11 +711,11 @@ export const guideStrings = {
     // Short, spoiler-safe one-liners for each zone's notable places (keyed by biome). One
     // sentence per place, in the same order as the POI list.
     valePlaceNotes:
-      "Eastbrook is your first home base. Wolf Run and Boar Meadow are gentle hunting ground; Mirror Lake is quiet water to fish; the Webwood and the Copper Dig hide spiders and ore-greedy diggers; a Bandit Camp and the Fallen Chapel hold rougher work; Reliquary Hill drops into the Collapsed Reliquary, the realm's first delve; and Brightwood Glade is a quiet, sunlit grove to the north.",
+      "Eastbrook is your first home base. Wolf Run and Boar Meadow are gentle hunting ground; Mirror Lake is quiet water to fish; the Sableweb and the Copper Dig hide spiders and ore-greedy diggers; a Bandit Camp and the Fallen Chapel hold rougher work; Reliquary Hill drops into the Collapsed Reliquary, the realm's first delve; and Brightwood Glade is a quiet, sunlit grove to the north.",
     marshPlaceNotes:
-      "Fenbridge guards the only dry road. The Prowler Reeds and Deepfen Shallows teem with marsh beasts and murlocs; the Widow Thicket is spun thick with web; the Drowned Chapel and the Troll Mounds keep older dangers; the Gravecaller Encampment is the cult dug in, and the Sunken Bastion is the marsh's instanced heart.",
+      "Fenbridge guards the only dry road. The Prowler Reeds and Deepfen Shallows teem with marsh beasts and mudfins; the Widow Thicket is spun thick with web; the Drowned Chapel and the Troll Mounds keep older dangers; the Gravecaller Encampment is the cult dug in, and the Sunken Bastion is the marsh's instanced heart.",
     peaksPlaceNotes:
-      "Highwatch holds the wall. Stalker Ridge and the Deeprock Burrows belong to ridge cats and kobolds; the Ogre Foothills and Drogmar's War-Camp to brutes for hire; Stormcrag crackles with elementals and the Glimmermere glows below it; the Wyrmcult Tents and Revenant Fields ring the cult's high ground, with Gravewyrm Sanctum at its peak.",
+      "Highwatch holds the wall. Stalker Ridge and the Deeprock Burrows belong to ridge cats and burrowers; the Ogre Foothills and Drogmar's War-Camp to brutes for hire; Stormcrag crackles with elementals and the Glimmermere glows below it; the Wyrmcult Tents and Revenant Fields ring the cult's high ground, with Gravewyrm Sanctum at its peak.",
 
     // Brightwood Glade vignette, distilled spoiler-safe.
     gladeTitle: 'A quiet corner: Brightwood Glade',
@@ -684,7 +774,7 @@ export const guideStrings = {
       'In Eastbrook the dead will not rest, and the mark behind it belongs to a sect long thought gone. Trace it to a Gravecaller working the chapel crypt, and his own papers point you toward the fen in the north.',
     sagaMarshTitle: 'The marsh: a tithe of souls',
     sagaMarshBody:
-      'In Mirefen the drownings are no accident. Someone is filling the fen like a tithing box, raising obedient dead from every traveler the water takes. Chase the orders up the chain to a Mistcaller in the drowned bastion, whose last words name something older still, stirring beneath the peaks.',
+      'In Mirefen the drownings are no accident. Someone is filling the fen like a tithing box, raising obedient dead from every traveler the water takes. Chase the orders up the chain to a Fogbinder in the drowned bastion, whose last words name something older still, stirring beneath the peaks.',
     sagaPeaksTitle: 'The peaks: what the tithe was for',
     sagaPeaksBody:
       "On Thornpeak the whole scheme comes clear. Every soul stolen since the Vale was a tithe poured toward the cult's grim work in the mountain's heart. The trail that began in a chapel yard ends here, in a five-player descent to face the hand behind it all. We will let you find out who waits at the bottom.",
@@ -861,6 +951,46 @@ export const guideStrings = {
       'Ranked play tracks your standing over time. Check the leaderboard to see where you sit and who holds the top of the realm.',
   },
 
+  // The Vale Cup boarball minigame page (docs/prd/vale-cup.md). Spoiler-safe:
+  // lore, how to play, nations, roles; no kick powers, timers, or matchmaker
+  // internals. Nation/role NAMES render from the shared hudChrome.vcup.* keys.
+  valeCupPage: {
+    heading: 'The Vale Cup',
+    intro:
+      'Boarball at the Sowfield: pick a banner, pick a role, and kick a stuffed boar hide past a keeper for the Copper Pail. No blood, no loot, just the roar of the stands.',
+    loreHeading: 'Boarball and the harvest truce',
+    loreOldSow:
+      "Long before the dead woke, Eastbrook's farmhands played boarball on the stubble fields after harvest: two mobs, one boar's hide stuffed with straw, and two wagon gates dragged to either end of the green. The first ball, the Old Sow, hangs bronzed above the tavern hearth.",
+    loreTruce:
+      'When the Ashen Coliseum began sanctioning war games, Marshal Redbrook answered with something gentler: a standing harvest truce on the old green. The wagon gates became goalposts, the green got walls, stands, and a name, the Sowfield, and the prize was always the same dented milk pail the winners drank from: the Copper Pail.',
+    howHeading: 'How to play',
+    howQueue:
+      'Queue from anywhere through the Vale Cup window, or talk to Groundskeeper Bram at the Sowfield gate. Pick a bracket from one-a-side up to five-a-side, a banner nation, and a sport role; queue solo or bring your party.',
+    howMatch:
+      'On kickoff your class kit is swapped for a sport kit and restored exactly afterward. Kicks aim at the ground reticle, the ball banks off the boards, and dribbling is just running with the ball. Score more goals than the other side before full time; a draw goes to golden goal.',
+    howTruce:
+      'Nobody bleeds at the Sowfield: tackles tumble, nothing hurts, and pets sit the match out.',
+    spectateBody:
+      'One match plays at a time at the stadium, and anyone can walk up and watch from the stands.',
+    nationsHeading: 'The eight banner nations',
+    nationsBody:
+      'Every team plays under a banner. The captain picks the nation, and if both sides fly the same one, the away side plays the inverted palette.',
+    nationVale: 'Green and gold, flying the wheat sheaf: the home side, farmhands to the bone.',
+    nationMirefen: 'Teal and grey under the heron: patient, long-legged, never hurried.',
+    nationThornpeak: 'Ice blue and white under the mountain peak: sure-footed and stubborn.',
+    nationColiseum: 'Red and black with crossed swords: they play like it is still a war game.',
+    nationChoir: 'Pale blue and silver under the bell: eerie, precise, and very quiet.',
+    nationOgre: 'Orange and umber behind the fist: shoulder-first and proud of it.',
+    nationMoon: 'Violet and silver under the crescent: night players, light on their feet.',
+    nationCopperdig: 'Copper and brown with the pickaxe: diggers who never stop running.',
+    rolesHeading: 'Sport roles',
+    rolesBody:
+      'Your role decides the kit you carry onto the pitch. Everyone kicks; the rest is temperament.',
+    rewardsHeading: 'Truce rules',
+    rewardsBody:
+      'Truce rules mean no experience and no loot: a decided match counts toward your record and the winners board, and daily-reward points come with it. Deserting a match benches your slot, and the Groundskeeper remembers.',
+  },
+
   // "Things I Wish I Knew" beginner page.
   wishPage: {
     heading: 'Things I wish I knew',
@@ -1003,6 +1133,66 @@ export const guideStrings = {
       'Set your active look from the appearance row on your character screen, and switch freely among everything you have unlocked.',
   },
 
+  professions: {
+    intro:
+      'Beyond combat and quests, the world rewards you for working the land and the forge: gathering raw materials, turning them into gear at the crafting stations of ten different trades, and settling into an identity as one of the ten archetypes those trades represent.',
+
+    // Gathering professions overview.
+    gatherTitle: 'Gathering: Mining, Logging, and Herbalism',
+    gatherIntro:
+      'Three gathering trades let you pull raw materials straight out of the world: Mining strikes ore and stone from veins, Logging fells timber from stands of trees, and Herbalism collects herbs and plants growing wild. Each is tracked separately, so working one never slows your progress in another.',
+
+    gatherWhatTitle: 'Resource nodes',
+    gatherWhatBody:
+      'Ore veins, wood stands, and herb patches are placed out in the zones as visible, unowned fixtures. Walk up to one and interact with it to harvest whatever it holds. Once you have harvested a node, it needs time to recover before you personally can harvest it again, though it never blocks anyone else: another player can harvest the very same node in the meantime.',
+
+    gatherProficiencyTitle: 'Proficiency and material quality',
+    gatherProficiencyBody:
+      'Every successful harvest builds your proficiency in that gathering trade. A higher proficiency shifts what you pull out of a node toward rarer grades of material, from common on up, though the rarest grades stay rare even at high proficiency. More practice never hurts your odds, it only ever improves them.',
+
+    gatherToolsTitle: 'Tools of the trade',
+    gatherToolsBody:
+      'Vendors sell basic tools for each gathering trade, and better ones can be crafted, so working a resource node is meant to feel more capable as you gear up for it rather than staying static. Higher-tier tools are the intended way to unlock access to richer nodes and to work them more efficiently over a long session.',
+
+    // The ten crafts overview.
+    craftTitle: 'The ten crafts',
+    craftIntro:
+      "Ten crafting trades turn gathered materials into finished gear and goods: Armorcrafting, Weaponcrafting, and Jewelcrafting shape raw matter into wearable gear; Alchemy and Engineering are driven by trial and error; Cooking, Inscription, and Enchanting each touch other crafts' output; Tailoring and Leatherworking work from exact patterns. Together they form a wheel, with each craft sitting next to two neighbors and opposite one other.",
+
+    craftRingTitle: 'A wheel of specialties',
+    craftRingBody:
+      'The ten crafts are arranged in a fixed ring, and where a craft sits on that ring matters: crafts next to each other on the wheel share more in common with each other than crafts on opposite sides do. Committing to one craft is meant to feel like joining a family of related trades, not picking an isolated skill.',
+
+    craftRecipesTitle: 'Recipes and reagents',
+    craftRecipesBody:
+      'Every craft has its own recipes, each calling for specific reagents you gather or buy. The most basic recipes in each craft ask for nothing but common materials and are craftable from the very start, so you can begin working a trade the moment you pick it up rather than waiting to unlock it.',
+
+    craftMasteryTitle: 'Skill and mastery',
+    craftMasteryBody:
+      'Crafting successfully builds skill in that trade, and richer recipes are gated behind higher skill: the basic recipes are open to everyone, while progressively more advanced ones ask for progressively more mastery to attempt. Growing your skill in a craft is the path from simple starter goods to its more ambitious recipes.',
+
+    craftComboTitle: 'Combination recipes',
+    craftComboBody:
+      "Beyond a single craft's own recipe list, the wheel also supports combination recipes that call on two neighboring crafts at once, rewarding a character (or a pair of trading partners) who has invested in adjacent trades on the ring rather than one in isolation.",
+
+    // Archetypes overview.
+    archetypeTitle: 'The ten archetypes',
+    archetypeIntro:
+      'Each of the ten crafts also stands for an archetype, a broader identity you can adopt beyond just working that trade. Your active archetype is a single choice at a time, not a checklist: you carry one, and can change which one later if you choose to.',
+
+    archetypeChooseTitle: 'Choosing your archetype',
+    archetypeChooseBody:
+      'You declare your first archetype through an early, zone one story quest that formally accepts you into that identity. Until you complete that quest, you have not yet chosen an archetype at all.',
+
+    archetypeSwitchTitle: 'Changing your mind',
+    archetypeSwitchBody:
+      'Having declared an archetype once does not lock you into it forever. Changing to a different archetype means first completing a repeatable "make amends" quest for your old one, and each time you switch, the amends expected of you the next time grow a little steeper, so switching stays meaningful rather than costless.',
+
+    archetypeIdentityTitle: 'What your archetype means',
+    archetypeIdentityBody:
+      'Your active archetype is a statement about who your character is in the world, recognized in how others and the world address you. The exact rewards and recognition that come with it are still being finalized; check back as the system fills in.',
+  },
+
   economy: {
     intro:
       'Coin oils the whole world: it buys your gear, supplies, and travel kit, and changes hands between players. You pick all of this up just by playing, so think of this page as a map of where your money comes from and goes.',
@@ -1021,6 +1211,15 @@ export const guideStrings = {
     marksTitle: 'A second currency: Delve Marks',
     marksBody:
       'Coin is not the only thing you bank. Delves pay out Delve Marks, a separate currency you spend only at the delve keeper, on companion upgrades and gear you will not find elsewhere. They never mix with your coin.',
+
+    // The personal bank: The Gilded Strongbox branches, deposits, and growing the vault.
+    bankTitle: 'The bank',
+    bankBody:
+      'Every hub town keeps a branch of The Gilded Strongbox, the banking house of the realm. Speak to the bursar there to open your vault, a private store of room beyond your bags that your character keeps for life. Whatever you leave with them waits safely, whichever branch you visit next.',
+    bankHow:
+      'With the vault open, click an item in your bags to deposit it and click it in the vault to take it back. The vault holds goods only, never coin, and quest items stay with you. When your bags fill up mid-journey, one button sweeps all your crafting materials in at once.',
+    bankSlots:
+      'A fresh vault starts small and grows with you. The bursar sells further slots for coin at ever-steeper prices, and playing online earns bonus room on top, for things like a verified email, linked accounts, and friends you bring into the game.',
 
     // Buying and selling at a vendor.
     buyingTitle: 'Buying and selling',

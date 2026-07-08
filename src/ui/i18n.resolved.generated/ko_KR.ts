@@ -4697,6 +4697,7 @@ export const ko_KR: EnTranslations = {
       "offGlobalCooldown": "공용 재사용 대기시간 없음",
       "friendlyTarget": "아군 대상",
       "enemyTarget": "적 대상",
+      "selfOnly": "자신에게만",
       "damageRange": "{min}에서 {max}",
       "finisherDamage": "기본 {base}, 연계 점수당 {perCombo}"
     },
@@ -6989,7 +6990,7 @@ export const ko_KR: EnTranslations = {
     },
     "mobs": {
       "yumi_cat": {
-        "name": "Yumi"
+        "name": "유미"
       },
       "forest_wolf": {
         "name": "숲늑대"

@@ -45,6 +45,7 @@ const abilityStringsEn = {
       offGlobalCooldown: 'Off the global cooldown',
       friendlyTarget: 'Friendly target',
       enemyTarget: 'Enemy target',
+      selfOnly: 'Self only',
       damageRange: '{min} to {max}',
       finisherDamage: '{base} plus {perCombo} per combo point',
     },

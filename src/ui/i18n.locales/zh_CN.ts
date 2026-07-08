@@ -1441,6 +1441,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.offGlobalCooldown': '不触发公共冷却',
   'abilityUi.tooltip.friendlyTarget': '友方目标',
   'abilityUi.tooltip.enemyTarget': '敌方目标',
+  'abilityUi.tooltip.selfOnly': '仅对自己',
   'abilityUi.tooltip.damageRange': '{min} 到 {max}',
   'abilityUi.tooltip.finisherDamage': '{base} 加每个连击点 {perCombo}',
   'abilityUi.resources.mana': '法力',
@@ -6128,4 +6129,5 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     '邀请好友：当好友升到 10 级，你们各获得 2 个格子，最多 5 位好友。',
   'hudChrome.bank.bonusSectionAria': '奖励银行格子及获取方式',
+  'entities.mobs.yumi_cat.name': '由美',
 };

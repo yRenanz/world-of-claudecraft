@@ -124,6 +124,7 @@ import {
   abilityPrimaryEffect,
   abilitySecondaryEffect,
 } from './ability_damage';
+import { isSelfOnlyAbility } from './ability_self_only';
 import { ActionBarPainter, type ActionBarSlotElements } from './action_bar_painter';
 import {
   ABILITY_ICON_PREFIX,
@@ -14229,7 +14230,7 @@ function abilityCastLine(known: ResolvedAbility, spellHaste = 0): string {
   return t('abilityUi.tooltip.instant');
 }
 
-function abilityRequirementLines(def: AbilityDef): string[] {
+export function abilityRequirementLines(def: AbilityDef): string[] {
   const lines: string[] = [];
   if (def.requiresForm)
     lines.push(t('abilityUi.tooltip.requiresForm', { form: t(FORM_LABEL_KEYS[def.requiresForm]) }));
@@ -14248,6 +14249,7 @@ function abilityRequirementLines(def: AbilityDef): string[] {
   if (def.offGcd) lines.push(t('abilityUi.tooltip.offGlobalCooldown'));
   if (def.targetType === 'friendly') lines.push(t('abilityUi.tooltip.friendlyTarget'));
   else if (def.requiresTarget) lines.push(t('abilityUi.tooltip.enemyTarget'));
+  else if (isSelfOnlyAbility(def)) lines.push(t('abilityUi.tooltip.selfOnly'));
   return lines;
 }
 

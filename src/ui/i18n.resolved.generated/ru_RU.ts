@@ -4697,6 +4697,7 @@ export const ru_RU: EnTranslations = {
       "offGlobalCooldown": "Вне глобального восстановления",
       "friendlyTarget": "Дружественная цель",
       "enemyTarget": "Вражеская цель",
+      "selfOnly": "Только на себя",
       "damageRange": "от {min} до {max}",
       "finisherDamage": "{base} плюс {perCombo} за прием серии"
     },
@@ -6989,7 +6990,7 @@ export const ru_RU: EnTranslations = {
     },
     "mobs": {
       "yumi_cat": {
-        "name": "Yumi"
+        "name": "Юми"
       },
       "forest_wolf": {
         "name": "Лесной волк"

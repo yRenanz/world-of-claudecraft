@@ -206,8 +206,8 @@ describe('world boss raid-tier combat (melee, Stormcall hardcast, yells)', () =>
     let sawCastBar = false;
     let castYell = false;
     let unleashed = false;
-    // 25s cadence + 3.5s cast, with slack for chase/knockback interruptions.
-    for (let t = 0; t < 20 * 45 && !unleashed; t++) {
+    // 40s cadence + 3.5s cast, with slack for chase/knockback interruptions.
+    for (let t = 0; t < 20 * 60 && !unleashed; t++) {
       // Step back into melee after every Tectonic Heave shove, and keep chipping
       // so the threat table never empties.
       p.pos.x = boss.pos.x + 2;
@@ -452,6 +452,14 @@ describe('world boss anti-kite snare (Howling Gale)', () => {
     sim.tick();
   }
 
+  it('outruns a player on foot: boss move speed exceeds base run speed', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('hunter', 'Runner');
+    const { boss } = spawnBossNow(sim);
+    const p = (sim as any).entities.get(pid) as Entity;
+    expect(boss.moveSpeed).toBeGreaterThan(p.moveSpeed);
+  });
+
   it('snares a ranged kiter it is chasing, cutting move speed to 70% (not kiteable)', () => {
     const sim = makeSim();
     const kiter = sim.addPlayer('hunter', 'Kiter');
@@ -464,8 +472,8 @@ describe('world boss anti-kite snare (Howling Gale)', () => {
     const slow = p.auras.find((a) => a.kind === 'slow' && a.name === 'Howling Gale');
     expect(slow).toBeTruthy();
     expect(slow?.value).toBe(0.7);
-    // Run speed (7) beats the boss's 5.8, but a 30% snare (4.9yd/s) still lets the boss,
-    // at 5.8, slowly close the gap: the gentler snare denies a perma-kite without rooting.
+    // The boss (11.6) already outruns base run speed (7); the 30% snare (4.9yd/s) is
+    // the second layer that keeps a speed-buffed runner from opening a gap.
     expect((sim as any).moveSpeedMult(p)).toBeCloseTo(0.7, 5);
   });
 
@@ -592,7 +600,8 @@ describe('world boss is imposing and loud', () => {
     // A large, imposing world boss, but no longer mountain-sized.
     expect(boss.scale).toBe(8);
     // His melee reach is PINNED to a ~17yd (scale-5) body, not the wider reach a scale-8
-    // body would give: the Howling Gale snare, not a giant swing, is what makes him unkitable.
+    // body would give: his move speed and the Howling Gale snare, not a giant swing,
+    // are what make him unkitable.
     const reach = combatProfileForMob(boss.templateId, boss.scale).meleeRange;
     expect(reach).toBe(scaledDefaultMobMeleeRange(5));
     expect(reach).toBeLessThan(scaledDefaultMobMeleeRange(boss.scale));

@@ -3046,7 +3046,7 @@ function c4aCastingLifecycle(): Scenario {
       rec.snapshot('mage-pushback');
       rec.tick(120); // let the 2.5s cast (+ pushback) finish -> applyAbility -> runEffects
 
-      // --- mage: spell queue (#1360) — a press in the cast tail queues, fires on completion ---
+      // --- mage: spell queue (#1360): a press in the cast tail queues, fires on completion ---
       eMage.resource = eMage.maxResource;
       face(eMage, mob);
       sim.castAbility('fireball', mage); // second timed-cast START (fresh 2.5s, no pushback)

@@ -12,6 +12,7 @@ import {
   type SocialTransport,
   validateGuildName,
 } from '../server/social';
+import type { SimEvent } from '../src/sim/types';
 
 // ---------------------------------------------------------------------------
 // In-memory fakes — let us exercise the full SocialService logic (friends,
@@ -987,5 +988,20 @@ describe('broadcastDeedUnlock', () => {
     h.tx.setOnline(9);
     await h.svc.broadcastDeedUnlock(h.actor(9), 'prog_veteran');
     expect(h.tx.delivered.size).toBe(0);
+  });
+
+  it('keeps the SocialEvent and SimEvent declarations structurally identical', () => {
+    // The event is declared in BOTH unions (SocialEvent for server delivery,
+    // SimEvent so the one client event switch stays well-typed) and the client
+    // casts one to the other on the events-frame passthrough. A field added or
+    // retyped on either side alone reds tsc here: the literal must satisfy the
+    // SocialEvent arm AND annotate as the SimEvent arm, and flow back.
+    const fromSocial: Extract<SimEvent, { type: 'deedBroadcast' }> = {
+      type: 'deedBroadcast',
+      characterName: 'Earner',
+      deedId: 'prog_veteran',
+    } satisfies Extract<SocialEvent, { type: 'deedBroadcast' }>;
+    const fromSim: Extract<SocialEvent, { type: 'deedBroadcast' }> = fromSocial;
+    expect(fromSim).toEqual(fromSocial);
   });
 });

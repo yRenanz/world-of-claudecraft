@@ -51,6 +51,7 @@ import {
   publicReadRateLimited,
   resetPublicReadRateLimits,
 } from '../../server/ratelimit';
+import { DEEDS } from '../../src/sim/content/deeds';
 import { LEADERBOARD_PAGE_SIZE } from '../../src/sim/leaderboard_page';
 import type {
   DevLeaderboardEntry,
@@ -414,6 +415,22 @@ describe('readPublicSheet (FakeCharactersDb, resolved by name)', () => {
     const out = await readPublicSheet(db, 'Oldtimer', sheetDeps);
     const body = out.body as Record<string, unknown>;
     expect(body.deeds).toEqual({ renown: 0, earnedCount: 0, activeTitle: null, recent: [] });
+  });
+
+  it('strips hidden deeds from the public recent strip (existence is part of the contract)', async () => {
+    // Fixture guard: the exemplar must actually be hidden in the catalog.
+    expect(DEEDS.hid_saul_footnote.hidden).toBe(true);
+    const db = new FakeCharactersDb();
+    db.seed(characterRow(33, 'Secretive'));
+    db.seedRecentDeeds(33, [
+      { deedId: 'hid_saul_footnote', earnedAt: '2026-07-08T00:00:00.000Z' },
+      { deedId: 'prog_veteran', earnedAt: '2026-07-07T00:00:00.000Z' },
+    ]);
+    const out = await readPublicSheet(db, 'Secretive', sheetDeps);
+    const body = out.body as Record<string, unknown>;
+    expect((body.deeds as { recent: unknown }).recent).toEqual([
+      { deedId: 'prog_veteran', earnedAt: '2026-07-07T00:00:00.000Z' },
+    ]);
   });
 });
 

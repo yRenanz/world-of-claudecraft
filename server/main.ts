@@ -102,6 +102,7 @@ import {
 } from './db';
 import { configureDeedsRuntime } from './deeds';
 import { deedRarityCounts, recentDeedsForCharacter } from './deeds_db';
+import { publicRarityPayload } from './deeds_records';
 import {
   type DesktopLoginRouteDeps,
   handleDesktopLoginExchange,
@@ -432,7 +433,10 @@ async function getDeedsRarity(): Promise<import('../src/world_api').DeedsRarity>
     return deedsRarityCache.payload;
   }
   try {
-    const payload = await deedRarityCounts();
+    // publicRarityPayload strips hidden deeds at refresh time: this cache
+    // feeds an anonymous endpoint, and a hidden deed's existence must not be
+    // enumerable the moment somebody earns it.
+    const payload = publicRarityPayload(await deedRarityCounts());
     deedsRarityCache = { at: Date.now(), payload };
     return payload;
   } catch (err) {

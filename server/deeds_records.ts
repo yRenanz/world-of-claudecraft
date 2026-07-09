@@ -10,7 +10,9 @@
 // SQL (ON CONFLICT DO NOTHING over UNIQUE (character_id, deed_id)), so retro
 // re-emits on every login and crash-replays are free.
 
+import { DEEDS } from '../src/sim/content/deeds';
 import type { DeedDef } from '../src/sim/types';
+import type { DeedsRarity } from '../src/world_api';
 import { insertCharacterDeed } from './deeds_db';
 import { REALM } from './realm';
 
@@ -23,6 +25,25 @@ let tail: Promise<void> = Promise.resolve();
  *  or any cosmetic reward. Pure so the gate is unit-testable. */
 export function isMarqueeDeed(def: DeedDef): boolean {
   return def.renown >= 25 || def.reward !== undefined;
+}
+
+/** Hidden deeds are invisible until earned, EXISTENCE included (the DeedDef
+ *  contract), so anonymous and third-party surfaces must omit them; only the
+ *  earner's own Book shows their copy. A drifted id (content removed) reads
+ *  as not hidden: it can no longer spoil anything. */
+export function isHiddenDeedId(deedId: string): boolean {
+  return DEEDS[deedId]?.hidden === true;
+}
+
+/** The public form of the rarity aggregate: strip hidden deeds so an
+ *  anonymous caller cannot enumerate their ids the moment one player earns
+ *  one. Pure; the main.ts cache applies it once per refresh. */
+export function publicRarityPayload(payload: DeedsRarity): DeedsRarity {
+  const earned: Record<string, number> = {};
+  for (const id in payload.earned) {
+    if (!isHiddenDeedId(id)) earned[id] = payload.earned[id];
+  }
+  return { totalEligible: payload.totalEligible, earned };
 }
 
 /** Mirror one sim-decided unlock into character_deeds, fire-and-forget.

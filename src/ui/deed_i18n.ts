@@ -8,7 +8,7 @@
 // release fill covers every locale at once).
 
 import { DEEDS } from '../sim/data';
-import { getLanguage, type SupportedLanguage } from './i18n';
+import { getLanguage, type SupportedLanguage, t } from './i18n';
 
 export type DeedTranslationField = 'name' | 'desc' | 'title';
 
@@ -53,6 +53,14 @@ export function deedTitleText(id: string): string {
   const def = DEEDS[id];
   if (!def || def.reward?.kind !== 'title') return '';
   return localeEntry(id)?.title ?? def.reward.text;
+}
+
+/** The guild-chat news line for another player's marquee unlock, composed
+ *  client-side from the id-based wire event (the server never sends deed
+ *  English). Pure and Node-testable so the one HUD switch arm stays a thin
+ *  log call. */
+export function deedBroadcastLine(characterName: string, deedId: string): string {
+  return t('hudChrome.deeds.broadcastLine', { name: characterName, deed: deedName(deedId) });
 }
 
 export interface DeedTranslationManifestEntry {

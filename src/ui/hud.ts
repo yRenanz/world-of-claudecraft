@@ -193,7 +193,7 @@ import { renderCorpseHarvestPicker } from './corpse_harvest_window';
 import { buildCraftingView } from './crafting_view';
 import { renderCraftingWindow } from './crafting_window';
 import { DailyRewardsWindow } from './daily_rewards_window';
-import { deedName, deedTitleText } from './deed_i18n';
+import { deedBroadcastLine, deedName, deedTitleText } from './deed_i18n';
 import { DeedTrackerPainter } from './deed_tracker_painter';
 import {
   buildDeedTrackerViewInto,
@@ -8674,15 +8674,9 @@ export class Hud {
         case 'deedBroadcast': {
           // A guildmate's or followed friend's marquee unlock. Id-based on
           // the wire (server sends the deed id, never English); the visible
-          // line is composed here from deed_i18n plus the chrome key, in the
-          // guild-chat green so it reads as social news.
-          this.log(
-            t('hudChrome.deeds.broadcastLine', {
-              name: ev.characterName,
-              deed: deedName(ev.deedId),
-            }),
-            '#40d264',
-          );
+          // line composes in deed_i18n (Node-pinned there), in the guild-chat
+          // green so it reads as social news.
+          this.log(deedBroadcastLine(ev.characterName, ev.deedId), '#40d264');
           break;
         }
         case 'error':

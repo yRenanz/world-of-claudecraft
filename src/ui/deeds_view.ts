@@ -521,7 +521,9 @@ export function deedRarityFraction(rarity: DeedsRarity | null, deedId: string): 
   if (rarity === null || rarity.totalEligible <= 0) return null;
   const earned = rarity.earned[deedId];
   if (earned === undefined) return null;
-  return earned / rarity.totalEligible;
+  // The aggregate's two scans are not one snapshot, so a count can outrun the
+  // denominator by a hair; a rarity line must never read over 100 percent.
+  return Math.min(1, earned / rarity.totalEligible);
 }
 
 /** Digest over the lifetime stat block: any counter climb, dungeon clear,

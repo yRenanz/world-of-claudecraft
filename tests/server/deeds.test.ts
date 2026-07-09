@@ -23,6 +23,7 @@ import {
   publicReadRateLimited,
   resetPublicReadRateLimits,
 } from '../../server/ratelimit';
+import { DEEDS } from '../../src/sim/content/deeds';
 import type { DeedsRarity } from '../../src/world_api';
 import { type FakeRes, fakeCtx, makeReq } from './helpers';
 
@@ -270,6 +271,19 @@ describe('characterSheet deeds summary', () => {
       { deedId: 'prog_first_steps', earnedAt: '2026-07-01T09:00:00.000Z' },
     ];
     expect(buildSheet({ level: 12 }, { deedsRecent: recent }).deeds.recent).toEqual(recent);
+    expect(
+      buildSheet({ level: 12 }, { deedsRecent: recent, visibility: 'owner' }).deeds.recent,
+    ).toEqual(recent);
+  });
+
+  it('strips hidden deeds from recent on the public arm only (the owner earned theirs)', () => {
+    // Fixture guard: the exemplar must actually be hidden in the catalog.
+    expect(DEEDS.hid_saul_footnote.hidden).toBe(true);
+    const recent = [
+      { deedId: 'hid_saul_footnote', earnedAt: '2026-07-08T10:00:00.000Z' },
+      { deedId: 'prog_veteran', earnedAt: '2026-07-07T09:00:00.000Z' },
+    ];
+    expect(buildSheet({ level: 12 }, { deedsRecent: recent }).deeds.recent).toEqual([recent[1]]);
     expect(
       buildSheet({ level: 12 }, { deedsRecent: recent, visibility: 'owner' }).deeds.recent,
     ).toEqual(recent);

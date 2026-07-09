@@ -6,13 +6,20 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
+  saveCharacterAndMarketState: vi.fn(async () => {}),
+  saveMarketState: vi.fn(async () => {}),
+  saveMailState: vi.fn(async () => {}),
+  loadMarketState: vi.fn(async () => null),
+  loadMailState: vi.fn(async () => null),
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
+  insertBankLedgerRow: vi.fn(async () => {}),
   walletForAccount: vi.fn(async () => null),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  revokeAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   acquireCharacterLease: vi.fn(async () => true),
   releaseCharacterLease: vi.fn(async () => {}),
   heartbeatCharacterLeases: vi.fn(async () => {}),
@@ -25,7 +32,13 @@ vi.mock('../server/deeds_db', () => ({
 }));
 
 import { getDeedBroadcasts, insertCharacterDeed } from '../server/deeds_db';
-import { deedRecordsIdle, isMarqueeDeed, recordDeedUnlock } from '../server/deeds_records';
+import {
+  deedRecordsIdle,
+  isHiddenDeedId,
+  isMarqueeDeed,
+  publicRarityPayload,
+  recordDeedUnlock,
+} from '../server/deeds_records';
 import { GameServer } from '../server/game';
 import { DEEDS } from '../src/sim/content/deeds';
 import type { DeedDef } from '../src/sim/types';
@@ -88,6 +101,32 @@ describe('isMarqueeDeed', () => {
   it('agrees with the real catalog on the two exemplars', () => {
     expect(isMarqueeDeed(DEEDS.prog_veteran)).toBe(true); // title reward at renown 10
     expect(isMarqueeDeed(DEEDS.prog_first_steps)).toBe(false); // renown 5, rewardless
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The hidden-deed strip for public surfaces (pure): existence is part of the
+// hidden contract, so the anonymous rarity payload must never carry a hidden
+// deed's id.
+// ---------------------------------------------------------------------------
+
+describe('publicRarityPayload', () => {
+  it('strips hidden deeds from the earned map and keeps everything else intact', () => {
+    // Fixture guard: the exemplar must actually be hidden in the catalog.
+    expect(DEEDS.hid_saul_footnote.hidden).toBe(true);
+    expect(DEEDS.prog_veteran.hidden).not.toBe(true);
+    const out = publicRarityPayload({
+      totalEligible: 120,
+      earned: { prog_veteran: 30, hid_saul_footnote: 4 },
+    });
+    expect(out).toEqual({ totalEligible: 120, earned: { prog_veteran: 30 } });
+    expect(isHiddenDeedId('hid_saul_footnote')).toBe(true);
+    expect(isHiddenDeedId('prog_veteran')).toBe(false);
+  });
+
+  it('a drifted id (content removed) passes through: nothing left to spoil', () => {
+    const out = publicRarityPayload({ totalEligible: 10, earned: { gone_deed: 1 } });
+    expect(out.earned).toEqual({ gone_deed: 1 });
   });
 });
 
@@ -296,6 +335,30 @@ describe('deedUnlocked through GameServer.detectActivity', () => {
     expect(rows.every((r) => r.characterId === 42 && r.accountId === 7)).toBe(true);
     expect(broadcastSpy).not.toHaveBeenCalled();
     expect(broadcastsFlagMock).not.toHaveBeenCalled();
+  });
+
+  it('a drifted deed id (content removed) still records but never reaches the broadcast gate', async () => {
+    const fc = fakeWs();
+    const session = server.join(fc.ws as never, 7, 42, 'Hilda', 'warrior', null);
+    if ('error' in session) throw new Error(session.error);
+    const broadcastSpy = vi
+      .spyOn(server.social, 'broadcastDeedUnlock')
+      .mockResolvedValue(undefined);
+    tickAndDetect();
+    await settle();
+    insertMock.mockClear();
+
+    // A synthetic event whose id has left the catalog: the observer mirrors
+    // the sim's decision regardless (the index answers "what was earned",
+    // not "what still exists"), while the broadcast gate drops it before
+    // ever reading the opt-out flag.
+    (server as unknown as { detectActivity(events: unknown[]): void }).detectActivity([
+      { type: 'deedUnlocked', pid: session.pid, deedId: 'gone_deed' },
+    ]);
+    await settle();
+    expect(insertMock.mock.calls.map((c) => c[0].deedId)).toEqual(['gone_deed']);
+    expect(broadcastsFlagMock).not.toHaveBeenCalled();
+    expect(broadcastSpy).not.toHaveBeenCalled();
   });
 
   it('a non-marquee live unlock records without ever reading the opt-out flag', async () => {

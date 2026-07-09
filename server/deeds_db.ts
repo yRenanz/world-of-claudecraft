@@ -45,8 +45,17 @@ export interface DeedRarityAggregate {
 export const DEED_RARITY_MIN_LEVEL = 5;
 
 export async function deedRarityCounts(): Promise<DeedRarityAggregate> {
+  // Numerator and denominator share ONE eligibility predicate: counting every
+  // earner while the denominator holds only level-floor characters would let
+  // a sub-floor earn push earned[deedId] past totalEligible (a >100 percent
+  // rarity), and the floor exists precisely to strip that population's noise.
   const counts = await pool.query(
-    'SELECT deed_id, COUNT(*)::int AS earned FROM character_deeds GROUP BY deed_id',
+    `SELECT cd.deed_id, COUNT(*)::int AS earned
+       FROM character_deeds cd
+       JOIN characters c ON c.id = cd.character_id
+      WHERE c.level >= $1 AND c.state IS NOT NULL
+      GROUP BY cd.deed_id`,
+    [DEED_RARITY_MIN_LEVEL],
   );
   const eligible = await pool.query(
     'SELECT COUNT(*)::int AS eligible FROM characters WHERE level >= $1 AND state IS NOT NULL',

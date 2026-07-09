@@ -2,8 +2,15 @@
 // English resolution from the live catalog, the unknown-id fallbacks, the
 // ''-for-non-title gate (load-bearing: the hud inspect/nameplate surfaces
 // hide entirely on ''), and the release-fill manifest shape.
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { deedDesc, deedName, deedTitleText, deedTranslationManifest } from '../src/ui/deed_i18n';
+import {
+  deedBroadcastLine,
+  deedDesc,
+  deedName,
+  deedTitleText,
+  deedTranslationManifest,
+} from '../src/ui/deed_i18n';
 
 describe('deed_i18n English resolution', () => {
   it('resolves name and desc from the catalog def', () => {
@@ -39,5 +46,31 @@ describe('deed_i18n English resolution', () => {
       source: 'Veteran',
     });
     for (const row of manifest) expect(row.source.length).toBeGreaterThan(0);
+  });
+});
+
+describe('deedBroadcastLine (the guild-chat news line)', () => {
+  it('composes the chrome key with the earner name and the localized deed name', () => {
+    expect(deedBroadcastLine('Hilda', 'prog_veteran')).toBe(
+      'Hilda has accomplished a deed: Veteran',
+    );
+  });
+
+  it('a catalog-unknown id degrades to the raw id, never a crash or empty line', () => {
+    expect(deedBroadcastLine('Hilda', 'removed_deed')).toBe(
+      'Hilda has accomplished a deed: removed_deed',
+    );
+  });
+
+  it('the HUD switch arm stays wired to this composer with the guild-chat green', () => {
+    // hud.ts cannot be unit-driven (DOM monolith); the live wiring was
+    // verified end to end against a real server, and this source pin keeps
+    // the arm from being dropped or detached from the pinned composer.
+    const hudSrc = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    const arm = hudSrc.slice(hudSrc.indexOf("case 'deedBroadcast'"));
+    expect(arm.length).toBeGreaterThan(0);
+    expect(arm.slice(0, 600)).toContain(
+      "this.log(deedBroadcastLine(ev.characterName, ev.deedId), '#40d264');",
+    );
   });
 });

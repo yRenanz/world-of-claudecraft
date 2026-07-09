@@ -829,4 +829,10 @@ describe('deedRarityFraction', () => {
       deedRarityFraction({ totalEligible: 0, earned: { prog_veteran: 3 } }, 'prog_veteran'),
     ).toBeNull();
   });
+
+  it('clamps to 1 when a count outruns the denominator (aggregate snapshot skew)', () => {
+    expect(
+      deedRarityFraction({ totalEligible: 10, earned: { prog_veteran: 12 } }, 'prog_veteran'),
+    ).toBe(1);
+  });
 });

@@ -13,6 +13,7 @@
 // recalcPlayerStats (through characterDerivedStats), zone via zoneAt, spec via
 // the talents specLabel, virtualLevel via the types helper.
 
+import { DEEDS } from '../src/sim/content/deeds';
 import {
   computeTalentModifiers,
   emptyAllocation,
@@ -211,7 +212,16 @@ export function characterSheet(input: CharacterSheetInput): CharacterSheet {
       renown: state.renown ?? 0,
       earnedCount: Object.keys(state.deeds ?? {}).length,
       activeTitle: state.activeTitle ?? null,
-      recent: input.deedsRecent ?? [],
+      // Hidden deeds are invisible until earned, existence included, so the
+      // PUBLIC arm strips them (a third-party viewer who has not earned one
+      // must not learn its id here); the owner HAS earned theirs, so the
+      // owner arm keeps them, matching the Book's own shelf. The strip can
+      // shorten the fetched window below its limit; hidden earns are rare by
+      // design.
+      recent:
+        visibility === 'public'
+          ? (input.deedsRecent ?? []).filter((r) => DEEDS[r.deedId]?.hidden !== true)
+          : (input.deedsRecent ?? []),
     },
     rank: rank ?? null,
     profileUrl,

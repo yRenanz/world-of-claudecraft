@@ -65,8 +65,15 @@ describe('deedRarityCounts', () => {
       totalEligible: 120,
       earned: { prog_veteran: 30, cmb_thunzharr: 2 },
     });
-    const [countsSql] = dbMock.query.mock.calls[0];
-    expect(countsSql).toContain('FROM character_deeds GROUP BY deed_id');
+    // Numerator and denominator must draw from the SAME eligible population:
+    // without the join, a sub-floor earner pushes a deed's count past
+    // totalEligible and the card renders over 100 percent.
+    const [countsSql, countsParams] = dbMock.query.mock.calls[0];
+    expect(countsSql).toContain('FROM character_deeds cd');
+    expect(countsSql).toContain('JOIN characters c ON c.id = cd.character_id');
+    expect(countsSql).toContain('WHERE c.level >= $1 AND c.state IS NOT NULL');
+    expect(countsSql).toContain('GROUP BY cd.deed_id');
+    expect(countsParams).toEqual([DEED_RARITY_MIN_LEVEL]);
     const [eligibleSql, eligibleParams] = dbMock.query.mock.calls[1];
     expect(eligibleSql).toContain('FROM characters WHERE level >= $1 AND state IS NOT NULL');
     expect(eligibleParams).toEqual([DEED_RARITY_MIN_LEVEL]);
@@ -91,6 +98,14 @@ describe('recentDeedsForCharacter', () => {
     expect(sql).toContain('ORDER BY earned_at DESC, id DESC');
     expect(sql).toContain('LIMIT $2');
     expect(params).toEqual([42, 5]);
+  });
+
+  it('a non-Date earned_at (driver drift) still serializes as a string', async () => {
+    dbMock.query.mockResolvedValueOnce({
+      rows: [{ deed_id: 'prog_veteran', earned_at: '2026-07-08 10:00:00+00' }],
+    } as never);
+    const rows = await recentDeedsForCharacter(42, 5);
+    expect(rows).toEqual([{ deedId: 'prog_veteran', earnedAt: '2026-07-08 10:00:00+00' }]);
   });
 });
 

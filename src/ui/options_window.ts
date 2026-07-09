@@ -833,12 +833,16 @@ export class OptionsWindow {
     this.close();
   }
 
-  /** Y: reset the focused row to its default via the same scoped-reset path. */
+  /** Y: reset the focused row to its default via the same scoped-reset path. A full
+   *  render refreshes the row value AND the rail changed-counts; focus is returned
+   *  to the same row so the controller cursor does not vanish. */
   private resetFocusedRow(): void {
     const key = this.focusedControl()?.closest<HTMLElement>('.opt-row')?.dataset.key;
     if (!key) return;
     this.resetKeys([key]);
     this.render();
+    const row = this.deps.root().querySelector<HTMLElement>(`.opt-row[data-key="${key}"]`);
+    row?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)?.focus();
   }
 
   /** X: clear the focused keybind cap only (no-op elsewhere); announces the result. */

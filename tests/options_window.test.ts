@@ -315,7 +315,11 @@ describe('options_window: controller navigation + legend (P3)', () => {
 
   it('Y resets the focused row via the scoped-reset path; X clears + announces a keybind cap', () => {
     const reset = painter.slice(painter.indexOf('private resetFocusedRow'));
-    expect(reset.slice(0, reset.indexOf('\n  /**'))).toContain('this.resetKeys([key])');
+    const resetBody = reset.slice(0, reset.indexOf('\n  /**'));
+    expect(resetBody).toContain('this.resetKeys([key])');
+    // After the full re-render, focus returns to the same row's control so the
+    // controller cursor does not vanish on Y.
+    expect(resetBody).toContain('row?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)?.focus()');
     const clear = painter.slice(painter.indexOf('private clearFocusedKeybind'));
     const body = clear.slice(0, clear.indexOf('\n  /** RT/LT'));
     // Clears ONLY a keybind cap (no-op elsewhere) and announces.

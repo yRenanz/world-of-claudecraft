@@ -14,6 +14,25 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  // Esc menu redesign (The Warden's Codex): category-rail IA (options_ia.ts).
+  'hudChrome.options.ia.railDisplay': '顯示',
+  'hudChrome.options.ia.railInput': '輸入',
+  'hudChrome.options.ia.railSystem': '系統',
+  'hudChrome.options.ia.catOverviewName': '總覽',
+  'hudChrome.options.ia.catOverviewSub': '釘選的常用項、快捷操作，以及已變更的內容。',
+  'hudChrome.options.ia.catGraphicsSub': '畫質、視野與世界畫面。',
+  'hudChrome.options.ia.catInterfaceSub': '介面縮放、面板、聊天與單位框體。',
+  'hudChrome.options.ia.catAccessibilityName': '無障礙',
+  'hudChrome.options.ia.catAccessibilitySub': '動態效果、對比度與內容舒適度。',
+  'hudChrome.options.ia.catControlsName': '控制',
+  'hudChrome.options.ia.catControlsSub': '鏡頭、移動、戰鬥與回饋。',
+  'hudChrome.options.ia.catKeybindsSub': '為每個操作綁定按鍵。',
+  'hudChrome.options.ia.catControllerSub': '手把手感與按鍵配置。',
+  'hudChrome.options.ia.catTouchName': '觸控',
+  'hudChrome.options.ia.catTouchSub': '螢幕搖桿、視角與按鈕。',
+  'hudChrome.options.ia.catAudioSub': '音量與聲音開關。',
+  'hudChrome.options.ia.catSystemName': '系統',
+  'hudChrome.options.ia.catSystemSub': '效能、支援與關於。',
   'hudChrome.vcup.guildBoardWl': '{wins} 勝，{losses} 敗',
   'hudChrome.vcup.shootPower': '力道',
   'hudChrome.discord.roleTag.coredevs': '核心開發者',

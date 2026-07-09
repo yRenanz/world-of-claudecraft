@@ -651,6 +651,32 @@ export const hudChromeStrings = {
     // for left-thumb-dominant players; the same setting as the Key Bindings
     // panel's leftHandedTouch row, surfaced again here alongside the joystick.
     mobileLeftHanded: 'Left-handed layout',
+    // Esc menu redesign ("The Warden's Codex"): the category-rail information
+    // architecture, owned as data by options_ia.ts. Rail-group headers plus the
+    // per-category NAME (only where no existing category key is reused) and the
+    // one-line muted SUBHEAD. All wordy prose, so the five non-Latin fills
+    // (zh_CN/zh_TW/ja_JP/ko_KR/ru_RU) land in this same change (M16). Not rendered
+    // yet: P2 wires the rail/detail chrome onto options_ia.
+    ia: {
+      railDisplay: 'Display',
+      railInput: 'Input',
+      railSystem: 'System',
+      catOverviewName: 'Overview',
+      catOverviewSub: 'Pinned essentials, quick actions, and what changed.',
+      catGraphicsSub: 'Quality, view, and world visuals.',
+      catInterfaceSub: 'HUD scale, panels, chat, and unit frames.',
+      catAccessibilityName: 'Accessibility',
+      catAccessibilitySub: 'Motion, contrast, and content comfort.',
+      catControlsName: 'Controls',
+      catControlsSub: 'Camera, movement, combat, and feedback.',
+      catKeybindsSub: 'Bind keys for every action.',
+      catControllerSub: 'Gamepad feel and button layout.',
+      catTouchName: 'Touch',
+      catTouchSub: 'On-screen sticks, look, and buttons.',
+      catAudioSub: 'Volume and sound toggles.',
+      catSystemName: 'System',
+      catSystemSub: 'Performance, support, and about.',
+    },
   },
   // Controller / gamepad options panel (Options > Controller). Player-facing
   // chrome, so every label is a key here; the live numbers run through

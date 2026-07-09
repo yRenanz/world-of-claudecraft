@@ -14,6 +14,25 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  // Esc menu redesign (The Warden's Codex): category-rail IA (options_ia.ts).
+  'hudChrome.options.ia.railDisplay': '表示',
+  'hudChrome.options.ia.railInput': '入力',
+  'hudChrome.options.ia.railSystem': 'システム',
+  'hudChrome.options.ia.catOverviewName': '概要',
+  'hudChrome.options.ia.catOverviewSub': 'よく使う項目、クイック操作、変更点をまとめて表示します。',
+  'hudChrome.options.ia.catGraphicsSub': '画質、視界、世界の見た目。',
+  'hudChrome.options.ia.catInterfaceSub': 'HUDの拡大率、パネル、チャット、ユニットフレーム。',
+  'hudChrome.options.ia.catAccessibilityName': 'アクセシビリティ',
+  'hudChrome.options.ia.catAccessibilitySub': 'モーション、コントラスト、コンテンツの快適さ。',
+  'hudChrome.options.ia.catControlsName': '操作',
+  'hudChrome.options.ia.catControlsSub': 'カメラ、移動、戦闘、フィードバック。',
+  'hudChrome.options.ia.catKeybindsSub': 'すべての操作にキーを割り当てます。',
+  'hudChrome.options.ia.catControllerSub': 'ゲームパッドの操作感とボタン配置。',
+  'hudChrome.options.ia.catTouchName': 'タッチ',
+  'hudChrome.options.ia.catTouchSub': '画面上のスティック、視点、ボタン。',
+  'hudChrome.options.ia.catAudioSub': '音量とサウンドの切り替え。',
+  'hudChrome.options.ia.catSystemName': 'システム',
+  'hudChrome.options.ia.catSystemSub': 'パフォーマンス、サポート、バージョン情報。',
   'hudChrome.vcup.guildBoardWl': '{wins} 勝 {losses} 敗',
   'hudChrome.vcup.shootPower': 'パワー',
   'hudChrome.discord.roleTag.coredevs': 'コア開発者',

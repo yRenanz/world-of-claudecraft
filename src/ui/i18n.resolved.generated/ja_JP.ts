@@ -572,7 +572,27 @@ export const ja_JP: EnTranslations = {
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",
-      "mobileLeftHanded": "左利き用レイアウト"
+      "mobileLeftHanded": "左利き用レイアウト",
+      "ia": {
+        "railDisplay": "表示",
+        "railInput": "入力",
+        "railSystem": "システム",
+        "catOverviewName": "概要",
+        "catOverviewSub": "よく使う項目、クイック操作、変更点をまとめて表示します。",
+        "catGraphicsSub": "画質、視界、世界の見た目。",
+        "catInterfaceSub": "HUDの拡大率、パネル、チャット、ユニットフレーム。",
+        "catAccessibilityName": "アクセシビリティ",
+        "catAccessibilitySub": "モーション、コントラスト、コンテンツの快適さ。",
+        "catControlsName": "操作",
+        "catControlsSub": "カメラ、移動、戦闘、フィードバック。",
+        "catKeybindsSub": "すべての操作にキーを割り当てます。",
+        "catControllerSub": "ゲームパッドの操作感とボタン配置。",
+        "catTouchName": "タッチ",
+        "catTouchSub": "画面上のスティック、視点、ボタン。",
+        "catAudioSub": "音量とサウンドの切り替え。",
+        "catSystemName": "システム",
+        "catSystemSub": "パフォーマンス、サポート、バージョン情報。"
+      }
     },
     "controller": {
       "title": "コントローラー",

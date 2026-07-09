@@ -14,6 +14,25 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  // Esc menu redesign (The Warden's Codex): category-rail IA (options_ia.ts).
+  'hudChrome.options.ia.railDisplay': '화면',
+  'hudChrome.options.ia.railInput': '입력',
+  'hudChrome.options.ia.railSystem': '시스템',
+  'hudChrome.options.ia.catOverviewName': '개요',
+  'hudChrome.options.ia.catOverviewSub': '고정한 필수 항목, 빠른 작업, 변경된 설정을 보여줍니다.',
+  'hudChrome.options.ia.catGraphicsSub': '품질, 시야, 월드 그래픽.',
+  'hudChrome.options.ia.catInterfaceSub': 'HUD 배율, 패널, 채팅, 유닛 프레임.',
+  'hudChrome.options.ia.catAccessibilityName': '접근성',
+  'hudChrome.options.ia.catAccessibilitySub': '모션, 대비, 콘텐츠 편의성.',
+  'hudChrome.options.ia.catControlsName': '조작',
+  'hudChrome.options.ia.catControlsSub': '카메라, 이동, 전투, 피드백.',
+  'hudChrome.options.ia.catKeybindsSub': '모든 동작에 키를 지정합니다.',
+  'hudChrome.options.ia.catControllerSub': '게임패드 감도와 버튼 배치.',
+  'hudChrome.options.ia.catTouchName': '터치',
+  'hudChrome.options.ia.catTouchSub': '화면 스틱, 시점, 버튼.',
+  'hudChrome.options.ia.catAudioSub': '음량과 사운드 토글.',
+  'hudChrome.options.ia.catSystemName': '시스템',
+  'hudChrome.options.ia.catSystemSub': '성능, 지원, 정보.',
   'hudChrome.vcup.guildBoardWl': '{wins}승 {losses}패',
   'hudChrome.vcup.shootPower': '파워',
   'hudChrome.discord.roleTag.coredevs': '핵심 개발자',

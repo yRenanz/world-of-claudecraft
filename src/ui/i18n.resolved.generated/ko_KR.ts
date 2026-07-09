@@ -572,7 +572,27 @@ export const ko_KR: EnTranslations = {
       "showSecondaryActionBar": "보조 액션 바 표시",
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
       "mobileCameraJoystick": "카메라 조이스틱",
-      "mobileLeftHanded": "왼손잡이 레이아웃"
+      "mobileLeftHanded": "왼손잡이 레이아웃",
+      "ia": {
+        "railDisplay": "화면",
+        "railInput": "입력",
+        "railSystem": "시스템",
+        "catOverviewName": "개요",
+        "catOverviewSub": "고정한 필수 항목, 빠른 작업, 변경된 설정을 보여줍니다.",
+        "catGraphicsSub": "품질, 시야, 월드 그래픽.",
+        "catInterfaceSub": "HUD 배율, 패널, 채팅, 유닛 프레임.",
+        "catAccessibilityName": "접근성",
+        "catAccessibilitySub": "모션, 대비, 콘텐츠 편의성.",
+        "catControlsName": "조작",
+        "catControlsSub": "카메라, 이동, 전투, 피드백.",
+        "catKeybindsSub": "모든 동작에 키를 지정합니다.",
+        "catControllerSub": "게임패드 감도와 버튼 배치.",
+        "catTouchName": "터치",
+        "catTouchSub": "화면 스틱, 시점, 버튼.",
+        "catAudioSub": "음량과 사운드 토글.",
+        "catSystemName": "시스템",
+        "catSystemSub": "성능, 지원, 정보."
+      }
     },
     "controller": {
       "title": "컨트롤러",

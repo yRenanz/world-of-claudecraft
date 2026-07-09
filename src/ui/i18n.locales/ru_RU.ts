@@ -14,6 +14,26 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  // Esc menu redesign (The Warden's Codex): category-rail IA (options_ia.ts).
+  'hudChrome.options.ia.railDisplay': 'Экран',
+  'hudChrome.options.ia.railInput': 'Ввод',
+  'hudChrome.options.ia.railSystem': 'Система',
+  'hudChrome.options.ia.catOverviewName': 'Обзор',
+  'hudChrome.options.ia.catOverviewSub':
+    'Закрепленные настройки, быстрые действия и что изменилось.',
+  'hudChrome.options.ia.catGraphicsSub': 'Качество, обзор и вид мира.',
+  'hudChrome.options.ia.catInterfaceSub': 'Масштаб интерфейса, панели, чат и рамки юнитов.',
+  'hudChrome.options.ia.catAccessibilityName': 'Доступность',
+  'hudChrome.options.ia.catAccessibilitySub': 'Анимация, контраст и комфорт контента.',
+  'hudChrome.options.ia.catControlsName': 'Управление',
+  'hudChrome.options.ia.catControlsSub': 'Камера, движение, бой и отклик.',
+  'hudChrome.options.ia.catKeybindsSub': 'Назначьте клавиши для всех действий.',
+  'hudChrome.options.ia.catControllerSub': 'Отклик геймпада и раскладка кнопок.',
+  'hudChrome.options.ia.catTouchName': 'Сенсор',
+  'hudChrome.options.ia.catTouchSub': 'Экранные стики, обзор и кнопки.',
+  'hudChrome.options.ia.catAudioSub': 'Громкость и переключатели звука.',
+  'hudChrome.options.ia.catSystemName': 'Система',
+  'hudChrome.options.ia.catSystemSub': 'Производительность, поддержка и о программе.',
   'hudChrome.vcup.guildBoardWl': '{wins} побед, {losses} поражений',
   'hudChrome.vcup.shootPower': 'СИЛА',
   'hudChrome.discord.roleTag.coredevs': 'Ведущий разработчик',

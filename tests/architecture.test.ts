@@ -143,6 +143,7 @@ const UI_PURE_CORES = [
   'src/ui/item_set_tooltip_view.ts',
   'src/ui/weapon_proc_view.ts',
   'src/ui/options_view.ts',
+  'src/ui/options_ia.ts',
   'src/ui/vendor_view.ts',
   'src/ui/heroic_vendor_view.ts',
   'src/ui/loot_roll_status_view.ts',
@@ -218,6 +219,7 @@ const RENDER_PURE_CORES = [
 // reverse-completeness guard.
 const BARE_NAMED = [
   'src/ui/unit_portrait.ts',
+  'src/ui/options_ia.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
   'src/ui/party_frames.ts',

@@ -572,7 +572,27 @@ export const ru_RU: EnTranslations = {
       "showSecondaryActionBar": "Показывать вторичную панель действий",
       "showDailyRewardsChest": "Показывать сундук ежедневных наград",
       "mobileCameraJoystick": "Джойстик камеры",
-      "mobileLeftHanded": "Раскладка для левшей"
+      "mobileLeftHanded": "Раскладка для левшей",
+      "ia": {
+        "railDisplay": "Экран",
+        "railInput": "Ввод",
+        "railSystem": "Система",
+        "catOverviewName": "Обзор",
+        "catOverviewSub": "Закрепленные настройки, быстрые действия и что изменилось.",
+        "catGraphicsSub": "Качество, обзор и вид мира.",
+        "catInterfaceSub": "Масштаб интерфейса, панели, чат и рамки юнитов.",
+        "catAccessibilityName": "Доступность",
+        "catAccessibilitySub": "Анимация, контраст и комфорт контента.",
+        "catControlsName": "Управление",
+        "catControlsSub": "Камера, движение, бой и отклик.",
+        "catKeybindsSub": "Назначьте клавиши для всех действий.",
+        "catControllerSub": "Отклик геймпада и раскладка кнопок.",
+        "catTouchName": "Сенсор",
+        "catTouchSub": "Экранные стики, обзор и кнопки.",
+        "catAudioSub": "Громкость и переключатели звука.",
+        "catSystemName": "Система",
+        "catSystemSub": "Производительность, поддержка и о программе."
+      }
     },
     "controller": {
       "title": "Геймпад",

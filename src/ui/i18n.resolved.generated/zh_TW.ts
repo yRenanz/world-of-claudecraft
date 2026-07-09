@@ -572,7 +572,27 @@ export const zh_TW: EnTranslations = {
       "showSecondaryActionBar": "顯示副動作列",
       "showDailyRewardsChest": "顯示每日獎勵寶箱",
       "mobileCameraJoystick": "攝影機搖桿",
-      "mobileLeftHanded": "左手配置"
+      "mobileLeftHanded": "左手配置",
+      "ia": {
+        "railDisplay": "顯示",
+        "railInput": "輸入",
+        "railSystem": "系統",
+        "catOverviewName": "總覽",
+        "catOverviewSub": "釘選的常用項、快捷操作，以及已變更的內容。",
+        "catGraphicsSub": "畫質、視野與世界畫面。",
+        "catInterfaceSub": "介面縮放、面板、聊天與單位框體。",
+        "catAccessibilityName": "無障礙",
+        "catAccessibilitySub": "動態效果、對比度與內容舒適度。",
+        "catControlsName": "控制",
+        "catControlsSub": "鏡頭、移動、戰鬥與回饋。",
+        "catKeybindsSub": "為每個操作綁定按鍵。",
+        "catControllerSub": "手把手感與按鍵配置。",
+        "catTouchName": "觸控",
+        "catTouchSub": "螢幕搖桿、視角與按鈕。",
+        "catAudioSub": "音量與聲音開關。",
+        "catSystemName": "系統",
+        "catSystemSub": "效能、支援與關於。"
+      }
     },
     "controller": {
       "title": "手把",

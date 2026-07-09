@@ -572,7 +572,27 @@ export const zh_CN: EnTranslations = {
       "showSecondaryActionBar": "显示副动作条",
       "showDailyRewardsChest": "显示每日奖励宝箱",
       "mobileCameraJoystick": "摄像机摇杆",
-      "mobileLeftHanded": "左手布局"
+      "mobileLeftHanded": "左手布局",
+      "ia": {
+        "railDisplay": "显示",
+        "railInput": "输入",
+        "railSystem": "系统",
+        "catOverviewName": "概览",
+        "catOverviewSub": "固定的常用项、快捷操作，以及已更改的内容。",
+        "catGraphicsSub": "画质、视野与世界画面。",
+        "catInterfaceSub": "界面缩放、面板、聊天与单位框体。",
+        "catAccessibilityName": "无障碍",
+        "catAccessibilitySub": "动态效果、对比度与内容舒适度。",
+        "catControlsName": "控制",
+        "catControlsSub": "镜头、移动、战斗与反馈。",
+        "catKeybindsSub": "为每个操作绑定按键。",
+        "catControllerSub": "手柄手感与按键布局。",
+        "catTouchName": "触控",
+        "catTouchSub": "屏幕摇杆、视角与按钮。",
+        "catAudioSub": "音量与声音开关。",
+        "catSystemName": "系统",
+        "catSystemSub": "性能、支持与关于。"
+      }
     },
     "controller": {
       "title": "手柄",

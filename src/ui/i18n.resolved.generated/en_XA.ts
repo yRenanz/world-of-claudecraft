@@ -572,7 +572,27 @@ export const en_XA: EnTranslations = {
       "showSecondaryActionBar": "[Šĥóŵ Šéçóñðáŕý Áçţíóñ Ɓáŕ]",
       "showDailyRewardsChest": "[Šĥóŵ Ðáíļý Ŕéŵáŕðš Çĥéšţ]",
       "mobileCameraJoystick": "[Çáɱéŕá ĵóýšţíçķ]",
-      "mobileLeftHanded": "[Ļéƒţ-ĥáñðéð ļáýóúţ]"
+      "mobileLeftHanded": "[Ļéƒţ-ĥáñðéð ļáýóúţ]",
+      "ia": {
+        "railDisplay": "[Ðíšþļáý]",
+        "railInput": "[Íñþúţ]",
+        "railSystem": "[Šýšţéɱ]",
+        "catOverviewName": "[Óʋéŕʋíéŵ]",
+        "catOverviewSub": "[Þíññéð éššéñţíáļš, ɋúíçķ áçţíóñš, áñð ŵĥáţ çĥáñĝéð.]",
+        "catGraphicsSub": "[Ɋúáļíţý, ʋíéŵ, áñð ŵóŕļð ʋíšúáļš.]",
+        "catInterfaceSub": "[ĤÚÐ šçáļé, þáñéļš, çĥáţ, áñð úñíţ ƒŕáɱéš.]",
+        "catAccessibilityName": "[Áççéššíƀíļíţý]",
+        "catAccessibilitySub": "[Ɱóţíóñ, çóñţŕášţ, áñð çóñţéñţ çóɱƒóŕţ.]",
+        "catControlsName": "[Çóñţŕóļš]",
+        "catControlsSub": "[Çáɱéŕá, ɱóʋéɱéñţ, çóɱƀáţ, áñð ƒééðƀáçķ.]",
+        "catKeybindsSub": "[Ɓíñð ķéýš ƒóŕ éʋéŕý áçţíóñ.]",
+        "catControllerSub": "[Ĝáɱéþáð ƒééļ áñð ƀúţţóñ ļáýóúţ.]",
+        "catTouchName": "[Ţóúçĥ]",
+        "catTouchSub": "[Óñ-šçŕééñ šţíçķš, ļóóķ, áñð ƀúţţóñš.]",
+        "catAudioSub": "[Ʋóļúɱé áñð šóúñð ţóĝĝļéš.]",
+        "catSystemName": "[Šýšţéɱ]",
+        "catSystemSub": "[Þéŕƒóŕɱáñçé, šúþþóŕţ, áñð áƀóúţ.]"
+      }
     },
     "controller": {
       "title": "[Çóñţŕóļļéŕ]",

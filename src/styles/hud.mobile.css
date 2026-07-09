@@ -4060,4 +4060,48 @@
   :root[data-fx-level="low"] body.mobile-touch .fct.crit {
     animation-name: fct-rise-mobile;
   }
+
+  /* ---------- AAA grammar: touch variants ---------- */
+  /* Touch overrides for the shared component grammar (docs/design/
+     ui-ux-redesign-spec.md sections 6.1 and 8): reach-first sizing so every
+     control clears the 40x40 tap floor. Additive: nothing carries .window-frame
+     yet. Tokens only; this layer outranks components, so no !important. */
+  body.mobile-touch .window-titlebar {
+    min-height: var(--window-titlebar-h-touch);
+  }
+  body.mobile-touch .window-close {
+    min-width: var(--control-h-touch);
+    min-height: var(--control-h-touch);
+  }
+  /* Tabs stay a single non-wrapping row that scrolls horizontally on touch
+     (spec 8), but grow to the touch control height so each clears 40x40. */
+  body.mobile-touch .tab {
+    height: var(--control-h-touch);
+  }
+  body.mobile-touch .window-frame .btn {
+    height: var(--control-h-touch);
+  }
+  body.mobile-touch .window-frame .icon-btn {
+    width: var(--control-h-touch);
+    height: var(--control-h-touch);
+  }
+  body.mobile-touch .window-frame .field input,
+  body.mobile-touch .window-frame .field select,
+  body.mobile-touch .window-frame .search-field input,
+  body.mobile-touch .window-frame .search-field .search-clear {
+    height: var(--control-h-touch);
+  }
+  /* Data-table rows grow to 48px on touch (spec 8). */
+  body.mobile-touch .window-frame .data-table th,
+  body.mobile-touch .window-frame .data-table td {
+    height: 48px;
+  }
+  /* Footer actions stack full-width on touch (spec 6.1). */
+  body.mobile-touch .window-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  body.mobile-touch .window-footer .btn {
+    width: 100%;
+  }
 }

@@ -7644,4 +7644,637 @@
       animation: none;
     }
   }
+
+  /* ---------- AAA grammar: panels and window chrome ---------- */
+  /* The shared component grammar for the AAA redesign (docs/design/
+     ui-ux-redesign-spec.md sections 6.1 and 8). Additive: nothing consumes it
+     yet (the window frame builder src/ui/window_frame.ts stamps these classes,
+     and Task 3 wires the first window). Tokens only, no literal colours.
+
+     Collision policy: the frame chrome + depth panels below are NEW class names
+     (no existing selector), so they are global. The CONTENT grammar further
+     down (buttons, bars, badges, and the rest) reuses names that already exist
+     globally (.btn / .btn-primary / .btn-danger / .bar / .bar-fill / .badge),
+     so to stay strictly additive (no existing element restyled) it is SCOPED
+     under .window-frame: it only applies inside a redesigned window, which none
+     exist yet. */
+
+  /* Three panel depths sharing one visual language (spec 9.2). */
+  .panel-l0 {
+    background: var(--color-panel-l0-bg);
+    border: 1px solid var(--color-panel-l0-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-light);
+  }
+  .panel-l1 {
+    background: var(--panel-l1-bg);
+    border: 1px solid var(--window-border);
+    box-shadow: inset 0 0 0 1px var(--panel-edge);
+    border-radius: var(--radius-md);
+    color: var(--color-text-light);
+  }
+  /* L2 must never composite the world through it: the gradient rides a fully
+     solid base (spec 9.2), so no translucency reaches the 3D canvas. */
+  .panel-l2 {
+    background-color: var(--color-panel-l2-base);
+    background-image: var(--panel-l1-bg);
+    border: 1px solid var(--color-border-focus);
+    box-shadow: inset 0 0 0 1px var(--panel-edge);
+    border-radius: var(--radius-md);
+    color: var(--color-text-light);
+  }
+
+  /* Shared header row (40px, display-font title, right-aligned control cluster). */
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    min-height: var(--window-titlebar-h);
+    padding: 0 var(--spacing-md);
+  }
+
+  /* The window frame: an L1 panel with a framed border, an inner edge line, and
+     a decorative corner ornament at fx medium and up. */
+  .window-frame {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    background: var(--panel-l1-bg);
+    border: 1px solid var(--window-border);
+    box-shadow: inset 0 0 0 1px var(--panel-edge);
+    border-radius: var(--radius-md);
+    color: var(--color-text-light);
+  }
+  /* Corner ornaments: pure decoration (spec 6.1), zero layout impact
+     (position: absolute, pointer-events: none), rendered only at fx medium and
+     up (the low tier drops them via the gate below). */
+  .window-frame::before,
+  .window-frame::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: var(--window-ornament-size);
+    height: var(--window-ornament-size);
+    pointer-events: none;
+    border-top: 1px solid var(--color-primary-dim);
+  }
+  .window-frame::before {
+    left: 0;
+    border-left: 1px solid var(--color-primary-dim);
+    border-top-left-radius: var(--radius-md);
+  }
+  .window-frame::after {
+    right: 0;
+    border-right: 1px solid var(--color-primary-dim);
+    border-top-right-radius: var(--radius-md);
+  }
+  /* Low fx tier: no ornaments (decoration only, spec 10.3). */
+  :root[data-fx-level="low"] .window-frame::before,
+  :root[data-fx-level="low"] .window-frame::after {
+    display: none;
+  }
+
+  /* Titlebar: 40px desktop; the title is the one display-font moment here. */
+  .window-titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    min-height: var(--window-titlebar-h);
+    padding: 0 var(--spacing-sm) 0 var(--spacing-md);
+    border-bottom: 1px solid var(--panel-edge);
+    flex: none;
+  }
+  .window-title {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    letter-spacing: 0.4px;
+    color: var(--window-title-color);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* Close: a 40px minimum hit area (via padding) even though the glyph is
+     smaller, colour/border only on hover (no transform), tokenized throughout. */
+  .window-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--touch-min);
+    min-height: var(--touch-min);
+    padding: var(--spacing-sm);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    transition:
+      color var(--dur-fast) var(--transition-ease),
+      border-color var(--dur-fast) var(--transition-ease);
+  }
+  .window-close .ui-icon {
+    width: 16px;
+    height: 16px;
+  }
+  .window-close:hover {
+    color: var(--color-text-light);
+    border-color: var(--color-border-focus);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .window-close {
+      transition: none;
+    }
+  }
+
+  .window-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+  }
+  /* Sticky footer action row for transactional windows (spec 6.1). */
+  .window-footer {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+    flex: none;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-top: 1px solid var(--panel-edge);
+    background: var(--color-panel-l2-base);
+  }
+
+  /* Tab rail: 36px tall, a gold underline on the active tab, horizontal scroll
+     rather than wrapping (spec 8). */
+  .tab-rail {
+    display: flex;
+    gap: var(--spacing-xs);
+    align-items: stretch;
+    flex: none;
+    padding: 0 var(--spacing-sm);
+    border-bottom: 1px solid var(--panel-edge);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+  }
+  .tab-rail::-webkit-scrollbar {
+    height: 0;
+  }
+  .tab {
+    flex: 0 0 auto;
+    height: var(--control-h);
+    padding: 0 var(--spacing-md);
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    white-space: nowrap;
+    cursor: var(--cursor-point);
+    transition:
+      color var(--dur-fast) var(--transition-ease),
+      border-color var(--dur-fast) var(--transition-ease);
+  }
+  .tab:hover {
+    color: var(--color-text-light);
+  }
+  .tab[aria-selected="true"] {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tab {
+      transition: none;
+    }
+  }
+
+  /* ---------- AAA grammar: controls, data, and states ---------- */
+  /* Scoped under .window-frame (see the collision policy above): the class names
+     here already exist globally, so scoping keeps this strictly additive until a
+     window opts into the redesigned frame. Tokens only. */
+
+  /* Buttons: 36px, hover brightens the BORDER (never a transform scale, per the
+     motion-sickness invariant), active adds an inset shade, disabled drops to
+     0.4 opacity, loading preserves width so the row never shifts. */
+  .window-frame .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    height: var(--control-h);
+    padding: 0 var(--spacing-md);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-text-light) 6%, transparent);
+    color: var(--color-text-light);
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+    cursor: var(--cursor-point);
+    transition:
+      border-color var(--dur-fast) var(--transition-ease),
+      background-color var(--dur-fast) var(--transition-ease);
+  }
+  .window-frame .btn:hover:not(:disabled) {
+    border-color: var(--color-border-focus);
+  }
+  .window-frame .btn:active:not(:disabled) {
+    box-shadow: inset 0 2px 6px color-mix(in srgb, var(--color-bg-dark) 70%, transparent);
+  }
+  .window-frame .btn:disabled,
+  .window-frame .btn[aria-disabled="true"] {
+    opacity: 0.4;
+    cursor: default;
+  }
+  /* Loading: the label is hidden but its width is preserved (min-width), so the
+     button does not collapse while a spinner shows. */
+  .window-frame .btn.is-loading {
+    color: transparent;
+    pointer-events: none;
+    min-width: var(--control-h);
+  }
+  .window-frame .btn-primary {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-bg-dark);
+    font-family: var(--font-display);
+  }
+  .window-frame .btn-primary:hover:not(:disabled) {
+    border-color: var(--color-text-light);
+  }
+  .window-frame .btn-ghost {
+    background: transparent;
+  }
+  .window-frame .btn-danger {
+    border-color: var(--color-border-invalid);
+    color: var(--color-text-error);
+  }
+  .window-frame .btn-danger:hover:not(:disabled) {
+    border-color: var(--color-text-error);
+  }
+
+  /* Icon button: control-height square with a badge slot top-right. */
+  .window-frame .icon-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--control-h);
+    height: var(--control-h);
+    padding: 0;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-text-light) 6%, transparent);
+    color: var(--color-text-light);
+    cursor: var(--cursor-point);
+    transition: border-color var(--dur-fast) var(--transition-ease);
+  }
+  .window-frame .icon-btn:hover:not(:disabled) {
+    border-color: var(--color-border-focus);
+  }
+  .window-frame .icon-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .window-frame .icon-btn .badge {
+    position: absolute;
+    top: calc(-1 * var(--spacing-xs));
+    right: calc(-1 * var(--spacing-xs));
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .window-frame .btn,
+    .window-frame .icon-btn {
+      transition: none;
+    }
+  }
+
+  /* Fields: label above, validation line below coloured by the validity tokens;
+     aria-invalid drives the input border. */
+  .window-frame .field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+  .window-frame .field > label {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+  .window-frame .field input,
+  .window-frame .field textarea,
+  .window-frame .field select {
+    height: var(--control-h);
+    padding: 0 var(--spacing-sm);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-input);
+    color: var(--color-text-light);
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+  }
+  .window-frame .field textarea {
+    height: auto;
+    padding: var(--spacing-sm);
+  }
+  .window-frame .field input[aria-invalid="true"] {
+    border-color: var(--color-border-invalid);
+  }
+  .window-frame .field-line {
+    font-size: var(--text-xs);
+    min-height: var(--text-md);
+  }
+  .window-frame .field-line.is-invalid {
+    color: var(--color-border-invalid);
+  }
+  .window-frame .field-line.is-valid {
+    color: var(--color-border-valid);
+  }
+
+  /* Search field: a field with a leading icon slot and a trailing clear button. */
+  .window-frame .search-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .window-frame .search-field .search-icon {
+    position: absolute;
+    left: var(--spacing-sm);
+    color: var(--color-text-muted);
+    pointer-events: none;
+  }
+  .window-frame .search-field input {
+    width: 100%;
+    height: var(--control-h);
+    padding: 0 calc(var(--spacing-md) + var(--control-h)) 0
+      calc(var(--spacing-md) + var(--spacing-sm));
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-input);
+    color: var(--color-text-light);
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+  }
+  .window-frame .search-field .search-clear {
+    position: absolute;
+    right: var(--spacing-xs);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--control-h);
+    height: var(--control-h);
+    border: 0;
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+  }
+
+  /* Filter row of chip toggles. */
+  .window-frame .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+  .window-frame .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    height: 24px;
+    padding: 0 var(--spacing-sm);
+    border: 1px solid var(--color-border-default);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--color-text-light) 6%, transparent);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    cursor: var(--cursor-point);
+    /* No transform on hover/focus, ever (spec 8; motion-sickness invariant). */
+    transition:
+      border-color var(--dur-fast) var(--transition-ease),
+      color var(--dur-fast) var(--transition-ease);
+  }
+  .window-frame .chip:hover {
+    border-color: var(--color-border-focus);
+  }
+  .window-frame .chip[aria-pressed="true"] {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .window-frame .chip {
+      transition: none;
+    }
+  }
+
+  /* Card: an L1 mini surface with 12px padding. */
+  .window-frame .card {
+    padding: 12px;
+    border: 1px solid var(--window-border);
+    border-radius: var(--radius-md);
+    background: var(--panel-l1-bg);
+  }
+
+  /* Data table: sticky header, 32px rows, zebra via a panel-depth tint. */
+  .window-frame .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+  .window-frame .data-table th,
+  .window-frame .data-table td {
+    height: 32px;
+    padding: 0 var(--spacing-sm);
+    text-align: left;
+  }
+  .window-frame .data-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--color-panel-l2-base);
+    color: var(--color-primary);
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    border-bottom: 1px solid var(--panel-edge);
+  }
+  .window-frame .data-table tbody tr:nth-child(odd) {
+    background: color-mix(in srgb, var(--color-text-light) 4%, transparent);
+  }
+
+  /* Vertical list of rows for a master pane. */
+  .window-frame .list-rows {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Item cell: 44px, a rarity border from the quality tokens (via data-quality),
+     a count corner, focusable. */
+  .window-frame .item-cell {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--color-quality-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-dark);
+    cursor: var(--cursor-point);
+  }
+  .window-frame .item-cell[data-quality="poor"] {
+    border-color: var(--color-quality-poor);
+  }
+  .window-frame .item-cell[data-quality="common"] {
+    border-color: var(--color-quality-common);
+  }
+  .window-frame .item-cell[data-quality="uncommon"] {
+    border-color: var(--color-quality-uncommon);
+  }
+  .window-frame .item-cell[data-quality="rare"] {
+    border-color: var(--color-quality-rare);
+  }
+  .window-frame .item-cell[data-quality="epic"] {
+    border-color: var(--color-quality-epic);
+  }
+  .window-frame .item-cell[data-quality="legendary"] {
+    border-color: var(--color-quality-legendary);
+  }
+  .window-frame .item-cell .item-cell-count {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    padding: 0 2px;
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+    background: color-mix(in srgb, var(--color-bg-dark) 78%, transparent);
+    border-radius: var(--radius-sm);
+  }
+
+  /* Progress / resource bars: a track with a fill, resource variants coloured by
+     the existing resource tokens. */
+  .window-frame .bar {
+    position: relative;
+    height: 14px;
+    border: 1px solid var(--panel-edge);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-dark);
+    overflow: hidden;
+  }
+  .window-frame .bar-fill {
+    height: 100%;
+    background: var(--color-primary);
+  }
+  .window-frame .bar.hp .bar-fill {
+    background: var(--color-hp);
+  }
+  .window-frame .bar.mana .bar-fill {
+    background: var(--color-mana);
+  }
+  .window-frame .bar.rage .bar-fill {
+    background: var(--color-rage);
+  }
+  .window-frame .bar.energy .bar-fill {
+    background: var(--color-energy);
+  }
+
+  /* Badge: a 16px count pill with priority variants from the notification tokens. */
+  .window-frame .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 var(--spacing-xs);
+    border: 1px solid var(--color-notify-info);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-dark);
+    color: var(--color-text-light);
+    font-size: var(--text-xs);
+    line-height: 1;
+  }
+  .window-frame .badge.badge-success {
+    border-color: var(--color-notify-success);
+  }
+  .window-frame .badge.badge-warning {
+    border-color: var(--color-notify-warning);
+  }
+  .window-frame .badge.badge-critical {
+    border-color: var(--color-notify-critical);
+  }
+
+  /* Shared window states (spec 6.1): one visual each across every window. */
+  .window-frame .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    text-align: center;
+  }
+  .window-frame .loading-state {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+  }
+  .window-frame .loading-state .skeleton-row {
+    height: var(--control-h);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-text-muted) 18%, transparent);
+  }
+  .window-frame .error-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--color-notify-critical);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-notify-critical) 14%, transparent);
+    color: var(--color-text-error);
+    font-size: var(--text-sm);
+  }
+
+  /* ---------- AAA grammar: focus ring ---------- */
+  /* One shared, steady (never transitioned) focus ring for every new interactive
+     class, drawn from the focus-ring tokens (spec 9.8). */
+  .window-frame .btn:focus-visible,
+  .window-frame .btn-primary:focus-visible,
+  .window-frame .btn-ghost:focus-visible,
+  .window-frame .btn-danger:focus-visible,
+  .window-frame .icon-btn:focus-visible,
+  .window-frame .chip:focus-visible,
+  .window-frame .card:focus-visible,
+  .window-frame .item-cell:focus-visible,
+  .window-frame .field input:focus-visible,
+  .window-frame .field textarea:focus-visible,
+  .window-frame .field select:focus-visible,
+  .window-frame .search-field input:focus-visible,
+  .window-frame .search-clear:focus-visible,
+  .window-frame .data-table [tabindex]:focus-visible,
+  .window-close:focus-visible,
+  .tab:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+  /* Forced colours: keep the frame / panel borders and the focus ring alive via
+     system colours (mirrors the base.css forced-colors section; the global
+     :focus-visible Highlight net there already covers these controls, so this
+     block only needs to preserve the panel edges the forced palette would drop). */
+  @media (forced-colors: active) {
+    .window-frame,
+    .panel-l0,
+    .panel-l1,
+    .panel-l2,
+    .window-frame .card,
+    .window-frame .item-cell,
+    .window-frame .error-banner {
+      border: 1px solid CanvasText;
+    }
+    .tab[aria-selected="true"] {
+      border-bottom-color: Highlight;
+    }
+  }
 }

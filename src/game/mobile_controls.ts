@@ -709,6 +709,8 @@ export class MobileControls {
     this.moveStickRadius = layoutRadius;
     this.moveAutorunLocked = false;
     this.syncMoveAutorunTarget('hidden');
+    // Autorun is a latch from the previous joystick drag; a fresh grab is a new
+    // movement intent, so it cancels the latch before steering.
     if (this.input.autorun) this.input.setAutorun(false);
     // The wheel's DRAWN position floats toward the thumb but is clamped to stay
     // within MOVE_JOYSTICK_FLOAT_RADIUS of its resting spot, so a touch anywhere

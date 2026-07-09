@@ -13,6 +13,7 @@ import {
 } from './game/browser_env';
 import { isCameraDrivenFacingActive } from './game/camera_driven_facing';
 import { cameraFollowShouldSettle, updateFollowCameraYaw, wrapAngle } from './game/camera_follow';
+import { keyboardDismissEffect, shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
 import {
   clickMoveShouldWalk,
   clickMoveStep,
@@ -1058,7 +1059,21 @@ async function startGame(
     }
   });
   chatInput.addEventListener('blur', () => {
-    if (chatInput.style.display === 'none') recoverFromMobileKeyboard();
+    // Recover the mobile-chat viewport ONLY when the composer is already hidden (the
+    // close path: closeChat hides then blurs). An intentional keyboard dismiss (the
+    // #chat-dismiss chevron below) blurs while the composer is still shown, so this is
+    // false and chat stays open at its resting seat, reflowed by the keyboard_viewport
+    // applier off the visualViewport resize.
+    if (shouldRecoverOnComposerBlur(chatInput.style.display)) recoverFromMobileKeyboard();
+  });
+  // The mobile keyboard-dismiss chevron: blur the composer (dropping the on-screen
+  // keyboard on Android + iOS) WITHOUT closing chat. The effect is a pure decision
+  // (blurComposer true, closeChat false); we apply only the blur, so the log +
+  // composer stay visible and re-tapping the input re-raises the keyboard (native).
+  const chatDismiss = document.getElementById('chat-dismiss');
+  chatDismiss?.addEventListener('click', () => {
+    const effect = keyboardDismissEffect();
+    if (effect.blurComposer) chatInput.blur();
   });
 
   const input = new Input(

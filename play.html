@@ -397,6 +397,12 @@
   </div>
 
   <textarea id="chat-input" rows="1" maxlength="255" data-i18n-placeholder="hud.core.chatPlaceholder" placeholder="Say something... (/w name, /r, /p, /gu, /o, /general, /join world|lfg, /afk, /dnd)" autocomplete="off" autocapitalize="sentences" autocorrect="off" spellcheck="false" data-1p-ignore data-lpignore="true" data-bwignore data-form-type="other"></textarea>
+    <!-- Mobile-only keyboard-dismiss chevron: blurs #chat-input so the on-screen
+         keyboard drops WITHOUT closing chat (the log + composer stay visible). Shown
+         only under body.mobile-touch while chat is open (CSS). The down chevron reuses
+         the hydrated `next` triangle rotated 90deg, the same SVG-chevron pattern as the
+         consumables toggle (no unicode arrow). -->
+    <button type="button" id="chat-dismiss" data-i18n-title="hudChrome.mobile.hideKeyboard" data-i18n-aria="hudChrome.mobile.hideKeyboard" title="Hide keyboard" aria-label="Hide keyboard" data-icon="next"></button>
   </template>
 
   <!-- Discord panel lives OUTSIDE the game-ui-template so it exists in the DOM at

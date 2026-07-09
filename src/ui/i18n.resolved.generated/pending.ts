@@ -22,14 +22,7 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [],
   "ru_RU": [],
-  "cs_CZ": [
-    "entities.items.arcanite_bar.name",
-    "entities.items.ashwood_log.name",
-    "entities.items.elderwood_log.name",
-    "entities.items.goldleaf_herb.name",
-    "entities.items.sunpetal_herb.name",
-    "entities.items.thorium_ore.name"
-  ],
+  "cs_CZ": [],
   "nl_NL": [],
   "pl_PL": [],
   "id_ID": [],

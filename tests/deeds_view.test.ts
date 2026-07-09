@@ -14,10 +14,13 @@ import {
   DEED_BESPOKE_CRESTS,
   DEED_DISPLAY_CATEGORIES,
   DEED_WATCH_CAP,
+  type DeedsRefreshSigParts,
   type DeedsViewInput,
   deedCrestId,
   deedDisplayCategory,
   deedProgress,
+  deedStatsDigest,
+  deedsRefreshSig,
   makeDeedTrackerView,
   toggleWatch,
 } from '../src/ui/deeds_view';
@@ -276,6 +279,31 @@ describe('buildDeedsView', () => {
     expect(feat?.feat).toBe(true);
     // feat_counter is 9/10 kills, the highest fraction anywhere, yet excluded.
     expect(view.summary.nearest.map((n) => n.id)).toEqual(['cmb_counter']);
+  });
+
+  it('breaks nearest same-fraction ties by catalog order, earlier first', () => {
+    const counter: Omit<DeedDef, 'id' | 'name'> = {
+      desc: 'Defeat ten enemies.',
+      category: 'combat',
+      renown: 5,
+      trigger: { kind: 'stat', stat: 'kills', count: 10 },
+    };
+    const tied: Record<string, DeedDef> = {
+      cmb_tie_first: { ...counter, id: 'cmb_tie_first', name: 'Tie First' },
+      cmb_tie_second: { ...counter, id: 'cmb_tie_second', name: 'Tie Second' },
+    };
+    const s = stats((x) => {
+      x.counters.kills = 5; // the same 0.5 fraction for both
+    });
+    const view = buildDeedsView(
+      makeInput({
+        deeds: tied,
+        order: ['cmb_tie_first', 'cmb_tie_second'],
+        deedStats: s,
+        searchText: (id) => id,
+      }),
+    );
+    expect(view.summary.nearest.map((n) => n.id)).toEqual(['cmb_tie_first', 'cmb_tie_second']);
   });
 
   it('builds entries with progress, clamped, and binary for unknown kinds', () => {
@@ -540,6 +568,16 @@ describe('toggleWatch', () => {
     expect(removed.watched.size).toBe(0);
   });
 
+  it('accepts the add that lands exactly at the cap (the fifth watch)', () => {
+    const four = new Set(['a', 'b', 'c', 'd']);
+    expect(four.size).toBe(DEED_WATCH_CAP - 1);
+    const fifth = toggleWatch(four, 'cmb_counter');
+    expect(fifth.changed).toBe(true);
+    expect(fifth.full).toBe(false);
+    expect(fifth.watched.size).toBe(5);
+    expect(fifth.watched.has('cmb_counter')).toBe(true);
+  });
+
   it('refuses an add at the cap with the full flag and an unchanged set', () => {
     const atCap = new Set(['a', 'b', 'c', 'd', 'e']);
     expect(atCap.size).toBe(DEED_WATCH_CAP);
@@ -551,6 +589,96 @@ describe('toggleWatch', () => {
     const removal = toggleWatch(atCap, 'c');
     expect(removal.changed).toBe(true);
     expect(removal.watched.size).toBe(4);
+  });
+});
+
+describe('deedsRefreshSig', () => {
+  const base = (): DeedsRefreshSigParts => ({
+    renown: 15,
+    earnedCount: 3,
+    activeTitle: 'cmb_title',
+    filter: 'all',
+    search: '',
+    category: 'combat',
+    watchRev: 2,
+    statsDigest: 41,
+  });
+
+  it('is identical for structurally equal parts (the elision arm)', () => {
+    expect(deedsRefreshSig(base())).toBe(deedsRefreshSig(base()));
+  });
+
+  it('moves when any single repaint dimension moves', () => {
+    const movers: Array<(p: DeedsRefreshSigParts) => void> = [
+      (p) => {
+        p.renown = 20;
+      },
+      (p) => {
+        p.earnedCount = 4;
+      },
+      (p) => {
+        p.activeTitle = null;
+      },
+      (p) => {
+        p.filter = 'earned';
+      },
+      (p) => {
+        p.search = 'wyrm';
+      },
+      (p) => {
+        p.category = 'titles';
+      },
+      (p) => {
+        p.watchRev = 3;
+      },
+      (p) => {
+        p.statsDigest = 42;
+      },
+    ];
+    // Every dimension of the parts record has a mover (dropping one from the
+    // signature, or adding one here without a mover, fails this pin).
+    expect(movers.length).toBe(Object.keys(base()).length);
+    const sig = deedsRefreshSig(base());
+    for (const move of movers) {
+      const parts = base();
+      move(parts);
+      expect(deedsRefreshSig(parts)).not.toBe(sig);
+    }
+  });
+});
+
+describe('deedStatsDigest', () => {
+  it('is stable on equal stats and moves on any climb, clear, discovery, or visit', () => {
+    const base = deedStatsDigest(stats());
+    expect(deedStatsDigest(stats())).toBe(base);
+    expect(
+      deedStatsDigest(
+        stats((x) => {
+          x.counters.kills = 1;
+        }),
+      ),
+    ).not.toBe(base);
+    expect(
+      deedStatsDigest(
+        stats((x) => {
+          x.dungeonClears.crypt = 1;
+        }),
+      ),
+    ).not.toBe(base);
+    expect(
+      deedStatsDigest(
+        stats((x) => {
+          x.itemsDiscovered.add('curio_a');
+        }),
+      ),
+    ).not.toBe(base);
+    expect(
+      deedStatsDigest(
+        stats((x) => {
+          x.visited.add('poi:a');
+        }),
+      ),
+    ).not.toBe(base);
   });
 });
 

@@ -477,3 +477,46 @@ export function buildDeedUnlockPlan(
     retroCount,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Window refresh signature: the compact key the cold painter's slow-band
+// refresh diffs, extracted pure so every repaint dimension is unit-pinned
+// (dropping one would silently freeze an open window).
+// ---------------------------------------------------------------------------
+
+/** The eight dimensions a slow-band repaint keys on. */
+export interface DeedsRefreshSigParts {
+  renown: number;
+  earnedCount: number;
+  activeTitle: string | null;
+  filter: DeedsFilter;
+  search: string;
+  category: DeedDisplayCategory | 'titles';
+  watchRev: number;
+  statsDigest: number;
+}
+
+/** Compact repaint signature (JSON keeps '' vs null and cross-type values
+ *  unambiguous). Equal parts elide the rebuild; any moved part triggers it. */
+export function deedsRefreshSig(parts: DeedsRefreshSigParts): string {
+  return JSON.stringify([
+    parts.renown,
+    parts.earnedCount,
+    parts.activeTitle,
+    parts.filter,
+    parts.search,
+    parts.category,
+    parts.watchRev,
+    parts.statsDigest,
+  ]);
+}
+
+/** Digest over the lifetime stat block: any counter climb, dungeon clear,
+ *  discovery, or first visit moves it (all monotonic, so climbs never cancel),
+ *  keeping an open window's progress bars live between unlocks. */
+export function deedStatsDigest(stats: Readonly<DeedStats>): number {
+  let digest = stats.itemsDiscovered.size + stats.visited.size;
+  for (const key in stats.counters) digest += stats.counters[key as never] as number;
+  for (const key in stats.dungeonClears) digest += stats.dungeonClears[key];
+  return digest;
+}

@@ -20,6 +20,8 @@ import {
   type DeedEntryModel,
   type DeedsFilter,
   type DeedsViewModel,
+  deedStatsDigest,
+  deedsRefreshSig,
   toggleWatch,
 } from './deeds_view';
 import { markDialogRoot } from './dialog_root';
@@ -144,20 +146,21 @@ export class DeedsWindow {
 
   /** Slow-band refresh: repaint only when the compact signature moves. The
    *  stat digest keeps open-window progress bars live while raw counters
-   *  climb between unlocks. */
+   *  climb between unlocks. Both builders are pure deeds_view exports so
+   *  every repaint dimension stays unit-pinned. */
   refreshIfChanged(): void {
     if (!this.opened) return;
     const world = this.deps.world();
-    const sig = JSON.stringify([
-      world.renown,
-      world.deedsEarned.size,
-      world.activeTitle,
-      this.filter,
-      this.search,
-      this.category,
-      this.watchRev,
-      this.statsDigest(),
-    ]);
+    const sig = deedsRefreshSig({
+      renown: world.renown,
+      earnedCount: world.deedsEarned.size,
+      activeTitle: world.activeTitle,
+      filter: this.filter,
+      search: this.search,
+      category: this.category,
+      watchRev: this.watchRev,
+      statsDigest: deedStatsDigest(world.deedStats),
+    });
     if (sig === this.lastSig) return;
     this.lastSig = sig;
     this.render();
@@ -439,14 +442,6 @@ export class DeedsWindow {
 
   private fmt(n: number): string {
     return formatNumber(n, { maximumFractionDigits: 0 });
-  }
-
-  private statsDigest(): number {
-    const stats = this.deps.world().deedStats;
-    let digest = stats.itemsDiscovered.size + stats.visited.size;
-    for (const key in stats.counters) digest += stats.counters[key as never] as number;
-    for (const key in stats.dungeonClears) digest += stats.dungeonClears[key];
-    return digest;
   }
 
   private watchKey(): string {

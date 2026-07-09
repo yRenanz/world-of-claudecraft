@@ -76,6 +76,14 @@ describe('painter hygiene', () => {
     expect(painter).toMatch(/world\(\)\.setActiveTitle\(id === '' \? null : id\)/);
     expect(painter).not.toMatch(/activeTitle\s*=/);
   });
+
+  it('elides slow-band repaints through the pure refresh-signature builders', () => {
+    // Both builders live in deeds_view.ts where every repaint dimension is
+    // unit-pinned; the painter must not grow a private signature again.
+    expect(painter).toContain('const sig = deedsRefreshSig({');
+    expect(painter).toContain('statsDigest: deedStatsDigest(world.deedStats),');
+    expect(painter).not.toMatch(/private statsDigest\(/);
+  });
 });
 
 describe('hud wiring', () => {

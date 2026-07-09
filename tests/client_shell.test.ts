@@ -2065,15 +2065,19 @@ describe('client HTML shell', () => {
     );
   });
 
-  it('shrinks the landscape map window to the room above the fixed bottom control row', () => {
-    // Same overlap class as the More tray: the base min(46vw, 330px) square map,
-    // vertically centered, dips into Jump/Interact on a short landscape phone (the
-    // map-canvas keeps a 1:1 aspect ratio, so width IS height). The landscape rule
-    // top-anchors it and caps the width against the free room above that row
-    // (var(--app-vh) - 140px). No !important needed: #map-window has no
-    // .panel-title, so the shared drag code never stamps an inline seat on it.
+  it('seats the landscape map above controls with a side rail for zoom buttons', () => {
+    // Same overlap class as the More tray: the base square map, vertically
+    // centered, can dip into Jump/Interact on a short landscape phone. The
+    // landscape rule top-anchors it, caps the drawn map against free height, and
+    // adds a right-side rail so the zoom buttons do not cover the map canvas.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #map-window {\n      top: max(10px, env(safe-area-inset-top));\n      transform: translateX(-50%);\n      width: min(46vw, 300px, calc(var(--app-vh) - 140px));',
+      'body.mobile-touch #map-window {\n      --mobile-map-size: min(60vw, 420px, calc(var(--app-vh) - 104px));\n      --mobile-map-rail: 58px;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #map-window #map-canvas {\n      width: var(--mobile-map-size);\n      max-width: calc(100% - var(--mobile-map-rail));',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #map-window #map-zoom {\n      right: 8px;\n      bottom: 8px;',
     );
   });
 

@@ -3646,32 +3646,46 @@
       grid-auto-rows: 34px;
       gap: 5px;
     }
-    /* The base rule's min(46vw, 330px) square map, vertically centered at 46%,
-       is tall enough on a short landscape phone (the map-canvas keeps a 1:1
-       aspect ratio via width:100%/height:auto) to dip its bottom edge into the
-       fixed Jump/Interact/combat-cluster row, which reserves no layout space
-       of its own. Shrink it to fit the room actually free above that row
-       instead of a fraction of the whole (short) viewport height. */
+    /* The base square map can dip into the fixed Jump/Interact/combat row on a
+       short landscape phone. Top-anchor it and reserve a right rail so the
+       close and zoom buttons do not sit on top of the drawn map. */
     body.mobile-touch #map-window {
+      --mobile-map-size: min(60vw, 420px, calc(var(--app-vh) - 104px));
+      --mobile-map-rail: 58px;
       top: max(10px, env(safe-area-inset-top));
       transform: translateX(-50%);
-      width: min(46vw, 300px, calc(var(--app-vh) - 140px));
+      width: min(
+        calc(var(--mobile-map-size) + var(--mobile-map-rail)),
+        calc(var(--app-vw) / var(--ui-scale, 1) - 32px)
+      );
+    }
+    body.mobile-touch #map-window #map-canvas {
+      width: var(--mobile-map-size);
+      max-width: calc(100% - var(--mobile-map-rail));
+    }
+    body.mobile-touch #map-window #map-zoom {
+      right: 8px;
+      bottom: 8px;
     }
     body.mobile-touch.mobile-map-quest-open #map-window {
-      top: calc(
-        var(--mobile-map-quest-stack-top) +
-        var(--mobile-map-quest-log-max-height) +
-        var(--mobile-map-quest-stack-gap)
-      );
-      width: min(
-        46vw,
-        300px,
+      --mobile-map-size: min(
+        52vw,
+        320px,
         calc(
           var(--app-vh) -
           var(--mobile-map-quest-log-max-height) -
           var(--mobile-map-quest-stack-gap) -
           22px
         )
+      );
+      top: calc(
+        var(--mobile-map-quest-stack-top) +
+        var(--mobile-map-quest-log-max-height) +
+        var(--mobile-map-quest-stack-gap)
+      );
+      width: min(
+        calc(var(--mobile-map-size) + var(--mobile-map-rail)),
+        calc(var(--app-vw) / var(--ui-scale, 1) - 32px)
       );
     }
     body.mobile-touch.mobile-left-handed #mobile-extra-controls {

@@ -57,11 +57,13 @@ describe('options_window: mobile shell integration', () => {
   it('gates the shell on the body.mobile-touch class (not the coarse-pointer probe)', () => {
     expect(win).toContain('private mobileActive(): boolean');
     expect(win).toContain("document.body.classList.contains('mobile-touch')");
-    // render() branches to the shell before the desktop two-pane
+    // render() selects the layout by mode: the NARROW back-stack shell forks to
+    // renderMobile; the desktop + WIDE-mobile rail share the two-pane path.
     const render = win.slice(win.indexOf('private render(): void {'));
-    const body = render.slice(0, render.indexOf('body.appendChild(this.buildSearchStrip())'));
-    expect(body).toContain('if (this.mobileActive()) {');
+    const body = render.slice(0, render.indexOf('private renderTwoPane'));
+    expect(body).toContain("if (mode === 'backstack') {");
     expect(body).toContain('this.renderMobile(body, footer);');
+    expect(body).toContain('this.renderTwoPane(body, footer);');
   });
 
   it('forces a touch render env so gating is correct under emulated capture', () => {
@@ -88,7 +90,9 @@ describe('options_window: mobile shell integration', () => {
   it('routes back / close through the back-stack (level-0 pop closes)', () => {
     const back = win.slice(win.indexOf('private backOrClose(): void {'));
     const fn = back.slice(0, back.indexOf('\n  /** Y:'));
-    expect(fn).toContain('if (this.mobileActive()) {');
+    // Gated on backStackActive (the NARROW shell only): the wide rail uses the
+    // desktop subview/close path, exactly like desktop.
+    expect(fn).toContain('if (this.backStackActive()) {');
     expect(fn).toContain('if (popClosesMenu(this.mobileNav)) {');
     expect(fn).toContain('this.mobileNav = popLevel(this.mobileNav);');
     // selecting a category pushes a single level-1 page

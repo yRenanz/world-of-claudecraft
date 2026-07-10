@@ -92,6 +92,9 @@ import {
   initialNav,
   levelSelection,
   type MobileNavState,
+  type MobileSettingsMode,
+  mobileSettingsMode,
+  navForSelection,
   openCategory,
   openSubView,
   popClosesMenu,
@@ -333,10 +336,20 @@ export class OptionsWindow {
   // a body-level child so a detail-only repaint never destroys it.
   private announceEl: HTMLElement | null = null;
   // The dedicated mobile back-stack navigation (spec section 9); only consulted
-  // under body.mobile-touch, always reset to the landing on open.
+  // under body.mobile-touch in the NARROW (back-stack) mode, always reset to the
+  // landing on open.
   private mobileNav: MobileNavState = initialNav();
+  // The layout the last render painted, so a live resize/rotate only re-renders
+  // when it crosses the rail <-> back-stack boundary (a cold, boundary-only cost).
+  private lastRenderMode: 'desktop' | MobileSettingsMode | null = null;
 
-  constructor(private readonly deps: OptionsWindowDeps) {}
+  constructor(private readonly deps: OptionsWindowDeps) {
+    // Re-render when a live resize/rotate crosses the touch rail<->back-stack
+    // breakpoint (cold path, guarded to open + mode-change only). Guarded for the
+    // Node test env, where `window` is absent (options_window_mobile_gamepad).
+    if (typeof window !== 'undefined')
+      window.addEventListener('resize', () => this.onViewportResize());
+  }
 
   get isOpen(): boolean {
     return this.deps.root().style.display === 'flex';
@@ -364,6 +377,36 @@ export class OptionsWindow {
    *  probe (see mobileActive). Off the shell it is the live env(). */
   private renderEnv(): { touch: boolean; nativeShell: boolean } {
     return this.mobileActive() ? { touch: true, nativeShell: isNativeAppShell() } : this.env();
+  }
+
+  /** The effective viewport width the touch layout breakpoint reads. */
+  private viewportWidth(): number {
+    return typeof window !== 'undefined' ? window.innerWidth : 0;
+  }
+
+  /** The active render layout: the desktop two-pane, the WIDE-mobile rail two-pane
+   *  (the desktop rail/detail path with touch sizing), or the NARROW-mobile
+   *  back-stack shell. Only the narrow shell forks; the wide rail reuses the
+   *  desktop navigation, so it inherits keyboard/controller nav + focus trap. */
+  private renderMode(): 'desktop' | MobileSettingsMode {
+    if (!this.mobileActive()) return 'desktop';
+    return mobileSettingsMode(this.viewportWidth());
+  }
+
+  /** True ONLY for the narrow-mobile back-stack shell (never the wide-mobile rail,
+   *  which is the desktop path with touch sizing). Every back-stack-only branch
+   *  gates on this so the wide rail behaves exactly like desktop. */
+  private backStackActive(): boolean {
+    return this.renderMode() === 'backstack';
+  }
+
+  /** Re-render when a live resize/rotate crosses the rail<->back-stack boundary,
+   *  so the touch menu lands in the right layout. Cold: only fires the rebuild on
+   *  an actual mode change (a same-mode resize is a no-op). */
+  private onViewportResize(): void {
+    if (!this.isOpen) return;
+    if (this.renderMode() === this.lastRenderMode) return;
+    this.render();
   }
 
   /** Mirror the top of the mobile back-stack onto activeCategory/subView so the
@@ -566,13 +609,30 @@ export class OptionsWindow {
 
   private render(): void {
     const { body, footer } = this.ensureFrame();
-    // Under body.mobile-touch the window becomes the dedicated back-stack shell
-    // (spec section 9); the desktop two-pane never renders on touch, and the
-    // desktop path below stays byte-identical.
-    if (this.mobileActive()) {
+    const mode = this.renderMode();
+    this.lastRenderMode = mode;
+    // The wide-mobile rail marker keeps the frame's own titlebar + footer visible
+    // (the narrow shell hides them and paints its own header + Done bar); it also
+    // scopes the wide-mode CSS. Off for desktop and the narrow shell.
+    this.deps.root().classList.toggle('opt-mrail', mode === 'rail');
+    // NARROW body.mobile-touch: the dedicated back-stack shell (spec section 9).
+    if (mode === 'backstack') {
+      // Seed the back-stack from the current desktop selection so a live
+      // wide->narrow rotate keeps the visible page (idempotent during normal
+      // shell navigation, which keeps activeCategory/subView in sync with the nav).
+      this.mobileNav = navForSelection(this.activeCategory, this.subView);
       this.renderMobile(body, footer);
       return;
     }
+    // DESKTOP or WIDE-mobile rail: the shared two-pane path (rail + detail),
+    // byte-identical dispatch; the wide-mobile touch sizing is CSS-only.
+    this.renderTwoPane(body, footer);
+  }
+
+  /** The desktop-style rail + detail two-pane. Shared by desktop and the
+   *  wide-mobile rail mode (the latter differs only in CSS touch sizing + the
+   *  solid mobile background), so the wide-mobile path never duplicates the DOM. */
+  private renderTwoPane(body: HTMLElement, footer: HTMLElement | null): void {
     body.replaceChildren();
     body.appendChild(this.buildSearchStrip());
     // Assertive live region for controller announcements (body-level so a detail
@@ -683,7 +743,10 @@ export class OptionsWindow {
     const conflictFor = (id: CategoryId): boolean =>
       (id === 'keybinds' && conflicts.keyboardWarning) ||
       (id === 'controller' && conflicts.controllerWarning);
-    const model = renderRailModel(this.env(), changed);
+    // renderEnv (not env): on the wide-mobile rail this forces touch:true so the
+    // rail shows the same category set as the narrow shell (Touch shown, the
+    // desktop-only Keybinds hidden). On desktop renderEnv === env, so byte-identical.
+    const model = renderRailModel(this.renderEnv(), changed);
     rail.appendChild(this.railTab(model.overview, conflictFor(model.overview.id)));
     for (const group of model.groups) {
       const head = el('div', 'opt-rail-group');
@@ -739,11 +802,11 @@ export class OptionsWindow {
   }
 
   private setActiveCategory(id: CategoryId, opts: { preserveRailFocus?: boolean } = {}): void {
-    // On the mobile back-stack shell, selecting a category pushes its level-1
-    // page (a single page, never stacked); the rail/roving machinery below is
-    // desktop-only. Search go-to + the Overview alert converge here too, so they
-    // navigate on touch without a mobile-only fork.
-    if (this.mobileActive()) {
+    // On the NARROW back-stack shell, selecting a category pushes its level-1
+    // page (a single page, never stacked); the rail/roving machinery below is the
+    // desktop + wide-mobile rail path. Search go-to + the Overview alert converge
+    // here too, so they navigate on the shell without a mobile-only fork.
+    if (this.backStackActive()) {
       audio.click();
       this.mobileNav = openCategory(this.mobileNav, id);
       this.searchQuery = '';
@@ -834,9 +897,10 @@ export class OptionsWindow {
   /** Ctrl+Tab / Ctrl+Shift+Tab cycle categories from anywhere in the body. */
   private onBodyKeydown(e: KeyboardEvent): void {
     if (e.key !== 'Tab' || !e.ctrlKey) return;
-    // No rail on the mobile back-stack shell (spec section 9): category cycling is
-    // inert, so leave Ctrl+Tab alone rather than deref the null rail.
-    if (this.mobileActive() || !this.railElOrNull()) return;
+    // No rail on the narrow back-stack shell (spec section 9): category cycling is
+    // inert, so leave Ctrl+Tab alone rather than deref the null rail. Keyed on rail
+    // presence, so the wide-mobile rail (which HAS a rail) still cycles.
+    if (!this.railElOrNull()) return;
     e.preventDefault();
     const visible = this.visibleCategoryIds();
     const current = visible.indexOf(this.activeCategory);
@@ -974,10 +1038,11 @@ export class OptionsWindow {
     switch (fi) {
       case 'categoryPrev':
       case 'categoryNext':
-        // The mobile back-stack shell renders no rail (spec section 9 wires only
+        // The narrow back-stack shell renders no rail (spec section 9 wires only
         // B/back there), so LB/RB category cycling is inert and must not deref the
-        // null rail from the frame loop.
-        if (this.mobileActive() || !this.railElOrNull()) return;
+        // null rail from the frame loop. Keyed on rail presence, so the wide-mobile
+        // rail still cycles.
+        if (!this.railElOrNull()) return;
         this.cycleCategory(fi === 'categoryNext' ? 1 : -1);
         return;
       case 'rowPrev':
@@ -1038,7 +1103,7 @@ export class OptionsWindow {
   /** LB/RB: cycle to the previous/next visible category (from anywhere), then land
    *  focus on the new pane's first row so D-pad Up/Down keeps working. */
   private cycleCategory(dir: -1 | 1): void {
-    if (this.mobileActive() || !this.railElOrNull()) return; // no rail to cycle (mobile shell)
+    if (!this.railElOrNull()) return; // no rail to cycle (the narrow back-stack shell)
     const visible = this.visibleCategoryIds();
     const current = visible.indexOf(this.activeCategory);
     if (current < 0) return;
@@ -1071,7 +1136,7 @@ export class OptionsWindow {
    *  close the menu. On the mobile shell this walks the back-stack: level-0 pop
    *  closes, any deeper pop steps back one page. */
   private backOrClose(): void {
-    if (this.mobileActive()) {
+    if (this.backStackActive()) {
       if (popClosesMenu(this.mobileNav)) {
         this.close();
         return;
@@ -1817,7 +1882,7 @@ export class OptionsWindow {
    *  over System (back pops to System); on desktop it swaps the detail pane to the
    *  bug-report sub-view under System, as before. */
   private openBugReport(): void {
-    if (this.mobileActive()) {
+    if (this.backStackActive()) {
       this.mobileNav = openSubView(this.mobileNav, 'bugreport', 'system');
       this.syncFromNav();
       this.render();
@@ -1832,7 +1897,7 @@ export class OptionsWindow {
    *  the mobile shell this pops the back-stack to System; on desktop it returns
    *  the detail pane to the System category. */
   private exitBugReport(): void {
-    if (this.mobileActive()) {
+    if (this.backStackActive()) {
       this.mobileNav = popLevel(this.mobileNav);
       this.syncFromNav();
       this.render();

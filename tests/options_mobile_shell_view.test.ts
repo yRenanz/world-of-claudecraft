@@ -8,8 +8,11 @@ import {
   LANDING_LEVEL,
   levelSelection,
   MOBILE_LANDING_ORDER,
+  MOBILE_RAIL_MIN_WIDTH,
   type MobileNavState,
   mobileCategoryRows,
+  mobileSettingsMode,
+  navForSelection,
   openCategory,
   openSubView,
   popClosesMenu,
@@ -180,5 +183,64 @@ describe('options_mobile_shell_view: landing section order', () => {
     expect(idx('quickActions')).toBeLessThan(idx('pins'));
     expect(idx('pins')).toBeLessThan(idx('categoryList'));
     expect(idx('categoryList')).toBeLessThan(idx('status'));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Render mode: rail two-pane on wide/landscape, back-stack shell on narrow
+// ---------------------------------------------------------------------------
+describe('options_mobile_shell_view: render mode by viewport width', () => {
+  it('selects the rail two-pane at wide / landscape widths', () => {
+    // The live-feedback sizes (1000x600 landscape, 1280x720) and a tablet width.
+    expect(mobileSettingsMode(1000)).toBe('rail');
+    expect(mobileSettingsMode(1280)).toBe('rail');
+    expect(mobileSettingsMode(834)).toBe('rail');
+  });
+
+  it('selects the back-stack shell at narrow / portrait widths', () => {
+    // A phone in portrait (the shell's home) stays the single-column back-stack.
+    expect(mobileSettingsMode(400)).toBe('backstack');
+    expect(mobileSettingsMode(390)).toBe('backstack');
+  });
+
+  it('switches at the rail-min-width breakpoint (inclusive at the threshold)', () => {
+    expect(MOBILE_RAIL_MIN_WIDTH).toBe(720);
+    expect(mobileSettingsMode(MOBILE_RAIL_MIN_WIDTH - 1)).toBe('backstack');
+    expect(mobileSettingsMode(MOBILE_RAIL_MIN_WIDTH)).toBe('rail');
+    expect(mobileSettingsMode(MOBILE_RAIL_MIN_WIDTH + 1)).toBe('rail');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// navForSelection: rebuild a back-stack nav from a desktop (category, subView)
+// selection (so a live wide->narrow switch keeps the current page). The inverse
+// of levelSelection over every representable back-stack shape.
+// ---------------------------------------------------------------------------
+describe('options_mobile_shell_view: navForSelection (desktop selection -> back-stack)', () => {
+  it('maps the Overview landing to the level-0 landing nav', () => {
+    expect(navForSelection('overview', 'none')).toEqual(initialNav());
+  });
+
+  it('maps a category to its level-1 page', () => {
+    const nav = navForSelection('graphics', 'none');
+    expect(currentLevel(nav)).toEqual({ kind: 'category', id: 'graphics' });
+    expect(depth(nav)).toBe(1);
+  });
+
+  it('maps a sub-view to its level-2 page over the parent category', () => {
+    const nav = navForSelection('system', 'bugreport');
+    expect(currentLevel(nav)).toEqual({ kind: 'subview', view: 'bugreport', parent: 'system' });
+    expect(depth(nav)).toBe(2);
+  });
+
+  it('round-trips with levelSelection for every representable back-stack shape', () => {
+    for (const nav of [
+      initialNav(),
+      openCategory(initialNav(), 'audio'),
+      openSubView(initialNav(), 'bugreport', 'system'),
+    ]) {
+      const sel = levelSelection(currentLevel(nav));
+      expect(navForSelection(sel.category, sel.subView)).toEqual(nav);
+    }
   });
 });

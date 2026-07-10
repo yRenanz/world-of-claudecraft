@@ -113,6 +113,45 @@ export function levelSelection(level: MobileLevel): {
   return { category: level.parent, subView: level.view };
 }
 
+/** Rebuild a back-stack nav from a desktop (activeCategory, subView) selection,
+ *  the inverse of levelSelection over every representable back-stack shape. A live
+ *  wide->narrow switch reads the desktop selection (the two-pane's source of
+ *  truth) and re-seeds the shell's stack from it, so the visible page survives the
+ *  layout change. Lossless because openCategory / openSubView / initialNav only
+ *  ever produce the three canonical stack shapes this reconstructs. */
+export function navForSelection(
+  category: CategoryId,
+  subView: 'none' | MobileSubView,
+): MobileNavState {
+  if (subView !== 'none') return openSubView(initialNav(), subView, category);
+  if (category === 'overview') return initialNav();
+  return openCategory(initialNav(), category);
+}
+
+// ---------------------------------------------------------------------------
+// Render mode: the touch settings menu picks its layout by viewport width
+// ---------------------------------------------------------------------------
+
+/** The minimum effective viewport width (px) at which the touch settings menu
+ *  renders the desktop-style rail + detail two-pane instead of the single-column
+ *  back-stack shell. Below it a rail (--opt-rail-w, 208px) plus a readable detail
+ *  pane (~360px min) will not both fit, so the shell is clearer; at or above it
+ *  the two-pane (the live-feedback fix for landscape / tablet) is comfortable. A
+ *  named threshold, not a bare literal (the no-magic contract). */
+export const MOBILE_RAIL_MIN_WIDTH = 720;
+
+/** The two touch settings layouts. `rail` reuses the desktop two-pane (rail +
+ *  detail) with touch sizing; `backstack` is the single-column back-stack shell. */
+export type MobileSettingsMode = 'rail' | 'backstack';
+
+/** Pick the touch settings layout for a viewport width: the rail two-pane once
+ *  the viewport is wide enough (landscape / tablet), else the narrow back-stack
+ *  shell (portrait). Pure so the render-mode branch is unit-tested directly and a
+ *  live rotate can re-evaluate it without a DOM. */
+export function mobileSettingsMode(viewportWidth: number): MobileSettingsMode {
+  return viewportWidth >= MOBILE_RAIL_MIN_WIDTH ? 'rail' : 'backstack';
+}
+
 // ---------------------------------------------------------------------------
 // The env-gated stacked category list (the landing's navigation)
 // ---------------------------------------------------------------------------

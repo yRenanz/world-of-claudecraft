@@ -1296,6 +1296,8 @@ export const en_XA: EnTranslations = {
       "parcelsLabel": "[Þáŕçéļš]",
       "parcelsHint": "[Çļíçķ áñ íţéɱ íñ ýóúŕ ƀáĝš ţó áţţáçĥ íţ.]",
       "removeParcelAria": "[Ŕéɱóʋé {item} ƒŕóɱ ţĥé ļéţţéŕ]",
+      "parcelQtyDecreaseAria": "[Šéñð óñé ƒéŵéŕ {item}]",
+      "parcelQtyIncreaseAria": "[Šéñð óñé ɱóŕé {item}]",
       "sendButton": "[Šéñð ļéţţéŕ]",
       "postageNote": "[Þóšţáĝé: {amount}. Ţĥé ŕáʋéñ ƒļíéš ƒóŕ áƀóúţ {seconds}š.]",
       "arrivedBanner": "[Ţĥé ŕáʋéñ ĥáš ļáñðéð: ɱáíļ ƒŕóɱ {name}.]",

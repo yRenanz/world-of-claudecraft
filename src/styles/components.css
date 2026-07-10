@@ -5830,6 +5830,41 @@
     gap: 8px;
     align-items: center;
   }
+
+  /* ---------- AAA window-frame adoption: tables + transactional (batch 3) ----------
+     The World Market chrome polish plus the shared .window-frame chrome
+     (window_frame.ts) for the leaderboard, calendar, daily rewards, and the
+     Heroic Quartermaster. Each single-tenant window mounts the frame on a
+     direct-child inner container (window_frame_mount.ts), so its .window.panel
+     root stays chrome-neutral (neutralized below with :has(> .window-frame), the
+     documented engine floor) and the inner frame draws the titlebar / body. Two
+     scroll models, each preserving the window's existing behavior:
+       - calendar is a bounded flex column (its .cal-day-pane keeps the scroll);
+       - leaderboard + daily keep their ROOT scroll (display stays block, so the
+         frame body is content-height and the root scrolls under a sticky
+         titlebar), leaving the .lb-body / .dr-body inner scroll unchanged.
+     The Heroic Quartermaster co-tenants #vendor-window with the copper vendor,
+     whose vendor_window.ts reuses a DIRECT-CHILD frame; heroic's frame nests one
+     level deeper inside a .heroic-shop wrapper so copper's reuse rule never
+     matches it and the shared root stays pristine either way. Tokens only. */
+
+  /* Calendar: a bounded flex column. Neutralize the legacy .panel chrome; the
+     frame body is a flex column so the month nav + grid stay fixed and the
+     .cal-day-pane owns the scroll (its existing flex:1 / overflow-y:auto). */
+  #calendar-window:has(> .window-frame) {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    outline: 0;
+  }
+  #calendar-window > .window-frame > .window-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
   #map-canvas {
     /* Authored display size matching the 560x560 backing store (index.html /
        play.html). Without a CSS length the canvas box is a replaced intrinsic size,

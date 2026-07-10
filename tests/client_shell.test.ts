@@ -1458,58 +1458,96 @@ describe('client HTML shell', () => {
     );
   });
 
-  it('lays out mobile More tray buttons horizontally', () => {
-    expect(html).toContain(
+  it('builds the mobile More drawer on the AAA window-frame grammar with a roomy 3-column tile grid', () => {
+    // The drawer region is BYTE-IDENTICAL across both entries (play.html had
+    // drifted: 12 buttons without type="button" and no Daily Rewards tile).
+    // The region regex ends at the drawer's own 6-space-indented close, before
+    // the entries' differing container close (</section> vs </div>).
+    const drawerRe = /<div id="mobile-extra-controls"[\s\S]*?\n {6}<\/div>/;
+    const drawer = html.match(drawerRe)?.[0] ?? '';
+    expect(drawer).not.toBe('');
+    expect(playHtml.match(drawerRe)?.[0]).toBe(drawer);
+    // The static markup carries the SAME window-frame anatomy the grammar
+    // windows (Social, Quest Log, Bags, ...) mount from window_frame.ts:
+    // titlebar (display-font title + 44px close) over a scrolling .window-body.
+    expect(drawer).toContain(
       '<div id="mobile-extra-controls" class="window panel" role="dialog" aria-modal="true" aria-labelledby="mobile-more-title">',
     );
-    expect(html).toContain('<div class="panel-title">');
-    expect(html).toContain('id="mobile-more-close"');
-    expect(html).toContain('<div id="mobile-extra-grid">');
+    expect(drawer).toContain('<div class="window-frame">');
+    expect(drawer).toContain('<div class="window-titlebar">');
+    expect(drawer).toContain(
+      '<span class="window-title" id="mobile-more-title" data-i18n="hud.core.mobileMore">More</span>',
+    );
+    expect(drawer).toContain('class="window-close" id="mobile-more-close"');
+    expect(drawer).toContain('<div class="window-body">');
+    expect(drawer).toContain('<div id="mobile-extra-grid">');
+    expect(drawer).not.toContain('panel-title');
+    expect(drawer).not.toContain('x-btn');
+    // All 15 actions ride the grid as tiles, Daily Rewards included in BOTH entries.
+    expect([...drawer.matchAll(/class="mobile-btn(?: active)?" id="mobile-/g)]).toHaveLength(15);
+    expect(drawer).toContain('id="mobile-daily-rewards"');
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-more-open #mobile-controls {\n    z-index: 140;\n  }',
     );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #mobile-extra-controls {\n    position: fixed;\n    left: 50%;\n    top: 50%;\n    bottom: auto;\n    transform: translate(-50%, -50%);',
+    // The root is a transparent shell around the frame, with the modal scrim
+    // (a huge-spread box-shadow, the cheap ::backdrop stand-in) dimming the
+    // chrome behind it: NO glass gradient, NO backdrop blur on the drawer.
+    const drawerRuleStart = hudMobileCss.indexOf('body.mobile-touch #mobile-extra-controls {');
+    expect(drawerRuleStart).toBeGreaterThan(-1);
+    const drawerRule = hudMobileCss.slice(
+      drawerRuleStart,
+      hudMobileCss.indexOf('\n  }', drawerRuleStart),
     );
-    expect(hudMobileCss).toContain('z-index: 100;');
-    expect(hudMobileCss).toContain('border-radius: 10px;');
-    expect(hudMobileCss).toContain(
-      'max-width: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));',
+    expect(drawerRule).toContain('position: fixed;');
+    expect(drawerRule).toContain('transform: translate(-50%, -50%);');
+    expect(drawerRule).toContain('z-index: 100;');
+    expect(drawerRule).toContain('background: transparent;');
+    expect(drawerRule).toContain('box-shadow: 0 0 0 100vmax var(--color-scrim);');
+    expect(drawerRule).not.toContain('backdrop-filter');
+    expect(drawerRule).not.toContain('--mobile-glass-bg');
+    // A roomier sheet than the old 440px pill tray, capped to 80 percent of the
+    // safe app viewport; overflowing tiles scroll INSIDE the frame's body.
+    expect(drawerRule).toContain(
+      'width: min(560px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));',
     );
-    expect(hudMobileCss).toContain(
-      'max-height: calc(var(--app-vh) - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));',
-    );
+    expect(drawerRule).toContain('max-height: min(\n      calc(var(--app-vh) * 0.8),');
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-more-open #mobile-extra-controls {\n    display: flex;\n    flex-direction: column;\n  }',
     );
-    // Anchored to the drawer-header rule itself (not just the declarations,
-    // which any rule could carry): the 48px floor must stay on THIS selector.
-    const drawerTitleStart = hudMobileCss.indexOf(
-      'body.mobile-touch #mobile-extra-controls .panel-title {',
-    );
-    expect(drawerTitleStart).toBeGreaterThan(-1);
-    const drawerTitleBody = hudMobileCss.slice(
-      drawerTitleStart,
-      hudMobileCss.indexOf('}', drawerTitleStart),
-    );
-    expect(drawerTitleBody).toContain('min-height: 48px;');
-    expect(drawerTitleBody).toContain('margin-bottom: 8px;');
-    expect(drawerTitleBody).toContain('padding-bottom: 6px;');
-    expect(drawerTitleBody).toContain('cursor: move;');
-    // Smaller than the old 560px cap: the More tray only holds short pill
-    // buttons now, not a wide desktop-style panel.
     expect(hudMobileCss).toContain(
-      'width: min(440px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));',
+      'body.mobile-touch #mobile-extra-controls .window-body {\n    overscroll-behavior: contain;',
     );
+    // 3 columns of icon-over-label tiles at a 64px row floor (was 4 columns of
+    // 36px pills): decisively ABOVE the 40px touch floor. Parse the numbers so
+    // shrinking either below 56px fails here, not just a changed literal.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #mobile-extra-grid {\n    display: grid;\n    grid-template-columns: repeat(4, minmax(0, 1fr));',
+      'body.mobile-touch #mobile-extra-grid {\n    display: grid;\n    grid-template-columns: repeat(3, minmax(0, 1fr));',
     );
-    expect(hudMobileCss).toContain('body.mobile-touch #mobile-extra-controls .mobile-btn');
+    const rowFloor = hudMobileCss.match(
+      /#mobile-extra-grid \{[^}]*grid-auto-rows: minmax\((\d+)px/,
+    );
+    expect(Number(rowFloor?.[1] ?? 0)).toBeGreaterThanOrEqual(56);
+    const tileRule = hudMobileCss.match(
+      /body\.mobile-touch #mobile-extra-controls \.mobile-btn \{[^}]*\}/,
+    )?.[0];
+    expect(tileRule).toBeTruthy();
+    expect(tileRule).toContain('flex-direction: column;');
+    const tileFloor = tileRule?.match(/min-height: (\d+)px/);
+    expect(Number(tileFloor?.[1] ?? 0)).toBeGreaterThanOrEqual(56);
+    // Tokenized tile chrome over the frame's solid base; a visibly larger icon.
+    expect(tileRule).toContain('background: var(--color-panel-l0-bg);');
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #mobile-extra-controls .mobile-btn {\n    width: 100%;',
+      'body.mobile-touch #mobile-extra-controls .mobile-btn .ui-icon {\n    flex: none;\n    width: 24px;\n    height: 24px;\n  }',
     );
-    expect(hudMobileCss).toContain('flex-direction: row;');
-    expect(hudMobileCss).toContain('body.mobile-touch #mobile-extra-controls .mobile-btn .ui-icon');
+    const labelRule = hudMobileCss.match(
+      /body\.mobile-touch #mobile-extra-controls \.mobile-label \{[^}]*\}/,
+    )?.[0];
+    expect(labelRule).toContain('font-size: var(--text-xs);');
+    // While the drawer is open the floating top-right chrome hides exactly like
+    // it does for mobile-window-open windows (the drawer never sets that class).
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-more-open #minimap-wrap,\n  body.mobile-touch.mobile-more-open #mail-indicator {',
+    );
     expect(mobileControlsTs).toContain(
       "const open = !document.body.classList.contains('mobile-more-open');",
     );
@@ -2137,22 +2175,17 @@ describe('client HTML shell', () => {
     );
   });
 
-  it('keeps the expanded mobile More tray inside the viewport', () => {
+  it('keeps the expanded mobile More drawer inside the viewport', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-left-handed #mobile-extra-controls {\n    left: 50%;\n    right: auto;',
     );
+    // 80 percent of the safe app viewport, everywhere (the drawer is a centered
+    // modal with an internal .window-body scroller; the old landscape-only
+    // top-anchor + 120px bottom clearance predates the scrim and is gone).
     expect(hudMobileCss).toContain(
-      'max-height: calc(\n        var(--app-vh) -\n        120px -\n        env(safe-area-inset-top) -\n        env(safe-area-inset-bottom)\n      );',
+      'max-height: min(\n      calc(var(--app-vh) * 0.8),\n      calc(var(--app-vh) - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom))\n    );',
     );
-  });
-
-  it('anchors the landscape More tray above the fixed bottom control row, not screen-centered', () => {
-    // The 4-row/16-pill grid centered on a short landscape viewport could grow
-    // tall enough to overlap Autorun/Jump/the combat cluster, which reserve no
-    // layout space of their own. !important beats the shared window-drag
-    // freeze (hud.ts stamps an inline inset/transform the first time this
-    // panel's .panel-title is pressed, same as any desktop window).
-    expect(hudMobileCss).toContain(
+    expect(hudMobileCss).not.toContain(
       'top: max(8px, env(safe-area-inset-top)) !important;\n      bottom: auto !important;\n      transform: translateX(-50%) !important;',
     );
   });

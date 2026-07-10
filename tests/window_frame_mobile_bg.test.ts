@@ -58,7 +58,9 @@ describe('mobile window-frame background layer hygiene', () => {
       const usesShorthand = /(^|;)\s*background\s*:/.test(block);
       if (!usesShorthand) {
         expect(block, 'background-size reset missing').toMatch(/background-size\s*:\s*auto/);
-        expect(block, 'background-position reset missing').toMatch(/background-position\s*:\s*0(px)?\s+0(px)?/);
+        expect(block, 'background-position reset missing').toMatch(
+          /background-position\s*:\s*0(px)?\s+0(px)?/,
+        );
         expect(block, 'background-repeat reset missing').toMatch(/background-repeat\s*:\s*repeat/);
       }
     });

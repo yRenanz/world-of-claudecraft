@@ -6,6 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { characterDerivedStats } from '../src/sim/entity';
+import { removePreferFungible } from '../src/sim/items';
 import {
   disenchantItem,
   disenchantYield,
@@ -56,12 +57,18 @@ describe('disenchant', () => {
     }
   });
 
-  it('yield scales with rarity: the qualityIdx term makes an epic strictly outyield a common with the same rng draw', () => {
+  it('yield scales with rarity: the qualityIdx AND derived-tier terms make an epic strictly outyield a common with the same rng draw', () => {
     // Same seed for both, so the rng draws (the +0/+1 bonus term) line up
-    // identically; only quality differs, so the whole gap must be the
-    // qualityIdx term (common=1, epic=4 in QUALITY_ORDER -> delta 3). A
-    // toBeGreaterThanOrEqual pin would still pass if that term were deleted;
-    // this pins the exact delta so it cannot.
+    // identically; only quality differs. Both fake items have no explicit
+    // requiredLevel and no derivable itemSourceLevel, so requiredLevelFor
+    // falls back per-quality: common -> 1 (tierBonus 0), epic -> 18
+    // (tierBonus 1). Gap = qualityIdx delta (common=1, epic=4 -> 3) + tier
+    // delta (1) = 4. Pinning the exact delta (rather than
+    // toBeGreaterThanOrEqual) means both terms are protected: deleting
+    // either one changes this number (#1712 round-3 review point 11: the
+    // tier axis previously read raw `def.requiredLevel`, which only the 41
+    // level-20 epics set, so it was inert for every other item; it now reads
+    // the derived requiredLevelFor, same as item_level_req.ts's equip gate).
     const low = disenchantYield(
       { id: 'a', name: 'a', sellValue: 0, quality: 'common', kind: 'weapon' } as never,
       makeSim(11).ctx.rng,
@@ -70,7 +77,7 @@ describe('disenchant', () => {
       { id: 'b', name: 'b', sellValue: 0, quality: 'epic', kind: 'weapon' } as never,
       makeSim(11).ctx.rng,
     );
-    expect(high - low).toBe(3);
+    expect(high - low).toBe(4);
   });
 
   it('the disenchantItem command entry point resolves the caller and stashes nothing extra beyond the result', () => {
@@ -287,7 +294,7 @@ describe('applyEnchant', () => {
     const slot = meta?.inventory.find((s) => s.itemId === 'moggers_copper_cudgel');
     expect(slot?.instance?.signer).toBe('Tester');
     expect(slot?.instance?.rolled?.quality).toBe('rare');
-    expect(slot?.instance?.rolled?.stats).toBeDefined();
+    expect(slot?.instance?.rolled?.stats).toEqual({ str: 5 });
   });
 
   it('the applyEnchant command entry point resolves the caller and stashes the result', () => {
@@ -376,5 +383,46 @@ describe('applyEnchant', () => {
     const reloadedPid = reloadedSim.addPlayer('warrior', 'Legacy2', { state });
     const meta = reloadedSim.meta(reloadedPid)!;
     expect(meta.equipmentInstance).toEqual({});
+  });
+
+  // Regression for review #1712 round-3 point 7a: removePreferFungible's
+  // prefer-plain branch (the entire reason the function exists over a plain
+  // ctx.removeItem) was untested. With both a plain and an enchanted copy
+  // held, removing one must consume the plain copy and leave the enchanted
+  // instance untouched.
+  it('removePreferFungible consumes the plain copy first, leaving an enchanted instance intact', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.addItem('eastbrook_arming_sword', 1, pid);
+    sim.addItem('arcane_dust', 5, pid);
+    resolveApplyEnchant(sim.ctx, pid, 'eastbrook_arming_sword', 'enchant_weapon_might');
+    // A second, plain copy of the same item id.
+    sim.addItem('eastbrook_arming_sword', 1, pid);
+    expect(sim.ctx.countFungibleItem('eastbrook_arming_sword', pid)).toBe(1);
+
+    removePreferFungible(sim.ctx, 'eastbrook_arming_sword', 1, pid);
+
+    expect(sim.countItem('eastbrook_arming_sword', pid)).toBe(1);
+    // The remaining copy is still the enchanted instance, not fungible.
+    expect(sim.ctx.countFungibleItem('eastbrook_arming_sword', pid)).toBe(0);
+    expect(sim.ctx.countEnchantableItem('eastbrook_arming_sword', pid)).toBe(0);
+  });
+
+  // Regression for review #1712 round-3 point 7b: the only insufficient_materials
+  // case tested was zero reagents on a single-reagent enchant. All-or-nothing
+  // consumption on a MULTI-reagent enchant (missing just one of the two) was
+  // untested, so a bug that consumed reagents in a loop before validating them
+  // all would have passed silently.
+  it('applying a multi-reagent enchant with one reagent short consumes nothing', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.addItem('recruit_tunic', 1, pid);
+    sim.addItem('arcane_dust', 3, pid);
+    // enchant_chest_stamina needs 3 dust AND 2 essence; essence is entirely absent.
+    const result = resolveApplyEnchant(sim.ctx, pid, 'recruit_tunic', 'enchant_chest_stamina');
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('insufficient_materials');
+    expect(sim.countItem('arcane_dust', pid)).toBe(3);
+    expect(sim.countItem('recruit_tunic', pid)).toBe(1);
   });
 });

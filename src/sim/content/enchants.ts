@@ -35,6 +35,16 @@ export const ENCHANTS: Record<string, EnchantDef> = {
     reagents: [{ itemId: 'arcane_dust', count: 5 }],
     statBonus: { str: 5 },
   },
+  // #1712 round-3 review: str-only weapon/gloves enchants gave casters (int)
+  // zero offensive value from either slot. Same magnitude as the sibling
+  // physical enchant on the same slot, just the int axis.
+  enchant_weapon_intellect: {
+    id: 'enchant_weapon_intellect',
+    name: 'Enchant Weapon - Spellpower',
+    itemSlot: 'mainhand',
+    reagents: [{ itemId: 'arcane_dust', count: 5 }],
+    statBonus: { int: 5 },
+  },
   enchant_helmet_fortitude: {
     id: 'enchant_helmet_fortitude',
     name: 'Enchant Helmet - Fortitude',
@@ -89,6 +99,13 @@ export const ENCHANTS: Record<string, EnchantDef> = {
     itemSlot: 'gloves',
     reagents: [{ itemId: 'arcane_dust', count: 5 }],
     statBonus: { agi: 6 },
+  },
+  enchant_gloves_intellect: {
+    id: 'enchant_gloves_intellect',
+    name: 'Enchant Gloves - Spellpower',
+    itemSlot: 'gloves',
+    reagents: [{ itemId: 'arcane_dust', count: 5 }],
+    statBonus: { int: 6 },
   },
   enchant_feet_agility: {
     id: 'enchant_feet_agility',

@@ -13,15 +13,21 @@
 // Layered on top of, not a replacement for, the existing everyone-can-salvage
 // system (./salvage.ts, issue #1300): salvage still yields the same generic
 // materials (bone_fragments/linen_scrap/spider_leg) for anyone, unconditionally.
-// disenchantItem here is the Enchanting-specific action: strictly better
-// yield (dedicated arcane materials, scaling with the item's rarity), and is
+// disenchantItem here is the Enchanting-specific action: dedicated arcane
+// materials, scaling with the item's rarity (strictly better than plain
+// salvage from `rare` up; near-identical vendor value at `common`), and is
 // the intended reagent source for applyEnchant below.
 //
 // Scope (v1): no skill-gate beyond the free-floor rule every other common-tier
 // craft action in this repo follows (crafting.ts, wheel.ts) - any player can
-// disenchant or apply an enchant; specialization/discount machinery
-// (professions/wheel.ts) is not wired in for enchanting yet, matching how
-// salvage.ts also does not participate in it. Not yet wired onto a server WS
+// disenchant or apply an enchant regardless of craftSkills.enchanting. Both
+// actions DO gain flat 'enchanting' skill on success now (#1712 round-3
+// review point 3), so the specialization recharge discount (professions/
+// tools.ts) and the Enchanter archetype eventually engage; the archetype
+// output-quality ceiling crafting.ts's craftItem enforces is NOT wired in
+// here yet (this action has no rollable output quality to clamp), matching
+// how salvage.ts also does not participate in that half of the wheel. Not
+// yet wired onto a server WS
 // command or a dedicated UI window (same not-yet-wired status salvageItem
 // documents on PlayerMeta.lastSalvageResult): a future issue extends
 // IWorldProfessions + ClientWorld + server/game.ts the way craft_item/
@@ -33,9 +39,20 @@
 
 import { ENCHANTS } from '../content/enchants';
 import { ITEMS } from '../data';
+import { requiredLevelFor } from '../item_level_req';
 import type { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import { cloneItemInstancePayload, type ItemDef, type ItemInstancePayload } from '../types';
+import { gainCraftSkill } from './wheel';
+
+// #1712 round-3 review: neither action previously called gainCraftSkill, so
+// craftSkills.enchanting stayed 0 forever, permanently locking the
+// specialization recharge discount (professions/tools.ts) and the Enchanter
+// archetype's own craft out of any progression. Flat gain, same shape as
+// crafting.ts's CRAFT_SKILL_GAIN: no tier-ceiling clamp on OUTPUT (v1 scope,
+// same as salvage.ts, which also does not participate in the archetype
+// ceiling machinery), just the skill counter itself moving.
+const ENCHANTING_SKILL_GAIN = 1;
 
 const QUALITY_ORDER: readonly NonNullable<ItemDef['quality']>[] = [
   'poor',
@@ -47,9 +64,11 @@ const QUALITY_ORDER: readonly NonNullable<ItemDef['quality']>[] = [
 ];
 
 // Which arcane material a disenchant yields, keyed by the disenchanted
-// item's rarity. Strictly better than plain salvage.ts's generic yield: a
-// dedicated Enchanting material rather than a shared junk item, and scales
-// up through the same three tiers applyEnchant's reagents draw from.
+// item's rarity: a dedicated Enchanting material rather than a shared junk
+// item, feeding the same three tiers applyEnchant's reagents draw from. Only
+// strictly better than plain salvage.ts's generic yield from `rare` up
+// (arcane_dust and bone_fragments vendor near-identically at `common`; see
+// #1712 round-3 review point 12).
 const DISENCHANT_MATERIAL_BY_QUALITY: Readonly<Record<string, string>> = {
   common: 'arcane_dust',
   uncommon: 'arcane_dust',
@@ -76,7 +95,7 @@ export function isDisenchantable(def: ItemDef | undefined): boolean {
  *  item. Pure aside from the rng draw. */
 export function disenchantYield(def: ItemDef, rng: Rng): number {
   const qualityIdx = Math.max(0, QUALITY_ORDER.indexOf(def.quality ?? 'common'));
-  const tierBonus = Math.floor((def.requiredLevel ?? 0) / 10);
+  const tierBonus = Math.floor(requiredLevelFor(def) / 10);
   const bonus = rng.next() < 0.5 ? 0 : 1;
   return qualityIdx + tierBonus + 1 + bonus;
 }
@@ -106,6 +125,8 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
   const materialItemId = DISENCHANT_MATERIAL_BY_QUALITY[def.quality ?? 'common'] ?? 'arcane_dust';
   const count = disenchantYield(def, ctx.rng);
   ctx.addItem(materialItemId, count, pid);
+  const meta = ctx.players.get(pid);
+  if (meta) gainCraftSkill(meta.craftSkills, 'enchanting', ENCHANTING_SKILL_GAIN);
   return { ok: true, itemId, materialItemId, count };
 }
 
@@ -176,6 +197,8 @@ export function resolveApplyEnchant(
     : ({} as ItemInstancePayload);
   merged.rolled = { ...merged.rolled, stats: { ...enchant.statBonus } };
   ctx.addItemInstance(itemId, merged, pid);
+  const meta = ctx.players.get(pid);
+  if (meta) gainCraftSkill(meta.craftSkills, 'enchanting', ENCHANTING_SKILL_GAIN);
   return { ok: true, itemId, enchantId };
 }
 

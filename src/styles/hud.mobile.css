@@ -4427,6 +4427,46 @@
   body.mobile-touch #options-menu.opt-mrail > .window-frame > .window-footer .btn {
     width: auto;
   }
+  /* Reach-first sizing for the touch two-pane (live feedback: the left rail rows
+     "seem a bit low in height" and the content is "all on the left side"). Scoped
+     to #options-menu under body.mobile-touch, NOT .opt-mrail, so any two-pane
+     render under touch (including emulated capture) gets the same sizing. The
+     rail grows to finger-height 54px category rows with 24px icons and a
+     proportionally wider rail column; the detail column centers inside its pane
+     at a wider reading measure instead of hugging the window's left edge. */
+  body.mobile-touch #options-menu {
+    --opt-rail-w: 248px;
+  }
+  body.mobile-touch #options-menu .opt-tab {
+    min-height: 54px;
+    font-size: var(--text-lg);
+  }
+  body.mobile-touch #options-menu .opt-tab-icon,
+  body.mobile-touch #options-menu .opt-tab-icon .ui-icon {
+    width: 24px;
+    height: 24px;
+  }
+  /* Under 900px effective window width components.css collapses the rail to a
+     56px icon strip; with the grown 24px touch icons the strip widens to 72px so
+     each icon keeps a comfortable centered tap column. Same container condition
+     as the components rule (this layer wins the tie), and ONLY the column width
+     is re-declared, so the over-scroll fix (grid-template-rows minmax(0,1fr) +
+     min-height:0 + per-pane overflow-y in components.css) is untouched. */
+  @container opt-shell (max-width: 900px) {
+    body.mobile-touch #options-menu .opt-body {
+      grid-template-columns: 72px 1fr;
+    }
+  }
+  body.mobile-touch #options-menu .opt-detail-inner {
+    max-width: 54rem;
+    margin-inline: auto;
+  }
+  /* Primary footer actions (Done / Log out / Reset all changes) grow to a 48px
+     touch height in the wide rail's frame footer; the narrow shell's own Done
+     bar matches via .opt-mshell-done. */
+  body.mobile-touch #options-menu .window-footer .btn {
+    min-height: 48px;
+  }
   .opt-mshell {
     display: flex;
     flex-direction: column;
@@ -4550,9 +4590,10 @@
     border-top: 1px solid var(--panel-edge);
     background: var(--color-panel-l2-base);
   }
+  /* 48px to match the wide rail's frame-footer actions (same primary control). */
   .opt-mshell-done {
     width: 100%;
-    min-height: var(--control-h-touch);
+    min-height: 48px;
   }
   .opt-mshell-cat:focus-visible {
     outline: var(--focus-ring-width) solid var(--focus-ring-color);
@@ -4564,22 +4605,26 @@
   body.mobile-touch #options-menu .opt-row {
     min-height: 48px;
   }
+  /* Row labels step up one type size on touch (readability at arm's length). */
+  body.mobile-touch #options-menu .opt-row-label {
+    font-size: var(--text-lg);
+  }
   body.mobile-touch #options-menu .opt-switch {
-    width: 52px;
-    height: 30px;
-    border-radius: 15px;
+    width: 60px;
+    height: 34px;
+    border-radius: 17px;
   }
   body.mobile-touch #options-menu .opt-switch::before {
-    width: 26px;
-    height: 26px;
+    width: 30px;
+    height: 30px;
   }
   body.mobile-touch #options-menu .opt-switch[aria-checked="true"]::before {
-    transform: translateX(22px);
+    transform: translateX(26px);
   }
-  /* WCAG 2.5.8 / house floor: the pill visual stays 52x30, but the control's OWN
+  /* WCAG 2.5.8 / house floor: the pill visual stays 60x34, but the control's OWN
      tap target must clear 40x40 (the 48px ROW is not the switch box). ::before is
      the thumb, so extend the hit area with a transparent ::after that reaches the
-     40px --touch-min height (52px wide already clears it); a tap on the pseudo is
+     40px --touch-min height (60px wide already clears it); a tap on the pseudo is
      dispatched to the button, so the switch box itself now meets the floor. */
   body.mobile-touch #options-menu .opt-switch::after {
     content: "";
@@ -4591,26 +4636,45 @@
     transform: translateY(-50%);
   }
   body.mobile-touch #options-menu .opt-seg-btn {
-    height: var(--control-h-touch);
+    height: 48px;
     padding: 0 var(--spacing-md);
-    font-size: var(--text-sm);
+    font-size: var(--text-md);
   }
+  /* Sliders stretch toward the wider touch rows (clamped so the narrow shell
+     keeps today's 180px minimum and a tablet never gets a runaway track). */
   body.mobile-touch #options-menu .opt-slider {
     max-width: none;
+    width: clamp(180px, 40vw, 280px);
   }
-  /* Spec section 9: 20px slider thumb on touch (a comfortable finger-drag target;
-     base.css sizes the custom thumb to 16px). Size BOTH engine thumbs; the gold
-     accent track + --range-fill gold fill are painted on the track pseudo, which is
-     untouched, so they still render. margin-top re-centers the 20px thumb on the
-     6px track. */
+  /* Spec section 9 + live feedback: a thicker 8px track under a 26px thumb on
+     touch (a comfortable finger-drag target; base.css ships 16px on 6px). Size
+     BOTH engine thumbs AND both track pseudos; the gold accent + --range-fill
+     gold fill are background paints on the track pseudo (base.css), untouched
+     here, so they still render. margin-top re-centers the 26px thumb on the 8px
+     track ((26 - 8) / 2 = 9), the same convention the 20px/6px pair used. */
+  body.mobile-touch #options-menu .opt-slider::-webkit-slider-runnable-track {
+    height: 8px;
+    border-radius: 4px;
+  }
+  body.mobile-touch #options-menu .opt-slider::-moz-range-track,
+  body.mobile-touch #options-menu .opt-slider::-moz-range-progress {
+    height: 8px;
+    border-radius: 4px;
+  }
   body.mobile-touch #options-menu .opt-slider::-webkit-slider-thumb {
-    width: 20px;
-    height: 20px;
-    margin-top: -7px;
+    width: 26px;
+    height: 26px;
+    margin-top: -9px;
   }
   body.mobile-touch #options-menu .opt-slider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
+    width: 26px;
+    height: 26px;
+  }
+  /* Text inputs and the custom dropdown trigger (the options "select") reach the
+     same 48px control height as the footer actions. */
+  body.mobile-touch #options-menu .search-field input,
+  body.mobile-touch #options-menu .ui-dd-btn {
+    min-height: 48px;
   }
   body.mobile-touch #options-menu .search-input {
     font-size: 16px;

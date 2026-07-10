@@ -7634,7 +7634,7 @@ export const pt_BR: EnTranslations = {
         "greeting": "Mind the damp on the pages, {playerName}. The fen eats more books than readers ever will."
       },
       "chronicler_edda_hartwell": {
-        "name": "Chronicler Edda Hartwell",
+        "name": "Chronicler Zenzie",
         "title": "The Peaks Chronicle",
         "greeting": "The mountain forgets nothing, {playerName}, and neither do I. Let us see what you have done."
       },

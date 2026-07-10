@@ -883,7 +883,7 @@ export const DEEDS: Record<string, DeedDef> = {
   chr_peaks_chapter_i: {
     id: 'chr_peaks_chapter_i',
     name: 'Peaks Chronicle, Chapter I',
-    desc: "Finish the first chapter of Edda Hartwell's chronicle: clear the ridge road, empty the burrows, and learn every path Highwatch guards.",
+    desc: "Finish the first chapter of Zenzie's chronicle: clear the ridge road, empty the burrows, and learn every path Highwatch guards.",
     category: 'chronicle',
     renown: 5,
     trigger: {
@@ -904,7 +904,7 @@ export const DEEDS: Record<string, DeedDef> = {
   chr_peaks_chapter_ii: {
     id: 'chr_peaks_chapter_ii',
     name: 'Peaks Chronicle, Chapter II',
-    desc: "Finish the second chapter of Edda Hartwell's chronicle: break Drogmar's war-camp, read the waking storm, and stand where the Glimmermere glows.",
+    desc: "Finish the second chapter of Zenzie's chronicle: break Drogmar's war-camp, read the waking storm, and stand where the Glimmermere glows.",
     category: 'chronicle',
     renown: 10,
     trigger: {

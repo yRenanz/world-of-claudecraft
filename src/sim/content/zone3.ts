@@ -1156,8 +1156,11 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     greeting: 'Every crate, coffer, and trinket is safe with the Gilded Strongbox.',
   },
   chronicler_edda_hartwell: {
+    // Display name renamed to Zenzie (maintainer call). The template id is
+    // retained for save compatibility: player saves persist it as the
+    // npc:chronicler_edda_hartwell visited mark, and it is the locale key stem.
     id: 'chronicler_edda_hartwell',
-    name: 'Chronicler Edda Hartwell',
+    name: 'Chronicler Zenzie',
     title: 'The Peaks Chronicle',
     // Just inside the south gate at the east fence terminus, overlooking the
     // road up from Fenbridge (clear of the house footprint at {8,650}).

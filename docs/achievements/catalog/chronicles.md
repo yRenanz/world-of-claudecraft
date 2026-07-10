@@ -41,8 +41,10 @@ page of the deeds window).
   gate by Warden Fenwick's post. Personality: a damp, cheerful scribe who
   binds his books in oiled prowler hide and swears the fen eats more pages
   than readers.
-- Chronicler Edda Hartwell (template id `chronicler_edda_hartwell`, Thornpeak
-  Heights). Home: Highwatch, on the wall
+- Chronicler Zenzie (template id `chronicler_edda_hartwell`, Thornpeak
+  Heights; the display name was renamed from "Chronicler Edda Hartwell" by
+  maintainer call, and the template id is retained for save compatibility).
+  Home: Highwatch, on the wall
   walk above the gate. Personality: a retired soldier of the watch who
   records names so the mountain cannot forget them, hers least of all.
 
@@ -210,17 +212,17 @@ page of the deeds window).
 
 ### chr_peaks_chapter_i
 - Name: Peaks Chronicle, Chapter I
-- Desc: Finish the first chapter of Edda Hartwell's chronicle: clear the ridge road, empty the burrows, and learn every path Highwatch guards.
+- Desc: Finish the first chapter of Zenzie's chronicle: clear the ridge road, empty the burrows, and learn every path Highwatch guards.
 - Renown: 5
 - Trigger: meta: questsDone contains q_highwatch_summons, q_stalkers, q_stalker_pelts, q_stalkers_return, q_stalker_cloaks, q_old_cragmaw, q_kobold_tunnels, and q_glowing_wax; plus deeds exp_peaks_wayfarer and chr_peaks_sparring.
 - Reward: none
 - Hidden: no
 - Steam: no
-- Notes: The stalker and kobold chains are the zone's level 13 to 15 opener arcs (Captain Thessaly, Quartermaster Bree, Loremaster Caddis; src/sim/content/zone3.ts). Claim ceremony at Chronicler Edda Hartwell in Highwatch.
+- Notes: The stalker and kobold chains are the zone's level 13 to 15 opener arcs (Captain Thessaly, Quartermaster Bree, Loremaster Caddis; src/sim/content/zone3.ts). Claim ceremony at Chronicler Zenzie in Highwatch.
 
 ### chr_peaks_chapter_ii
 - Name: Peaks Chronicle, Chapter II
-- Desc: Finish the second chapter of Edda Hartwell's chronicle: break Drogmar's war-camp, read the waking storm, and stand where the Glimmermere glows.
+- Desc: Finish the second chapter of Zenzie's chronicle: break Drogmar's war-camp, read the waking storm, and stand where the Glimmermere glows.
 - Renown: 10
 - Trigger: meta: questsDone contains q_ogre_edges, q_ogre_totems, q_ogre_bounty, q_crushers, q_drogmar, q_elementals, q_shard_cores, q_kazzix, q_glimmermere_light, and q_tarn_waders; plus deeds chr_peaks_glimmer_cast, chr_peaks_moongate, and chr_peaks_waking_witness.
 - Reward: none

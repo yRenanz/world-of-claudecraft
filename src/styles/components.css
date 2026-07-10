@@ -4271,6 +4271,40 @@
     margin-top: 4px;
   }
 
+  /* ---------- AAA window-frame adoption: light special windows (batch 5) ---------- */
+  /* Light windows adopting the shared .window-frame chrome (spec 6.1 to 6.3):
+     town_focus, loot_settings, rite, vale_cup and arena (framed) plus
+     corpse_harvest (a grammar-aligned picker inside the loot popup, styled with
+     its own rules in its section). Each framed root keeps display:block (its Hud
+     open/close and isOpen checks stay unchanged), so the layout is the ROOT-SCROLL
+     model: neutralize the legacy .panel chrome under :has(> .window-frame) (the
+     documented engine floor, .browserslistrc), re-enable the root's own vertical
+     scroll (the frame base sets overflow:hidden for the flex model), and pin the
+     titlebar sticky so it holds while the root scrolls. The inner .window-frame
+     draws its own border, edge line, and background. Tokens only; the per-window
+     body content classes keep their existing sections. */
+
+  /* town-focus: budget + stepper rows in the body, Save in the sticky footer. */
+  #town-focus-window:has(> .window-frame) {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  #town-focus-window > .window-frame .window-titlebar {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    background: var(--panel-l1-bg);
+  }
+  #town-focus-window .window-footer .town-focus-save {
+    width: 100%;
+    margin-top: 0;
+  }
+
   /* ---------- The Vale Cup (boarball at the Sowfield) ---------- */
   /* Flag colors are set per element as --vcup-field / --vcup-accent custom
      properties DERIVED from the VC_NATIONS sim data record (vale_cup_flag.ts),

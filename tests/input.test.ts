@@ -792,7 +792,7 @@ describe('Input modifier combos', () => {
     windowListeners.get('keydown')!({ code: 'Digit1', repeat: false }); // slot0 = Attack
     expect(cb.onAbilityDown).toHaveBeenLastCalledWith(0);
     cb.onAbilityDown.mockClear();
-    // Ctrl+1 is a distinct, unbound chord — it must NOT fire bare slot 0. (Shift+1
+    // Ctrl+1 is a distinct, unbound chord: it must NOT fire bare slot 0. (Shift+1
     // is no longer a valid "unbound" example: it is now the Secondary Bar 1 default.)
     windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, ctrlKey: true });
     expect(cb.onAbilityDown).not.toHaveBeenCalled();

@@ -2967,107 +2967,20 @@
   }
 
   /* ---------- vendor ---------- */
-  /* LEGACY vendor rules: still LOAD-BEARING. The copper vendor no longer emits
-     these classes (it uses the AAA grammar further down), but two live
-     consumers do: heroic_vendor_window.ts (.vendor-item, .vi-name, .vi-price,
-     .vendor-section-title, the :disabled arm) and crafting_window.ts
-     (.vendor-item, .vi-name, .vi-sub, .vi-price, .vendor-section-title,
-     .vendor-empty). Only .vendor-sell-junk and .vendor-hint are truly
-     unmatched. The deferred cleanup chore must migrate BOTH consumers before
-     removing anything here. */
+  /* The legacy .vendor-item / .vi-name / .vi-price / .vi-sub / .vendor-section-title
+     / .vendor-empty / .vendor-sell-junk / .vendor-hint family was REMOVED: every
+     vendor surface now uses the AAA grammar below (.window-frame + .list-rows /
+     .vendor-row / .item-cell). The copper vendor (vendor_window.ts, whose sell-junk
+     row and hint are .vendor-row / .vendor-note) and the Heroic Quartermaster
+     (heroic_vendor_window.ts) both migrated, and crafting_window.ts builds
+     .vendor-row rows, so nothing emits the old classes. */
   #vendor-window {
     width: 400px;
   }
-  .vendor-item {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    width: 100%;
-    padding: 5px;
-    border: 0;
-    border-radius: 4px;
-    cursor: var(--cursor-point);
-    background: transparent;
-    color: inherit;
-    font-family: var(--ui-font);
-    text-align: left;
-  }
-  .vendor-item:hover {
-    background: #ffffff10;
-  }
-  .vendor-item .vi-name {
-    font-size: 12px;
-    flex: 1;
-  }
-  .vendor-item .vi-price {
-    font-size: 11px;
-    color: #ddd;
-  }
-  .vendor-item .vi-sub {
-    display: block;
-    font-size: 10px;
-    color: #887c5c;
-  }
-  .vendor-item:disabled {
-    opacity: 0.45;
-    cursor: default;
-  }
-  .vendor-item:disabled:hover {
-    background: transparent;
-  }
-  .vendor-sell-junk {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    min-height: 40px;
-    margin-top: 8px;
-    padding: 8px;
-    border: 1px solid #6a5320;
-    border-radius: 4px;
-    cursor: var(--cursor-point);
-    background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
-    color: #ffe6a8;
-    font-family: var(--title-font);
-    font-size: 12px;
-  }
-  .vendor-sell-junk .vi-name {
-    flex: 0 1 auto;
-  }
-  .vendor-sell-junk:hover:not(:disabled) {
-    filter: brightness(1.12);
-  }
-  .vendor-sell-junk:disabled {
-    opacity: 0.5;
-    cursor: default;
-  }
-  .vendor-section-title {
-    margin-top: 8px;
-    padding-top: 7px;
-    border-top: 1px solid #463a1c;
-    color: var(--gold);
-    font-family: var(--title-font);
-    font-size: 12px;
-  }
-  .vendor-empty {
-    padding: 5px;
-    font-size: 11px;
-    color: #887c5c;
-  }
-  .vendor-hint {
-    font-size: 11px;
-    color: #c8b888;
-    margin-top: 8px;
-    border-top: 1px solid #463a1c;
-    padding-top: 6px;
-  }
 
   /* Redesigned vendor: adopts the shared .window-frame chrome plus the
-     .list-rows / .item-cell grammar (spec 6.1 to 6.3). The copper vendor no
-     longer emits the legacy classes above, but heroic_vendor_window.ts and
-     crafting_window.ts still do (see the section-top comment); the legacy rules
-     stay load-bearing. The frame mounts on an INNER container
+     .list-rows / .item-cell grammar (spec 6.1 to 6.3). The frame mounts on an
+     INNER container
      (vendor_window.ts ensureFrame), so the shared #vendor-window root never
      carries builder classes or aria; the root overrides below are scoped with
      :has(> .window-frame) (part of the documented engine floor, .browserslistrc),

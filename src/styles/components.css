@@ -4305,6 +4305,25 @@
     margin-top: 0;
   }
 
+  /* loot-settings: a plain form. The root stays the static dialog (index.html +
+     the Hud focus trap), so the frame is chrome only; its body content classes
+     (.ls-body, .ls-row, selects) keep their existing hud.css rules. */
+  #loot-settings-window:has(> .window-frame) {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  #loot-settings-window > .window-frame .window-titlebar {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    background: var(--panel-l1-bg);
+  }
+
   /* ---------- The Vale Cup (boarball at the Sowfield) ---------- */
   /* Flag colors are set per element as --vcup-field / --vcup-accent custom
      properties DERIVED from the VC_NATIONS sim data record (vale_cup_flag.ts),

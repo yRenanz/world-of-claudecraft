@@ -254,6 +254,15 @@ async function flipViewport(w, h, dsf, phone) {
 // ---------------------------------------------------------------------------
 await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
 await flipViewport(1600, 900, 1, false);
+// The own nameplate is a real Options toggle (off by default). Seed it the
+// way a returning player's client stores it, before the game boots and
+// reads settings, so the 07 frames can carry the titled own plate. This is
+// the only pre-seeded setting; everything else ships defaults.
+await evr(() => {
+  const raw = JSON.parse(localStorage.getItem('woc_settings') ?? 'null') ?? {};
+  raw.showOwnNameplate = true;
+  localStorage.setItem('woc_settings', JSON.stringify(raw));
+});
 await enterOfflineGame(page, { charClass: 'paladin', charName: 'Evidence', settleMs: 2000 });
 let entered = false;
 for (let i = 0; i < 30 && !entered; i++) {
@@ -544,7 +553,12 @@ for (const tier of TIERS) {
   await surfacePass(tier.vp, tier.phone);
   if (tier.vp === '844x390') {
     // The phone chat panel and own nameplate, carrying the same live title.
+    // Chat is collapsed behind the Chat button on phones; open it first.
+    await evr(() => document.querySelector('#mobile-chat')?.click());
+    await sleep(900);
     await shot(page, '06-chat-title-844x390.png', 'Chat panel with the titled say line', '844x390');
+    await page.keyboard.press('Escape');
+    await sleep(500);
     await page.keyboard.press('KeyV');
     await sleep(900);
     await shot(

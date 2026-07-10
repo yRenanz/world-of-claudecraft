@@ -607,7 +607,7 @@ describe('Guide deeds cross-page surfaces', () => {
     setLanguage('en');
     const deedsBind = BIND_ACTIONS.find((a) => a.id === 'deeds');
     expect(deedsBind?.defaults).toEqual(['KeyZ']);
-    expect(t('guide.controls.deeds' as never)).toBe('Book of Deeds');
+    expect(t('guide.controls.deeds')).toBe('Book of Deeds');
     const html = controlsPage.render({
       params: [],
       sub: 'reference/controls',

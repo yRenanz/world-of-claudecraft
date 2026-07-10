@@ -4324,6 +4324,26 @@
     background: var(--panel-l1-bg);
   }
 
+  /* rite: the Drowned Reliquary difficulty popup (a centered fixed .window that
+     stays draggable via the titlebar). The display-font title is the ceremony
+     moment; the blurb, guide, and ante grid keep their lp-ante-* / rite-guide
+     rules from the lockpick section. */
+  #delve-rite-panel:has(> .window-frame) {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  #delve-rite-panel > .window-frame .window-titlebar {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    background: var(--panel-l1-bg);
+  }
+
   /* ---------- The Vale Cup (boarball at the Sowfield) ---------- */
   /* Flag colors are set per element as --vcup-field / --vcup-accent custom
      properties DERIVED from the VC_NATIONS sim data record (vale_cup_flag.ts),

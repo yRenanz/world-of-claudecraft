@@ -64,6 +64,7 @@ export interface QuestLogWindowDeps extends PainterHostPresentation {
   restoreFocus(target: HTMLElement | null): void;
   hideTooltip(): void;
   focusFirstInteractive(root: HTMLElement, preferredSelector?: string): void;
+  onVisibilityChange?(): void;
   confirmDialog(
     title: string,
     body: string,
@@ -101,6 +102,7 @@ export class QuestLogWindow {
     this.deps.closeOthers();
     this.render();
     this.deps.root().style.display = 'flex';
+    this.deps.onVisibilityChange?.();
   }
 
   /** Open the log (if closed) with the given quest selected, so a click on a
@@ -112,6 +114,7 @@ export class QuestLogWindow {
       this.deps.closeOthers();
       this.render();
       this.deps.root().style.display = 'flex';
+      this.deps.onVisibilityChange?.();
       return;
     }
     this.render();
@@ -144,6 +147,7 @@ export class QuestLogWindow {
     this.deps.hideTooltip();
     const target = this.openerFocus;
     this.openerFocus = null;
+    this.deps.onVisibilityChange?.();
     if (restoreFocus) this.deps.restoreFocus(target);
   }
 

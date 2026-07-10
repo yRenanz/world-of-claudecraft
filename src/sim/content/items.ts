@@ -906,7 +906,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     hand: 'twohand',
     quality: 'common',
     // Two-handers trade the offhand (no shield, no dual wield) for a slow, heavy
-    // swing at roughly 15% more DPS than the one-hand whites of the same stock.
+    // swing at a 10 to 15% DPS premium over the one-hand whites of the same stock.
     weapon: { min: 9, max: 15, speed: 3.4 },
     sellValue: 160,
     buyValue: 1600,

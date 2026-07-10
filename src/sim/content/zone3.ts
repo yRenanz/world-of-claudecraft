@@ -3018,7 +3018,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     hand: 'twohand',
     quality: 'common',
-    // Same 15%-over-one-hand DPS line as the Eastbrook Greatsword, at this tier.
+    // Same 10-to-15%-over-one-hand DPS line as the Eastbrook Greatsword, at this tier.
     weapon: { min: 26, max: 40, speed: 3.4 },
     sellValue: 680,
     buyValue: 6800,

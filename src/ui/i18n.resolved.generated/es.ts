@@ -5136,11 +5136,11 @@ export const es: EnTranslations = {
       },
       "commanding_shout": {
         "name": "Grito Alentador",
-        "description": "Aumenta tu Aguante en {buff} durante 2 min."
+        "description": "Aumenta tu Aguante en 6 durante 1 hora."
       },
       "demoralizing_shout": {
         "name": "Aullido Pavoroso",
-        "description": "Lanza un grito aterrador que reduce el poder de ataque de todos los enemigos cercanos en {buff} durante 30 s."
+        "description": "Lanza un grito aterrador que reduce el daño infligido por todos los enemigos cercanos un 20% durante 20 s."
       },
       "charge": {
         "name": "Arremetida",
@@ -5160,11 +5160,11 @@ export const es: EnTranslations = {
       },
       "bloodrage": {
         "name": "Tributo de Sangre",
-        "description": "Genera 10 de ira a costa de salud."
+        "description": "Genera {rage} de ira a costa de salud."
       },
       "overpower": {
         "name": "Mano Roja",
-        "description": "Ataque instantáneo que inflige daño de arma más {damage}. Solo se puede usar después de que el objetivo esquive. No puede esquivarse."
+        "description": "Ataque instantáneo (2 cargas) que inflige daño de arma más {damage}, genera {rage} de ira y potencia tu siguiente Golpe Mutilador un 20% (se acumula dos veces). No se puede esquivar."
       },
       "execute": {
         "name": "Tumba Temprana",

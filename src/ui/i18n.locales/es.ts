@@ -2764,10 +2764,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.battle_shout.description':
     'Aumenta tu poder de ataque en {buff} durante 2 min.',
   'entities.abilities.commanding_shout.name': 'Grito Alentador',
-  'entities.abilities.commanding_shout.description': 'Aumenta tu Aguante en {buff} durante 2 min.',
+  'entities.abilities.commanding_shout.description': 'Aumenta tu Aguante en 6 durante 1 hora.',
   'entities.abilities.demoralizing_shout.name': 'Aullido Pavoroso',
   'entities.abilities.demoralizing_shout.description':
-    'Lanza un grito aterrador que reduce el poder de ataque de todos los enemigos cercanos en {buff} durante 30 s.',
+    'Lanza un grito aterrador que reduce el daño infligido por todos los enemigos cercanos un 20% durante 20 s.',
   'entities.abilities.charge.name': 'Arremetida',
   'entities.abilities.charge.description':
     'Carga contra un enemigo, genera 9 de ira y lo aturde durante 1 s. Alcance de 8-25 m.',
@@ -2781,10 +2781,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.description':
     'Mutila al enemigo por {damage} de daño y reduce su velocidad de movimiento un 50% durante 15 s.',
   'entities.abilities.bloodrage.name': 'Tributo de Sangre',
-  'entities.abilities.bloodrage.description': 'Genera 10 de ira a costa de salud.',
+  'entities.abilities.bloodrage.description': 'Genera {rage} de ira a costa de salud.',
   'entities.abilities.overpower.name': 'Mano Roja',
   'entities.abilities.overpower.description':
-    'Ataque instantáneo que inflige daño de arma más {damage}. Solo se puede usar después de que el objetivo esquive. No puede esquivarse.',
+    'Ataque instantáneo (2 cargas) que inflige daño de arma más {damage}, genera {rage} de ira y potencia tu siguiente Golpe Mutilador un 20% (se acumula dos veces). No se puede esquivar.',
   'entities.abilities.execute.name': 'Tumba Temprana',
   'entities.abilities.execute.description':
     'Intenta rematar a un enemigo herido e inflige {damage} de daño. Solo usable contra enemigos con menos del 20% de salud.',

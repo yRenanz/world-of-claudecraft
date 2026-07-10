@@ -34,8 +34,8 @@
   "counts": {
     "keys": 6698,
     "rows": 140658,
-    "translated": 136934,
-    "pending": 3531,
+    "translated": 136930,
+    "pending": 3535,
     "blocked": 193,
     "blockedSource": 93
   },
@@ -46,8 +46,8 @@
       "blocked": 6
     },
     "es_ES": {
-      "translated": 6516,
-      "pending": 176,
+      "translated": 6514,
+      "pending": 178,
       "blocked": 6
     },
     "fr_FR": {
@@ -56,8 +56,8 @@
       "blocked": 17
     },
     "fr_CA": {
-      "translated": 6506,
-      "pending": 176,
+      "translated": 6504,
+      "pending": 178,
       "blocked": 16
     },
     "en_CA": {

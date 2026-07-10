@@ -177,15 +177,53 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     expectAtLeastFloor(leave, '#party-leave');
   });
 
-  it('the mobile More-tray close button', () => {
+  it('the mobile More-drawer close button, menu tiles, and solid frame', () => {
+    // Mirrors the real static anatomy (index.html/play.html): the drawer root
+    // hosts the AAA .window-frame (titlebar + close + scrolling body) around
+    // the 15-tile #mobile-extra-grid.
     document.body.className = 'mobile-touch game-active mobile-more-open';
     const tray = el('div', { id: 'mobile-extra-controls', class: 'window panel' });
-    const title = el('div', { class: 'panel-title' });
-    const close = el('button', { class: 'x-btn', 'data-close': '', 'aria-label': 'Close' });
-    title.appendChild(close);
-    tray.appendChild(title);
+    const frame = el('div', { class: 'window-frame' });
+    const titlebar = el('div', { class: 'window-titlebar' });
+    const title = el('span', { class: 'window-title', id: 'mobile-more-title' });
+    title.textContent = 'More';
+    const close = el('button', {
+      class: 'window-close',
+      id: 'mobile-more-close',
+      'aria-label': 'Close',
+    });
+    titlebar.append(title, close);
+    const body = el('div', { class: 'window-body' });
+    const grid = el('div', { id: 'mobile-extra-grid' });
+    for (let i = 0; i < 15; i++) {
+      const tile = el('button', { class: 'mobile-btn' });
+      const label = el('span', { class: 'mobile-label' });
+      label.textContent = 'Spellbook';
+      tile.appendChild(label);
+      grid.appendChild(tile);
+    }
+    body.appendChild(grid);
+    frame.append(titlebar, body);
+    tray.appendChild(frame);
     document.body.appendChild(tray);
     expectAtLeastFloor(close, '#mobile-more-close');
+    // The redesigned drawer uses roomy icon-over-label tiles, gated at 56px so
+    // a regression back toward the cramped 34-44px pills fails here (the 40px
+    // floor still gates the width).
+    const TILE_FLOOR = 56;
+    for (const tile of Array.from(grid.querySelectorAll<HTMLElement>('.mobile-btn'))) {
+      const { w, h } = measure(tile);
+      expect(h, `More tile height ${h} < ${TILE_FLOOR}`).toBeGreaterThanOrEqual(
+        TILE_FLOOR - EPSILON,
+      );
+      expect(w, `More tile width ${w} < ${TOUCH_FLOOR}`).toBeGreaterThanOrEqual(
+        TOUCH_FLOOR - EPSILON,
+      );
+    }
+    // Never-see-through: the frame rides the fully opaque L2 base (an rgb()
+    // computed color, no alpha channel), so the world cannot read through the
+    // open drawer.
+    expect(getComputedStyle(frame).backgroundColor).toMatch(/^rgb\(/);
   });
 
   it('the community HUD toggle', () => {

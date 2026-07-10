@@ -1198,98 +1198,107 @@
     bottom: auto;
     transform: translate(-50%, -50%);
     display: none;
-    width: min(440px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));
-    --window-pad: 10px;
+    width: min(560px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+    --window-pad: 0px;
+    padding: 0;
     pointer-events: auto;
     z-index: 100;
-    border: 1px solid var(--mobile-glass-border);
-    border-radius: 10px;
-    background: var(--mobile-glass-bg);
-    -webkit-backdrop-filter: blur(calc(var(--mobile-glass-blur) * 1.5));
-    backdrop-filter: blur(calc(var(--mobile-glass-blur) * 1.5));
-    box-shadow:
-      0 8px 28px #000d,
-      inset 0 1px 0 #ffffff12;
+    /* AAA window grammar (live feedback: the old glass pills were cramped and
+       see-through). The root is a transparent shell: the static .window-frame
+       child inside it draws the whole chrome (solid L2 base + L1 gradient +
+       tokenized border/edge/ornaments, components.css + the universal
+       body.mobile-touch .window-frame rule), so the world never reads through
+       the drawer. The huge-spread box-shadow is the modal scrim: it dims
+       EVERYTHING under the drawer (the drawer paints on top of the whole
+       #mobile-controls stack at z 140), the cheap ::backdrop stand-in for this
+       body-level window that cannot reuse #mobile-window-backdrop (z 85 sits
+       under the mobile chrome this modal must dim). */
+    border: 0;
+    outline: 0;
+    background: transparent;
+    border-radius: var(--radius-md);
+    box-shadow: 0 0 0 100vmax var(--color-scrim);
     /* Centre-screen modal (the More button lives in the top-left trio now, so
        the menu opens under the middle of the screen instead of stacking on the
-       trigger): cap to the safe viewport so short landscape phones can
-       scroll the full menu without hiding rows behind controls or browser chrome.
+       trigger): a roomy sheet capped at 80 percent of the safe viewport so
+       short landscape phones scroll the tile grid INSIDE .window-body instead
+       of hiding rows behind browser chrome.
        No --ui-scale division: this drawer is a <body>-level window OUTSIDE the
        zoomed #ui (see the --window-scale note in layout.css). */
     max-width: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));
-    max-height: calc(var(--app-vh) - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
+    max-height: min(
+      calc(var(--app-vh) * 0.8),
+      calc(var(--app-vh) - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom))
+    );
   }
   body.mobile-touch.mobile-more-open #mobile-extra-controls {
     display: flex;
     flex-direction: column;
   }
-  body.mobile-touch #mobile-extra-controls .panel-title {
-    /* 48px, not the old 32px: the close button is a 40x40 absolute-pinned touch
-       target now (it no longer props the header height from the flex flow), so
-       the header itself must be at least as tall as the target. */
-    min-height: 48px;
-    margin-bottom: 8px;
-    padding-bottom: 6px;
-    cursor: move;
-    touch-action: none;
+  /* The frame's .window-body is the single scroller (the generic
+     .window:has(> .window-frame) rule clips the root), matching every other
+     framed window on touch. */
+  body.mobile-touch #mobile-extra-controls .window-body {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
-  body.mobile-touch #mobile-extra-controls .panel-title .x-btn {
-    /* Meet the 40x40 mobile touch floor (was 32x28), matching the general
-       body.mobile-touch .x-btn rule. */
-    min-width: 40px;
-    min-height: 40px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-  /* Issue 1577 round 2 (4): 4 columns instead of 3 so each More-tray button is a
-     bit narrower (the tray holds a long list of verbs, and the wide 3-up pills
-     were bulkier than they needed to be). */
+  /* Roomy 3-column icon-over-label tile grid (was 4 columns of 36px text
+     pills, live feedback: too cramped): each tile clears the 40px touch floor
+     with margin at 64px min. */
   body.mobile-touch #mobile-extra-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     /* No chrome-scale here: the More tray is a TRANSIENT modal, not persistent
-       chrome, so shrinking it frees no world view; and its pills already sit
-       under the 40px floor (36px), so scaling them 0.85x only worsened the tap
-       targets the chrome-scale token promises never to push below the floor. */
-    grid-auto-rows: 36px;
-    gap: 6px;
+       chrome, so shrinking it frees no world view. */
+    grid-auto-rows: minmax(64px, auto);
+    gap: var(--spacing-sm);
   }
   body.mobile-touch #mobile-extra-controls .mobile-btn {
     width: 100%;
-    height: 36px;
+    height: 100%;
+    min-height: 64px;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 0 8px;
-    font-size: 14px;
-    /* The base .mobile-btn's border-radius: 50% is meant for the near-square
-       combat/hotbar buttons; on this wide row it computes a squashed oval
-       (elliptical corner radii bigger than the box is tall). A pill needs the
-       radius capped at half the height so the ends are true semicircles and
-       the sides stay straight. */
-    border-radius: 18px;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    /* In-window tiles, not floating glass chrome: the L0 panel depth over the
+       frame's solid base (the bag-grid cell vocabulary), no backdrop blur (the
+       base .mobile-btn's glass filter is useless over an opaque panel and
+       costs a per-pixel composite). */
+    background: var(--color-panel-l0-bg);
+    border: 1px solid var(--color-panel-l0-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-light);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
+    text-shadow: none;
+    font-size: var(--text-md);
   }
   body.mobile-touch #mobile-extra-controls .mobile-label {
-    display: inline;
+    display: block;
     margin: 0;
-    font-size: 9px;
-    color: #e6d8ae;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--text-xs);
+    line-height: 1.2;
+    color: var(--color-text-light);
   }
   body.mobile-touch #mobile-extra-controls .mobile-btn .ui-icon {
-    flex: 0 0 18px;
+    flex: none;
+    width: 24px;
+    height: 24px;
   }
-  /* A toggle tray button (e.g. Nameplates) glows gold while its feature is on. */
+  /* A toggle tray tile (e.g. Nameplates) glows gold while its feature is on. */
   body.mobile-touch #mobile-extra-controls .mobile-btn.active {
-    border-color: var(--gold);
+    border-color: var(--color-border-focus);
     box-shadow:
-      0 0 8px #ffd10066,
-      inset 0 0 6px #ffd10033;
+      0 0 8px var(--color-primary-glow-heavy),
+      inset 0 0 6px var(--color-primary-glow);
   }
   body.mobile-touch #mobile-extra-controls .mobile-btn.active .mobile-label {
     color: var(--gold);
@@ -1301,12 +1310,14 @@
   body.mobile-touch #mobile-music.mm-muted::after {
     content: "";
     position: absolute;
-    left: 21px;
-    top: 50%;
-    width: 24px;
+    /* Centered over the ICON of the icon-over-label tile: the icon's centre
+       sits half the label block (12px text + 4px gap) above the tile centre. */
+    left: 50%;
+    top: calc(50% - 8px);
+    width: 28px;
     height: 2px;
     border-radius: 2px;
-    background: #f0e8d2;
+    background: var(--color-text-light);
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.7);
     transform: translate(-50%, -50%) rotate(-45deg);
     pointer-events: none;
@@ -3779,46 +3790,12 @@
       font-size: 20px;
       background: radial-gradient(circle at 35% 30%, #2d3048bf, #11121ec2 72%);
     }
-    body.mobile-touch #mobile-extra-controls {
-      left: 50%;
-      /* True vertical centering (the base rule's top:50%/translate(-50%,-50%))
-         let this 4-row, 16-pill grid grow tall enough on a short landscape
-         viewport to overlap the fixed bottom control row (Autorun/Jump/combat
-         cluster), which reserves no layout space of its own. Anchor from the
-         top instead so the drawer's height is measured against the space
-         actually free above that row, not the whole viewport.
-         !important: the shared window-drag code (hud.ts, pointerdown on any
-         .panel-title) freezes a window's CURRENT computed inset/transform into
-         an inline style the first time its title bar is pressed, same as any
-         desktop window; that inline style otherwise wins over this rule and
-         reintroduces the overlap it exists to prevent. This panel is not meant
-         to be draggable on mobile at all (it is excluded from the resize grip
-         via window_resize.ts's NON_RESIZABLE_WINDOW_IDS), so pinning its
-         landscape position here is correct regardless. */
-      top: max(8px, env(safe-area-inset-top)) !important;
-      bottom: auto !important;
-      transform: translateX(-50%) !important;
-      --window-pad: 8px;
-      /* No --ui-scale division: body-level window outside the zoomed #ui.
-         120px clears the bottom control row (Autorun/Jump/combat cluster +
-         labels), which sits outside normal layout flow so nothing else
-         reserves space for it. */
-      max-height: calc(
-        var(--app-vh) -
-        120px -
-        env(safe-area-inset-top) -
-        env(safe-area-inset-bottom)
-      );
-    }
-    body.mobile-touch #mobile-extra-grid {
-      /* 4 columns in landscape too (issue 1577 round 2 (4)), matching the base
-         tier so each More-tray pill stays narrow on a wide landscape phone.
-         No chrome-scale on the rows (see the base-tier rule): transient modal,
-         already under the 40px floor. */
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      grid-auto-rows: 34px;
-      gap: 5px;
-    }
+    /* (No landscape More-drawer override: the drawer is a centered modal with
+       its own scrim and an internal .window-body scroller, and its base
+       max-height already caps at 80 percent of --app-vh, so a short landscape
+       phone scrolls the tile grid inside the sheet. The old top-anchored
+       120px-clearance variant predates the scrim, when the undimmed bottom
+       control row had to stay clear of the tray.) */
     /* The base rule's min(46vw, 330px) square map, vertically centered at 46%,
        is tall enough on a short landscape phone (the map-canvas keeps a 1:1
        aspect ratio via width:100%/height:auto) to dip its bottom edge into the
@@ -3833,16 +3810,6 @@
     body.mobile-touch.mobile-left-handed #mobile-extra-controls {
       left: 50%;
       right: auto;
-    }
-    body.mobile-touch #mobile-extra-controls .mobile-btn {
-      width: 100%;
-      height: 34px;
-      font-size: 13px;
-      padding: 0 7px;
-      border-radius: 17px;
-    }
-    body.mobile-touch #mobile-extra-controls .mobile-label {
-      font-size: 9px;
     }
     body.mobile-touch #bottom-bar {
       left: calc(max(20px, env(safe-area-inset-left)) + 164px);
@@ -4361,21 +4328,16 @@
      edge-pinned sheets and covered their top strip (the leaderboard's Daily
      Leaderboard tab, the town-focus first stepper row: audit shots). While any
      window is open on touch the world chrome is dimmed behind the backdrop and
-     not actionable anyway, so hide the floaters instead of fighting z-order. */
+     not actionable anyway, so hide the floaters instead of fighting z-order.
+     The More drawer is the one modal that never sets mobile-window-open (it is
+     a body-level window hud.ts's open-state sync deliberately excludes), so
+     its own body class joins the selector list: while it is open the floaters
+     are dimmed behind its scrim and must not poke through. */
   body.mobile-touch.mobile-window-open #minimap-wrap,
-  body.mobile-touch.mobile-window-open #mail-indicator {
+  body.mobile-touch.mobile-window-open #mail-indicator,
+  body.mobile-touch.mobile-more-open #minimap-wrap,
+  body.mobile-touch.mobile-more-open #mail-indicator {
     display: none;
-  }
-  /* The More drawer is a modal list, so it takes the same L2 never-see-through
-     base as the framed windows (its bespoke glass gradient stayed mildly
-     transparent over the world), and its 15 menu pills grow from 36px to the
-     44px comfortable touch height (the 40px floor plus breathing room; the
-     drawer body already scrolls when the list outgrows the sheet). */
-  body.mobile-touch #mobile-extra-controls {
-    background: var(--color-panel-l2-base);
-  }
-  body.mobile-touch #mobile-extra-controls .mobile-btn {
-    height: 44px;
   }
   /* Touch-floor sweep (PR #1736 audit): every interactive control the audit
      measured under the 40x40 mobile floor, lifted per window. The harvest

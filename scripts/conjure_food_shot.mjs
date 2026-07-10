@@ -76,11 +76,11 @@ await page.evaluate(() => {
 });
 await sleep(600);
 const hovered = await page.evaluate(() => {
-  const rows = [...document.querySelectorAll('#bags .bag-item')];
-  const el = rows.find((r) => /Conjured (Bread|Pumpernickel|Sweet Roll)/i.test(r.textContent || r.getAttribute('aria-label') || ''));
+  const rows = [...document.querySelectorAll('#bags .item-cell')];
+  const el = rows.find((r) => /Conjured (Bread|Pumpernickel|Sweet Roll)/i.test(r.getAttribute('aria-label') || ''));
   if (!el) return false;
   el.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
-  return el.textContent.trim();
+  return (el.getAttribute('aria-label') || '').trim();
 });
 console.log('hovered conjured bread slot:', hovered);
 await sleep(500);

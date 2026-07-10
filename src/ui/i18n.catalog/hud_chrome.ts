@@ -951,9 +951,19 @@ export const hudChromeStrings = {
       talents: 'Talents and effects: {value}',
     },
   },
-  // Default name pre-filled into the Save-Build-As dialog, e.g. "Build 3".
+  // Talents window chrome for the tiered-choices layout (the rest of the panel's
+  // labels predate it and live in game.talents.*). defaultBuildName pre-fills the
+  // Save-Build-As dialog, e.g. "Build 3".
   talents: {
     defaultBuildName: 'Build {n}',
+    // The CHOICES tab label, doubling as the status-strip "Choices: N / M" lead.
+    choicesTab: 'Choices',
+    // The Current-build action that clears every staged point.
+    resetChoices: 'Reset choices',
+    // Tier-row unlock level: the accessible label ("Level 12") and the small
+    // caption over the rail's big level number.
+    tierLevel: 'Level {n}',
+    tierLevelLabel: 'Level',
   },
   // One-off chat-log tips shown at HUD bootstrap. The /join command tokens stay
   // literal (they are commands); the surrounding prose localizes.

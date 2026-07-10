@@ -3115,12 +3115,11 @@
   body.mobile-touch .perf-footer .btn {
     min-height: 44px;
   }
-  /* Full-screen landscape-first overlay (issue 1577 char/talents redo, see
-     #char-window above): the old partial sheet left too little height for a
-     full talent tree to read on a real landscape phone even before the
-     fit-to-view scale (talent_tree_fit.ts / fitTreeToMobileViewport in
-     talents_window.ts) kicks in, so #tal-body gets the whole screen to work
-     with instead of a reserved player-frame band. */
+  /* Full-screen overlay (issue 1577 char/talents redo, see #char-window
+     above): the talents window covers the whole screen on touch and scrolls as
+     one sheet. The tiered-choices layout reflows on its own (the tier-card
+     grid collapses via the container query in components.css), so no
+     fit-to-view scale is needed. */
   body.mobile-touch #talents-window {
     position: fixed;
     left: 0;
@@ -3133,17 +3132,10 @@
     transform: none;
     z-index: 95 !important;
   }
-  body.mobile-touch #talents-window #tal-body {
-    overflow: auto;
-  }
-  /* The class/spec tab switch already exists on desktop (tal-tabs); on mobile
-     it is the mechanism issue 1577's redo leans on to see one tree at a time
-     at a bigger fit-to-view scale, instead of a taller stacked layout. Bigger
-     touch targets for the tab strip itself. */
-  body.mobile-touch #talents-window .tal-tab {
-    min-height: 40px;
-    display: flex;
-    align-items: center;
+  /* Touch targets: every tier card is a tap target (min 48px); the frame tab
+     rail + grammar buttons already ride the shared 44px --control-h-touch bump. */
+  body.mobile-touch #talents-window .tal-card {
+    min-height: 48px;
   }
   body.mobile-touch #spellbook [data-close] {
     min-width: 40px;
@@ -4042,33 +4034,10 @@
     body.mobile-touch #mobile-preflight-steps {
       font-size: 11px;
     }
-    /* Issue 1577 round 2 (11): a further landscape improvement on top of the
-       full-screen fit-to-view talent tree. Flow the window as a wrapping row so
-       the tree (#tal-body) and the build/loadout controls (.tal-foot) sit side
-       by side (two columns) instead of the foot stacking below and stealing the
-       vertical room the tree fits into. The header/help/tabs stay full width on
-       top. The tree's fit-to-view scale (fitTreeToMobileViewport) measures
-       #tal-body live, so it adapts to the narrower-but-taller column
-       automatically. */
-    body.mobile-touch #talents-window {
-      column-count: 2;
-      column-gap: 14px;
-      box-sizing: border-box;
-    }
-    body.mobile-touch #talents-window > * {
-      break-inside: avoid;
-    }
-    body.mobile-touch #talents-window > .panel-title,
-    body.mobile-touch #talents-window > .tal-head,
-    body.mobile-touch #talents-window > .tal-help,
-    body.mobile-touch #talents-window > .tal-tabs {
-      column-span: all;
-    }
-    body.mobile-touch #talents-window > .tal-foot {
-      margin-top: 0;
-      border-top: 0;
-      padding-top: 0;
-    }
+    /* The tiered-choices talents layout reflows on its own in short landscape
+       viewports (the tier-card grid + build panels collapse via the container
+       query in components.css and the sheet scrolls vertically), so the old
+       two-column column-count split of the fixed-grid tree is gone. */
   }
   /* Re-homed from the char-select responsive block in shell.css: narrow-width
      repositioning of the in-game community HUD + quest

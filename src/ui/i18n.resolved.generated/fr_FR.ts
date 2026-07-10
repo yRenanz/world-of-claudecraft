@@ -797,7 +797,11 @@ export const fr_FR: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Configuration {n}"
+      "defaultBuildName": "Configuration {n}",
+      "choicesTab": "Choices",
+      "resetChoices": "Reset choices",
+      "tierLevel": "Level {n}",
+      "tierLevelLabel": "Level"
     },
     "tips": {
       "joinChannels": "Conseil : tapez /join world ou /join lfg pour discuter avec les joueurs du monde entier."

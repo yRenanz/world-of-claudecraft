@@ -797,7 +797,11 @@ export const ru_RU: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Билд {n}"
+      "defaultBuildName": "Билд {n}",
+      "choicesTab": "Выбор талантов",
+      "resetChoices": "Сбросить выбор",
+      "tierLevel": "Уровень {n}",
+      "tierLevelLabel": "Уровень"
     },
     "tips": {
       "joinChannels": "Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру."

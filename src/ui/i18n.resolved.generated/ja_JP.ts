@@ -797,7 +797,11 @@ export const ja_JP: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "ビルド {n}"
+      "defaultBuildName": "ビルド {n}",
+      "choicesTab": "選択",
+      "resetChoices": "選択をリセット",
+      "tierLevel": "レベル {n}",
+      "tierLevelLabel": "レベル"
     },
     "tips": {
       "joinChannels": "ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。"

@@ -487,6 +487,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.landing.highContrastAria':
     'Переключить фон высокой контрастности: отключает движущийся ролик, чтобы текст начального экрана оставался читаемым',
   'hudChrome.talents.defaultBuildName': 'Билд {n}',
+  'hudChrome.talents.choicesTab': 'Выбор талантов',
+  'hudChrome.talents.resetChoices': 'Сбросить выбор',
+  'hudChrome.talents.tierLevel': 'Уровень {n}',
+  'hudChrome.talents.tierLevelLabel': 'Уровень',
   'hudChrome.tips.joinChannels':
     'Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру.',
   'meta.builtOn': 'Сборка от {date}',

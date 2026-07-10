@@ -1,16 +1,18 @@
 // @vitest-environment jsdom
 //
-// Behavioral guards for the talents window's AAA frame adoption (the pure tree /
-// point-economy decisions are unit-tested in talents_view.test.ts; the
-// source-level token/dash pins live in talents_window.test.ts). These render the
-// real DOM through the shared window-frame builder and assert: the frame chrome
-// is stamped on an INNER mount (the shared #talents-window root stays pristine so
-// its clamp/resize/mobile-fit rules keep matching), the class/spec tab rail + tree
-// + staged-edit build footer all render in the body, and the sacred staged-edit
-// semantics survive: apply commits through deps.saveLoadout, revert-on-close
-// discards the staged buffer without committing, and a loadout switch re-seeds the
-// stage. The titlebar is a Hud drag handle (never the close), and the close routes
-// through the frame to close().
+// Behavioral guards for the talents window's tiered-choices layout on the AAA
+// frame (the pure tier / point-economy decisions are unit-tested in
+// talents_view.test.ts; the source-level token/dash pins live in
+// talents_window.test.ts). These render the real DOM through the shared
+// window-frame builder and assert: the frame chrome is stamped on an INNER mount
+// (the shared #talents-window root stays pristine so its clamp/resize/mobile-inset
+// rules keep matching), the CHOICES / SPECIALIZATION rail is the frame's own
+// tab-rail, the titlebar pairs "Talents" with the class name, the status strip +
+// tier rows + staged-edit build panels all render in the body, and the sacred
+// staged-edit semantics survive: apply commits through deps.saveLoadout,
+// revert-on-close discards the staged buffer without committing, and a loadout
+// switch re-seeds the stage. The titlebar is a Hud drag handle (never the close),
+// and the close routes through the frame to close().
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -18,13 +20,14 @@ import {
   emptyAllocation,
   type SavedLoadout,
   type TalentAllocation,
+  talentsFor,
 } from '../src/sim/content/talents';
 import type { PlayerClass } from '../src/sim/types';
 import { TalentsWindow, type TalentsWindowDeps } from '../src/ui/talents_window';
 import { isWindowDragHandle } from '../src/ui/window_drag_handle';
 
 // Talent node/choice icons resolve procedural icons through a 2D canvas, which
-// jsdom lacks; stub the icon module so the tree can paint without a real canvas.
+// jsdom lacks; stub the icon module so the cards can paint without a real canvas.
 vi.mock('../src/ui/talent_icons', () => ({
   talentNodeIconDataUrl: () => 'data:image/png;base64,stub',
   talentChoiceIconDataUrl: () => 'data:image/png;base64,stub',
@@ -109,7 +112,7 @@ afterEach(() => {
 });
 
 describe('TalentsWindow: frame adoption', () => {
-  it('stamps the window-frame chrome on an INNER mount with titlebar, body, close, and NO footer', () => {
+  it('stamps the window-frame chrome on an INNER mount with titlebar, tab rail, body, close, and NO footer', () => {
     const el = talentsEl();
     openWindow(el);
     expect(el.classList.contains('window-frame')).toBe(false);
@@ -121,16 +124,21 @@ describe('TalentsWindow: frame adoption', () => {
     expect(frame?.querySelector('.window-titlebar')).not.toBeNull();
     expect(frame?.querySelector('.window-body')).not.toBeNull();
     expect(frame?.querySelector('[data-window-close]')).not.toBeNull();
-    // The staged-edit build actions stay in the body, so the frame has no footer.
+    // The CHOICES / SPECIALIZATION rail is the frame's own tab-rail grammar.
+    const tabs = frame?.querySelectorAll('.tab-rail [data-window-tab]') ?? [];
+    expect(tabs.length).toBe(2);
+    expect(tabs[0].textContent).toContain('Choices');
+    expect(tabs[1].textContent).toContain('Specialization');
+    // The staged-edit build panels stay in the body, so the frame has no footer.
     expect(frame?.querySelector('.window-footer')).toBeNull();
   });
 
-  it('titles the frame "Talents" and leads the body with the class-name subtitle', () => {
+  it('titles the frame "Talents" and pairs the class name in the titlebar', () => {
     const el = talentsEl();
     openWindow(el);
     expect(el.querySelector('.window-title')?.textContent).toBe('Talents');
-    const body = el.querySelector<HTMLElement>('.window-body') as HTMLElement;
-    expect(body.querySelector('.tal-classname')?.textContent).toBe('Warrior');
+    const sub = el.querySelector('.window-titlebar .tal-class-sub');
+    expect(sub?.textContent).toBe('Warrior');
   });
 
   it('keeps the shared root a pristine .window.panel (no builder class / role / aria)', () => {
@@ -141,17 +149,6 @@ describe('TalentsWindow: frame adoption', () => {
     expect(el.hasAttribute('aria-labelledby')).toBe(false);
   });
 
-  it('renders the class/spec tab rail, the tree, and the build footer inside the body', () => {
-    const el = talentsEl();
-    openWindow(el);
-    const body = el.querySelector<HTMLElement>('.window-body') as HTMLElement;
-    expect(body.querySelectorAll('.tal-tabs .tal-tab').length).toBe(2);
-    expect(body.querySelector('#tal-body .tal-tree')).not.toBeNull();
-    expect(body.querySelectorAll('#tal-body .tal-node').length).toBeGreaterThan(0);
-    expect(body.querySelector('.tal-foot')).not.toBeNull();
-    expect(body.querySelector('[data-act="save"]')).not.toBeNull();
-  });
-
   it('reuses the frame on a re-render instead of rebuilding it cold', () => {
     const el = talentsEl();
     const { win } = openWindow(el);
@@ -159,6 +156,105 @@ describe('TalentsWindow: frame adoption', () => {
     win.render();
     expect(el.querySelector('.window-body')).toBe(firstBody);
     expect(el.querySelectorAll('.window-titlebar').length).toBe(1);
+  });
+});
+
+describe('TalentsWindow: status strip + tier rows (CHOICES tab)', () => {
+  it('shows the choices count and the unchosen-spec placeholder in the status strip', () => {
+    const el = talentsEl();
+    openWindow(el);
+    const strip = el.querySelector<HTMLElement>('.window-body .tal-status');
+    expect(strip).not.toBeNull();
+    expect(strip?.querySelector('.tal-status-choices')?.textContent).toContain('Choices');
+    expect(strip?.querySelector('.tal-status-choices')?.textContent).toContain('0');
+    expect(strip?.querySelector('.tal-status-choices')?.textContent).toContain('11');
+    expect(strip?.querySelector('.tal-status-spec')?.textContent).toContain(
+      'Choose a Specialization',
+    );
+  });
+
+  it('renders the class tree as unlock-level tier rows of talent cards', () => {
+    const el = talentsEl();
+    openWindow(el);
+    const ct = talentsFor('warrior')!;
+    const classNodes = ct.nodes.filter((n) => n.tree === 'class');
+    const rowCount = new Set(classNodes.map((n) => n.row)).size;
+    const tiers = el.querySelectorAll('#tal-body .tal-tiers .tal-tier');
+    expect(tiers.length).toBe(rowCount);
+    expect(el.querySelectorAll('#tal-body .tal-card').length).toBe(classNodes.length);
+    // The left rail carries the tier's unlock level; the first tier is the
+    // first talent level (10) and levels never decrease down the rows.
+    const levels = Array.from(tiers).map((tier) =>
+      Number(tier.querySelector('.tal-tier-num')?.textContent),
+    );
+    expect(levels[0]).toBe(10);
+    expect(levels).toEqual([...levels].sort((a, b) => a - b));
+    // Cards keep their column identity on the 3-column grid.
+    for (const card of Array.from(el.querySelectorAll<HTMLElement>('#tal-body .tal-card'))) {
+      expect(card.className).toMatch(/tal-col-[0-2]/);
+    }
+    // The build panels render under the tiers.
+    const body = el.querySelector<HTMLElement>('.window-body') as HTMLElement;
+    expect(body.querySelector('.tal-foot')).not.toBeNull();
+    expect(body.querySelector('[data-act="save"]')).not.toBeNull();
+  });
+
+  it('level-locks the deep tiers when the point budget cannot open them', () => {
+    const el = talentsEl();
+    openWindow(el, { total: 1 }); // one point: only the free tier is reachable
+    const tiers = Array.from(el.querySelectorAll<HTMLElement>('#tal-body .tal-tier'));
+    expect(tiers[0].classList.contains('level-locked')).toBe(false);
+    const last = tiers[tiers.length - 1];
+    expect(last.classList.contains('level-locked')).toBe(true);
+    // The locked rail carries the lock affordance; its cards are gate-locked.
+    expect(last.querySelector('.tal-tier-rail .tal-tier-lock')).not.toBeNull();
+    expect(last.querySelectorAll('.tal-card.locked').length).toBeGreaterThan(0);
+  });
+
+  it('updates the tab pip and the strip count when a point is staged', () => {
+    const el = talentsEl();
+    openWindow(el);
+    const node = el.querySelector<HTMLElement>('#tal-body .tal-card.avail:not(.octagon)');
+    expect(node).not.toBeNull();
+    (node as HTMLElement).click();
+    const pip = el.querySelector('[data-window-tab="choices"] .tt-pts');
+    expect(pip?.textContent).toBe('1');
+    expect(el.querySelector('.tal-status-choices')?.textContent).toContain('1');
+  });
+});
+
+describe('TalentsWindow: SPECIALIZATION tab', () => {
+  it('switches to the spec radiogroup through the frame tab and back', () => {
+    const el = talentsEl();
+    openWindow(el);
+    const specTab = el.querySelector<HTMLButtonElement>('[data-window-tab="spec"]');
+    expect(specTab).not.toBeNull();
+    specTab?.click();
+    expect(specTab?.getAttribute('aria-selected')).toBe('true');
+    // The body IS the tabpanel: its id follows the active tab's panel.
+    const body = el.querySelector<HTMLElement>('.window-body') as HTMLElement;
+    expect(body.id).toBe('talents-window-panel-spec');
+    const radios = el.querySelectorAll('#tal-body .tal-specs [role="radio"]');
+    expect(radios.length).toBe(talentsFor('warrior')!.specs.length);
+    // No spec chosen yet: the empty-state prompt shows instead of a tier list.
+    expect(el.querySelector('#tal-body .tal-tiers')).toBeNull();
+    expect(el.querySelector('#tal-body .tal-empty')).not.toBeNull();
+    // Back to CHOICES.
+    el.querySelector<HTMLButtonElement>('[data-window-tab="choices"]')?.click();
+    expect(el.querySelector('#tal-body .tal-tiers')).not.toBeNull();
+  });
+
+  it('choosing a spec paints its tier rows and names it in the status strip', () => {
+    const el = talentsEl();
+    openWindow(el);
+    el.querySelector<HTMLButtonElement>('[data-window-tab="spec"]')?.click();
+    const radio = el.querySelector<HTMLElement>('#tal-body .tal-spec');
+    expect(radio).not.toBeNull();
+    radio?.click();
+    // The spec tree now renders as tier rows, and the strip names the spec.
+    expect(el.querySelectorAll('#tal-body .tal-tiers .tal-tier').length).toBeGreaterThan(0);
+    const specName = talentsFor('warrior')!.specs[0].name;
+    expect(el.querySelector('.tal-status-spec')?.textContent).toContain(specName);
   });
 });
 
@@ -184,18 +280,40 @@ describe('TalentsWindow: move / resize / fit parity', () => {
 });
 
 describe('TalentsWindow: staged-edit semantics (sacred)', () => {
-  it('spends a point into the staged buffer when an available node is clicked, never the live build', () => {
+  it('spends a point into the staged buffer when an available card is clicked, never the live build', () => {
     const el = talentsEl();
     const { stageRef } = openWindow(el);
-    // An available (avail) non-choice node spends a rank directly on click; a
-    // choice (octagon) node opens a flyout instead, so exclude it here.
-    const node = el.querySelector<HTMLElement>('#tal-body .tal-node.avail:not(.octagon)');
-    expect(node, 'expected at least one spendable node in the warrior class tree').not.toBeNull();
+    // An available (avail) non-choice card spends a rank directly on click; a
+    // choice (octagon) card opens a flyout instead, so exclude it here.
+    const node = el.querySelector<HTMLElement>('#tal-body .tal-card.avail:not(.octagon)');
+    expect(node, 'expected at least one spendable card in the warrior class tree').not.toBeNull();
     (node as HTMLElement).click();
     // The click mutated the staged buffer in place (points now spent), NOT the
     // server-authoritative build (the commit path is save/switch/delete only).
     const spent = Object.keys(stageRef.current?.ranks ?? {}).length;
     expect(spent).toBeGreaterThan(0);
+  });
+
+  it('opens the option flyout for a choice (octagon) card and stages the pick', () => {
+    const el = talentsEl();
+    const { win, stageRef } = openWindow(el);
+    const ct = talentsFor('warrior')!;
+    // Stage enough gate-free points to satisfy the choice node's points gate,
+    // then re-render so the octagon card reflects the staged budget.
+    const stage = stageRef.current as TalentAllocation;
+    for (const n of ct.nodes.filter((x) => x.tree === 'class' && !x.pointsGate && !x.requires)) {
+      stage.ranks[n.id] = n.maxRank;
+    }
+    win.render();
+    const choiceNode = ct.nodes.find((n) => n.tree === 'class' && n.kind === 'choice')!;
+    const octagon = el.querySelector<HTMLElement>('#tal-body .tal-card.octagon');
+    expect(octagon).not.toBeNull();
+    octagon?.click();
+    const pop = document.getElementById('tal-choice-pop');
+    expect(pop).not.toBeNull();
+    const opt = pop?.querySelector<HTMLElement>('.tal-choice-opt');
+    opt?.click();
+    expect(stageRef.current?.choices[choiceNode.id]).toBe(choiceNode.choices?.[0].id ?? 'missing');
   });
 
   it('APPLY: Save current commits the staged build through deps.saveLoadout', () => {
@@ -207,6 +325,20 @@ describe('TalentsWindow: staged-edit semantics (sacred)', () => {
     // An active loadout saves in place under its own name (no prompt).
     expect(saveLoadout).toHaveBeenCalledTimes(1);
     expect(saveLoadout.mock.calls[0][0]).toBe('PvP');
+  });
+
+  it('RESET CHOICES: clears every staged point without committing', () => {
+    const el = talentsEl();
+    const saveLoadout = vi.fn();
+    const { stageRef } = openWindow(el, { saveLoadout });
+    const node = el.querySelector<HTMLElement>('#tal-body .tal-card.avail:not(.octagon)');
+    (node as HTMLElement).click();
+    expect(Object.keys(stageRef.current?.ranks ?? {}).length).toBeGreaterThan(0);
+    const clear = el.querySelector<HTMLButtonElement>('[data-act="clear"]');
+    expect(clear?.textContent).toBe('Reset choices');
+    clear?.click();
+    expect(stageRef.current?.ranks).toEqual({});
+    expect(saveLoadout).not.toHaveBeenCalled();
   });
 
   it('REVERT: closing discards the staged buffer without committing to the live build', () => {

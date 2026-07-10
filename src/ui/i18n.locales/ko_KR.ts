@@ -475,6 +475,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.landing.highContrastAria':
     '고대비 배경 전환: 움직이는 예고편을 꺼서 시작 화면 텍스트를 읽기 쉽게 유지합니다',
   'hudChrome.talents.defaultBuildName': '빌드 {n}',
+  'hudChrome.talents.choicesTab': '선택',
+  'hudChrome.talents.resetChoices': '선택 초기화',
+  'hudChrome.talents.tierLevel': '레벨 {n}',
+  'hudChrome.talents.tierLevelLabel': '레벨',
   'hudChrome.tips.joinChannels':
     '팁: /join world 또는 /join lfg를 입력하면 월드 전역의 플레이어와 대화할 수 있습니다.',
   'meta.builtOn': '{date} 빌드',

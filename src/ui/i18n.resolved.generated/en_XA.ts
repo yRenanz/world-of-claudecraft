@@ -797,7 +797,11 @@ export const en_XA: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "[Ɓúíļð {n}]"
+      "defaultBuildName": "[Ɓúíļð {n}]",
+      "choicesTab": "[Çĥóíçéš]",
+      "resetChoices": "[Ŕéšéţ çĥóíçéš]",
+      "tierLevel": "[Ļéʋéļ {n}]",
+      "tierLevelLabel": "[Ļéʋéļ]"
     },
     "tips": {
       "joinChannels": "[Ţíþ: ţýþé /ĵóíñ ŵóŕļð óŕ /ĵóíñ ļƒĝ ţó çĥáţ ŵíţĥ þļáýéŕš áçŕóšš ţĥé ŵóŕļð.]"

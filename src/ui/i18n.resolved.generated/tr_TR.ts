@@ -797,7 +797,11 @@ export const tr_TR: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Yapı {n}"
+      "defaultBuildName": "Yapı {n}",
+      "choicesTab": "Choices",
+      "resetChoices": "Reset choices",
+      "tierLevel": "Level {n}",
+      "tierLevelLabel": "Level"
     },
     "tips": {
       "joinChannels": "İpucu: Dünya genelindeki oyuncularla sohbet etmek için /join world ya da /join lfg yaz."

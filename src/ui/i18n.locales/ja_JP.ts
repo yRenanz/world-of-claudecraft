@@ -474,6 +474,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.landing.highContrastAria':
     '高コントラスト背景を切り替えます。動画トレーラーを無効にして、スタート画面のテキストを読みやすくします',
   'hudChrome.talents.defaultBuildName': 'ビルド {n}',
+  'hudChrome.talents.choicesTab': '選択',
+  'hudChrome.talents.resetChoices': '選択をリセット',
+  'hudChrome.talents.tierLevel': 'レベル {n}',
+  'hudChrome.talents.tierLevelLabel': 'レベル',
   'hudChrome.tips.joinChannels':
     'ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。',
   'meta.builtOn': 'ビルド日：{date}',

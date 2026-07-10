@@ -797,7 +797,11 @@ export const ko_KR: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "빌드 {n}"
+      "defaultBuildName": "빌드 {n}",
+      "choicesTab": "선택",
+      "resetChoices": "선택 초기화",
+      "tierLevel": "레벨 {n}",
+      "tierLevelLabel": "레벨"
     },
     "tips": {
       "joinChannels": "팁: /join world 또는 /join lfg를 입력하면 월드 전역의 플레이어와 대화할 수 있습니다."

@@ -797,7 +797,11 @@ export const zh_TW: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "配置 {n}"
+      "defaultBuildName": "配置 {n}",
+      "choicesTab": "天賦選擇",
+      "resetChoices": "重置選擇",
+      "tierLevel": "等級 {n}",
+      "tierLevelLabel": "等級"
     },
     "tips": {
       "joinChannels": "提示：輸入 /join world 或 /join lfg 可與全世界的玩家聊天。"

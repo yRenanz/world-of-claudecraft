@@ -1069,6 +1069,10 @@ export const zh_TW: EnTranslations = {
       "spawn": "{name}在荊峰高地崛起！"
     },
     "auth": {
+      "appleLoginCta": "透過 Apple 繼續",
+      "appleError": "無法透過 Apple 登入。請再試一次。",
+      "appleChoiceIntro": "建立新帳戶，或將 Apple 連結到現有帳戶。",
+      "appleChoiceExpired": "Apple 登入已過期。請再次使用 Apple 登入。",
       "forgotPrompt": "忘記密碼？",
       "forgotTitle": "重設密碼",
       "forgotHint": "輸入您的使用者名稱，我們會將重設連結寄送到登記的電子郵件。",
@@ -3922,13 +3926,13 @@ export const zh_TW: EnTranslations = {
     "connectionRejected": "伺服器已關閉連線。",
     "tips": {
       "classes": "提示：9 個職業玩法各不相同，投入之前不妨都試一試。",
-      "talents": "提示：可以隨時在任意訓練師處重置天賦，嘗試新搭配不會造成損失。",
-      "dungeons": "提示：地下城會依隊伍人數調整難度，組隊挑戰更快更安全。",
+      "talents": "提示：只要不在戰鬥中，隨時都能重置天賦，因此早期的選擇不會成為陷阱。",
+      "dungeons": "提示：裝備超出普通難度要求後，試試地下城的英雄難度，享受更艱難也更有成就感的戰鬥。",
       "market": "提示：世界市場可以讓你與全服玩家進行買賣交易。",
-      "guilds": "提示：加入公會可解鎖團隊內容和專屬聊天頻道。",
+      "guilds": "提示：加入公會可獲得專屬聊天頻道與公會成員名單。",
       "professions": "提示：採集與製造類生活技能可以與你的戰鬥職業同時培養。",
-      "mounts": "提示：坐騎在較高等級解鎖，能大幅加快區域間的移動速度。",
-      "pvp": "提示：如果想在實戰中檢驗配裝，可以留意標記出的 PvP 區域。"
+      "loadouts": "提示：保存多套天賦配置，即可在不同組合間切換而無需重新分配天賦點。",
+      "pvp": "提示：向其他玩家發起友誼決鬥，或報名灰燼競技場，來檢驗你的組合。"
     }
   },
   "errors": {

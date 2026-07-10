@@ -14,6 +14,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.auth.appleLoginCta': 'Appleで続ける',
+  'hudChrome.auth.appleError': 'Appleでサインインできませんでした。もう一度お試しください。',
+  'hudChrome.auth.appleChoiceIntro':
+    '新しいアカウントを作成するか、Appleを既存のアカウントに連携します。',
+  'hudChrome.auth.appleChoiceExpired':
+    'Appleでのサインインの有効期限が切れました。もう一度お試しください。',
   'hudChrome.vcup.guildBoardWl': '{wins} 勝 {losses} 敗',
   'hudChrome.vcup.shootPower': 'パワー',
   'hudChrome.discord.roleTag.coredevs': 'コア開発者',
@@ -6483,16 +6489,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'loading.tips.classes':
     'ヒント：9つのクラスはそれぞれ遊び方が異なります。決める前にいくつか試してみましょう。',
   'loading.tips.talents':
-    'ヒント：タレントポイントはいつでもトレーナーのもとでリセットできるので、気軽に試せます。',
+    'ヒント：非戦闘中ならいつでも特性をリセットできるので、最初の選択が失敗になることはありません。',
   'loading.tips.dungeons':
-    'ヒント：ダンジョンはパーティ人数に応じて難易度が調整されます。仲間と挑めばより速く安全にクリアできます。',
+    'ヒント：通常難易度の装備が整ったら、より歯応えのあるヒロイック難易度のダンジョンに挑戦してみましょう。',
   'loading.tips.market': 'ヒント：ワールドマーケットではサーバー中のプレイヤーと売買ができます。',
   'loading.tips.guilds':
-    'ヒント：ギルドに加入するとグループコンテンツと専用チャットチャンネルが解放されます。',
+    'ヒント：ギルドに加入すると専用のチャットチャンネルとギルドメンバーの名簿が使えるようになります。',
   'loading.tips.professions':
     'ヒント：採集や製作の生産系スキルは、戦闘クラスと並行して育てられます。',
-  'loading.tips.mounts':
-    'ヒント：マウントは高レベルで解放され、エリア間の移動が大幅に速くなります。',
+  'loading.tips.loadouts':
+    'ヒント：複数の特性ロードアウトを保存しておけば、ポイントを使い直さずにビルドを切り替えられます。',
   'loading.tips.pvp':
-    'ヒント：自分のビルドを他プレイヤーと試したいなら、PvPエリアを探してみましょう。',
+    'ヒント：他のプレイヤーに友好的な決闘を申し込むか、灰塵のコロシアムに参加してビルドを試してみましょう。',
 };

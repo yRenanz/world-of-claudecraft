@@ -1069,6 +1069,10 @@ export const id_ID: EnTranslations = {
       "spawn": "{name} bangkit di atas Dataran Tinggi Thornpeak!"
     },
     "auth": {
+      "appleLoginCta": "Continue with Apple",
+      "appleError": "Could not sign in with Apple. Please try again.",
+      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
+      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
       "forgotPrompt": "Lupa kata sandi?",
       "forgotTitle": "Atur ulang kata sandimu",
       "forgotHint": "Masukkan nama penggunamu dan kami akan mengirim tautan pengaturan ulang ke alamat email yang terdaftar.",
@@ -3922,13 +3926,13 @@ export const id_ID: EnTranslations = {
     "connectionRejected": "Server menutup koneksi.",
     "tips": {
       "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
-      "talents": "Tip: talent points can be respecced at any trainer, so experimenting is never permanent.",
-      "dungeons": "Tip: dungeons scale to your party size. Bring friends for a faster, safer clear.",
+      "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
+      "dungeons": "Tip: try a dungeon on heroic difficulty once you outgear normal for a tougher, more rewarding fight.",
       "market": "Tip: the World Market lets you buy and sell with players across the whole realm.",
-      "guilds": "Tip: joining a guild unlocks group content and a shared chat channel.",
+      "guilds": "Tip: joining a guild gives you a private chat channel and a shared roster of your guildmates.",
       "professions": "Tip: gathering and crafting professions can be trained alongside your combat class.",
-      "mounts": "Tip: mounts unlock at higher levels and make travel between zones much faster.",
-      "pvp": "Tip: look for marked PvP areas if you want to test your build against other players."
+      "loadouts": "Tip: save more than one talent loadout to swap between builds without spending points twice.",
+      "pvp": "Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build."
     }
   },
   "errors": {

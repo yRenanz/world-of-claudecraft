@@ -14,6 +14,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.auth.appleLoginCta': 'Apple로 계속하기',
+  'hudChrome.auth.appleError': 'Apple로 로그인할 수 없습니다. 다시 시도해 주세요.',
+  'hudChrome.auth.appleChoiceIntro': '새 계정을 만들거나 Apple을 기존 계정에 연결하세요.',
+  'hudChrome.auth.appleChoiceExpired':
+    'Apple 로그인이 만료되었습니다. Apple로 다시 로그인해 주세요.',
   'hudChrome.vcup.guildBoardWl': '{wins}승 {losses}패',
   'hudChrome.vcup.shootPower': '파워',
   'hudChrome.discord.roleTag.coredevs': '핵심 개발자',
@@ -6471,13 +6476,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'loading.tips.classes':
     '팁: 9개 클래스는 저마다 플레이 방식이 다릅니다. 정하기 전에 몇 가지를 직접 해보세요.',
   'loading.tips.talents':
-    '팁: 특성 포인트는 언제든 훈련관에게서 초기화할 수 있으니, 새로운 조합을 마음껏 시도해 보세요.',
+    '팁: 비전투 상태라면 언제든 특성을 초기화할 수 있어, 처음 선택도 절대 돌이킬 수 없는 것이 아닙니다.',
   'loading.tips.dungeons':
-    '팁: 던전은 파티 인원수에 맞춰 난이도가 조정됩니다. 친구와 함께 도전하면 더 빠르고 안전합니다.',
+    '팁: 일반 던전 장비를 갖췄다면 영웅 난이도에 도전해 더 어렵고 보람찬 전투를 즐겨보세요.',
   'loading.tips.market': '팁: 월드 마켓에서 서버 전체 플레이어와 거래할 수 있습니다.',
-  'loading.tips.guilds': '팁: 길드에 가입하면 그룹 콘텐츠와 전용 채팅 채널이 열립니다.',
+  'loading.tips.guilds': '팁: 길드에 가입하면 전용 채팅 채널과 길드원 명단을 이용할 수 있습니다.',
   'loading.tips.professions':
     '팁: 채집이나 제작 같은 생활 전문 기술은 전투 클래스와 함께 키울 수 있습니다.',
-  'loading.tips.mounts': '팁: 탈것은 높은 레벨에서 해금되며, 지역 간 이동 속도를 크게 높여줍니다.',
-  'loading.tips.pvp': '팁: 다른 플레이어와 빌드를 겨뤄보고 싶다면 표시된 PvP 지역을 찾아보세요.',
+  'loading.tips.loadouts':
+    '팁: 특성 로드아웃을 여러 개 저장해 두면 포인트를 다시 쓰지 않고도 빌드를 바꿀 수 있습니다.',
+  'loading.tips.pvp':
+    '팁: 다른 플레이어에게 친선 결투를 신청하거나 잿빛 콜로세움 투기장에 참가해 빌드를 시험해보세요.',
 };

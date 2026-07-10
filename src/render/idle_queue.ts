@@ -24,11 +24,14 @@ export interface IdleQueueOptions {
   timeoutMs: number;
   /** Injectable for tests; defaults to requestIdleCallback with a setTimeout fallback. */
   scheduler?: IdleScheduler;
+  /** Polled before every batch; once true, the queue stops scheduling and resolves. */
+  cancelled?: () => boolean;
 }
 
 /**
  * Runs `worker` over every item in `items`, a bounded batch per idle slot,
- * until the queue is empty. Resolves once all items are processed.
+ * until the queue is empty. Resolves once all items are processed, or as soon
+ * as `cancelled()` reports true (it does not keep walking the remaining items).
  */
 export function runIdleQueue<T>(
   items: readonly T[],
@@ -40,6 +43,10 @@ export function runIdleQueue<T>(
   let index = 0;
   return new Promise((resolve) => {
     const step = (): void => {
+      if (options.cancelled?.()) {
+        resolve();
+        return;
+      }
       const end = Math.min(index + options.batchSize, items.length);
       for (; index < end; index++) worker(items[index]);
       if (index < items.length) schedule(step, options.timeoutMs);

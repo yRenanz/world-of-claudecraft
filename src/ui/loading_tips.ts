@@ -10,7 +10,7 @@ const LOADING_TIP_KEYS: TranslationKey[] = [
   'loading.tips.market',
   'loading.tips.guilds',
   'loading.tips.professions',
-  'loading.tips.mounts',
+  'loading.tips.loadouts',
   'loading.tips.pvp',
 ];
 

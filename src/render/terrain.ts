@@ -960,7 +960,7 @@ export interface TerrainView {
 const STREAM_BATCH_SIZE = 4;
 const STREAM_TIMEOUT_MS = 200;
 
-export function buildTerrain(seed: number): TerrainView {
+export function buildTerrain(seed: number, priorityPoint?: { x: number; z: number }): TerrainView {
   const lowGfx = !GFX.terrainSplat || !hasTerrainSplatAssets();
   const brush = makeBrushUniforms();
   const normalTex = lowGfx ? null : terrainNormalTexture(seed);
@@ -1028,6 +1028,15 @@ export function buildTerrain(seed: number): TerrainView {
     const mesh = new THREE.Mesh(geo, mat);
     mesh.receiveShadow = true;
     group.add(mesh);
+    // A chunk's transform never changes after this point (its shape lives in
+    // the geometry, not the mesh matrix), so it can freeze immediately rather
+    // than waiting for the caller's group-wide freezeStaticMatrices pass.
+    // That pass only runs once, right after the synchronous near ring returns,
+    // so every chunk streamed in afterward (the majority, on the far bands)
+    // would otherwise keep matrixAutoUpdate = true and recompose every frame
+    // for the rest of the session.
+    mesh.updateMatrixWorld(true);
+    mesh.matrixAutoUpdate = false;
     chunks.push({
       mesh,
       x: x0 + size / 2,
@@ -1106,14 +1115,32 @@ export function buildTerrain(seed: number): TerrainView {
     if (job.near) addChunk(job.x0, job.z0, job.size, job.spacing);
   }
   const farJobs = jobs.filter((job) => !job.near);
+  // A returning character can log out anywhere, not just at a zone hub, so
+  // the near ring alone can leave them standing on not-yet-streamed terrain.
+  // Ordering the far queue by distance to the actual entry point (falling
+  // back to world center when none is given) guarantees the chunk directly
+  // underfoot streams in first rather than landing wherever row-major order
+  // happens to reach it.
+  if (priorityPoint) {
+    const centerX = (job: (typeof farJobs)[number]): number => job.x0 + job.size / 2;
+    const centerZ = (job: (typeof farJobs)[number]): number => job.z0 + job.size / 2;
+    farJobs.sort(
+      (a, b) =>
+        Math.hypot(centerX(a) - priorityPoint.x, centerZ(a) - priorityPoint.z) -
+        Math.hypot(centerX(b) - priorityPoint.x, centerZ(b) - priorityPoint.z),
+    );
+  }
   let cancelled = false;
   const streamingDone = runIdleQueue(
     farJobs,
     (job) => {
-      if (cancelled) return;
       addChunk(job.x0, job.z0, job.size, job.spacing);
     },
-    { batchSize: STREAM_BATCH_SIZE, timeoutMs: STREAM_TIMEOUT_MS },
+    {
+      batchSize: STREAM_BATCH_SIZE,
+      timeoutMs: STREAM_TIMEOUT_MS,
+      cancelled: () => cancelled,
+    },
   );
 
   return {

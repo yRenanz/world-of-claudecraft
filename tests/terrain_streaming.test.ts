@@ -85,4 +85,50 @@ describe('progressive terrain build', () => {
     // are folded into fog culling.
     expect(() => terrain.update(0, 0, 1000)).not.toThrow();
   });
+
+  it('freezes matrixAutoUpdate on every streamed-in chunk, not just the near ring', async () => {
+    vi.resetModules();
+    mockEmptyAssetLoads();
+    const { buildTerrain } = await import('../src/render/terrain');
+
+    const terrain = buildTerrain(20061);
+    await vi.runAllTimersAsync();
+    await terrain.streamingDone;
+
+    for (const child of terrain.group.children) {
+      expect(child.matrixAutoUpdate).toBe(false);
+    }
+  });
+
+  it('streams the chunk nearest a given priority point before farther ones', async () => {
+    vi.resetModules();
+    mockEmptyAssetLoads();
+    const { buildTerrain } = await import('../src/render/terrain');
+
+    // Anchor near one corner of the map so the ordering effect is unambiguous.
+    const terrain = buildTerrain(20061, { x: -170, z: 20 });
+    const nearCount = terrain.group.children.length;
+
+    // Advance one idle-queue batch only: the first few streamed chunks should
+    // already include ones far closer to the priority point than a plain
+    // row-major walk would produce this early.
+    await vi.advanceTimersByTimeAsync(0);
+    const afterFirstBatch = terrain.group.children.length;
+    expect(afterFirstBatch).toBeGreaterThan(nearCount);
+
+    const distToPriority = (mesh: THREE.Object3D): number => {
+      const box = new THREE.Box3().setFromObject(mesh);
+      const center = box.getCenter(new THREE.Vector3());
+      return Math.hypot(center.x - -170, center.z - 20);
+    };
+    const firstStreamed = terrain.group.children.slice(nearCount, afterFirstBatch);
+    const closest = Math.min(...firstStreamed.map(distToPriority));
+
+    await vi.runAllTimersAsync();
+    await terrain.streamingDone;
+    const allStreamed = terrain.group.children.slice(nearCount);
+    const overallClosest = Math.min(...allStreamed.map(distToPriority));
+
+    expect(closest).toBeCloseTo(overallClosest, 5);
+  });
 });

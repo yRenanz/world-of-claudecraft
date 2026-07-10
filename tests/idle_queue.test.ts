@@ -82,4 +82,21 @@ describe('runIdleQueue', () => {
     expect(batchSizes.every((n) => n <= 3)).toBe(true);
     expect(seenThisBatch).toBe(7);
   });
+
+  it('stops scheduling and resolves as soon as cancelled() reports true', async () => {
+    const { scheduler, drainAll } = fakeScheduler();
+    const seen: number[] = [];
+    let cancel = false;
+    const items = Array.from({ length: 10 }, (_, i) => i);
+    const done = runIdleQueue(items, (item) => seen.push(item), {
+      batchSize: 2,
+      timeoutMs: 50,
+      scheduler,
+      cancelled: () => cancel,
+    });
+    cancel = true;
+    drainAll();
+    await done;
+    expect(seen).toEqual([]);
+  });
 });

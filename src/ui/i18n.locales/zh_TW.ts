@@ -14,6 +14,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.auth.appleLoginCta': '透過 Apple 繼續',
+  'hudChrome.auth.appleError': '無法透過 Apple 登入。請再試一次。',
+  'hudChrome.auth.appleChoiceIntro': '建立新帳戶，或將 Apple 連結到現有帳戶。',
+  'hudChrome.auth.appleChoiceExpired': 'Apple 登入已過期。請再次使用 Apple 登入。',
   'hudChrome.vcup.guildBoardWl': '{wins} 勝，{losses} 敗',
   'hudChrome.vcup.shootPower': '力道',
   'hudChrome.discord.roleTag.coredevs': '核心開發者',
@@ -6146,11 +6150,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusSectionAria': '獎勵銀行格子及獲取方式',
   'entities.mobs.yumi_cat.name': '由美',
   'loading.tips.classes': '提示：9 個職業玩法各不相同，投入之前不妨都試一試。',
-  'loading.tips.talents': '提示：可以隨時在任意訓練師處重置天賦，嘗試新搭配不會造成損失。',
-  'loading.tips.dungeons': '提示：地下城會依隊伍人數調整難度，組隊挑戰更快更安全。',
+  'loading.tips.talents': '提示：只要不在戰鬥中，隨時都能重置天賦，因此早期的選擇不會成為陷阱。',
+  'loading.tips.dungeons': '提示：裝備超出普通難度要求後，試試地下城的英雄難度，享受更艱難也更有成就感的戰鬥。',
   'loading.tips.market': '提示：世界市場可以讓你與全服玩家進行買賣交易。',
-  'loading.tips.guilds': '提示：加入公會可解鎖團隊內容和專屬聊天頻道。',
+  'loading.tips.guilds': '提示：加入公會可獲得專屬聊天頻道與公會成員名單。',
   'loading.tips.professions': '提示：採集與製造類生活技能可以與你的戰鬥職業同時培養。',
-  'loading.tips.mounts': '提示：坐騎在較高等級解鎖，能大幅加快區域間的移動速度。',
-  'loading.tips.pvp': '提示：如果想在實戰中檢驗配裝，可以留意標記出的 PvP 區域。',
+  'loading.tips.loadouts': '提示：保存多套天賦配置，即可在不同組合間切換而無需重新分配天賦點。',
+  'loading.tips.pvp': '提示：向其他玩家發起友誼決鬥，或報名灰燼競技場，來檢驗你的組合。',
 };

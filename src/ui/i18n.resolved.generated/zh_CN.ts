@@ -1069,6 +1069,10 @@ export const zh_CN: EnTranslations = {
       "spawn": "{name}在荆峰高地崛起！"
     },
     "auth": {
+      "appleLoginCta": "通过 Apple 继续",
+      "appleError": "无法通过 Apple 登录。请重试。",
+      "appleChoiceIntro": "创建新帐户，或将 Apple 关联到现有帐户。",
+      "appleChoiceExpired": "Apple 登录已过期。请再次使用 Apple 登录。",
       "forgotPrompt": "忘记密码？",
       "forgotTitle": "重置密码",
       "forgotHint": "输入您的用户名，我们会将重置链接发送到登记的邮箱。",
@@ -3922,13 +3926,13 @@ export const zh_CN: EnTranslations = {
     "connectionRejected": "服务器关闭了连接。",
     "tips": {
       "classes": "提示：9 个职业玩法各不相同，投入之前不妨都试一试。",
-      "talents": "提示：可以随时在任意训练师处重置天赋，尝试新搭配不会造成损失。",
-      "dungeons": "提示：地下城会根据队伍人数调整难度，组队挑战更快更安全。",
+      "talents": "提示：你可以在任意脱离战斗的时候重置天赋，因此早期的选择永远不会成为陷阱。",
+      "dungeons": "提示：装备超出普通难度要求后，试试地下城的英雄难度，享受更艰难也更有回报的战斗。",
       "market": "提示：世界市场可以让你与全服玩家进行买卖交易。",
-      "guilds": "提示：加入公会可解锁团队内容和专属聊天频道。",
+      "guilds": "提示：加入公会可获得专属聊天频道和公会成员名单。",
       "professions": "提示：采集与制造类生活技能可以与你的战斗职业同时培养。",
-      "mounts": "提示：坐骑在较高等级解锁，能大幅加快区域间的移动速度。",
-      "pvp": "提示：如果想在实战中检验配装，可以留意标记出的 PvP 区域。"
+      "loadouts": "提示：保存多套天赋配置，即可在不同 build 间切换而无需重新分配天赋点。",
+      "pvp": "提示：向其他玩家发起友谊决斗，或报名灰烬竞技场，来检验你的 build。"
     }
   },
   "errors": {

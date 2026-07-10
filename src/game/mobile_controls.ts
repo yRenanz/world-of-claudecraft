@@ -306,6 +306,13 @@ export class MobileControls {
   private swipeLookActive = false;
   private swipeLookDownAt = 0;
   private lastSwipeTapAt = 0;
+  // Set when a pinch degrades to one finger and that finger is adopted as a
+  // fresh swipe-look (see onPinchEnd). The adopted finger's tracked position
+  // may be stale (pinch pointers hold no capture, so moves over HUD chrome are
+  // lost), so the first move only resyncs the origin instead of applying a
+  // spurious jump delta; and a pinch remnant is never a recenter "tap".
+  private swipeLookResync = false;
+  private swipeLookAdopted = false;
 
   private chatPressTimer: ReturnType<typeof setTimeout> | null = null;
   private chatLongFired = false;
@@ -398,25 +405,35 @@ export class MobileControls {
       this.onMoveMove(e);
       this.onCameraMove(e);
     });
+    // The pinch/swipe ends are forwarded at window level too: pinch pointers
+    // hold no pointer capture, so a finger that drifts over HUD chrome delivers
+    // its pointerup/pointercancel THERE, never to the canvas. Without this
+    // forwarding that pointer stayed in pinchPointers forever and every later
+    // single-finger touch was misread as a pinch against the stale phantom
+    // point (the "camera locked after zooming once" bug: drags only zoomed).
     window.addEventListener('pointerup', (e) => {
       this.onMoveEnd(e);
       this.onCameraEnd(e);
+      this.onPinchEnd(e);
+      this.onSwipeLookEnd(e);
     });
     window.addEventListener('pointercancel', (e) => {
       this.onMoveEnd(e);
       this.onCameraEnd(e);
+      this.onPinchEnd(e);
+      this.onSwipeLookEnd(e);
     });
     window.addEventListener('blur', () => {
       this.releaseMove();
       this.releaseCamera();
-      this.releaseSwipeLook();
+      this.releasePinch();
       this.touchOwners.releaseAll();
     });
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
         this.releaseMove();
         this.releaseCamera();
-        this.releaseSwipeLook();
+        this.releasePinch();
         this.touchOwners.releaseAll();
       }
     });
@@ -983,8 +1000,41 @@ export class MobileControls {
   }
 
   private onPinchEnd(e: PointerEvent): void {
-    this.pinchPointers.delete(e.pointerId);
+    // Idempotent: the canvas handler and the window-level forwarder both call
+    // this for a canvas pointerup, so only the first delete does any work.
+    if (!this.pinchPointers.delete(e.pointerId)) return;
     if (this.pinchPointers.size < 2) this.pinchPrevDist = null;
+    // A pinch degrading to exactly one remaining finger hands that finger back
+    // to camera drag (swipe-look), so the player can keep rotating without a
+    // re-touch. Pinch pointers only ever come from canvas pointerdowns, so the
+    // remaining finger is a legitimate camera-surface touch.
+    if (
+      this.pinchPointers.size !== 1 ||
+      !this.active ||
+      this.swipeLookPointer !== null ||
+      this.lookPointer !== null ||
+      document.body.classList.contains('mobile-window-open')
+    )
+      return;
+    const remainingId = this.pinchPointers.keys().next().value;
+    if (remainingId === undefined) return;
+    const pos = this.pinchPointers.get(remainingId);
+    if (!pos) return;
+    this.touchOwners.set(remainingId, 'camera');
+    this.swipeLookPointer = remainingId;
+    this.swipeLookStartX = pos.x;
+    this.swipeLookStartY = pos.y;
+    this.swipeLookLastX = pos.x;
+    this.swipeLookLastY = pos.y;
+    this.swipeLookActive = false;
+    this.swipeLookDownAt = this.now();
+    this.swipeLookResync = true;
+    this.swipeLookAdopted = true;
+    try {
+      this.canvas?.setPointerCapture(remainingId);
+    } catch {
+      /* synthetic test event */
+    }
   }
 
   private releasePinch(): void {
@@ -1040,6 +1090,17 @@ export class MobileControls {
       this.releaseSwipeLook();
       return;
     }
+    // First move after a pinch-degrade adoption: the tracked position may be
+    // stale, so resync the origin to the live finger instead of applying the
+    // gap as a camera jump.
+    if (this.swipeLookResync) {
+      this.swipeLookResync = false;
+      this.swipeLookStartX = e.clientX;
+      this.swipeLookStartY = e.clientY;
+      this.swipeLookLastX = e.clientX;
+      this.swipeLookLastY = e.clientY;
+      return;
+    }
     const totalDx = e.clientX - this.swipeLookStartX;
     const totalDy = e.clientY - this.swipeLookStartY;
     if (!this.swipeLookActive) {
@@ -1066,7 +1127,12 @@ export class MobileControls {
     // never crossed the swipe deadzone (never became a drag); two of those in
     // quick succession recenter the camera, mirroring the joystick logic.
     const now = this.now();
-    const quickTap = !this.swipeLookActive && now - this.swipeLookDownAt <= RECENTER_DOUBLE_TAP_MS;
+    // A pinch remnant adopted mid-gesture is never a "tap": without this guard
+    // two quick pinch releases could fire a surprise camera recenter.
+    const quickTap =
+      !this.swipeLookAdopted &&
+      !this.swipeLookActive &&
+      now - this.swipeLookDownAt <= RECENTER_DOUBLE_TAP_MS;
     if (quickTap && isRecenterDoubleTap(this.lastSwipeTapAt, now, this.swipeLookActive)) {
       this.callbacks.onRecenterCamera();
       this.lastSwipeTapAt = 0;
@@ -1092,6 +1158,8 @@ export class MobileControls {
       this.input.setTouchLookVector({ x: 0, y: 0 });
     }
     this.swipeLookActive = false;
+    this.swipeLookResync = false;
+    this.swipeLookAdopted = false;
   }
 }
 

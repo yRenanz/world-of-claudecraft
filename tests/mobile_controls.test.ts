@@ -1507,6 +1507,166 @@ describe('MobileControls pointer lifecycle', () => {
   });
 });
 
+// BUG: "camera locked after zooming once" (mobile). A pinch pointer whose
+// pointerup/pointercancel never reaches the canvas (no pointer capture during a
+// pinch, so a finger that drifts over HUD chrome delivers its up THERE) stayed
+// in pinchPointers forever. Every later single-finger touch then made
+// pinchPointers.size === 2 again: swipe-look was blocked (size > 1) and each
+// drag re-ran the pinch zoom against the stale phantom point, exactly the
+// reported "touch input only causes the camera to zoom in or out".
+describe('MobileControls pinch lifecycle: camera drag ownership after zoom', () => {
+  function gestureRecorder(): {
+    input: Input;
+    deltas: Array<{ dx: number; dy: number }>;
+    zooms: number[];
+  } {
+    const deltas: Array<{ dx: number; dy: number }> = [];
+    const zooms: number[] = [];
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+      applyTouchLookDelta: (dx: number, dy: number) => {
+        deltas.push({ dx, dy });
+      },
+      zoomBy: (delta: number) => {
+        zooms.push(delta);
+      },
+    } as unknown as Input;
+    return { input, deltas, zooms };
+  }
+
+  function touch(target: EventTarget, type: string, pointerId: number, x: number, y: number): void {
+    target.dispatchEvent(
+      pointerEvent(type, { pointerId, pointerType: 'touch', clientX: x, clientY: y }),
+    );
+  }
+
+  it('restores camera rotation after a pinch finger lifts over HUD chrome (up seen only by window)', () => {
+    const { canvas, windowTarget } = installMobileControlDom();
+    const { input, deltas, zooms } = gestureRecorder();
+    new MobileControls(input, mobileCallbacks()).start();
+
+    // Two fingers land on the canvas and pinch: zoom must fire.
+    touch(canvas, 'pointerdown', 31, 140, 300);
+    touch(canvas, 'pointerdown', 32, 260, 300);
+    touch(canvas, 'pointermove', 31, 160, 300);
+    expect(zooms.length).toBeGreaterThan(0);
+    const zoomsDuringPinch = zooms.length;
+
+    // Finger 31 drifts over HUD chrome and lifts THERE: pinch pointers hold no
+    // pointer capture, so the canvas never sees this pointerup; only the
+    // window-level listener does.
+    windowTarget.dispatchEvent(
+      pointerEvent('pointerup', { pointerId: 31, pointerType: 'touch', clientX: 80, clientY: 600 }),
+    );
+    touch(canvas, 'pointerup', 32, 260, 300);
+
+    // A fresh single-finger horizontal drag must rotate the camera again...
+    touch(canvas, 'pointerdown', 33, 150, 300);
+    touch(canvas, 'pointermove', 33, 190, 300);
+    touch(canvas, 'pointermove', 33, 230, 300);
+    expect(deltas.length).toBeGreaterThan(0);
+    // ...and must NOT be reinterpreted as a pinch against a stale phantom finger.
+    expect(zooms.length).toBe(zoomsDuringPinch);
+  });
+
+  it('restores camera rotation after a browser gesture takeover cancels the pinch (pointercancel via window)', () => {
+    const { canvas, windowTarget } = installMobileControlDom();
+    const { input, deltas, zooms } = gestureRecorder();
+    let recenters = 0;
+    new MobileControls(input, {
+      ...mobileCallbacks(),
+      onRecenterCamera: () => {
+        recenters += 1;
+      },
+    }).start();
+
+    touch(canvas, 'pointerdown', 34, 140, 300);
+    touch(canvas, 'pointerdown', 35, 260, 300);
+    touch(canvas, 'pointermove', 34, 160, 300);
+    expect(zooms.length).toBeGreaterThan(0);
+    const zoomsDuringPinch = zooms.length;
+
+    // Chrome fires pointercancel (not pointerup) when a native gesture takes
+    // over; deliver both cancels through the window path only.
+    windowTarget.dispatchEvent(
+      pointerEvent('pointercancel', { pointerId: 34, pointerType: 'touch' }),
+    );
+    windowTarget.dispatchEvent(
+      pointerEvent('pointercancel', { pointerId: 35, pointerType: 'touch' }),
+    );
+
+    touch(canvas, 'pointerdown', 36, 150, 300);
+    touch(canvas, 'pointermove', 36, 190, 300);
+    touch(canvas, 'pointermove', 36, 230, 300);
+    expect(deltas.length).toBeGreaterThan(0);
+    expect(zooms.length).toBe(zoomsDuringPinch);
+    // The cancelled pinch remnant is never a recenter "tap".
+    expect(recenters).toBe(0);
+  });
+
+  it('hands the remaining finger back to camera drag when a pinch degrades to one finger', () => {
+    const { canvas } = installMobileControlDom();
+    const { input, deltas, zooms } = gestureRecorder();
+    new MobileControls(input, mobileCallbacks()).start();
+
+    touch(canvas, 'pointerdown', 41, 140, 300);
+    touch(canvas, 'pointerdown', 42, 260, 300);
+    touch(canvas, 'pointermove', 41, 160, 300);
+    expect(zooms.length).toBeGreaterThan(0);
+    const zoomsDuringPinch = zooms.length;
+
+    // One finger lifts normally (on the canvas); the OTHER stays down and keeps
+    // dragging. The player expects the camera to rotate without a re-touch.
+    touch(canvas, 'pointerup', 41, 160, 300);
+    touch(canvas, 'pointermove', 42, 300, 300);
+    touch(canvas, 'pointermove', 42, 340, 300);
+    touch(canvas, 'pointermove', 42, 380, 300);
+    touch(canvas, 'pointerup', 42, 380, 300);
+
+    expect(deltas.length).toBeGreaterThan(0);
+    expect(zooms.length).toBe(zoomsDuringPinch);
+  });
+
+  it('clears pinch tracking on window blur so the next touch is not misread as a pinch', () => {
+    const { canvas, windowTarget } = installMobileControlDom();
+    const { input, deltas, zooms } = gestureRecorder();
+    new MobileControls(input, mobileCallbacks()).start();
+
+    touch(canvas, 'pointerdown', 51, 140, 300);
+    touch(canvas, 'pointerdown', 52, 260, 300);
+    (windowTarget as unknown as EventTarget).dispatchEvent(new Event('blur'));
+
+    touch(canvas, 'pointerdown', 53, 150, 300);
+    touch(canvas, 'pointermove', 53, 190, 300);
+    touch(canvas, 'pointermove', 53, 230, 300);
+    expect(deltas.length).toBeGreaterThan(0);
+    expect(zooms).toEqual([]);
+  });
+
+  it('keeps the normal full pinch cycle intact: zoom, both fingers up, then swipe rotates', () => {
+    const { canvas } = installMobileControlDom();
+    const { input, deltas, zooms } = gestureRecorder();
+    new MobileControls(input, mobileCallbacks()).start();
+
+    touch(canvas, 'pointerdown', 61, 140, 300);
+    touch(canvas, 'pointerdown', 62, 260, 300);
+    touch(canvas, 'pointermove', 61, 160, 300);
+    touch(canvas, 'pointerup', 62, 260, 300);
+    touch(canvas, 'pointerup', 61, 160, 300);
+    expect(zooms.length).toBeGreaterThan(0);
+    const zoomsDuringPinch = zooms.length;
+
+    touch(canvas, 'pointerdown', 63, 150, 300);
+    touch(canvas, 'pointermove', 63, 190, 300);
+    touch(canvas, 'pointermove', 63, 230, 300);
+    expect(deltas.length).toBeGreaterThan(0);
+    expect(zooms.length).toBe(zoomsDuringPinch);
+  });
+});
+
 describe('MobileControls chrome idle-fade lifecycle', () => {
   afterEach(() => {
     vi.useRealTimers();

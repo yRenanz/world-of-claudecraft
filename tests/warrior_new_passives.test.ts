@@ -2,12 +2,13 @@
 // +10% rage) and the reworked Arms mastery Master Armorer (+10% damage with a
 // two-handed weapon). Fury passives land in follow-up commits.
 
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { updatePlayerAutoAttack } from '../src/sim/combat/auto_attack';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity } from '../src/sim/types';
-import { ENRAGE_DMG_DONE, MAX_LEVEL } from '../src/sim/types';
+import { ENRAGE_DMG_DONE, MAX_LEVEL, SUDDEN_DEATH_CHANCE } from '../src/sim/types';
 
 type AnySim = Sim & Record<string, any>;
 
@@ -68,21 +69,14 @@ describe('Seasoned Soldier (Arms): crit autos mint 10% more rage', () => {
 });
 
 describe('Master Armorer (Arms mastery): +10% damage while wielding a two-handed weapon', () => {
-  // No 2H weapon ships in content yet (dual-wield first pass is one-handers), so the
-  // test injects one to exercise the combat/damage.ts hook.
-  const TWO_H = 'test_master_armorer_2h';
-  beforeAll(() => {
-    (ITEMS as Record<string, unknown>)[TWO_H] = {
-      id: TWO_H,
-      name: 'Test Greatsword',
-      kind: 'weapon',
-      hand: 'twohand',
-      slot: 'mainhand',
-      weapon: { min: 10, max: 10, speed: 3 },
-    };
-  });
-  afterAll(() => {
-    delete (ITEMS as Record<string, unknown>)[TWO_H];
+  // Pinned to a REAL shipped two-hander (Armorer Hode's vendor stock), so this
+  // suite fails if the mastery's only enabling item ever drops out of content.
+  const TWO_H = 'highwatch_greatsword';
+
+  it('the enabling weapon ships in content as a real two-hander', () => {
+    const def = ITEMS[TWO_H];
+    expect(def?.kind).toBe('weapon');
+    expect(def?.kind === 'weapon' && def.hand).toBe('twohand');
   });
 
   function hitDamage(mainhandId: string | undefined, spec: string | null): number {
@@ -149,6 +143,34 @@ describe('Diabolical Twinstrike (Fury): Twinstrike hits 15% harder while Enraged
     expect(withPassive).toBeGreaterThan(0);
     expect(without).toBeGreaterThan(0);
     expect(withPassive / without).toBeCloseTo(1.15, 2);
+  });
+
+  it('no bonus while NOT Enraged: passive-known equals passive-removed damage', () => {
+    const { sim, p, mob } = makeWarrior('fury');
+    const meta = requireMeta(sim, p.id);
+    p.weapon = { min: 30, max: 30, speed: 2 };
+    p.attackPower = 0;
+    p.critChance = 0;
+    mob.dodgeChance = 0;
+    mob.stats.armor = 0;
+    faceMelee(sim, p, mob);
+    const cast = (): number => {
+      p.gcdRemaining = 0;
+      p.cooldowns.delete('raging_gale');
+      p.charges?.delete('raging_gale');
+      p.auras = p.auras.filter((a) => a.kind !== 'enrage'); // deliberately NOT enraged
+      mob.hp = mob.maxHp;
+      const hp0 = mob.hp;
+      sim.castAbility('raging_gale');
+      return hp0 - mob.hp;
+    };
+    const withPassive = cast();
+    meta.known = meta.known.filter(
+      (k: { def: { id: string } }) => k.def.id !== 'diabolical_twinstrike',
+    );
+    const without = cast();
+    expect(withPassive).toBeGreaterThan(0);
+    expect(withPassive).toBe(without); // the 1.15x rider is Enrage-gated
   });
 });
 
@@ -246,5 +268,32 @@ describe('Sudden Death (Arms): free, any-health Early Grave', () => {
     const hp0 = mob.hp;
     sim.castAbility('execute');
     expect(mob.hp).toBe(hp0); // blocked by the <20% HP gate
+  });
+
+  // The proc itself (auto_attack.ts): a CONNECTED auto rolls SUDDEN_DEATH_CHANCE
+  // and arms the aura. Force exactly that roll (every other chance draw returns
+  // false, so the swing cannot miss/dodge/crit and stays connected) and drive a
+  // real auto swing, so a regression that stops the proc rolling fails here.
+  function forcedProcSwing(spec: string | null): Entity {
+    const { sim, p, mob } = makeWarrior(spec);
+    const meta = requireMeta(sim, p.id);
+    faceMelee(sim, p, mob);
+    mob.dodgeChance = 0;
+    (sim as AnySim).rng.chance = (chance: number): boolean => chance === SUDDEN_DEATH_CHANCE;
+    p.autoAttack = true;
+    p.swingTimer = 0;
+    p.offhandSwingTimer = 0;
+    updatePlayerAutoAttack(sim.ctx, p, meta);
+    return p;
+  }
+
+  it('a connected auto on a committed Arms warrior arms the Sudden Death aura', () => {
+    const p = forcedProcSwing('arms');
+    expect(p.auras.some((a) => a.kind === 'sudden_death')).toBe(true);
+  });
+
+  it('the same connected auto never arms it for Fury or a no-spec warrior', () => {
+    expect(forcedProcSwing('fury').auras.some((a) => a.kind === 'sudden_death')).toBe(false);
+    expect(forcedProcSwing(null).auras.some((a) => a.kind === 'sudden_death')).toBe(false);
   });
 });

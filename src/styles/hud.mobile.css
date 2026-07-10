@@ -4660,23 +4660,6 @@
     border-color: var(--color-accent);
     background: color-mix(in srgb, var(--color-text-light) 8%, transparent);
   }
-  /* The primary Return-to-Game tile: accented like the .btn.is-primary CTA. */
-  .opt-mshell-cat.is-primary {
-    background: var(--color-primary);
-    border-color: var(--color-primary);
-    color: var(--color-bg-dark);
-  }
-  .opt-mshell-cat.is-primary:hover {
-    border-color: var(--color-text-light);
-    background: var(--color-primary);
-  }
-  .opt-mshell-cat.is-primary .opt-mshell-cat-icon,
-  .opt-mshell-cat.is-primary .opt-mshell-cat-label {
-    color: var(--color-bg-dark);
-  }
-  .opt-mshell-cat.is-primary .opt-mshell-cat-label {
-    font-family: var(--font-display);
-  }
   .opt-mshell-cat-icon {
     flex: none;
     display: inline-flex;

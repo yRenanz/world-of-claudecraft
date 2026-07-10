@@ -155,25 +155,6 @@ function categoryRow(
   return btn;
 }
 
-/** The primary Return-to-Game tile that leads the front-page grid (the reference
- *  mock's first, accented card). Same card shape as a category tile (icon over
- *  label) so the grid stays uniform; activating it closes the menu. */
-function returnToGameCard(deps: MobileShellDeps): HTMLButtonElement {
-  const label = t('hud.options.returnToGame');
-  const btn = el('button', 'opt-mshell-cat is-primary');
-  btn.type = 'button';
-  btn.setAttribute('aria-label', label);
-  const icon = el('span', 'opt-mshell-cat-icon');
-  icon.innerHTML = svgIcon('next');
-  const text = el('span', 'opt-mshell-cat-text');
-  const name = el('span', 'opt-mshell-cat-label');
-  name.textContent = label;
-  text.appendChild(name);
-  btn.append(icon, text);
-  btn.addEventListener('click', () => deps.onClose());
-  return btn;
-}
-
 /** The landing's lower region (everything below the persistent search field):
  *  either the search results (when a query is live) or the quick actions +
  *  alerts + pins + stacked category list + status, in the pinned order. */
@@ -198,10 +179,11 @@ function fillLandingLower(lower: HTMLElement, deps: MobileShellDeps): void {
         if (searching) {
           deps.appendSearchResults(lower);
         } else {
-          // The settings front page: a card grid (icon over label) led by the
-          // primary Return-to-Game tile, then one tile per env-visible category.
+          // The settings front page: a card grid (icon over label), one tile per
+          // env-visible category. No Return-to-Game tile: the Done bar and the
+          // header close both already return to the game, so it would be a third
+          // redundant control.
           const grid = el('div', 'opt-mshell-grid');
-          grid.appendChild(returnToGameCard(deps));
           const rows = mobileCategoryRows(deps.env(), deps.changedCount, deps.hasConflict);
           for (const row of rows) grid.appendChild(categoryRow(row, deps));
           lower.appendChild(grid);

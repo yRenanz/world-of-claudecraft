@@ -4274,9 +4274,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     class: 'warrior',
     learnLevel: 8,
     // Arms base-kit defensive cooldown (owner restructure 2026-07-08): Arms had
-    // no defensive of its own. Also still reachable as a choice-row grant.
+    // no defensive of its own. Also still reachable as a choice-row grant. No
+    // shield gate: the "sword" IS the defense (Arms wields a two-hander).
     specs: ['arms'],
-    requiresShield: true,
     cost: 0,
     castTime: 0,
     cooldown: 120,

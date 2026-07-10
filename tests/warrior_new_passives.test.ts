@@ -206,6 +206,17 @@ describe('Protection shield abilities require a shield equipped', () => {
   const hasShieldError = (events: Array<{ type?: string; text?: string }>): boolean =>
     events.some((e) => e.type === 'error' && /shield/i.test(e.text ?? ''));
 
+  it('die_by_sword needs NO shield (the Arms defensive is wielded, not blocked)', () => {
+    const { sim, p, mob } = makeWarrior('arms');
+    faceMelee(sim, p, mob);
+    p.equippedItems.offhand = undefined;
+    p.gcdRemaining = 0;
+    sim.drainEvents();
+    sim.castAbility('die_by_sword');
+    expect(hasShieldError(sim.drainEvents())).toBe(false);
+    expect(p.auras.some((a) => a.kind === 'die_by_sword')).toBe(true);
+  });
+
   for (const ability of ['shield_slam', 'raised_guard']) {
     it(`${ability} is blocked without a shield and allowed with one`, () => {
       const { sim, p, mob } = makeWarrior('prot');

@@ -90,7 +90,12 @@ import {
   walletForAccount,
 } from './db';
 import { getDeedBroadcasts } from './deeds_db';
-import { isHiddenDeedId, isMarqueeDeed, recordDeedUnlock } from './deeds_records';
+import {
+  isHiddenDeedId,
+  isMarqueeDeed,
+  reconcileCharacterDeeds,
+  recordDeedUnlock,
+} from './deeds_records';
 import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueRelay } from './discord_relay';
@@ -2134,6 +2139,16 @@ export class GameServer {
     void touchCharacterLogin(characterId).catch((err) =>
       console.error('failed to stamp character last_login:', err),
     );
+    // Book of Deeds drift heal: the character_deeds index is written
+    // fire-and-forget per unlock, and the sim never re-emits a deed already in
+    // the state blob, so a transient per-unlock insert failure leaves the index
+    // one row short forever. Replay the loaded earned set (the blob is
+    // authoritative) into the index once per join, idempotently. Fire-and-
+    // forget: it never blocks or reorders the join, and resumes skip it (they
+    // return above without reloading state).
+    reconcileCharacterDeeds({ characterId, accountId }, [
+      ...(this.sim.meta(pid)?.deedsEarned.keys() ?? []),
+    ]);
     openPlaySession(accountId, characterId, name, meta)
       .then((id) => {
         session.dbSessionId = id;

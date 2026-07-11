@@ -740,7 +740,14 @@ CREATE TABLE IF NOT EXISTS character_deeds (
   earned_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   UNIQUE (character_id, deed_id)
 );
-CREATE INDEX IF NOT EXISTS character_deeds_deed ON character_deeds(deed_id);
+-- character_deeds_deed (a lone index on deed_id) was retired: no query seeks
+-- by deed_id. insertCharacterDeed's ON CONFLICT rides the UNIQUE (character_id,
+-- deed_id) index, deedRarityCounts groups by deed_id but cannot seek on it,
+-- and the board and account reads use their own indexes below, so the index
+-- was pure write amplification. The statement below removes it idempotently to
+-- converge databases that booted the earlier schema; a no-op where it never
+-- existed.
+DROP INDEX IF EXISTS character_deeds_deed;
 -- Per-account roll-up reads: earnedDeedIdsForAccount (server/deeds_db.ts,
 -- the Steam reconcile-on-link push) filters on account_id through this
 -- index. The Renown board's deedsBoardRows read stays a full-table

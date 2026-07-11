@@ -7,7 +7,7 @@
 // retro re-emits and crash-replays collapse into no-ops, and nothing here can
 // grant, deny, or mutate a deed in gameplay terms.
 
-import { pool } from './db';
+import { ELIGIBLE_ACCOUNT_SQL, pool } from './db';
 
 /** One earned-deed record. realm is passed explicitly on every insert (the
  *  table carries no DEFAULT; the interpolated-default pattern is
@@ -30,6 +30,27 @@ export async function insertCharacterDeed(row: CharacterDeedRow): Promise<void> 
   );
 }
 
+/** Backfill a character's whole earned-deed set into the index in ONE
+ *  statement, same columns and explicit-realm handling as insertCharacterDeed.
+ *  The login reconcile replays deedsEarned (the authoritative state blob) so a
+ *  row a transient per-unlock insert failure lost, and which the sim never
+ *  re-emits, is re-created; ON CONFLICT DO NOTHING collapses the rows that
+ *  already landed into no-ops, so the common case (nothing drifted) touches no
+ *  data. Empty set is a caller-side no-op (it never reaches SQL). deedIds is a
+ *  fixed-length text[] bind, never interpolated. */
+export async function insertCharacterDeeds(
+  who: { realm: string; characterId: number; accountId: number },
+  deedIds: readonly string[],
+): Promise<void> {
+  if (deedIds.length === 0) return;
+  await pool.query(
+    `INSERT INTO character_deeds (realm, character_id, account_id, deed_id)
+     SELECT $1, $2, $3, unnest($4::text[])
+     ON CONFLICT (character_id, deed_id) DO NOTHING`,
+    [who.realm, who.characterId, who.accountId, [...deedIds]],
+  );
+}
+
 /** The rarity aggregate the public endpoint serves: how many characters have
  *  earned each deed (zero-earn deeds absent) over the eligible population.
  *  GLOBAL (cross-realm) by design: at current population, per-realm
@@ -45,20 +66,29 @@ export interface DeedRarityAggregate {
 export const DEED_RARITY_MIN_LEVEL = 5;
 
 export async function deedRarityCounts(): Promise<DeedRarityAggregate> {
-  // Numerator and denominator share ONE eligibility predicate: counting every
-  // earner while the denominator holds only level-floor characters would let
-  // a sub-floor earn push earned[deedId] past totalEligible (a >100 percent
-  // rarity), and the floor exists precisely to strip that population's noise.
+  // Numerator and denominator share ONE eligibility predicate on TWO axes so
+  // they stay mutually consistent: (1) the level floor plus state IS NOT NULL,
+  // because counting every earner while the denominator holds only level-floor
+  // characters would let a sub-floor earn push earned[deedId] past
+  // totalEligible (a >100 percent rarity); and (2) ELIGIBLE_ACCOUNT_SQL,
+  // embedded VERBATIM through an `accounts a` join in BOTH arms exactly as
+  // every public board read does (db.ts), so a banned or suspended account
+  // leaves the numerator and the denominator together and can never inflate a
+  // deed's percentage past the eligible population it is measured against.
   const counts = await pool.query(
     `SELECT cd.deed_id, COUNT(*)::int AS earned
        FROM character_deeds cd
        JOIN characters c ON c.id = cd.character_id
-      WHERE c.level >= $1 AND c.state IS NOT NULL
+       JOIN accounts a ON a.id = cd.account_id
+      WHERE c.level >= $1 AND c.state IS NOT NULL AND ${ELIGIBLE_ACCOUNT_SQL}
       GROUP BY cd.deed_id`,
     [DEED_RARITY_MIN_LEVEL],
   );
   const eligible = await pool.query(
-    'SELECT COUNT(*)::int AS eligible FROM characters WHERE level >= $1 AND state IS NOT NULL',
+    `SELECT COUNT(*)::int AS eligible
+       FROM characters c
+       JOIN accounts a ON a.id = c.account_id
+      WHERE c.level >= $1 AND c.state IS NOT NULL AND ${ELIGIBLE_ACCOUNT_SQL}`,
     [DEED_RARITY_MIN_LEVEL],
   );
   const earned: Record<string, number> = {};

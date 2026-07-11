@@ -217,10 +217,11 @@ describe('broadcasts toggle handler', () => {
 // ---------------------------------------------------------------------------
 
 describe('character_deeds DDL', () => {
-  // The block runs from its CREATE TABLE to its first index; slicing keeps the
-  // realm/UNIQUE pins scoped to THIS table, not a lookalike elsewhere.
+  // The block runs from its CREATE TABLE to the retired-index reconcile that
+  // immediately follows it; slicing keeps the realm/UNIQUE pins scoped to THIS
+  // table, not a lookalike elsewhere.
   const start = SCHEMA.indexOf('CREATE TABLE IF NOT EXISTS character_deeds');
-  const end = SCHEMA.indexOf('CREATE INDEX IF NOT EXISTS character_deeds_deed');
+  const end = SCHEMA.indexOf('DROP INDEX IF EXISTS character_deeds_deed');
   const block = SCHEMA.slice(start, end);
 
   it('exists, with the idempotence backbone and the explicit-realm column', () => {
@@ -238,16 +239,18 @@ describe('character_deeds DDL', () => {
     expect(block).toContain('earned_at TIMESTAMPTZ NOT NULL DEFAULT now()');
   });
 
-  it('carries the three read-path indexes (rarity, account roll-up, sheet strip)', () => {
-    expect(SCHEMA).toContain(
-      'CREATE INDEX IF NOT EXISTS character_deeds_deed ON character_deeds(deed_id)',
-    );
+  it('carries the two read-path indexes (account roll-up, sheet strip) and retires the deed_id index', () => {
     expect(SCHEMA).toContain(
       'CREATE INDEX IF NOT EXISTS character_deeds_account ON character_deeds(account_id)',
     );
     expect(SCHEMA).toMatch(
       /CREATE INDEX IF NOT EXISTS character_deeds_character_earned\s+ON character_deeds\(character_id, earned_at DESC\)/,
     );
+    // The lone deed_id index was pure write amplification (no query seeks by
+    // deed_id): its CREATE is gone, and the boot DDL converges already-deployed
+    // databases with an idempotent DROP INDEX IF EXISTS.
+    expect(SCHEMA).not.toContain('CREATE INDEX IF NOT EXISTS character_deeds_deed');
+    expect(SCHEMA).toContain('DROP INDEX IF EXISTS character_deeds_deed;');
   });
 
   it('is additive-only, like every block in the boot-reapplied SCHEMA', () => {

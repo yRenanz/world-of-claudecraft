@@ -14,11 +14,13 @@ vi.mock('pg', () => ({
   },
 }));
 
+import { ELIGIBLE_ACCOUNT_SQL } from '../server/db';
 import {
   DEED_RARITY_MIN_LEVEL,
   deedRarityCounts,
   getDeedBroadcasts,
   insertCharacterDeed,
+  insertCharacterDeeds,
   recentDeedsForCharacter,
   setDeedBroadcasts,
 } from '../server/deeds_db';
@@ -50,6 +52,33 @@ describe('insertCharacterDeed', () => {
   });
 });
 
+describe('insertCharacterDeeds (batched login reconcile)', () => {
+  it('inserts the whole set in ONE conflict-swallowing statement with explicit realm', async () => {
+    await insertCharacterDeeds({ realm: REALM, characterId: 42, accountId: 7 }, [
+      'prog_veteran',
+      'prog_first_steps',
+    ]);
+    expect(dbMock.query).toHaveBeenCalledTimes(1);
+    const [sql, params] = dbMock.query.mock.calls[0];
+    expect(sql).toContain('INSERT INTO character_deeds (realm, character_id, account_id, deed_id)');
+    // One statement over the whole set: the ids ride a single text[] bind
+    // (never interpolated), fanned to rows by unnest.
+    expect(sql).toContain('unnest($4::text[])');
+    // The same idempotence backbone as insertCharacterDeed, so a row that
+    // already landed collapses to a no-op and only a drifted row is re-created.
+    expect(sql).toContain('ON CONFLICT (character_id, deed_id) DO NOTHING');
+    // Four binds, no fifth (realm/character/account scalars plus the id array).
+    expect(sql).toContain('$4');
+    expect(sql).not.toContain('$5');
+    expect(params).toEqual([REALM, 42, 7, ['prog_veteran', 'prog_first_steps']]);
+  });
+
+  it('an empty set is a no-op that never issues SQL', async () => {
+    await insertCharacterDeeds({ realm: REALM, characterId: 42, accountId: 7 }, []);
+    expect(dbMock.query).not.toHaveBeenCalled();
+  });
+});
+
 describe('deedRarityCounts', () => {
   it('groups earns by deed id and counts the eligible denominator with the level floor', async () => {
     dbMock.query
@@ -65,17 +94,25 @@ describe('deedRarityCounts', () => {
       totalEligible: 120,
       earned: { prog_veteran: 30, cmb_thunzharr: 2 },
     });
-    // Numerator and denominator must draw from the SAME eligible population:
-    // without the join, a sub-floor earner pushes a deed's count past
-    // totalEligible and the card renders over 100 percent.
+    // Numerator and denominator must draw from the SAME eligible population on
+    // BOTH axes. Without the level floor, a sub-floor earner pushes a deed's
+    // count past totalEligible and the card renders over 100 percent; without
+    // the accounts join + ELIGIBLE_ACCOUNT_SQL (the board-read contract), a
+    // banned or suspended account feeds one arm but not the other and desyncs
+    // them the same way. So both arms embed the fragment VERBATIM.
     const [countsSql, countsParams] = dbMock.query.mock.calls[0];
     expect(countsSql).toContain('FROM character_deeds cd');
     expect(countsSql).toContain('JOIN characters c ON c.id = cd.character_id');
+    expect(countsSql).toContain('JOIN accounts a ON a.id = cd.account_id');
     expect(countsSql).toContain('WHERE c.level >= $1 AND c.state IS NOT NULL');
+    expect(countsSql).toContain(ELIGIBLE_ACCOUNT_SQL);
     expect(countsSql).toContain('GROUP BY cd.deed_id');
     expect(countsParams).toEqual([DEED_RARITY_MIN_LEVEL]);
     const [eligibleSql, eligibleParams] = dbMock.query.mock.calls[1];
-    expect(eligibleSql).toContain('FROM characters WHERE level >= $1 AND state IS NOT NULL');
+    expect(eligibleSql).toContain('FROM characters c');
+    expect(eligibleSql).toContain('JOIN accounts a ON a.id = c.account_id');
+    expect(eligibleSql).toContain('WHERE c.level >= $1 AND c.state IS NOT NULL');
+    expect(eligibleSql).toContain(ELIGIBLE_ACCOUNT_SQL);
     expect(eligibleParams).toEqual([DEED_RARITY_MIN_LEVEL]);
     expect(DEED_RARITY_MIN_LEVEL).toBe(5);
   });

@@ -150,21 +150,29 @@ describe('ensureSchema wires every schema module at boot', () => {
     await ensureSchema();
     const applied = h.calls.join('\n');
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS character_deeds');
-    expect(applied).toContain('CREATE INDEX IF NOT EXISTS character_deeds_deed');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS character_deeds_account');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS character_deeds_character_earned');
+    // The retired deed_id index: the CREATE is gone and the boot DDL converges
+    // deployed databases with an idempotent DROP INDEX IF EXISTS.
+    expect(applied).not.toContain('CREATE INDEX IF NOT EXISTS character_deeds_deed');
+    expect(applied).toContain('DROP INDEX IF EXISTS character_deeds_deed;');
     expect(applied).toContain(
       'ALTER TABLE accounts ADD COLUMN IF NOT EXISTS deed_broadcasts BOOLEAN NOT NULL DEFAULT TRUE',
     );
-    // Additive-only within the block (the bank-tables slicing idiom above).
+    // Additive-only within the block (the bank-tables slicing idiom above),
+    // save for the ONE sanctioned reconcile: the DROP INDEX IF EXISTS that
+    // retires the deed_id index is index-only and idempotent, so strip that
+    // exact line before the destructive-token scan and the scan still catches
+    // any UNsanctioned DROP/TRUNCATE/ALTER COLUMN in the block.
     const coreCall = h.calls.find((c) => c.includes('CREATE TABLE IF NOT EXISTS character_deeds'));
     expect(coreCall).toBeDefined();
     const start = (coreCall as string).indexOf('CREATE TABLE IF NOT EXISTS character_deeds');
     const rest = (coreCall as string).slice(start + 1);
     const end = rest.indexOf('CREATE TABLE');
     const ddl = rest.slice(0, end === -1 ? undefined : end);
-    expect(ddl).not.toMatch(/\b(?:DROP|TRUNCATE|ALTER COLUMN)\b/i);
-    expect(ddl).not.toMatch(/ADD COLUMN (?!IF NOT EXISTS)/i);
+    const sansReconcile = ddl.replace('DROP INDEX IF EXISTS character_deeds_deed;', '');
+    expect(sansReconcile).not.toMatch(/\b(?:DROP|TRUNCATE|ALTER COLUMN)\b/i);
+    expect(sansReconcile).not.toMatch(/ADD COLUMN (?!IF NOT EXISTS)/i);
   });
 
   it('applies the tier-2 rate-limit schema under the advisory lock', async () => {

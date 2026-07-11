@@ -11,16 +11,18 @@
 // initial retro backfill and crash-replays of unpersisted state are free.
 // The guarantee's edge: a deed already persisted in the state blob never
 // re-emits on a later login (grantDeed no-ops on the earned set), so a
-// TRANSIENT insert failure leaves this index one row short until the same
-// deed is earned by another character on the account. That drift touches
-// only the rarity aggregate, the Renown board, and the Steam reconcile; the
-// player's own Book reads the state blob and stays correct. A login-time
-// reconcile of deedsEarned into character_deeds would close it.
+// TRANSIENT insert failure would leave this index one row short. The
+// login-time reconcile (reconcileCharacterDeeds, wired at join in
+// server/game.ts) closes that drift: it replays the loaded earned set into
+// character_deeds idempotently on every join, so a dropped row is re-created
+// the next time the character logs in. The one gap this cannot heal is a
+// rollback that strips the deeds fields FROM the blob itself: with the blob no
+// longer carrying those ids, there is nothing left to replay from.
 
 import { DEEDS } from '../src/sim/content/deeds';
 import type { DeedDef } from '../src/sim/types';
 import type { DeedsRarity } from '../src/world_api';
-import { insertCharacterDeed } from './deeds_db';
+import { insertCharacterDeed, insertCharacterDeeds } from './deeds_db';
 import { REALM } from './realm';
 // Imported from the mirror module DIRECTLY (not the ./steam barrel): this
 // module rides in game.ts's graph, and the barrel would drag routes.ts (and
@@ -88,6 +90,42 @@ export function recordDeedUnlock(
   } catch (err) {
     // The observer must never fault the event-routing path.
     console.error('deeds recordDeedUnlock failed:', err);
+  }
+}
+
+/** Login-time reconcile: replay a character's whole earned-deed set (from the
+ *  authoritative state blob) into character_deeds in ONE idempotent batch,
+ *  chained onto the SAME FIFO tail as live unlocks so it never races them. It
+ *  heals a row that a transient per-unlock insert failure dropped and that
+ *  grantDeed never re-emits (the deed is already in the earned set). Fire-and-
+ *  forget: returns void immediately, is fully guarded so it can never throw
+ *  into the join path, and a rejected batch logs and continues the chain. An
+ *  empty set is a no-op that never touches the tail.
+ *
+ *  Deliberately does NOT call the Steam onDeedRecorded hook per row. Pushing an
+ *  account's entire deed history to the mirror on every login would churn the
+ *  push queue for no gain (each already-set achievement is idempotent Steam-
+ *  side), and the mirror owns its own reconcileLink path for Steam catch-up.
+ *  The character_deeds write is the whole job here. */
+export function reconcileCharacterDeeds(
+  who: { characterId: number; accountId: number },
+  deedIds: readonly string[],
+): void {
+  if (deedIds.length === 0) return;
+  try {
+    tail = tail
+      .then(() =>
+        insertCharacterDeeds(
+          { realm: REALM, characterId: who.characterId, accountId: who.accountId },
+          deedIds,
+        ),
+      )
+      .catch((err) => {
+        console.error('character_deeds reconcile failed:', err);
+      });
+  } catch (err) {
+    // The reconcile must never fault the join path.
+    console.error('deeds reconcileCharacterDeeds failed:', err);
   }
 }
 

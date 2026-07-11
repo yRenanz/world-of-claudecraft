@@ -158,7 +158,9 @@ export const en_CA: EnTranslations = {
       "prompt": "{name} has started a ready check. Are you ready?",
       "ready": "Ready",
       "notReady": "Not Ready",
-      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response.",
+      "notInPartyError": "You must be in a party to start a ready check.",
+      "inProgressError": "A ready check is already in progress."
     },
     "death": {
       "resurrectAtCorpse": "Resurrect at Corpse",

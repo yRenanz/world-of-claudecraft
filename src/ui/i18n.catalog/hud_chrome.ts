@@ -18,6 +18,8 @@ export const hudChromeStrings = {
     ready: 'Ready',
     notReady: 'Not Ready',
     result: 'Ready check: {ready} ready, {notReady} not ready, {noResponse} no response.',
+    notInPartyError: 'You must be in a party to start a ready check.',
+    inProgressError: 'A ready check is already in progress.',
   },
   // WoW-style death loop overlay (release -> ghost run -> resurrect). The release
   // button and "You have died." title reuse the hud.core.* keys; these are the

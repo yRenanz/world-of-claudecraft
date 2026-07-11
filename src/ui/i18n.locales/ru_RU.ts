@@ -14,6 +14,20 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'itemUi.vendor.sellItemAria': 'Продать {item} за {price}',
+  'hudChrome.itemHeroicTag': '[ГЕРОИЧЕСКИЙ]',
+  'hudChrome.options.done': 'Готово',
+  'hudChrome.options.keybindUnbound': 'Для действия «{action}» не назначена клавиша',
+  'hudChrome.options.legend.back': 'Назад',
+  'hudChrome.options.legend.page': 'Страница',
+  'hudChrome.options.searchGoTo': 'Перейти к разделу «{category}»',
+  'hudChrome.options.sec.chat': 'Чат',
+  'hudChrome.options.sec.feel': 'Ощущения',
+  'hudChrome.options.sec.look': 'Вид',
+  'hudChrome.options.sec.view': 'Обзор',
+  'hudChrome.readyCheck.notInPartyError':
+    'Чтобы начать проверку готовности, вы должны состоять в группе.',
+  'hudChrome.readyCheck.inProgressError': 'Проверка готовности уже идёт.',
   // Esc menu redesign (The Warden's Codex): category-rail IA (options_ia.ts).
   'hudChrome.options.ia.railDisplay': 'Экран',
   'hudChrome.options.ia.railInput': 'Ввод',

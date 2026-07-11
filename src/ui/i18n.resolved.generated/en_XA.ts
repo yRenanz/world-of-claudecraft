@@ -158,7 +158,9 @@ export const en_XA: EnTranslations = {
       "prompt": "[{name} ĥáš šţáŕţéð á ŕéáðý çĥéçķ. Áŕé ýóú ŕéáðý?]",
       "ready": "[Ŕéáðý]",
       "notReady": "[Ñóţ Ŕéáðý]",
-      "result": "[Ŕéáðý çĥéçķ: {ready} ŕéáðý, {notReady} ñóţ ŕéáðý, {noResponse} ñó ŕéšþóñšé.]"
+      "result": "[Ŕéáðý çĥéçķ: {ready} ŕéáðý, {notReady} ñóţ ŕéáðý, {noResponse} ñó ŕéšþóñšé.]",
+      "notInPartyError": "[Ýóú ɱúšţ ƀé íñ á þáŕţý ţó šţáŕţ á ŕéáðý çĥéçķ.]",
+      "inProgressError": "[Á ŕéáðý çĥéçķ íš áļŕéáðý íñ þŕóĝŕéšš.]"
     },
     "death": {
       "resurrectAtCorpse": "[Ŕéšúŕŕéçţ áţ Çóŕþšé]",

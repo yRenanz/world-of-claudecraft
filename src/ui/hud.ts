@@ -9759,6 +9759,8 @@ export class Hud {
       'No one has whispered you recently.': 'hud.errors.noRecentWhisper',
       'You mutter to yourself. Nobody hears it.': 'hud.errors.whisperSelf',
       'You are not in a party.': 'hud.errors.notInParty',
+      'You must be in a party to start a ready check.': 'hudChrome.readyCheck.notInPartyError',
+      'A ready check is already in progress.': 'hudChrome.readyCheck.inProgressError',
       'Only the party leader can change the loot method.': 'hudChrome.masterLoot.leaderOnly',
       'Only the party leader may invite.': 'hud.errors.partyLeaderInvite',
       'Your party is full.': 'hud.errors.partyFull',

@@ -14,6 +14,20 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'itemUi.vendor.sellItemAria': '{item}を{price}で売却',
+  'hudChrome.itemHeroicTag': '[ヒロイック]',
+  'hudChrome.options.done': '完了',
+  'hudChrome.options.keybindUnbound': '{action}にキーが割り当てられていません',
+  'hudChrome.options.legend.back': '戻る',
+  'hudChrome.options.legend.page': 'ページ',
+  'hudChrome.options.searchGoTo': '{category}へ移動',
+  'hudChrome.options.sec.chat': 'チャット',
+  'hudChrome.options.sec.feel': '操作感',
+  'hudChrome.options.sec.look': '外観',
+  'hudChrome.options.sec.view': '視野',
+  'hudChrome.readyCheck.notInPartyError':
+    '準備確認を開始するにはパーティーに参加している必要があります。',
+  'hudChrome.readyCheck.inProgressError': '準備確認はすでに進行中です。',
   // Esc menu redesign (The Warden's Codex): category-rail IA (options_ia.ts).
   'hudChrome.options.ia.railDisplay': '表示',
   'hudChrome.options.ia.railInput': '入力',

@@ -14,6 +14,19 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'itemUi.vendor.sellItemAria': '以 {price} 的價格出售 {item}',
+  'hudChrome.itemHeroicTag': '[英雄]',
+  'hudChrome.options.done': '完成',
+  'hudChrome.options.keybindUnbound': '{action} 尚未綁定按鍵',
+  'hudChrome.options.legend.back': '返回',
+  'hudChrome.options.legend.page': '頁面',
+  'hudChrome.options.searchGoTo': '前往{category}',
+  'hudChrome.options.sec.chat': '聊天',
+  'hudChrome.options.sec.feel': '操作手感',
+  'hudChrome.options.sec.look': '外觀',
+  'hudChrome.options.sec.view': '視野',
+  'hudChrome.readyCheck.notInPartyError': '你必須加入隊伍才能發起就緒確認。',
+  'hudChrome.readyCheck.inProgressError': '就緒確認已在進行中。',
   // Esc menu redesign (The Warden's Codex): category-rail IA (options_ia.ts).
   'hudChrome.options.ia.railDisplay': '顯示',
   'hudChrome.options.ia.railInput': '輸入',

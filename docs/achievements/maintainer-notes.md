@@ -19,14 +19,12 @@ directory lives in git history before 2026-07-11.
   branch are byte-identical to the release/v0.25.0 tip, so the pristine base
   is equally red; conforming the assets (`sfx:conform`) belongs upstream, not
   in this branch's diff.
-- The one branch-owned red: `tests/i18n_completeness.test.ts` (M16) lists
-  exactly 36 English-only `guide.*` keys; a dedicated translation pass fills
-  them (registry pending is 1650 pairs across 97 keys, every one branch-owned
-  `guide.*` prose; deeds-owned pending is zero in every locale). That pass
-  must ALSO refresh reworded existing keys via an en-resolved diff against the
-  merge base, because rewording an English value does not mark its
-  translations pending (example: zh_CN `guide.howToPlay.deathBody` still
-  carries the old Spirit Healer copy).
+- The translation pass has landed: registry pending is zero in every locale
+  and `tests/i18n_completeness.test.ts` (M16) is green. The pass also
+  refreshed the reworded existing keys surfaced by an en-resolved diff
+  against the merge base (rewording an English value does not mark its
+  translations pending, so that diff is the only way to catch them). The
+  inherited `sfx check` red above is the only red left on this branch.
 - Icon art in progress: six deeds still render the procedural category crest;
   the work order is `icon-brief.md` beside this file. Icon files land as
   512x512 RGBA named by deed id, ingested by `npm run assets:deeds`.

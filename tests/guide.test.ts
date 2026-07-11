@@ -8,6 +8,7 @@ import {
   GUIDE_CLASSES,
   GUIDE_DEEDS,
   GUIDE_DELVES,
+  GUIDE_DUNGEONS,
   GUIDE_FAMILIES,
   GUIDE_MODELS,
   GUIDE_WARLOCK_PETS,
@@ -666,6 +667,49 @@ describe('Guide deeds cross-page surfaces', () => {
       titleKey: 'guide.nav.dungeons',
     });
     expect(html).toContain(`href="${hrefFor('deeds')}"`);
+  });
+
+  it('documents heroic mode on the dungeons page with a search anchor per dungeon', () => {
+    setLanguage('en');
+    const html = dungeonsPage.render({
+      params: [],
+      sub: 'dungeons',
+      titleKey: 'guide.nav.dungeons',
+    });
+    // The heroic explainer renders (difficulty, Marks economy, daily rhythm).
+    expect(html).toContain('Heroic mode');
+    expect(html).toContain('Heroic Marks');
+    expect(html).toContain('/dungeon heroic');
+    // Every generated dungeon card carries its deep-link anchor for site search.
+    for (const d of GUIDE_DUNGEONS) {
+      expect(html, `dungeon card missing anchor id "dungeon-${d.id}"`).toContain(
+        `id="dungeon-${d.id}"`,
+      );
+    }
+  });
+
+  it('documents the new default binds on the controls page', () => {
+    setLanguage('en');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    expect(html).toContain('<kbd>T</kbd></td><td>Crafting</td>');
+    expect(html).toContain('<kbd>Y</kbd></td><td>Vale Cup</td>');
+    expect(html).toContain('<kbd>I</kbd></td><td>Event Calendar</td>');
+    expect(html).toContain('<kbd>U</kbd></td><td>Discord</td>');
+    expect(html).toContain('<kbd>Ctrl+1</kbd> <kbd>Ctrl+5</kbd>');
+  });
+
+  it('keeps the documented binds in step with the game defaults', () => {
+    const defaults = new Map(BIND_ACTIONS.map((a) => [a.id, a.defaults]));
+    expect(defaults.get('crafting')).toEqual(['KeyT']);
+    expect(defaults.get('valecup')).toEqual(['KeyY']);
+    expect(defaults.get('calendar')).toEqual(['KeyI']);
+    expect(defaults.get('discord')).toEqual(['KeyU']);
+    expect(defaults.get('petAttack')).toEqual(['Ctrl+Digit1']);
+    expect(defaults.get('petAggressive')).toEqual(['Ctrl+Digit5']);
   });
 });
 

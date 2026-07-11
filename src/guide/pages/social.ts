@@ -55,6 +55,9 @@ export const social: GuidePage = {
           <p>${esc(t('guide.social.raidBody'))}</p>
         </section>
 
+        ${section('guide.social.readyHeading', p('guide.social.readyBody'))}
+        ${section('guide.social.markersHeading', p('guide.social.markersBody'))}
+
         <section class="guide-block">
           <h2>${esc(t('guide.social.lootHeading'))}</h2>
           <p>${esc(t('guide.social.lootBody'))}</p>

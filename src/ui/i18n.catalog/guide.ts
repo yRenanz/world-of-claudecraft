@@ -224,7 +224,7 @@ export const guideStrings = {
       'Accept quests from people with a marker over their head, complete the objective, and turn them in for experience, coin, and gear. The tracker on screen keeps your goals in view.',
     deathTitle: 'Death is not the end',
     deathBody:
-      'If you fall, you release your spirit and revive at the nearest graveyard, back to full health, then make your way to where you were. No experience is lost.',
+      'If you fall, your body stays where it dropped and you rise as a ghost at the nearest graveyard. Run your spirit back to your body to revive on the spot, penalty free, or accept the Spirit Healer at the graveyard for an instant raise at the cost of a passing weakness. Brand-new heroes are spared the weakness entirely, and nothing you own or have earned is ever lost.',
     groupingTitle: 'Playing together',
     groupingBody:
       'Invite others to a party to share quest credit and take on dungeons. Most of the world is soloable, so grouping is a choice, not a chore.',
@@ -232,7 +232,7 @@ export const guideStrings = {
     onlineBody:
       'Play the shared online world with everyone else, or start an instant offline world in your browser to learn the ropes.',
     reassure:
-      'Talents unlock at level 10 and can be reset at any time, so your early choices are never permanent. Experiment freely.',
+      'Talents unlock at level 10 and can be reset any time you are out of combat, so your early choices are never permanent. Experiment freely.',
     controlsLink: 'See the full controls reference',
   },
 
@@ -249,10 +249,19 @@ export const guideStrings = {
     arena: 'Arena',
     leaderboard: 'Leaderboard',
     deeds: 'Book of Deeds',
+    crafting: 'Crafting',
+    valeCup: 'Vale Cup',
+    calendar: 'Event Calendar',
+    discord: 'Discord',
     abilities: 'Use action bar abilities (the number row; a second bar sits on the numpad)',
     targetFriendly: 'Target nearest friendly',
     cycleFriendly: 'Cycle friendly target',
     gameMenu: 'Open game menu and options',
+    groupPet: 'Pet commands',
+    petBar:
+      'Pet bar: Attack, Stop, Taunt, Defensive, Aggressive (with a hunter or warlock pet out)',
+    attackMoveNote:
+      'One more, off by default: enable Attack Move in the options to reserve a key (A, while the option is on) that walks you toward your cursor and opens up on the enemy under it, or the first one met along the way.',
     mobileHeading: 'On mobile',
     mobileBody:
       'Touch controls appear automatically on phones and tablets: a movement stick on the left, drag anywhere on the right to look, and on-screen buttons for your abilities and menus.',
@@ -311,7 +320,7 @@ export const guideStrings = {
       'Advanced starts from the High tier and unlocks four extra pickers, so you can spend your frames where you actually notice them: Terrain Detail, Foliage Density, Effects & Lighting, and Shadow Quality. Like Graphics Quality, they apply after a reload.',
     advancedMixes:
       'Two favorite mixes: keep Shadow Quality on High and set Effects & Lighting to Low for a crisp, glow-free look that runs light, or do the reverse to keep the bloom and soften the shadows.',
-    tableHeading: 'Every option, explained',
+    tableHeading: 'Every graphics option, explained',
     colSetting: 'Setting',
     colDoes: 'What it does',
     colImpact: 'FPS impact',
@@ -346,6 +355,12 @@ export const guideStrings = {
     mobileTitle: 'On phones and tablets',
     mobileBody:
       'Mobile manages more for you: the game picks the tier, holds resolution a touch lower to protect battery and heat, and keeps the highest tiers desktop-only. The loadouts above still apply; phones simply top out at High.',
+    touchBody:
+      'On a touchscreen the options also grow a comfort cluster of their own: joystick size and sensitivity, on-screen button size and opacity, a left-handed mirrored layout, an optional camera stick, and inverted touch look, so the screen fits your hands rather than the other way around.',
+    // Non-graphics options: the Audio tab and the live language picker.
+    audioTitle: 'Sound and language',
+    audioBody:
+      'The options window is not all pixels. An Audio tab holds separate volume controls for effects, music, and voice, and the Interface section carries a language picker that relocalizes the whole interface on the spot, no reload needed.',
   },
 
   // Combat overview. Deliberately high level: concepts, not formulas or numbers, so
@@ -370,11 +385,15 @@ export const guideStrings = {
     effectsBody:
       'Many abilities apply an effect that lingers. Helpful ones (buffs) raise your stats, shield you, or heal you a little at a time; harmful ones (debuffs) drain your health with damage over time or weaken you. Watch the small icons near your action bar to see what is on you and how long it lasts.',
     ccBody:
-      'Crowd control is a special kind of debuff that limits what a target can do: stuns, roots and slows, silences that stop spellcasting, disarms, fears, and transformations that turn a foe harmless for a moment. Some of these, like roots, fears, and transforms, lose their hold when they are reapplied too quickly, so they cannot be chained forever.',
+      'Crowd control is a special kind of debuff that limits what a target can do: stuns, roots and slows, silences that stop spellcasting, disarms, fears, and transformations that turn a foe harmless for a moment. Against other players, control wears thin with repetition: the same kind reapplied too quickly weakens and then fails outright, and a stun that opens from stealth is counted apart from the stuns that follow, so nobody can be chained helpless forever. The creatures of the world hold no such grudge; control lands on them at full strength every time.',
+    // The one-slot ability queue: a press mid-cast is held and fired at cast end.
+    queueTitle: 'Your next move is already loaded',
+    queueBody:
+      'You do not have to time your presses to the frame. Press your next ability while the current one is still casting and it is queued, firing the instant the cast completes, so practiced play flows without gaps. Some melee strikes work the same way, riding out on your next weapon swing.',
     // Death and recovery: light penalty, no lost progress.
     deathTitle: 'When you fall',
     deathBody:
-      'If your health reaches zero you are downed. Release your spirit to revive at the nearest graveyard at full health, then make your way back, so a death costs you a little time, not your progress. Between fights, sit to eat and drink so you start the next one at full strength.',
+      "If your health reaches zero you are downed where you stand, and your body stays there. Release your spirit and you rise as a ghost at the nearest graveyard: faster on its feet than the living, beyond the reach of your enemies, but unable to fight, loot, or speak with anyone except the Spirit Healer hovering over the stones. From there you choose. Run your ghost back to your body and you revive on the spot with part of your health and mana restored and no penalty at all. Or take the Spirit Healer up on an instant raise where you stand, at the price of the Keeper's Toll: a temporary weakening of all you are that lasts longer the more seasoned you are, and spares brand-new characters entirely. Fall inside a dungeon and your spirit waits at the graveyard outside; walk your ghost back through the door and you revive at the entrance. Either road, you lose no experience, gear, or coin. Between fights, sit to eat and drink so you start the next one at full strength.",
   },
 
   // Glossary.
@@ -433,6 +452,30 @@ export const guideStrings = {
     augmentTerm: 'Augment',
     augmentDef:
       'A temporary boost you draft during a two-on-two Fiesta arena match that reshapes your kit for that match only.',
+    deedTerm: 'Deed',
+    deedDef:
+      'An achievement recorded in the Book of Deeds. Earning one grants Renown, and some grant a cosmetic title or nameplate border.',
+    renownTerm: 'Renown',
+    renownDef:
+      'The lifetime score your deeds add up to. It only ever climbs, and the realm keeps standings of it in the Book of Deeds.',
+    heroicTerm: 'Heroic',
+    heroicDef:
+      'The harder version of a dungeon or the raid, tuned for geared endgame parties. Heroic bosses drop upgraded loot, and the final boss pays Heroic Marks.',
+    loadoutTerm: 'Loadout',
+    loadoutDef:
+      'A saved talent layout. Keep several and swap between builds without respending your points one by one.',
+    readyCheckTerm: 'Ready check',
+    readyCheckDef:
+      'A group leader typing /ready to poll the party or raid: everyone confirms Ready or Not Ready, and the group sees the counts.',
+    soulboundTerm: 'Soulbound',
+    soulboundDef:
+      'An item bound to your character from the moment you acquire it. It cannot be traded, mailed, vendor-sold, or listed on the market.',
+    spiritHealerTerm: 'Spirit Healer',
+    spiritHealerDef:
+      'The keeper hovering over every graveyard, who can raise your ghost on the spot at the price of a passing weakness.',
+    worldBossTerm: 'World boss',
+    worldBossDef:
+      'A raid-strength boss that rises in the open world on a steady rhythm, fought by whoever gathers to answer rather than a fixed party.',
   },
 
   // FAQ page (fuller than the home teaser).
@@ -457,7 +500,7 @@ export const guideStrings = {
     q9: 'Is there PvP?',
     a9: 'Yes. Duel anyone for fun, or step into the Ashen Coliseum to fight other players. PvP is opt in, so you are never forced into it.',
     q10: 'What is there to do at max level?',
-    a10: 'The cap is level {cap}. From there you run the five-player dungeons and the ten-player raid, chase better gear, and test yourself in the arena.',
+    a10: 'The cap is level {cap}. From there you run the five-player dungeons and the ten-player raid, take them on again in heroic mode for upgraded loot, face the world boss when he rises, and test yourself in the arena.',
     q11: 'How do I find a group?',
     a11: 'Invite anyone you meet to a party, ask in chat, or team up at a dungeon. Most of the world is soloable, so grouping is a choice, not a requirement.',
   },
@@ -713,9 +756,9 @@ export const guideStrings = {
     // Short, spoiler-safe one-liners for each zone's notable places (keyed by biome). One
     // sentence per place, in the same order as the POI list.
     valePlaceNotes:
-      "Eastbrook is your first home base. Wolf Run and Boar Meadow are gentle hunting ground; Mirror Lake is quiet water to fish; the Sableweb and the Copper Dig hide spiders and ore-greedy diggers; a Bandit Camp and the Fallen Chapel hold rougher work; Reliquary Hill drops into the Collapsed Reliquary, the realm's first delve; and Brightwood Glade is a quiet, sunlit grove to the north.",
+      "Eastbrook is your first home base. Wolf Run and Boar Meadow are gentle hunting ground; Mirror Lake is quiet water to fish; the Sableweb and the Copper Dig hide spiders and ore-greedy diggers; a Bandit Camp and the Fallen Chapel hold rougher work; Reliquary Hill drops into the Collapsed Reliquary, the realm's first delve; Brightwood Glade is a quiet, sunlit grove to the north; and the Sowfield is Eastbrook's walled boarball ground, where the Vale Cup plays under a harvest truce.",
     marshPlaceNotes:
-      "Fenbridge guards the only dry road. The Prowler Reeds and Deepfen Shallows teem with marsh beasts and mudfins; the Widow Thicket is spun thick with web; the Drowned Chapel and the Troll Mounds keep older dangers; the Gravecaller Encampment is the cult dug in, and the Sunken Bastion is the marsh's instanced heart.",
+      "Fenbridge guards the only dry road. The Prowler Reeds and Deepfen Shallows teem with marsh beasts and mudfins; the Widow Thicket is spun thick with web; the Drowned Chapel and the Troll Mounds keep older dangers, with The Drowned Litany, the marsh's own delve, opening just north of the mounds; the Gravecaller Encampment is the cult dug in, and the Sunken Bastion is the marsh's instanced heart.",
     peaksPlaceNotes:
       "Highwatch holds the wall. Stalker Ridge and the Deeprock Burrows belong to ridge cats and burrowers; the Ogre Foothills and Drogmar's War-Camp to brutes for hire; Stormcrag crackles with elementals and the Glimmermere glows below it; the Wyrmcult Tents and Revenant Fields ring the cult's high ground, with Gravewyrm Sanctum at its peak.",
 
@@ -723,6 +766,13 @@ export const guideStrings = {
     gladeTitle: 'A quiet corner: Brightwood Glade',
     gladeBody:
       'Not every story in the Vale is about the dead. In the north, a sunlit grove called Brightwood Glade keeps its own gentler rhythm, all quiet paths and dappled light beneath the boughs. It is a soft counterpoint to the trail you are following, and worth seeing when the road gives you room to wander.',
+
+    // The open-world raid boss. Spoiler-safe: his name is broadcast to the whole realm when
+    // he rises, so it is public knowledge, unlike the withheld raid boss. No timers, health
+    // scaling internals, or loot tables.
+    worldBossTitle: 'When the peak wakes: the world boss',
+    worldBossBody:
+      'High on Thornpeak, the storm over Stormcrag sometimes gathers a shape. Thunzharr, the Waking Peak rises there on a steady rhythm, a raid-strength elemental fought in the open world by whoever answers the call, and he grows mightier the more challengers stand against him. Everyone who joins the fight earns their own roll of his spoils, honored on raid-lockout terms, and his fall lingers long enough for the fallen to run back and claim their due. Gather more swords than you think you need.',
   },
 
   // Quests.
@@ -756,7 +806,7 @@ export const guideStrings = {
       "Thin out a pack of beasts or break a cult's hold by defeating a set number of a marked enemy. The first quest in the game, clearing wolves off the Eastbrook road, is one of these.",
     typeGatherTitle: 'Gather',
     typeGatherBody:
-      "Collect items from the world or from what enemies drop: herbs, ore, lost letters, a cult's grim reagents. Some pieces only fall from a particular foe, so the hunt and the haul go together.",
+      "Collect items from the world or from what enemies drop: herbs, ore, a cult's grim reagents. Some pieces only fall from a particular foe, so the hunt and the haul go together.",
     typeInteractTitle: 'Interact',
     typeInteractBody:
       'Use, cleanse, or read something fixed in the world: a defiled grave, a warning carved on a shore-rock, a sealed crypt door. Walk up to the marker and act on it.',
@@ -834,7 +884,20 @@ export const guideStrings = {
       "The dark heart of Thornpeak, where the cult's long work reaches its terrible peak.",
     raidName: 'The endgame raid',
     raidBody:
-      'Beyond a sealed royal door waits a ten-player trial: a multi-phase fight and a deathless power the whole raid must shut down together. Earn your way in, then bring nine friends.',
+      'Beyond a sealed royal door waits a ten-player trial: a multi-stage fight and a deathless power the whole raid must shut down together. Earn your way in, then bring nine friends.',
+
+    // Heroic difficulty. Spoiler-safe: what it is, how to set it, the Marks economy and
+    // daily rhythm. No multipliers, mark counts, prices, or encounter changes.
+    heroicTitle: 'Heroic mode',
+    heroicBody:
+      'Every five-player dungeon, and the raid itself, has a heroic version waiting past the level cap. The same halls, remade for a geared endgame party: everything hits harder, nothing can be outrun on foot, and the bosses shrug off stuns and snares entirely. Outgrow the normal versions first; heroic assumes you have.',
+    heroicHowBody:
+      'Choose the difficulty before your group claims the instance: type /dungeon heroic, or flip the Dungeon Difficulty toggle on the party menu. The choice is shared by the whole party and locks in at the door, so a run stays what it was claimed as.',
+    heroicRewardsTitle: 'Heroic Marks and upgraded spoils',
+    heroicRewardsBody:
+      'Heroic bosses drop the loot you know, upgraded and tagged Heroic on the tooltip, and the final boss of each run adds epics found nowhere else. That last kill also leaves Heroic Marks for every participant: a currency spent with Quartermaster Vex in Highwatch, whose stock of rings and necklaces is the only jewelry in the realm.',
+    heroicLockoutBody:
+      'Normal dungeons can be run all day. Heroic asks patience: each dungeon rewards one heroic clear per day, and the raid keeps a daily lockout for each difficulty. A cleared run always stays open to its own party, so nobody is locked away from loot they earned.',
 
     // Standalone, spoiler-safe lore for the Drowned Temple card (the goddess twist and any
     // boss names are withheld).
@@ -883,13 +946,13 @@ export const guideStrings = {
       'A delve offers more than one difficulty. The higher one makes the enemies stronger and rolls in a run modifier, and pays out more in return. It also asks that you have a few levels under your belt before it will let you in.',
     affixesHeading: 'Run modifiers',
     affixesBody:
-      'Harder runs roll a modifier that changes how the descent plays, from restless dead to foul air to failing roof-work. They raise the danger and the reward together. A crypt-themed delve can roll any of these:',
+      'Harder runs roll a modifier that changes how the descent plays, from restless dead to foul air to failing roof-work. They raise the danger and the reward together. Each delve draws from the modifiers that suit its theme; across the realm, the pool looks like this:',
     marksHeading: 'Delve Marks',
     marksBody:
       'Clearing delves earns Delve Marks, a currency kept apart from your coin. Spend them at the keeper to strengthen your companion and pick up gear you will not find anywhere else.',
     whereHeading: 'Where to find one',
     whereBody:
-      'The first delve, the Collapsed Reliquary, opens at Reliquary Hill in the starting valley of Eastbrook Vale. Brother Halven keeps the board there, and he will send you down once you are ready.',
+      'The first delve, the Collapsed Reliquary, opens at Reliquary Hill in the starting valley of Eastbrook Vale. Brother Halven keeps the board there, and he will send you down once you are ready. His rounds do not end there: past the Troll Mounds at the northern edge of Mirefen Marsh, the same keeper opens The Drowned Litany for delvers who have found their feet.',
   },
 
   // Talents and Specializations reference.
@@ -905,6 +968,8 @@ export const guideStrings = {
       "Talents open up at level 10, and you keep earning points as you climb to the cap. You spend them in your class's talent panel, and you can save more than one layout to swap between builds.",
     shareNote:
       'A finished build can be copied to a short shareable code and handed to a friend, who pastes it straight into their own talent panel to load it.',
+    choiceNote:
+      'A few points on every tree are a crossroads rather than a purchase: the node offers two or three options and you commit to one of them. Your next reset reopens the choice, like everything else on the tree.',
     resetTitle: 'Nothing is permanent',
     resetNote:
       'You can reset your talents any time you are out of combat, so an early pick is never a trap. Try things, see what you like, and change your mind freely.',
@@ -977,6 +1042,14 @@ export const guideStrings = {
       'Nobody bleeds at the Sowfield: tackles tumble, nothing hurts, and pets sit the match out.',
     spectateBody:
       'One match plays at a time at the stadium, and anyone can walk up and watch from the stands.',
+    // Spectator wagering and the bot-backed modes. Spoiler-safe: no stake amounts, caps,
+    // wait timers, or matchmaker internals.
+    bettingHeading: 'A flutter at the rail',
+    bettingBody:
+      "Spectators at the Sowfield can back a side while a match is forming: stakes pool together, and at the final whistle the winners split the losers' pool in proportion to what they staked. A drawn match, or an upset nobody backed, refunds every coin. Players seated in the match cannot bet on it, and the rail keeps your lifetime record of wins, losses, and net coin.",
+    practiceHeading: 'Practice bouts and the idle pitch',
+    practiceBody:
+      'The Vale Cup window also offers practice: a private copy of the pitch where bots fill both sides and nothing counts toward your record. Short a player or two for the real thing? After a short wait, bots round out the teams, and any match with bots on the pitch is a friendly, never rated. And when the Sowfield sits idle, the bots put on an exhibition you can watch, and bet on, from the stands; the moment real players ready up, the exhibition yields the pitch and every stake is returned.',
     nationsHeading: 'The eight banner nations',
     nationsBody:
       'Every team plays under a banner. The captain picks the nation, and if both sides fly the same one, the away side plays the inverted palette.',
@@ -1005,7 +1078,7 @@ export const guideStrings = {
       'The Book of Deeds is where the world keeps score of all you have done, from your first steps out of the starting valley to the hardest fights the realm can offer. Earn deeds as you play, wear the titles they grant, and watch your Renown climb.',
     howHeading: 'How deeds work',
     howBody:
-      'Deeds are earned one character at a time and shown across your whole account, so every hero you play adds to the same collection. Each deed spells out plainly what it asks of you, right there in the Book of Deeds in game, so you always know what to chase, and you can set a watch on the ones you are after to keep them in sight while you play. A small few stay secret and reveal themselves only once you have earned them.',
+      'Deeds are earned one character at a time and shown across your whole account, so every hero you play adds to the same collection. Each deed spells out plainly what it asks of you, right there in the Book of Deeds in game, so you always know what to chase, and you can set a watch on the ones you are after to keep them in sight while you play. A small few stay secret and reveal themselves only once you have earned them. The Book also keeps itself honest: whatever your past record can prove, it credits on the spot, so a veteran never opens it to an empty page; only the counting deeds begin their tally fresh.',
     renownHeading: 'Renown',
     renownBody:
       'Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all.',
@@ -1056,10 +1129,10 @@ export const guideStrings = {
       'Every class can hold its own and reach the cap. Choose the fantasy you like, not the one someone else calls best.',
     i2Title: 'Dying barely costs you',
     i2Body:
-      'When you fall, you release your spirit and revive at the nearest graveyard, then make your way back. No experience is lost, so it is safe to take risks and learn.',
+      "When you fall you rise as a ghost at the nearest graveyard. Run back to your body to revive free, or take the Spirit Healer's instant raise and carry a short-lived weakness for the convenience. No experience, gear, or coin is ever lost, so it is safe to take risks and learn.",
     i3Title: 'Talents are not a trap',
     i3Body:
-      'They unlock at level 10 and reset whenever you want, so your early choices are never permanent.',
+      'They unlock at level 10 and reset whenever you like, out of combat, so your early choices are never permanent.',
     i4Title: 'Follow the quest trail',
     i4Body:
       'Quests are the fastest way to level and they lead you across the world. When you are unsure where to go, find the next marker.',
@@ -1111,18 +1184,20 @@ export const guideStrings = {
     intro:
       'Gear is the equipment your character wears and the items you carry. Better gear is the steadiest way to grow stronger, and you pick most of it up just by playing.',
 
-    // The eight equip slots (the paperdoll).
+    // The eleven equip slots (the paperdoll).
     slotsTitle: 'What you can equip',
     slotsBody:
-      'You have a weapon slot and seven armor slots. Each class can use only certain weapons and wears armor up to its own weight, cloth, leather, or mail, so the upgrades that fit you are the ones made for your class. Within that, fill every slot with the best piece you find.',
+      'You have a weapon slot, seven armor slots, and three jewelry slots: a neck and two fingers. Each class can use only certain weapons and wears armor up to its own weight, cloth, leather, or mail, so the upgrades that fit you are the ones made for your class. Jewelry carries no weight at all: any class wears whatever it earns. Within that, fill every slot with the best piece you find.',
     slotMainhand: 'Weapon',
     slotHelmet: 'Head',
+    slotNeck: 'Neck',
     slotShoulder: 'Shoulders',
     slotChest: 'Chest',
     slotWaist: 'Waist',
     slotLegs: 'Legs',
     slotGloves: 'Hands',
     slotFeet: 'Feet',
+    slotFinger: 'Finger',
 
     // Quality / rarity tiers. Color signals quality, but the name is always shown too.
     qualityTitle: 'Quality, at a glance',
@@ -1147,12 +1222,17 @@ export const guideStrings = {
     // Where gear comes from.
     sourcesTitle: 'Where gear comes from',
     sourcesBody:
-      'Most of your early upgrades are quest rewards, so it pays to finish quests rather than grind. Enemies drop gear when you defeat them, vendors in town sell solid basics, and the player market lets you buy from other adventurers.',
+      'Most of your early upgrades are quest rewards, so it pays to finish quests rather than grind. Enemies drop gear when you defeat them, vendors in town sell solid basics, crafters turn gathered materials into wearable pieces, and the player market lets you buy from other adventurers. At the top of the hill, two mark currencies buy gear found nowhere else: Delve Marks at the delve keeper, and Heroic Marks at the heroic quartermaster.',
+
+    // Soulbound items. Flag-level only: bound from acquisition, no BoP/BoE tiers exist.
+    soulboundTitle: 'Soulbound: yours and yours alone',
+    soulboundBody:
+      'Many prized pieces are soulbound, bound to your character from the moment you acquire them. A soulbound item cannot be traded, mailed, sold to a vendor, or listed on the market; it is part of your story now, and no one else can carry it for you.',
 
     // Tier sets and set bonuses. Concept only: no set names, bonus numbers, or the raid boss.
     setsTitle: 'Sets and set bonuses',
     setsBody:
-      "The rarest armor comes in matched families, several pieces cut to look and fight as one. Wear enough of a family at once and the set wakes up, granting bonuses on top of each piece's own stats, and the more pieces you wear the stronger it gets. These drop from the toughest group content near the level cap, so chasing a full set is a classic endgame goal.",
+      "Some armor comes in matched families, several pieces cut to look and fight as one. Wear enough of a family at once and the set wakes up, granting bonuses on top of each piece's own stats, and the more pieces you wear the stronger it gets. A few such families turn up as prized drops while you level; the greatest of them come from the toughest group content near the level cap, so chasing a full set is a classic endgame goal.",
 
     // Consumables: potions, food, drink, elixirs. No numbers.
     consumablesTitle: 'Consumables',
@@ -1209,6 +1289,14 @@ export const guideStrings = {
     gatherToolsBody:
       'Vendors sell basic tools for each gathering trade, and better ones can be crafted, so working a resource node is meant to feel more capable as you gear up for it rather than staying static. Higher-tier tools are the intended way to unlock access to richer nodes and to work them more efficiently over a long session.',
 
+    // Corpse component harvesting: open to every character, no profession gate.
+    harvestTitle: 'Harvesting the hunt itself',
+    harvestBody:
+      'Gathering does not stop at nodes. Some slain beasts can be harvested for components, hides, fangs, silk, and stranger things, straight from the corpse alongside its ordinary loot. One hunter per kill: whoever harvests first claims it all. The choice is yours each time, too: strip everything the corpse offers, or concentrate on a single component and take a finer grade of it. Any character can harvest, no trade or training required, and a particularly fine component even carries the name of whoever harvested it.',
+    focusTitle: 'Town Focus',
+    focusBody:
+      'Every hub town keeps a Town Focus panel for visiting harvesters: stand in town, open it from beside the minimap, and aim a small budget of focus points at the component types you care about. Focused components come off every later corpse a grade finer and a little richer, your allocation follows your character wherever they roam, and you can rework it, free, on any later visit to town.',
+
     // The ten crafts overview.
     craftTitle: 'The ten crafts',
     craftIntro:
@@ -1237,11 +1325,11 @@ export const guideStrings = {
 
     archetypeChooseTitle: 'Choosing your archetype',
     archetypeChooseBody:
-      'You declare your first archetype through an early, zone one story quest that formally accepts you into that identity. Until you complete that quest, you have not yet chosen an archetype at all.',
+      'Declaring an archetype will be a story moment: a quest that formally accepts you into that identity. That road is still being built, so for now every character walks the world with the choice ahead of them, and every craft advances to the rare quality tier in the meantime.',
 
     archetypeSwitchTitle: 'Changing your mind',
     archetypeSwitchBody:
-      'Having declared an archetype once does not lock you into it forever. Changing to a different archetype means first completing a repeatable "make amends" quest for your old one, and each time you switch, the amends expected of you the next time grow a little steeper, so switching stays meaningful rather than costless.',
+      'Nor will a declaration be a life sentence. The plan is a repeatable act of making amends to your old trade before taking up a new one, with the amends growing steeper each time you switch, so the choice stays meaningful rather than costless. Like the declaration itself, it is still on its way.',
 
     archetypeIdentityTitle: 'What your archetype means',
     archetypeIdentityBody:
@@ -1262,10 +1350,10 @@ export const guideStrings = {
     vendorsBody:
       'Towns and outposts are dotted with merchants, each with their own trade. Provisioners stock food and drink, weaponsmiths and armorers carry gear, and a quartermaster keeps practical travel kit. Walk up to one to see what they sell.',
 
-    // Delve Marks: the second player currency, earned in delves and spent at the keeper.
-    marksTitle: 'A second currency: Delve Marks',
+    // The mark currencies: Delve Marks (delve keeper) and Heroic Marks (heroic quartermaster).
+    marksTitle: 'Marks: the currencies beyond coin',
     marksBody:
-      'Coin is not the only thing you bank. Delves pay out Delve Marks, a separate currency you spend only at the delve keeper, on companion upgrades and gear you will not find elsewhere. They never mix with your coin.',
+      'Coin is not the only thing you bank. Delves pay out Delve Marks, spent only at the delve keeper on companion upgrades and gear you will not find elsewhere. Heroic dungeon runs leave Heroic Marks on the final boss, spent with the heroic quartermaster in Highwatch on jewelry no other corner of the realm sells. Neither ever mixes with your coin.',
 
     // The personal bank: The Gilded Strongbox branches, deposits, and growing the vault.
     bankTitle: 'The bank',
@@ -1290,6 +1378,13 @@ export const guideStrings = {
     tradeTitle: 'Trading with other players',
     tradeBody:
       'You can trade face to face with anyone standing near you. Both of you put items and coin into a shared window and the swap only happens once you both confirm it, so neither side can be caught out. It is the simple way to hand a friend a drop or settle a deal.',
+
+    // The Ravenpost player mail. No postage amounts, delays, caps, or expiry durations.
+    mailTitle: 'The Ravenpost',
+    mailBody:
+      'Every hub town keeps a carved raven pillar: a mailbox of the Ravenpost, the letter service of the realm. Stand at one to write to any character by name, a friend online or long offline, and attach coin or goods to the letter for a small postage. The raven takes a short while to fly; when it lands, an envelope indicator tells the recipient something is waiting.',
+    mailHow:
+      'Collecting works the same in reverse: stand at any pillar to read your letters and take what they carry into your purse and bags. Letters do not wait forever, so collect before the raven gives up on you. Two things the post refuses outright: soulbound items and quest goods travel with you or not at all. And keep an eye on the pillar after a good turn-in; some questgivers write.',
 
     // The World Market (player auction house): browse, post, collect, pricing.
     marketTitle: 'The World Market',
@@ -1378,6 +1473,16 @@ export const guideStrings = {
     guildChatBody:
       'Belonging to a guild gives you a private guild chat channel and shows your guildmates on a shared roster, so there are always familiar faces online.',
 
+    // Ready checks: /ready polls the group; counts-only summary, answers stay private.
+    readyHeading: 'Ready checks',
+    readyBody:
+      'Before a big pull, the group leader can type /ready to poll the room: everyone else gets a Ready or Not Ready prompt, and once all have answered, or 30 seconds run out, the whole group sees a single summary of the counts. Nobody is singled out; the point is the count, not the culprit.',
+
+    // Party target markers: any member, eight symbols, one target per symbol.
+    markersHeading: 'Target markers',
+    markersBody:
+      'In a party, right-click a hostile creature to crown it with one of eight raid symbols. Any member can mark, each symbol lives on one target at a time, and reapplying a symbol to its own target clears it. Kill order, crowd-control assignments, or a plain "this one first" all travel faster as a symbol than a sentence.',
+
     // Grouping etiquette.
     etiquetteHeading: 'Grouping etiquette',
     etiquetteBody:
@@ -1422,10 +1527,13 @@ export const guideStrings = {
       "Spell power is a caster's counterpart to attack power: it raises the damage your spells deal. Intellect feeds it, and caster gear and buffs add more on top, so a spellcaster watches spell power the way a melee fighter watches attack power.",
     critTitle: 'Critical strike',
     critBody:
-      'Your critical strike chance is how often an attack lands for extra damage. Everyone starts with a small base chance, and Agility (plus some talents and gear) builds on it.',
+      'Your critical strike chance is how often an attack lands for extra damage. Everyone starts with a small base chance, and Agility (plus some talents and gear) builds on it. Your sheet shows both the chance itself and the critical strike rating your gear contributes toward it.',
     dodgeTitle: 'Dodge',
     dodgeBody:
       'Dodge is your chance to avoid an incoming melee attack entirely. You begin with a small base chance, and Agility raises it, so nimble classes slip more blows.',
+    hasteTitle: 'Haste',
+    hasteBody:
+      'Haste is one stat that quickens everything you do: melee swings, ranged shots, and spellcasting all speed up together. It comes from gear, most notably armor-set bonuses, and a few abilities grant a burst of it. Your sheet shows it as Haste Rating.',
     dpsTitle: 'Damage per second',
     dpsBody:
       'Your sheet also shows a damage-per-second estimate: roughly what your weapon, its swing speed, and your attack power add up to over time. It is a quick way to compare two weapons at a glance.',
@@ -1464,7 +1572,7 @@ export const guideStrings = {
     // What happens at the cap: cosmetic, optional, long-term. {cap} = level cap.
     capTitle: 'Reaching level {cap}',
     capJourneyBody:
-      'Level {cap} is the cap, the end of leveling but not of growing. From there you run dungeons and the raid, chase better gear, and test yourself in the arena.',
+      'Level {cap} is the cap, the end of leveling but not of growing. From there you run dungeons and the raid on normal and heroic, face the world boss when he rises, chase better gear, and test yourself in the arena.',
     prestigeBody:
       'Experience keeps counting even after the cap. It feeds a cosmetic virtual level, so your experience bar keeps climbing, and a long-term prestige rank you can earn for the recognition. Passing big lifetime-experience milestones also unlocks cosmetic titles and nameplate borders that show on your character sheet. All of it is purely optional and never grants power, just a mark of the road you have walked.',
     // Gentle reassurance.

@@ -12,6 +12,7 @@ const BLOCKS = [
   ['guide.combat.hitTitle', 'guide.combat.hitBody'],
   ['guide.combat.mitigationTitle', 'guide.combat.mitigationBody'],
   ['guide.combat.resourcesTitle', 'guide.combat.resourcesBody'],
+  ['guide.combat.queueTitle', 'guide.combat.queueBody'],
 ] as const;
 
 export const combat: GuidePage = {

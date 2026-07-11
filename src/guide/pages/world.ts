@@ -110,6 +110,11 @@ export const world: GuidePage = {
         </section>
 
         <section class="guide-block">
+          <h2>${esc(t('guide.worldPage.worldBossTitle'))}</h2>
+          <p>${esc(t('guide.worldPage.worldBossBody'))}</p>
+        </section>
+
+        <section class="guide-block">
           <h2>${esc(t('guide.worldPage.gladeTitle'))}</h2>
           <p>${esc(t('guide.worldPage.gladeBody'))}</p>
         </section>

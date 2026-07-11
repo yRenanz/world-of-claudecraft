@@ -22,16 +22,20 @@ const QUALITY_TIERS = [
   ['legendary', 'guide.gear.qualityLegendary'],
 ] as const;
 
-// The eight equip slots, paired with their catalog label key (paperdoll order).
+// The eleven equip slots, paired with their catalog label key (paperdoll order; the
+// two ring slots share the one Finger label, listed once each).
 const SLOTS = [
   'guide.gear.slotMainhand',
   'guide.gear.slotHelmet',
+  'guide.gear.slotNeck',
   'guide.gear.slotShoulder',
   'guide.gear.slotChest',
   'guide.gear.slotWaist',
   'guide.gear.slotLegs',
   'guide.gear.slotGloves',
   'guide.gear.slotFeet',
+  'guide.gear.slotFinger',
+  'guide.gear.slotFinger',
 ] as const;
 
 function qualityList(): string {
@@ -63,6 +67,8 @@ export const gear: GuidePage = {
         ${section('guide.gear.upgradeTitle', p('guide.gear.upgradeBody') + p('guide.gear.itemLevelBody'))}
 
         ${section('guide.gear.sourcesTitle', p('guide.gear.sourcesBody'))}
+
+        ${section('guide.gear.soulboundTitle', p('guide.gear.soulboundBody'))}
 
         ${section('guide.gear.setsTitle', p('guide.gear.setsBody'))}
 

@@ -8140,30 +8140,31 @@ function wireStartScreens(): void {
 
   // Initialize 3D character preview once assets are ready
   assetsReady().then(() => {
-    const activePanelId = ['#charselect-panel', '#offline-select'].find(
+    // ALL THREE play panels are init candidates, #charcreate-panel included: on
+    // a slow connection (a phone with a cold cache) assets finish AFTER the
+    // player has already registered and landed on the create panel, and the old
+    // two-panel list resolved to the hidden charselect container, so the canvas
+    // never reached #charcreate-preview-container and the create preview
+    // rendered nothing. show()'s own updatePreviewContainer call cannot repair
+    // it either: it no-ops until this constructor has run.
+    const activePanelId = ['#charselect-panel', '#charcreate-panel', '#offline-select'].find(
       (id) => !$(id).hasAttribute('hidden'),
     );
-    const containerId =
-      activePanelId === '#offline-select'
-        ? '#offline-preview-container'
-        : '#online-preview-container';
-    const container = $(containerId);
+    const container = $('#online-preview-container');
     const canvas = $('#char-preview-canvas') as HTMLCanvasElement | null;
     if (container && canvas) {
       characterPreview = new CharacterPreview(container, canvas);
-      // If a token auto-login already rendered the roster and selected a
-      // character before assets finished, show its real appearance; otherwise
-      // fall back to the selected class chip (create/offline panels).
-      if (charselectSelected) {
+      if (activePanelId) {
+        // The full panel wiring: re-homes the canvas into the active panel's
+        // container, applies the roster appearance or the selected class chip
+        // (+ skins), and runs the deferred size sync.
+        updatePreviewContainer(activePanelId);
+      } else if (charselectSelected) {
+        // Token auto-login selected a roster character before assets finished
+        // but no play panel is up yet: seed its real appearance for the reveal.
         characterPreview.setAppearance(charselectAppearance(charselectSelected));
       } else {
-        const selSelector =
-          activePanelId === '#offline-select'
-            ? '#offline-select .mini-class.sel'
-            : '#charcreate-panel .mini-class.sel';
-        const selEl = document.querySelector(selSelector) as HTMLElement | null;
-        const cls = selEl ? (selEl.dataset.class as PlayerClass) : 'warrior';
-        characterPreview.setClass(cls);
+        characterPreview.setClass('warrior');
       }
     }
     decorateClassChips();

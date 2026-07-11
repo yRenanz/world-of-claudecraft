@@ -2291,4 +2291,17 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('transform: translate(-50%, -50%);');
     expect(hudMobileCss).toContain('z-index: 95 !important;');
   });
+
+  it('character-preview init considers ALL THREE play panels (create included)', () => {
+    // On a slow connection (a phone with a cold cache) assets finish loading
+    // AFTER the player has registered and landed on the CREATE panel; the old
+    // two-panel candidate list resolved to the hidden charselect container and
+    // the create preview rendered nothing (show()'s updatePreviewContainer
+    // no-ops until this init has run). The init must consider the create panel
+    // and route through the full panel wiring.
+    expect(mainTs).toContain("['#charselect-panel', '#charcreate-panel', '#offline-select'].find(");
+    const init = mainTs.slice(mainTs.indexOf('assetsReady().then(() => {'));
+    const body = init.slice(0, init.indexOf('decorateClassChips();'));
+    expect(body).toContain('updatePreviewContainer(activePanelId);');
+  });
 });

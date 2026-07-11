@@ -5,6 +5,7 @@ export declare const DURATION_THRESHOLD: number;
 export declare const TARGET_PEAK_DBFS: number;
 export declare const TARGET_LUFS: number;
 export declare const NORM_TOLERANCE: number;
+export declare const LOSSLESS_EXTENSIONS: Set<string>;
 
 export interface FileStats {
   duration: number;
@@ -12,6 +13,7 @@ export interface FileStats {
   sampleRate: number;
   peakDb?: number | null;
   lufs?: number | null;
+  isLossless?: boolean;
 }
 
 export interface Classification {

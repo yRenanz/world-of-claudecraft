@@ -7,6 +7,7 @@ import {
   TARGET_PEAK_DBFS,
   TARGET_LUFS,
   NORM_TOLERANCE,
+  LOSSLESS_EXTENSIONS,
 } from '../scripts/sfx/sfx_conform_rules.mjs';
 
 // A file already at every spec dimension.
@@ -108,5 +109,46 @@ describe('classify: loudness gate', () => {
     // If caller passes neither peakDb nor lufs, no loudness problem is reported.
     const { problems } = classify({ ...AT_SPEC });
     expect(problems.filter(p => p.includes('dBFS') || p.includes('LUFS'))).toHaveLength(0);
+  });
+});
+
+describe('classify: lossless sources', () => {
+  // WAV/FLAC probe at high bitrates that are meaningless for the quality gate.
+  const LOSSLESS = { duration: 2.0, bitrate: 1411, sampleRate: TARGET_SAMPLE_RATE, isLossless: true };
+
+  it('does not reject lossless sources regardless of bitrate', () => {
+    expect(classify(LOSSLESS).reject).toBe(false);
+  });
+
+  it('always marks lossless sources for processing (lossless source in problems)', () => {
+    const { problems } = classify({ ...LOSSLESS, lufs: TARGET_LUFS });
+    expect(problems.some(p => p.includes('lossless'))).toBe(true);
+  });
+
+  it('does not flag lossless bitrate as a kbps problem', () => {
+    const { problems } = classify({ ...LOSSLESS, lufs: TARGET_LUFS });
+    expect(problems.filter(p => p.includes('kbps'))).toHaveLength(0);
+  });
+
+  it('still checks sample rate for lossless sources', () => {
+    const { problems } = classify({ ...LOSSLESS, sampleRate: 48000, lufs: TARGET_LUFS });
+    expect(problems.some(p => p.includes('48000Hz'))).toBe(true);
+  });
+
+  it('still checks loudness for lossless sources', () => {
+    const { problems } = classify({ ...LOSSLESS, lufs: -20.0 });
+    expect(problems.some(p => p.includes('LUFS'))).toBe(true);
+  });
+
+  it('LOSSLESS_EXTENSIONS contains wav, flac, aiff, aif', () => {
+    for (const ext of ['.wav', '.flac', '.aiff', '.aif']) {
+      expect(LOSSLESS_EXTENSIONS.has(ext)).toBe(true);
+    }
+  });
+
+  it('LOSSLESS_EXTENSIONS does not contain lossy formats', () => {
+    for (const ext of ['.mp3', '.ogg', '.opus', '.m4a']) {
+      expect(LOSSLESS_EXTENSIONS.has(ext)).toBe(false);
+    }
   });
 });

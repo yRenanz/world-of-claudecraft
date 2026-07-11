@@ -1,10 +1,18 @@
-// Inspect and optionally conform all MP3s in public/audio/sfx/ to the project standard:
+// Inspect and optionally conform all audio files in public/audio/sfx/ to the project standard:
 //   Format:      MP3
 //   Bitrate:     192 kbps
 //   Sample rate: 44.1 kHz
 //   Normalization:
 //     < 1 s  -> -6 dBFS peak
 //     >= 1 s -> -14 LUFS  (loudnorm=I=-14:LRA=7:TP=-1)
+//
+// Accepted input formats: .mp3 .wav .flac .aiff .aif .ogg .opus .m4a
+// All non-MP3 inputs are transcoded to <stem>.mp3 and the original is removed.
+//
+// Conflict resolution: if both <stem>.wav and <stem>.mp3 exist (or any two
+// formats for the same stem), the lossless file takes priority. If two lossy
+// files conflict, the first alphabetically wins and a warning is printed.
+// This policy is intentional: lossless is always the better source.
 //
 // Usage:
 //   node scripts/sfx_conform.mjs            # check only, exit 1 if anything is out of spec
@@ -18,13 +26,15 @@ import ffmpegPath from 'ffmpeg-static';
 import ffprobeStatic from 'ffprobe-static';
 import {
   classify,
+  LOSSLESS_EXTENSIONS,
   MIN_SOURCE_BITRATE,
   TARGET_BITRATE,
   TARGET_SAMPLE_RATE,
   TARGET_PEAK_DBFS,
-  TARGET_LUFS,
   DURATION_THRESHOLD,
 } from './sfx/sfx_conform_rules.mjs';
+
+const AUDIO_EXTENSIONS = new Set(['.mp3', '.wav', '.flac', '.aiff', '.aif', '.ogg', '.opus', '.m4a']);
 
 const fix = process.argv.includes('--fix');
 const root = process.cwd();
@@ -78,47 +88,88 @@ function getLufs(file) {
 }
 
 // Temp files go to the system temp directory so a crashed run cannot leave
-// an orphan .tmp.mp3 inside the scanned sfxDir on the next run.
-function conformPeak(file, peakDb) {
+// an orphan inside the scanned sfxDir on the next run.
+// inputFile and outputFile differ when converting a non-MP3 to MP3; on success
+// the original source file is removed.
+function conformPeak(inputFile, outputFile, peakDb) {
   const adjustment = TARGET_PEAK_DBFS - peakDb;
-  const tmp = path.join(tmpdir(), `sfx_conform_${path.basename(file)}`);
+  const tmp = path.join(tmpdir(), `sfx_conform_${path.basename(outputFile)}`);
   try {
     execFileSync(ffmpegPath, [
       '-hide_banner', '-loglevel', 'error',
-      '-y', '-i', file,
+      '-y', '-i', inputFile,
       '-af', `volume=${adjustment}dB,aformat=sample_rates=${TARGET_SAMPLE_RATE}`,
       '-ar', String(TARGET_SAMPLE_RATE),
       '-b:a', `${TARGET_BITRATE}k`,
       '-codec:a', 'libmp3lame',
       tmp,
     ]);
-    renameSync(tmp, file);
+    renameSync(tmp, outputFile);
   } finally {
     try { unlinkSync(tmp); } catch { /* already renamed or never created */ }
   }
+  if (inputFile !== outputFile) {
+    try { unlinkSync(inputFile); } catch (e) {
+      console.warn(`  WARN could not remove source file ${path.basename(inputFile)}: ${e.message}`);
+    }
+  }
 }
 
-function conformLufs(file) {
-  const tmp = path.join(tmpdir(), `sfx_conform_${path.basename(file)}`);
+function conformLufs(inputFile, outputFile) {
+  const tmp = path.join(tmpdir(), `sfx_conform_${path.basename(outputFile)}`);
   try {
     execFileSync(ffmpegPath, [
       '-hide_banner', '-loglevel', 'error',
-      '-y', '-i', file,
+      '-y', '-i', inputFile,
       '-af', `loudnorm=I=-14:LRA=7:TP=-1,aformat=sample_rates=${TARGET_SAMPLE_RATE}`,
       '-ar', String(TARGET_SAMPLE_RATE),
       '-b:a', `${TARGET_BITRATE}k`,
       '-codec:a', 'libmp3lame',
       tmp,
     ]);
-    renameSync(tmp, file);
+    renameSync(tmp, outputFile);
   } finally {
     try { unlinkSync(tmp); } catch { /* already renamed or never created */ }
   }
+  if (inputFile !== outputFile) {
+    try { unlinkSync(inputFile); } catch (e) {
+      console.warn(`  WARN could not remove source file ${path.basename(inputFile)}: ${e.message}`);
+    }
+  }
 }
 
-const files = existsSync(sfxDir)
-  ? readdirSync(sfxDir).filter(f => f.endsWith('.mp3')).sort()
+// Build the list of files to process, one per stem.
+// If multiple formats share a stem, lossless wins over lossy.
+// Two lossless or two lossy files for the same stem: first alphabetically wins, warn.
+const allFiles = existsSync(sfxDir)
+  ? readdirSync(sfxDir)
+      .filter(f => AUDIO_EXTENSIONS.has(path.extname(f).toLowerCase()))
+      .sort()
   : [];
+
+const byKey = new Map(); // stem -> filename
+for (const name of allFiles) {
+  const stem = path.basename(name, path.extname(name));
+  const ext = path.extname(name).toLowerCase();
+  const existing = byKey.get(stem);
+  if (!existing) {
+    byKey.set(stem, name);
+    continue;
+  }
+  const existingExt = path.extname(existing).toLowerCase();
+  const newIsLossless = LOSSLESS_EXTENSIONS.has(ext);
+  const existingIsLossless = LOSSLESS_EXTENSIONS.has(existingExt);
+  if (newIsLossless && !existingIsLossless) {
+    console.log(`  WARN ${stem}: ${name} (lossless) takes priority over ${existing} -- remove the lossy copy`);
+    byKey.set(stem, name);
+  } else if (!newIsLossless && existingIsLossless) {
+    console.log(`  WARN ${stem}: ${existing} (lossless) takes priority over ${name} -- remove the lossy copy`);
+  } else {
+    console.log(`  WARN ${stem}: duplicate files (${existing}, ${name}) -- keeping ${existing}, remove the other`);
+  }
+}
+
+const files = [...byKey.values()].sort();
 
 let issues = 0;
 let fixed = 0;
@@ -127,13 +178,17 @@ let rejected = 0;
 
 for (const name of files) {
   const file = path.join(sfxDir, name);
+  const ext = path.extname(name).toLowerCase();
+  const stem = path.basename(name, ext);
+  const isLossless = LOSSLESS_EXTENSIONS.has(ext);
+  const outputFile = path.join(sfxDir, `${stem}.mp3`);
   const { duration, bitrate, sampleRate } = getStats(file);
 
-  // Source quality gate: re-encoding a low-bitrate MP3 to 192kbps does not recover
-  // lost quality; it produces a larger file that sounds the same or worse. The floor
-  // is 112kbps (not 128kbps) because ElevenLabs 128kbps exports can probe slightly
-  // low due to encoding variance, and we must not false-reject legitimate assets.
-  const preliminary = classify({ duration, bitrate, sampleRate });
+  // Source quality gate (lossy only): re-encoding a low-bitrate MP3 to 192kbps
+  // does not recover lost quality. The floor is 112kbps, not 128kbps, because
+  // ElevenLabs 128kbps exports can probe slightly low due to encoding variance.
+  // Lossless sources skip this gate entirely.
+  const preliminary = classify({ duration, bitrate, sampleRate, isLossless });
   if (preliminary.reject) {
     console.log(`  REJECT ${name}  [${bitrate}kbps source, minimum ${MIN_SOURCE_BITRATE}kbps; re-export at 128kbps or higher]`);
     rejected++;
@@ -149,7 +204,7 @@ for (const name of files) {
     lufs = getLufs(file);
   }
 
-  const { problems, normBranch } = classify({ duration, bitrate, sampleRate, peakDb, lufs });
+  const { problems, normBranch } = classify({ duration, bitrate, sampleRate, peakDb, lufs, isLossless });
 
   if (problems.length === 0) {
     console.log(`  ok   ${name}`);
@@ -163,9 +218,9 @@ for (const name of files) {
     process.stdout.write(`  fix  ${name}  [${problems.join(', ')}]  (${normLabel})... `);
     try {
       if (normBranch === 'peak') {
-        conformPeak(file, peakDb);
+        conformPeak(file, outputFile, peakDb);
       } else {
-        conformLufs(file);
+        conformLufs(file, outputFile);
       }
       console.log('done');
       fixed++;

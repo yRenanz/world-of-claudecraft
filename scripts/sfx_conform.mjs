@@ -148,6 +148,8 @@ const allFiles = existsSync(sfxDir)
   : [];
 
 const byKey = new Map(); // stem -> filename
+const conflicts = []; // stems with ambiguous duplicates that block processing
+
 for (const name of allFiles) {
   const stem = path.basename(name, path.extname(name));
   const ext = path.extname(name).toLowerCase();
@@ -160,12 +162,18 @@ for (const name of allFiles) {
   const newIsLossless = LOSSLESS_EXTENSIONS.has(ext);
   const existingIsLossless = LOSSLESS_EXTENSIONS.has(existingExt);
   if (newIsLossless && !existingIsLossless) {
-    console.log(`  WARN ${stem}: ${name} (lossless) takes priority over ${existing} -- remove the lossy copy`);
+    // Unambiguous: lossless always beats lossy.
+    console.log(`  WARN ${stem}: ${name} (lossless) takes priority over ${existing} -- remove the lossy copy after conforming`);
     byKey.set(stem, name);
   } else if (!newIsLossless && existingIsLossless) {
-    console.log(`  WARN ${stem}: ${existing} (lossless) takes priority over ${name} -- remove the lossy copy`);
+    // Unambiguous: existing lossless stays.
+    console.log(`  WARN ${stem}: ${existing} (lossless) takes priority over ${name} -- remove the lossy copy after conforming`);
   } else {
-    console.log(`  WARN ${stem}: duplicate files (${existing}, ${name}) -- keeping ${existing}, remove the other`);
+    // Two lossless or two lossy files for the same key: ambiguous, cannot determine
+    // which is correct. Skip both and force the contributor to resolve it manually.
+    console.log(`  ERROR ${stem}: ambiguous duplicate (${existing} vs ${name}) -- remove one and rerun`);
+    byKey.delete(stem);
+    conflicts.push(stem);
   }
 }
 
@@ -235,6 +243,9 @@ for (const name of files) {
 }
 
 console.log('');
+if (conflicts.length > 0) {
+  console.log(`${conflicts.length} key(s) skipped due to ambiguous duplicates: ${conflicts.join(', ')}. Remove one file per key and rerun.`);
+}
 if (rejected > 0) {
   console.log(`${rejected} file(s) rejected: source bitrate below ${MIN_SOURCE_BITRATE}kbps. Re-export from your DAW and resubmit.`);
 }
@@ -243,4 +254,4 @@ if (fix) {
 } else if (issues > 0) {
   console.log(`${issues} file(s) out of spec. Run with --fix to conform them.`);
 }
-if (failures > 0 || rejected > 0 || (!fix && issues > 0)) process.exit(1);
+if (failures > 0 || conflicts.length > 0 || rejected > 0 || (!fix && issues > 0)) process.exit(1);

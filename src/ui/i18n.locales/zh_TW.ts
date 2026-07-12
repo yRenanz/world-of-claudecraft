@@ -226,7 +226,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestButton': '採集',
   'hudChrome.corpseHarvest.concentrateHint': '選擇的部位越少，每個部位的品質越高。',
   'hudChrome.corpseHarvest.alreadyHarvested': '這具屍體已經被採集過了。',
-  'hudChrome.corpseHarvest.harvestButtonTooltip': '採集：從這具屍體取得製作材料（獸皮、尖牙、絲線等類似部位），與戰利品分開。任何人都可以採集，但每具屍體只能被一名玩家採集。',
+  'hudChrome.corpseHarvest.harvestButtonTooltip':
+    '採集：從這具屍體取得製作材料（獸皮、尖牙、絲線等類似部位），與戰利品分開。任何人都可以採集，但每具屍體只能被一名玩家採集。',
   'hudChrome.corpseHarvest.componentAria': '採集{component}',
   'hudChrome.corpseHarvest.components.hide': '獸皮',
   'hudChrome.corpseHarvest.components.fang': '尖牙',

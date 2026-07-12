@@ -123,7 +123,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.result':
     '準備確認：{ready} 人準備完了、{notReady} 人準備未完了、{noResponse} 人未回答。',
   'hudChrome.loot.chestTitle': '宝箱',
-  'hudChrome.loot.takeAllTooltip': 'すべて取る：この戦利品ウィンドウ内のすべてのお金とアイテムを回収します。',
+  'hudChrome.loot.takeAllTooltip':
+    'すべて取る：この戦利品ウィンドウ内のすべてのお金とアイテムを回収します。',
   'hudChrome.itemTooltip.requiresLevel': '必要レベル {level}',
   'hudChrome.spellbook.addToBarAria': '{name}をアクションバーに追加',
   'hudChrome.spellbook.removeFromBarAria': '{name}をアクションバーから削除',
@@ -241,7 +242,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestButton': '採取',
   'hudChrome.corpseHarvest.concentrateHint': '選ぶ部位が少ないほど、各部位の品質が高くなります。',
   'hudChrome.corpseHarvest.alreadyHarvested': 'この死体はすでに採取されています。',
-  'hudChrome.corpseHarvest.harvestButtonTooltip': '採取：この死体から製作素材（毛皮、牙、絹糸など）を戦利品とは別に集めます。誰でも採取できますが、1体の死体を採取できるのは1人だけです。',
+  'hudChrome.corpseHarvest.harvestButtonTooltip':
+    '採取：この死体から製作素材（毛皮、牙、絹糸など）を戦利品とは別に集めます。誰でも採取できますが、1体の死体を採取できるのは1人だけです。',
   'hudChrome.corpseHarvest.componentAria': '{component}を採取',
   'hudChrome.corpseHarvest.components.hide': '毛皮',
   'hudChrome.corpseHarvest.components.fang': '牙',

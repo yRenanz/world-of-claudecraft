@@ -754,8 +754,11 @@ export class Input {
       // keypress (and its default newline insertion) to whichever element is
       // focused AT THAT POINT, i.e. the composer we just focused, so Enter
       // both opens chat and types a newline into it before the placeholder is
-      // ever seen. Cancel the default so the composer opens empty.
-      if (edge === 'chat') e.preventDefault?.();
+      // ever seen. Cancel the default so the composer opens empty, but only
+      // when the key was not itself focused on a button: a button's own Enter
+      // activation is a real default action too, and it should still fire
+      // alongside chat opening, same as before this fix.
+      if (edge === 'chat' && tag !== 'button') e.preventDefault?.();
       if (edge.startsWith('slot')) {
         // Slot keys use DOWN/UP so a slot can hold to charge; the HUD decides
         // whether a slot charges (shoot) or fires immediately (tap = down+up).

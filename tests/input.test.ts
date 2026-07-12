@@ -685,6 +685,19 @@ describe('Input chat keybind', () => {
 
     expect(preventDefault).toHaveBeenCalled();
   });
+
+  it('does not cancel a focused button own Enter activation when it also opens chat', () => {
+    // A focused button (e.g. a HUD button reached via Tab) still activates on
+    // Enter today; only the composer-newline case needs its default cancelled.
+    const { cb, windowListeners } = makeInput();
+    (globalThis as any).document.activeElement = { tagName: 'BUTTON' };
+    const preventDefault = vi.fn();
+
+    windowListeners.get('keydown')!({ code: 'Enter', repeat: false, preventDefault });
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('chat');
+    expect(preventDefault).not.toHaveBeenCalled();
+  });
 });
 
 describe('Input Space handling', () => {

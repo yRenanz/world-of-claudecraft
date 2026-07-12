@@ -340,7 +340,11 @@ export const zh_TW: EnTranslations = {
       "returnBodyTouch": "任務已完成。返回雷德布魯克元帥處並點按「使用」按鈕繳交任務。",
       "doneBodyTouch": "你已掌握基礎，{name}。東溪谷任你探索。點按「更多」再選「任務日誌」即可隨時查看任務。祝你狩獵順利。",
       "slayTargetHint": "第一次戰鬥嗎？按下 {targetKey} 或點擊狼來選定牠，然後使用快捷欄技能攻擊牠。",
-      "slayTargetHintTouch": "第一次戰鬥嗎？點擊狼來選定牠，然後點擊快捷欄技能攻擊牠。"
+      "slayTargetHintTouch": "第一次戰鬥嗎？點擊狼來選定牠，然後點擊快捷欄技能攻擊牠。",
+      "nextTipsTitle": "接下來去哪",
+      "nextTipQuestLog": "開啟任務日誌（{key}）尋找附近的下一個任務。",
+      "nextTipMap": "查看世界地圖（{key}）了解任務所在位置。",
+      "nextTipSocial": "開啟社交面板（{key}）尋找隊伍應對更強的戰鬥。"
     },
     "widgets": {
       "clockTitle": "本地時間 - 點擊切換 12／24 小時制",

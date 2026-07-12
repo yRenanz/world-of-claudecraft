@@ -328,6 +328,13 @@ export const hudChromeStrings = {
       'New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.',
     slayTargetHintTouch:
       'New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.',
+    // Shown as a short bulleted list under the closing "done" card so a brand-new
+    // player has somewhere to go right after the last tutorial step, instead of
+    // being dropped into the open world with no pointer (see tutorial.ts).
+    nextTipsTitle: 'Where to next',
+    nextTipQuestLog: 'Open your Quest Log ({key}) to find your next task nearby.',
+    nextTipMap: 'Check the World Map ({key}) to see where quests are waiting.',
+    nextTipSocial: 'Open Social ({key}) to find a group for tougher fights.',
   },
   // Minimap / compass / clock / coordinate widget tooltips and accessible names.
   widgets: {

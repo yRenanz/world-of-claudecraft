@@ -192,6 +192,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '戦闘は初めてですか？{targetKey} を押すか狼をクリックしてターゲットし、アクションバーのスキルで攻撃しましょう。',
   'hudChrome.tutorial.slayTargetHintTouch':
     '戦闘は初めてですか？狼をタップしてターゲットし、アクションバーのスキルをタップして攻撃しましょう。',
+  'hudChrome.tutorial.nextTipsTitle': '次にすべきこと',
+  'hudChrome.tutorial.nextTipQuestLog':
+    'クエストログ（{key}）を開いて近くの次のクエストを確認しましょう。',
+  'hudChrome.tutorial.nextTipMap': 'ワールドマップ（{key}）でクエストの場所を確認しましょう。',
+  'hudChrome.tutorial.nextTipSocial':
+    'ソーシャル（{key}）を開いて、手強い戦いに備えるパーティーを探しましょう。',
   'hudChrome.raidLockout.title': 'レイドロックアウト',
   'hudChrome.raidLockout.allReady': 'すべてのレイドが利用可能',
   'hudChrome.raidLockout.daysHours': '{d}日{h}時間',

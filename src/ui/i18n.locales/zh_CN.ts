@@ -178,6 +178,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '第一次战斗？按下 {targetKey} 或点击狼来选中它，然后使用快捷栏技能攻击它。',
   'hudChrome.tutorial.slayTargetHintTouch':
     '第一次战斗？点击狼来选中它，然后点击快捷栏技能攻击它。',
+  'hudChrome.tutorial.nextTipsTitle': '接下来去哪',
+  'hudChrome.tutorial.nextTipQuestLog': '打开任务日志（{key}）查找附近的下一个任务。',
+  'hudChrome.tutorial.nextTipMap': '查看世界地图（{key}）了解任务所在位置。',
+  'hudChrome.tutorial.nextTipSocial': '打开社交面板（{key}）寻找队伍应对更强的战斗。',
   'hudChrome.raidLockout.title': '团队副本锁定',
   'hudChrome.raidLockout.allReady': '所有团队副本就绪',
   'hudChrome.raidLockout.daysHours': '{d}天{h}小时',

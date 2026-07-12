@@ -340,7 +340,11 @@ export const ko_KR: EnTranslations = {
       "returnBodyTouch": "임무를 마쳤습니다. 레드브룩 원수에게 돌아가 사용 버튼을 눌러 완료하세요.",
       "doneBodyTouch": "기본기를 익혔습니다, {name}. 이제 골짜기를 자유롭게 누비세요. 더보기를 누른 뒤 퀘스트 기록을 눌러 언제든 퀘스트를 확인할 수 있습니다. 좋은 사냥 되세요.",
       "slayTargetHint": "전투가 처음인가요? {targetKey} 를 누르거나 늑대를 클릭해 대상으로 지정한 뒤, 액션바 기술로 공격하세요.",
-      "slayTargetHintTouch": "전투가 처음인가요? 늑대를 탭해 대상으로 지정한 뒤, 액션바 기술을 탭해 공격하세요."
+      "slayTargetHintTouch": "전투가 처음인가요? 늑대를 탭해 대상으로 지정한 뒤, 액션바 기술을 탭해 공격하세요.",
+      "nextTipsTitle": "다음으로 할 일",
+      "nextTipQuestLog": "퀘스트 기록({key})을 열어 근처의 다음 임무를 확인하세요.",
+      "nextTipMap": "월드 맵({key})에서 퀘스트가 있는 곳을 확인하세요.",
+      "nextTipSocial": "소셜({key})을 열어 강력한 전투를 위한 파티를 찾아보세요."
     },
     "widgets": {
       "clockTitle": "현지 시각 - 클릭하면 12/24시간제 전환",

@@ -91,3 +91,21 @@ export function tutorialNeedsRerender(
   if (nextStep !== prevStep) return true;
   return nextTouch !== prevTouch && tutorialStepDiffersByTouch(nextStep);
 }
+
+// A "where to next" tip shown under the closing 'done' card: a body string that
+// splices in the bound key for a keybinds.ts action, so a brand-new player has a
+// concrete pointer (quest log / map / social) instead of being dropped into the
+// open world with nothing after the last tutorial step. Identical on touch and
+// keyboard: these name chrome windows (opened the same way on both interfaces),
+// not movement/interact controls, so unlike the step bodies above they need no
+// touch variant.
+export interface TutorialNextTip {
+  bodyKey: TranslationKey;
+  keybindId: string;
+}
+
+export const TUTORIAL_NEXT_TIPS: TutorialNextTip[] = [
+  { bodyKey: 'hudChrome.tutorial.nextTipQuestLog', keybindId: 'questlog' },
+  { bodyKey: 'hudChrome.tutorial.nextTipMap', keybindId: 'map' },
+  { bodyKey: 'hudChrome.tutorial.nextTipSocial', keybindId: 'social' },
+];

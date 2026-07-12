@@ -189,6 +189,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Впервые в бою? Нажмите {targetKey} или щелкните по волку, чтобы выбрать цель, затем атакуйте способностью с панели действий.',
   'hudChrome.tutorial.slayTargetHintTouch':
     'Впервые в бою? Коснитесь волка, чтобы выбрать цель, затем коснитесь способности на панели действий, чтобы атаковать.',
+  'hudChrome.tutorial.nextTipsTitle': 'Что дальше',
+  'hudChrome.tutorial.nextTipQuestLog':
+    'Откройте журнал заданий ({key}), чтобы найти следующее задание поблизости.',
+  'hudChrome.tutorial.nextTipMap':
+    'Проверьте карту мира ({key}), чтобы увидеть, где вас ждут задания.',
+  'hudChrome.tutorial.nextTipSocial':
+    'Откройте раздел «Общение» ({key}), чтобы найти группу для сложных боёв.',
   'hudChrome.raidLockout.title': 'Блокировки рейдов',
   'hudChrome.raidLockout.allReady': 'Все рейды доступны',
   'hudChrome.raidLockout.daysHours': '{d}д {h}ч',

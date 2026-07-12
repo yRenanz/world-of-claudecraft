@@ -5,15 +5,18 @@
 // push-time link revalidation that makes an unlink a revocation barrier.
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_steam_mirror_units';
 
+import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ACHIEVEMENT_MAP } from '../../server/steam/achievement_map';
 import {
   LINK_CACHE_TTL_MS,
+  LOGIN_RECONCILE_TTL_MS,
   MAX_PUSH_ATTEMPTS,
   onDeedRecorded,
   onLinkChanged,
   PUSH_BACKOFF_BASE_MS,
   reconcileLink,
+  reconcileOnLogin,
   resetSteamMirrorForTests,
   setSteamMirrorDepsForTests,
   steamMirrorIdle,
@@ -477,5 +480,120 @@ describe('push-time revalidation read resilience', () => {
     expect(dropLines[0]).toBe(
       `steam mirror: dropping unlock ${MAPPED_ACH}, link revalidation read failed twice`,
     );
+  });
+});
+
+describe('per-attempt revalidation is a mid-ladder revocation barrier', () => {
+  it('an unlink BETWEEN retry attempts stops the ladder: no push to the revoked id', async () => {
+    enableSteam();
+    linkMock.mockResolvedValue({ steamId: STEAM_ID });
+    // Attempt 1 pushes (fails); the unlink lands before attempt 2 can
+    // revalidate. A once-before-the-loop read would have kept pushing to the
+    // dead id for all MAX_PUSH_ATTEMPTS attempts.
+    pushMock.mockImplementationOnce(async () => {
+      linkMock.mockResolvedValue(null);
+      return false;
+    });
+    onDeedRecorded(ACCOUNT_ID, MAPPED_DEED);
+    await settle();
+    // Exactly one push: attempt 2's fresh revalidation saw the revoked link and
+    // dropped the item before pushing again.
+    expect(pushMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('a RELINK to a new id between attempts drops the in-flight item, never pushing the old item to the new id', async () => {
+    enableSteam();
+    linkMock.mockResolvedValue({ steamId: OLD_STEAM_ID });
+    // Attempt 1 targets the old id (fails); a relink to a NEW id lands before
+    // attempt 2 revalidates.
+    pushMock.mockImplementationOnce(async () => {
+      linkMock.mockResolvedValue({ steamId: STEAM_ID });
+      return false;
+    });
+    onDeedRecorded(ACCOUNT_ID, MAPPED_DEED);
+    await settle();
+    expect(pushMock).toHaveBeenCalledTimes(1);
+    // The single push named the OLD id; nothing was ever pushed to the new id
+    // under this (old-id) item.
+    expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({ steamId: OLD_STEAM_ID }));
+    const pushedIds = pushMock.mock.calls.map((c) => c[0].steamId);
+    expect(pushedIds).not.toContain(STEAM_ID);
+  });
+});
+
+describe('reconcile-on-login: the durable heal for a dropped push', () => {
+  it('re-pushes an unlock that the retry ladder dropped (character_deeds is the outbox)', async () => {
+    enableSteam();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    // A live unlock whose push exhausts the ladder and drops: the in-memory
+    // queue holds nothing afterward and grantDeed never re-emits it.
+    pushMock.mockResolvedValue(false);
+    onDeedRecorded(ACCOUNT_ID, MAPPED_DEED);
+    await settle();
+    expect(pushMock).toHaveBeenCalledTimes(MAX_PUSH_ATTEMPTS);
+    expect(warn).toHaveBeenCalledTimes(1);
+    // The next login reconciles from the durable earned set with delivery now
+    // healthy: the dropped unlock is re-pushed to the linked Steam id.
+    pushMock.mockClear();
+    pushMock.mockResolvedValue(true);
+    earnedMock.mockResolvedValue([MAPPED_DEED]);
+    reconcileOnLogin(ACCOUNT_ID);
+    await settle();
+    expect(earnedMock).toHaveBeenCalledWith(ACCOUNT_ID);
+    expect(pushMock).toHaveBeenCalledTimes(1);
+    expect(pushMock).toHaveBeenCalledWith(
+      expect.objectContaining({ steamId: STEAM_ID, achName: MAPPED_ACH }),
+    );
+  });
+
+  it('throttles repeated logins: two calls inside the TTL do exactly one earned read', async () => {
+    enableSteam();
+    earnedMock.mockResolvedValue([MAPPED_DEED]);
+    reconcileOnLogin(ACCOUNT_ID);
+    await settle();
+    reconcileOnLogin(ACCOUNT_ID);
+    await settle();
+    expect(earnedMock).toHaveBeenCalledTimes(1);
+    // Past the TTL the same account reconciles again.
+    clock += LOGIN_RECONCILE_TTL_MS + 1;
+    reconcileOnLogin(ACCOUNT_ID);
+    await settle();
+    expect(earnedMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('is inert while the flag is off (no read, no push)', async () => {
+    reconcileOnLogin(ACCOUNT_ID);
+    await settle();
+    expect(linkMock).not.toHaveBeenCalled();
+    expect(earnedMock).not.toHaveBeenCalled();
+    expect(pushMock).not.toHaveBeenCalled();
+  });
+
+  it('does nothing for an unlinked account: resolves the link, reads no earned set, pushes nothing', async () => {
+    enableSteam();
+    linkMock.mockResolvedValue(null);
+    reconcileOnLogin(ACCOUNT_ID);
+    await settle();
+    expect(earnedMock).not.toHaveBeenCalled();
+    expect(pushMock).not.toHaveBeenCalled();
+  });
+});
+
+describe('server/main.ts shutdown drains the mirror queue', () => {
+  // Source scan (main.ts builds a pg pool at load, so it is never imported):
+  // an unlock still queued in the mirror's in-memory FIFO at shutdown would be
+  // lost on pool.end(), so the drain must await steamMirrorIdle() alongside the
+  // other FIFO drains, right after the deeds-records drain and before the lease
+  // sweep that lets a replacement process reload the same characters.
+  const src = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8');
+
+  it('awaits steamMirrorIdle after deedRecordsIdle and before the lease sweep', () => {
+    expect(src).toContain('await steamMirrorIdle();');
+    const deedIdle = src.indexOf('await deedRecordsIdle();');
+    const steamIdle = src.indexOf('await steamMirrorIdle();');
+    const leaseSweep = src.indexOf('releaseAllCharacterLeases(');
+    expect(deedIdle).toBeGreaterThan(-1);
+    expect(steamIdle).toBeGreaterThan(deedIdle);
+    expect(leaseSweep).toBeGreaterThan(steamIdle);
   });
 });

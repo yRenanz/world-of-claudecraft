@@ -36,6 +36,7 @@ vi.mock('../server/deeds_db', () => ({
 // per-unlock recorder); spy it so that boundary is pinned here.
 vi.mock('../server/steam/mirror', () => ({
   onDeedRecorded: vi.fn(),
+  reconcileOnLogin: vi.fn(),
 }));
 
 import { insertCharacterDeeds } from '../server/deeds_db';

@@ -120,11 +120,12 @@ export function recordDeedUnlock(
  *  into the join path, and a rejected batch logs and continues the chain. An
  *  empty set is a no-op that never touches the tail.
  *
- *  Deliberately does NOT call the Steam onDeedRecorded hook per row. Pushing an
- *  account's entire deed history to the mirror on every login would churn the
- *  push queue for no gain (each already-set achievement is idempotent Steam-
- *  side), and the mirror owns its own reconcileLink path for Steam catch-up.
- *  The character_deeds write is the whole job here. */
+ *  Deliberately does NOT call the Steam onDeedRecorded hook per row: the
+ *  character_deeds write is the whole job here. Steam's own login catch-up is
+ *  owned by mirror.reconcileOnLogin, called separately from the join path
+ *  (server/game.ts) beside this reconcile. It replays the earned-and-mapped
+ *  subset to Steam throttled per account, so a dropped achievement push heals
+ *  without churning the push queue with an account's whole history every join. */
 export function reconcileCharacterDeeds(
   who: { characterId: number; accountId: number },
   deedIds: readonly string[],

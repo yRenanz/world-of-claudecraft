@@ -16,9 +16,17 @@
 // nonce, so a ticket stolen inside its short Steam validity window could link
 // the victim's Steam id to the THIEF'S account (a griefing nuisance: the
 // thief's deeds mirror onto the victim's Steam profile). It can never mint a
-// session or credential; it is bounded by the ticket lifetime, the identity
-// binding, steam_id UNIQUE, and the victim's unlink+relink reclaim path. This
-// equals Steam's own account-linking model.
+// session or credential; it is bounded by the ticket lifetime and the identity
+// binding. The squat is not durable: the real owner reclaims by proof. When the
+// victim posts a fresh valid ticket for the same Steam id, POST /api/steam/link
+// DISPLACES the thief's row (server/steam/routes.ts, displaceSteamLink) rather
+// than answering account_taken, because a fresh ticket proves CURRENT control
+// of the Steam account, strictly stronger than the thief's stale stolen one, so
+// the true owner always wins in steady state. The stronger future design is a
+// server-issued identity challenge: today both ends pin the fixed identity
+// 'wocc-link' (the desktop mints its ticket for it, electron/steam.cjs), so a
+// per-link server nonce would close the theft window entirely, not just bound
+// it. This equals Steam's own account-linking model.
 
 /** The agreed identity string both ends pin: the desktop shell requests its
  *  ticket for this identity and the server verifies with the same value, so a

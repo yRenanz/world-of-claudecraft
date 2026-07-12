@@ -9,9 +9,13 @@
 // SetUserStatsForGame is idempotent for an already-set achievement, so a
 // redelivery (crash replay, retro re-emit, reconcile overlap) is harmless. A
 // push that still fails after the capped retries is DROPPED with one warn
-// line: the server store stays canonical and the reconcile-on-link push heals
-// any gap the next time the player links (no periodic sweep in v1, the
-// Cogmind pattern).
+// line: the in-memory queue holds nothing afterward, so a durable REPLAY heals
+// the gap. character_deeds is that durable outbox (the server store is
+// canonical and Steam is a mirrored subset), and TWO reconcile paths replay
+// from it: reconcile-on-link (the moment an account first links) and
+// reconcile-on-login (every join, per-account throttled), so a linked account
+// that never re-links still catches up. No periodic sweep in v1 (the Cogmind
+// pattern); the login reconcile is the steady-state heal.
 //
 // Secrets: the publisher key is read inside web_api.ts request builders only;
 // no log line here carries a URL, a body, or anything upstream echoed.
@@ -28,6 +32,13 @@ export const MAX_PUSH_ATTEMPTS = 4;
 export const PUSH_BACKOFF_BASE_MS = 1000;
 /** How long a link lookup is trusted before re-reading steam_links. */
 export const LINK_CACHE_TTL_MS = 60_000;
+/** How long after a login reconcile before the same account reconciles again.
+ *  Login churn (reconnects, alt hops) must not re-push an account's whole
+ *  earned-and-mapped history every join, so the login heal is throttled to at
+ *  most once per this window per account. Long relative to the link cache TTL:
+ *  a dropped push is a rare tail event, and the next reconnect after the window
+ *  still heals it. */
+export const LOGIN_RECONCILE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
 
 interface MirrorDeps {
   linkForAccount(accountId: number): Promise<{ steamId: string } | null>;
@@ -176,36 +187,46 @@ async function attemptPush(item: PushItem): Promise<void> {
   // rather than row existence keeps queued pushes flowing after a relink. A
   // REJECTED read proves nothing about the link, so it is retried once (one
   // transient DB blip must not eat a push), and a second rejection drops WITH
-  // a warn line so operators can see the loss instead of a silent gap;
-  // reconcile-on-link heals it either way.
-  let row: { steamId: string } | null;
-  try {
-    row = await deps.linkForAccount(item.accountId);
-  } catch {
+  // a warn line so operators can see the loss instead of a silent gap; a
+  // reconcile (on link or on login) heals it either way.
+  //
+  // Revalidated INSIDE the retry loop, before EVERY attempt, not once before
+  // it: the backoff ladder can span seconds, and an unlink or relink landing
+  // between attempts must stop the very next push, never let attempts 2..N keep
+  // pushing to an id the account no longer controls.
+  for (let attempt = 1; attempt <= MAX_PUSH_ATTEMPTS; attempt++) {
+    let row: { steamId: string } | null;
     try {
       row = await deps.linkForAccount(item.accountId);
     } catch {
-      console.warn(
-        `steam mirror: dropping unlock ${item.achName}, link revalidation read failed twice`,
-      );
-      return;
+      try {
+        row = await deps.linkForAccount(item.accountId);
+      } catch {
+        console.warn(
+          `steam mirror: dropping unlock ${item.achName}, link revalidation read failed twice`,
+        );
+        return;
+      }
     }
-  }
-  if (row?.steamId !== item.steamId) return;
-  for (let attempt = 1; attempt <= MAX_PUSH_ATTEMPTS; attempt++) {
+    if (row?.steamId !== item.steamId) return;
     const ok = await deps.pushUnlock({ key, appId, steamId: item.steamId, achName: item.achName });
     if (ok) return;
     if (attempt < MAX_PUSH_ATTEMPTS) {
       await deps.delay(PUSH_BACKOFF_BASE_MS * 2 ** (attempt - 1));
     }
   }
-  // One fixed line, no URL, no body, no key: reconcile-on-link heals the gap.
+  // One fixed line, no URL, no body, no key: a reconcile heals the gap.
   console.warn(`steam mirror: dropping unlock ${item.achName} after ${MAX_PUSH_ATTEMPTS} attempts`);
 }
 
 // ---------------------------------------------------------------------------
 // Entry points.
 // ---------------------------------------------------------------------------
+
+// Per-account throttle for the login reconcile: the last time (deps.now) an
+// account ran reconcileOnLogin, so login churn cannot re-push whole histories
+// every join. Bounded by LOGIN_RECONCILE_TTL_MS.
+const lastReconciledAt = new Map<number, number>();
 
 /**
  * Mirror one recorded unlock. Called by server/deeds_records.ts AFTER the
@@ -255,6 +276,48 @@ export function reconcileLink(accountId: number, steamId: string): void {
   }
 }
 
+/**
+ * Reconcile-on-login: the steady-state durable heal. A live unlock's push can
+ * exhaust its retry ladder and DROP (delivery is at-least-once and the queue is
+ * in-memory only), and grantDeed never re-emits a deed already in the earned
+ * set, so nothing replays it on its own. reconcile-on-link only fires when an
+ * account FIRST links (an already-linked account never re-links: the route 409s
+ * it), so without this a linked account's dropped push would never heal.
+ * character_deeds IS the durable outbox: on join, re-push the account's
+ * earned-and-mapped set to its currently linked Steam id, idempotent Steam-side.
+ *
+ * Called fire-and-forget from the join path (server/game.ts) beside the
+ * character_deeds reconcile: returns void immediately, is fully guarded so it
+ * can never throw into join, and no-ops unless the flag is on and the account
+ * has a link. Throttled per account (LOGIN_RECONCILE_TTL_MS) so reconnect churn
+ * stays bounded; the throttle stamp is taken even for an unlinked account so a
+ * relink-then-reconnect burst cannot hammer the reads either.
+ */
+export function reconcileOnLogin(accountId: number): void {
+  try {
+    if (!steamEnabled()) return;
+    const now = deps.now();
+    const last = lastReconciledAt.get(accountId);
+    if (last !== undefined && now - last < LOGIN_RECONCILE_TTL_MS) return;
+    lastReconciledAt.set(accountId, now);
+    void cachedSteamId(accountId)
+      .then((steamId) => {
+        if (steamId === null) return;
+        return deps.earnedDeedIds(accountId).then((deedIds) => {
+          for (const deedId of deedIds) {
+            const achName = ACHIEVEMENT_MAP[deedId];
+            if (achName !== undefined) enqueue({ accountId, steamId, achName });
+          }
+        });
+      })
+      .catch((err) => {
+        console.error('steam mirror: login reconcile failed:', err);
+      });
+  } catch (err) {
+    console.error('steam mirror: reconcileOnLogin failed:', err);
+  }
+}
+
 /** The current drain tail, for tests to await deterministic queue settling. */
 export function steamMirrorIdle(): Promise<void> {
   return drain;
@@ -265,6 +328,7 @@ export function resetSteamMirrorForTests(): void {
   queue.length = 0;
   pending.clear();
   linkCache.clear();
+  lastReconciledAt.clear();
   draining = false;
   drain = Promise.resolve();
   deps = REAL_DEPS;

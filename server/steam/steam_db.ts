@@ -82,3 +82,67 @@ export async function insertSteamLink(
 export async function deleteSteamLink(accountId: number): Promise<void> {
   await pool.query('DELETE FROM steam_links WHERE account_id = $1', [accountId]);
 }
+
+/** How a displace attempt resolved: the same insert taxonomy plus the account
+ *  whose link was displaced (null when the Steam id was actually free), so the
+ *  caller can flip that account's cached mirror view in-request. */
+export interface SteamLinkDisplaceResult {
+  result: SteamLinkInsert;
+  displacedAccountId: number | null;
+}
+
+/**
+ * Reclaim-by-proof: hand steamId's link to newAccountId, displacing whatever
+ * OTHER account currently holds it, in ONE transaction. A caller reaching here
+ * has proven CURRENT control of the Steam account with a fresh verified ticket,
+ * strictly stronger evidence than the stale (possibly stolen) ticket the
+ * displaced owner linked with, so the true owner always wins in steady state.
+ *
+ * The transaction locks the steam_id row (FOR UPDATE), deletes the old owner's
+ * row if a DIFFERENT account holds it, then inserts the caller's, so a
+ * concurrent reclaim serializes instead of racing. The final INSERT can still
+ * lose a 23505 to a racer that beat the lock's window; it is re-classified by
+ * constraint exactly like insertSteamLink (account_id PK -> 'account_linked',
+ * steam_id UNIQUE -> 'steam_taken'), both terminal 409s, nothing written on
+ * either. The route pre-checks already answer the same-account already-linked
+ * case, so displacedAccountId is only ever a genuinely different account.
+ */
+export async function displaceSteamLink(
+  newAccountId: number,
+  steamId: string,
+): Promise<SteamLinkDisplaceResult> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const existing = await client.query(
+      'SELECT account_id FROM steam_links WHERE steam_id = $1 FOR UPDATE',
+      [steamId],
+    );
+    const oldOwner: number | null = existing.rows[0]?.account_id ?? null;
+    const displaced = oldOwner !== null && oldOwner !== newAccountId ? oldOwner : null;
+    if (displaced !== null) {
+      await client.query('DELETE FROM steam_links WHERE steam_id = $1 AND account_id <> $2', [
+        steamId,
+        newAccountId,
+      ]);
+    }
+    await client.query('INSERT INTO steam_links (account_id, steam_id) VALUES ($1, $2)', [
+      newAccountId,
+      steamId,
+    ]);
+    await client.query('COMMIT');
+    return { result: 'ok', displacedAccountId: displaced };
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => undefined);
+    if (isUniqueViolation(err)) {
+      // A concurrent request beat this transaction to the INSERT. Classify which
+      // uniqueness lost the race the same way insertSteamLink does; nothing was
+      // written, so no link was displaced either.
+      const mine = await steamLinkForAccount(newAccountId);
+      return { result: mine ? 'account_linked' : 'steam_taken', displacedAccountId: null };
+    }
+    throw err;
+  } finally {
+    client.release();
+  }
+}

@@ -127,6 +127,11 @@ import { createSerialWriter } from './serial_writer';
 import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
+// Imported from the mirror module DIRECTLY (not the ./steam barrel), the same
+// way deeds_records imports onDeedRecorded: the barrel drags routes.ts (and its
+// load-time requireAccount over the db module) into every test that
+// partial-mocks the db, the known overlay-mock breakage class.
+import { reconcileOnLogin } from './steam/mirror';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { holderInfoForPubkey } from './woc_balance';
@@ -2178,6 +2183,13 @@ export class GameServer {
     reconcileCharacterDeeds({ characterId, accountId }, [
       ...(this.sim.meta(pid)?.deedsEarned.keys() ?? []),
     ]);
+    // Steam mirror drift heal (the steady-state counterpart to the link-time
+    // reconcile): a live achievement push can exhaust its retry ladder and
+    // drop, and an already-linked account never re-links, so the login
+    // reconcile is the only path that replays it. Fire-and-forget, fully
+    // guarded, per-account throttled, and a no-op unless STEAM_ENABLED and the
+    // account is linked; it never blocks or reorders the join.
+    reconcileOnLogin(accountId);
     openPlaySession(accountId, characterId, name, meta)
       .then((id) => {
         session.dbSessionId = id;

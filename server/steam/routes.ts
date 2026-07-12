@@ -29,6 +29,7 @@ import { onLinkChanged, reconcileLink } from './mirror';
 import {
   accountForSteamId,
   deleteSteamLink,
+  displaceSteamLink,
   insertSteamLink,
   steamLinkForAccount,
 } from './steam_db';
@@ -69,13 +70,30 @@ async function linkHandler(ctx: Ctx): Promise<void> {
   const steamId = outcome.steamId;
 
   const owner = await accountForSteamId(steamId);
-  if (owner !== null && owner !== accountId) throw new HttpError(409, 'steam.account_taken');
-
-  // The insert re-classifies a 23505 in case a concurrent request beat the
-  // pre-checks; both arms are the same 409s the pre-checks answer.
-  const inserted = await insertSteamLink(accountId, steamId);
-  if (inserted === 'account_linked') throw new HttpError(409, 'steam.already_linked');
-  if (inserted === 'steam_taken') throw new HttpError(409, 'steam.account_taken');
+  if (owner !== null && owner !== accountId) {
+    // Reclaim-by-proof, NOT a 409: this Steam id is currently linked to a
+    // DIFFERENT WoCC account, but the caller just proved CURRENT control of the
+    // Steam account with a fresh verified ticket, strictly stronger evidence
+    // than the stale (possibly stolen) ticket the squatter linked with. Displace
+    // the old row and hand the link to the true owner, so the account that
+    // controls the Steam login always wins in steady state. (The server-issued
+    // identity-challenge in ticket.ts is the stronger future design; today the
+    // fresh-ticket displacement is the reclaim path.)
+    const displaced = await displaceSteamLink(accountId, steamId);
+    if (displaced.result === 'account_linked') throw new HttpError(409, 'steam.already_linked');
+    if (displaced.result === 'steam_taken') throw new HttpError(409, 'steam.account_taken');
+    // Flip the displaced account's cached mirror view in-request so its
+    // in-flight pushes revalidate against a now-empty link and drop, exactly as
+    // unlink does. A peer realm process still heals via its own push-time read.
+    if (displaced.displacedAccountId !== null) onLinkChanged(displaced.displacedAccountId, null);
+  } else {
+    // The Steam id is free. Plain insert; it re-classifies a 23505 in case a
+    // concurrent request beat the pre-checks, both arms the same 409s the
+    // pre-checks answer.
+    const inserted = await insertSteamLink(accountId, steamId);
+    if (inserted === 'account_linked') throw new HttpError(409, 'steam.already_linked');
+    if (inserted === 'steam_taken') throw new HttpError(409, 'steam.account_taken');
+  }
 
   reconcileLink(accountId, steamId);
   json(ctx.res, 200, { linked: true, steamId });

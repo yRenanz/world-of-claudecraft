@@ -36,6 +36,7 @@ vi.mock('../server/deeds_db', () => ({
 // here, not only in the mirror's own isolated suite.
 vi.mock('../server/steam/mirror', () => ({
   onDeedRecorded: vi.fn(),
+  reconcileOnLogin: vi.fn(),
 }));
 
 import { saveCharacterState } from '../server/db';

@@ -15,6 +15,7 @@ vi.mock('../../server/steam/steam_db', () => ({
   steamLinkForAccount: vi.fn(async () => null),
   accountForSteamId: vi.fn(async () => null),
   insertSteamLink: vi.fn(async () => 'ok'),
+  displaceSteamLink: vi.fn(async () => ({ result: 'ok', displacedAccountId: null })),
   deleteSteamLink: vi.fn(async () => {}),
 }));
 vi.mock('../../server/steam/web_api', () => ({
@@ -54,6 +55,7 @@ import { routes } from '../../server/steam/routes';
 import {
   accountForSteamId,
   deleteSteamLink,
+  displaceSteamLink,
   insertSteamLink,
   steamLinkForAccount,
 } from '../../server/steam/steam_db';
@@ -70,6 +72,7 @@ import { type FakeRes, fakeCtx } from './helpers';
 const linkForAccountMock = vi.mocked(steamLinkForAccount);
 const accountForSteamIdMock = vi.mocked(accountForSteamId);
 const insertMock = vi.mocked(insertSteamLink);
+const displaceMock = vi.mocked(displaceSteamLink);
 const deleteMock = vi.mocked(deleteSteamLink);
 const verifyMock = vi.mocked(verifyLinkTicket);
 const reconcileMock = vi.mocked(reconcileLink);
@@ -130,6 +133,7 @@ afterEach(() => {
   linkForAccountMock.mockResolvedValue(null);
   accountForSteamIdMock.mockResolvedValue(null);
   insertMock.mockResolvedValue('ok');
+  displaceMock.mockResolvedValue({ result: 'ok', displacedAccountId: null });
   verifyMock.mockResolvedValue({ kind: 'ok', steamId: STEAM_ID });
 });
 
@@ -289,14 +293,44 @@ describe('POST /api/steam/link', () => {
     expect(reconcileMock).not.toHaveBeenCalled();
   });
 
-  it('409 steam.account_taken when the verified steam id belongs to another account', async () => {
+  it('reclaim-by-proof: a fresh valid ticket for a squatted steam id displaces the old owner and links the caller', async () => {
+    // The behavior deliberately CHANGED: a verified steam id linked to another
+    // account is no longer a 409 account_taken. A fresh valid ticket proves
+    // CURRENT control of the Steam account, strictly stronger than the
+    // squatter's stale (stolen) ticket, so the true owner reclaims it.
     enableSteam();
-    accountForSteamIdMock.mockResolvedValue(99);
+    const OLD_OWNER = 99;
+    accountForSteamIdMock.mockResolvedValue(OLD_OWNER);
+    displaceMock.mockResolvedValue({ result: 'ok', displacedAccountId: OLD_OWNER });
+    const ctx = linkCtx({ ticket: GOOD_TICKET });
+    await handler()(ctx);
+    expect(captured(ctx.res)).toEqual({ status: 200, body: { linked: true, steamId: STEAM_ID } });
+    // Displaced the squatter and linked the caller in one transaction; the plain
+    // insert path was NOT taken.
+    expect(displaceMock).toHaveBeenCalledWith(ACCOUNT.accountId, STEAM_ID);
+    expect(insertMock).not.toHaveBeenCalled();
+    // The displaced owner's cached mirror view is flipped in-request so its
+    // in-flight pushes revalidate against an empty link and drop.
+    expect(onLinkChangedMock).toHaveBeenCalledWith(OLD_OWNER, null);
+    // The caller's already-earned deeds reconcile to the reclaimed id.
+    expect(reconcileMock).toHaveBeenCalledWith(ACCOUNT.accountId, STEAM_ID);
+  });
+
+  it('same-account already-linked is still a 409 pre-check, never a reclaim (displace untouched)', async () => {
+    enableSteam();
+    linkForAccountMock.mockResolvedValue({
+      accountId: ACCOUNT.accountId,
+      steamId: STEAM_ID,
+      createdAt: '2026-01-01T00:00:00.000Z',
+    });
     await expect(handler()(linkCtx({ ticket: GOOD_TICKET }))).rejects.toMatchObject({
       status: 409,
-      code: 'steam.account_taken',
+      code: 'steam.already_linked',
     });
+    // The pre-check answered before any upstream, insert, or reclaim work.
+    expect(verifyMock).not.toHaveBeenCalled();
     expect(insertMock).not.toHaveBeenCalled();
+    expect(displaceMock).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -310,6 +344,22 @@ describe('POST /api/steam/link', () => {
       code,
     });
     expect(reconcileMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['account_linked' as const, 'steam.already_linked'],
+    ['steam_taken' as const, 'steam.account_taken'],
+  ])('maps a displace race arm %s to its 409 (23505 re-classified behind the reclaim)', async (arm, code) => {
+    enableSteam();
+    accountForSteamIdMock.mockResolvedValue(99);
+    displaceMock.mockResolvedValue({ result: arm, displacedAccountId: null });
+    await expect(handler()(linkCtx({ ticket: GOOD_TICKET }))).rejects.toMatchObject({
+      status: 409,
+      code,
+    });
+    // A lost race wrote nothing, so no reconcile and no cache flip.
+    expect(reconcileMock).not.toHaveBeenCalled();
+    expect(onLinkChangedMock).not.toHaveBeenCalled();
   });
 });
 

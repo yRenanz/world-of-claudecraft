@@ -1556,6 +1556,10 @@ export interface GatherNodeDef {
   zoneId: string;
   type: GatherNodeType;
   pos: { x: number; z: number };
+  // Effective content level for the profession-XP green/gray curve
+  // (professions/profession_xp.ts gatherActionXp), snapshotted at authoring
+  // time from the node's zone levelRange midpoint rather than looked up live.
+  level: number;
 }
 
 export interface DungeonSpawn {

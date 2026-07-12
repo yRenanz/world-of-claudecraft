@@ -215,11 +215,19 @@ describe('POST /api/steam/link', () => {
     expect(reconcileMock).toHaveBeenCalledWith(ACCOUNT.accountId, STEAM_ID);
   });
 
-  it('links with a max-size (5120 hex) ticket: the clamp admits it and verification runs', async () => {
+  it('links with a max-size (5120 hex) ticket through the REAL chain: clamp and body cap both admit it', async () => {
+    // Through runRoute (gate -> auth -> limiter -> body -> handler), not a
+    // preset ctx.body: the body middleware's own size ceiling must admit a
+    // max-size ticket's JSON envelope too, or the clamp headroom is theater.
     enableSteam();
     const maxTicket = 'b'.repeat(5120);
-    const ctx = linkCtx({ ticket: maxTicket });
-    await handler()(ctx);
+    const ctx = fakeCtx({
+      method: 'POST',
+      url: '/api/steam/link',
+      headers: { authorization: `Bearer ${'a'.repeat(64)}` },
+      body: { ticket: maxTicket },
+    });
+    await runRoute(routeFor('POST', '/api/steam/link'), ctx);
     expect(captured(ctx.res)).toEqual({
       status: 200,
       body: { linked: true, steamId: STEAM_ID },

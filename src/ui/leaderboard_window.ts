@@ -283,8 +283,11 @@ export class LeaderboardWindow {
   // The Renown tab: same async + page-control shape as the other boards, but
   // the board is account-scored and character-faced, so the viewer's standing
   // is the server-resolved `self` line (an account-level rank the client
-  // cannot derive), rendered under the rows when present. Offline (or logged
-  // out) this resolves the empty state; a rejection is the error state.
+  // cannot derive), rendered under the rows when present. That same rank
+  // marks the viewer's own row inside the core, so no viewer identity is
+  // passed here (the character name would miss alts and match same-named
+  // cross-realm characters). Offline (or logged out) this resolves the empty
+  // state; a rejection is the error state.
   private async renderDeedsBoard(
     el: HTMLElement,
     world: IWorld,
@@ -302,9 +305,7 @@ export class LeaderboardWindow {
     if (!body) return;
 
     const view = buildDeedsLeaderboardView(
-      result === null
-        ? { kind: 'error' }
-        : { kind: 'page', page: result, viewerName: world.player.name },
+      result === null ? { kind: 'error' } : { kind: 'page', page: result },
     );
 
     if (view.kind === 'error') {

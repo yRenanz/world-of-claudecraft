@@ -10,10 +10,14 @@
 // through deed_i18n.ts, never this core.
 //
 // The board is account-scored but character-faced (each row is the account's
-// highest-Renown character), so the viewer's own row is flagged `me` by
-// character name, and the account's own standing arrives as the server-side
-// `self` line instead of a computed sticky row: the client cannot derive an
-// account-level rank from what it can see.
+// highest-Renown character), so the viewer's own row is flagged `me` by the
+// server-resolved account rank on the page's `self` line (rank is a strict
+// total order, so equality identifies the row exactly). Names are not
+// identity here: the viewer may be on a lower alt, and the board is global
+// across realms, so a same-named cross-realm character must not match. The
+// same `self` line doubles as the account's own standing instead of a
+// computed sticky row: the client cannot derive an account-level rank from
+// what it can see.
 
 import { CLASSES } from '../sim/data';
 import type { PlayerClass } from '../sim/types';
@@ -34,7 +38,8 @@ export interface DeedsLeaderboardRow {
   /** The display character's selected title as a DEED ID (null untitled);
    *  the painter localizes through deed_i18n.ts. */
   title: string | null;
-  /** True for the viewer's own display character (matched by name). */
+  /** True for the viewer's own account row (matched by the server-resolved
+   *  account rank, `page.self.rank`, never by character name). */
   me: boolean;
 }
 
@@ -62,12 +67,12 @@ export type DeedsLeaderboardView =
     };
 
 /** The painter feeds the builder the in-flight loading discriminator, the
- *  rejection/offline error discriminator, or an already-resolved page (plus
- *  the viewer's character name to flag their own display row). */
+ *  rejection/offline error discriminator, or an already-resolved page (the
+ *  page's server-resolved `self` rank flags the viewer's own row). */
 export type DeedsLeaderboardInput =
   | { kind: 'loading' }
   | { kind: 'error' }
-  | { kind: 'page'; page: DeedsLeaderboardPage; viewerName?: string | null };
+  | { kind: 'page'; page: DeedsLeaderboardPage };
 
 /**
  * Build the Renown-tab view-model. `loading` / `error` map straight through.
@@ -82,7 +87,7 @@ export function buildDeedsLeaderboardView(input: DeedsLeaderboardInput): DeedsLe
   const { page } = input;
   const entries = page.leaders;
   if (entries.length === 0) return { kind: 'empty' };
-  const viewer = input.viewerName ?? '';
+  const selfRank = page.self?.rank ?? null;
   const rows: DeedsLeaderboardRow[] = entries.map((e) => ({
     rank: e.rank,
     name: e.name,
@@ -93,7 +98,7 @@ export function buildDeedsLeaderboardView(input: DeedsLeaderboardInput): DeedsLe
     renown: e.renown,
     deedCount: e.deedCount,
     title: e.title,
-    me: viewer !== '' && e.name === viewer,
+    me: selfRank !== null && e.rank === selfRank,
   }));
   const pager: LeaderboardPager | null =
     page.pageCount <= 1

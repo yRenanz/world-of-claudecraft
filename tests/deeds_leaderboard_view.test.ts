@@ -2,7 +2,7 @@
 //  - the async state machine: loading / error / empty / ranked discriminators,
 //  - row derivation (rank, name, realm, class + knownClass, level, renown,
 //    deedCount, and the TITLE passed through as a DEED ID, never text),
-//  - the viewer's own display-character row flagged `me` by name,
+//  - the viewer's own row flagged `me` by the server-resolved account rank,
 //  - the server-resolved `self` standing passed through (null when absent),
 //  - the pager state and the server page-clamp passthrough,
 //  - parity: a Sim-shaped empty page (the offline sandbox has no account
@@ -108,26 +108,62 @@ describe('buildDeedsLeaderboardView', () => {
     expect(view.rows[0].knownClass).toBe(false);
   });
 
-  it('flags the viewer display row me by exact character name', () => {
+  it('flags exactly the row whose rank equals the server-resolved self rank, whatever its name', () => {
+    // The board is account-scored and character-faced: the viewer may be
+    // logged in on a lower alt whose name never appears on the board, so
+    // identity is the account rank the server resolved, not the name.
     const view = buildDeedsLeaderboardView({
       kind: 'page',
       page: page({
         leaders: [entry({ rank: 1, name: 'Aldwin' }), entry({ rank: 2, name: 'Berrin' })],
         total: 2,
+        self: { rank: 2, topPercent: 4 },
       }),
-      viewerName: 'Berrin',
     });
     if (view.kind !== 'ranked') throw new Error('expected ranked');
     expect(view.rows[0].me).toBe(false);
     expect(view.rows[1].me).toBe(true);
   });
 
-  it('does not flag any row me when the viewer name is absent, empty, or null', () => {
-    for (const viewerName of [undefined, '', null] as const) {
-      const view = buildDeedsLeaderboardView({ kind: 'page', page: page(), viewerName });
-      if (view.kind !== 'ranked') throw new Error('expected ranked');
-      expect(view.rows[0].me).toBe(false);
-    }
+  it('does not flag a same-named row when self is null or points at a different rank', () => {
+    // The board is global across realms, so a same-named cross-realm
+    // character must never read as the viewer.
+    const noSelf = buildDeedsLeaderboardView({
+      kind: 'page',
+      page: page({ leaders: [entry({ rank: 1, name: 'Aldwin' })] }),
+    });
+    if (noSelf.kind !== 'ranked') throw new Error('expected ranked');
+    expect(noSelf.rows[0].me).toBe(false);
+
+    const otherRank = buildDeedsLeaderboardView({
+      kind: 'page',
+      page: page({
+        leaders: [entry({ rank: 1, name: 'Aldwin' }), entry({ rank: 2, name: 'Aldwin' })],
+        total: 2,
+        self: { rank: 2, topPercent: 4 },
+      }),
+    });
+    if (otherRank.kind !== 'ranked') throw new Error('expected ranked');
+    expect(otherRank.rows[0].me).toBe(false);
+    expect(otherRank.rows[1].me).toBe(true);
+  });
+
+  it('flags nothing when self is absent or its rank is off the visible page', () => {
+    const absent = buildDeedsLeaderboardView({ kind: 'page', page: page() });
+    if (absent.kind !== 'ranked') throw new Error('expected ranked');
+    expect(absent.rows.every((r) => !r.me)).toBe(true);
+
+    const offPage = buildDeedsLeaderboardView({
+      kind: 'page',
+      page: page({
+        leaders: [entry({ rank: 1 }), entry({ rank: 2, name: 'Berrin' })],
+        total: 120,
+        pageCount: 3,
+        self: { rank: 90, topPercent: 75 },
+      }),
+    });
+    if (offPage.kind !== 'ranked') throw new Error('expected ranked');
+    expect(offPage.rows.every((r) => !r.me)).toBe(true);
   });
 
   it('passes the server-resolved self standing through, null when absent', () => {
@@ -168,7 +204,10 @@ describe('buildDeedsLeaderboardView', () => {
   });
 
   it('is deterministic for the same input', () => {
-    const input: DeedsLeaderboardInput = { kind: 'page', page: page(), viewerName: 'Aldwin' };
+    const input: DeedsLeaderboardInput = {
+      kind: 'page',
+      page: page({ self: { rank: 1, topPercent: 1 } }),
+    };
     expect(buildDeedsLeaderboardView(input)).toEqual(buildDeedsLeaderboardView(input));
   });
 

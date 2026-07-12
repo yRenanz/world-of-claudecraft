@@ -224,8 +224,9 @@ describe('leaderboard_window: Renown (deeds) board tab', () => {
     expect(code).toContain('world.deedsLeaderboard(this.page, LEADERBOARD_PAGE_SIZE)');
   });
 
-  it('passes the viewer character name so their display row can be flagged', () => {
-    expect(code).toContain('viewerName: world.player.name');
+  it('hands the core only the resolved page: the me row comes from the server self rank', () => {
+    expect(code).toContain("result === null ? { kind: 'error' } : { kind: 'page', page: result },");
+    expect(code).not.toContain('viewerName');
   });
 
   it('keeps its own page state so the tab pages independently', () => {

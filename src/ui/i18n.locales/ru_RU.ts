@@ -120,6 +120,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.result':
     'Проверка готовности: {ready} готовы, {notReady} не готовы, {noResponse} без ответа.',
   'hudChrome.loot.chestTitle': 'Сундук',
+  'hudChrome.loot.takeAllTooltip': 'Взять все: забрать все монеты и предметы из этого окна добычи.',
   'hudChrome.itemTooltip.requiresLevel': 'Требуется уровень {level}',
   'hudChrome.spellbook.addToBarAria': 'Добавить {name} на панель действий',
   'hudChrome.spellbook.removeFromBarAria': 'Убрать {name} с панели действий',
@@ -246,6 +247,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.concentrateHint':
     'Чем меньше выбрано компонентов, тем выше их качество.',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Этот труп уже был собран.',
+  'hudChrome.corpseHarvest.harvestButtonTooltip':
+    'Добыча: собрать с этого трупа материалы для крафта (шкура, клык, шелк и подобные компоненты) отдельно от добычи. Добывать может любой, но каждый труп может обработать только один игрок.',
   'hudChrome.corpseHarvest.componentAria': 'Собрать {component}',
   'hudChrome.corpseHarvest.components.hide': 'Шкура',
   'hudChrome.corpseHarvest.components.fang': 'Клык',

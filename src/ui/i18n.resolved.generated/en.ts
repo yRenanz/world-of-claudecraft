@@ -931,6 +931,7 @@ export const en: EnTranslations = {
     "corpseHarvest": {
       "title": "Harvest",
       "harvestButton": "Harvest",
+      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
       "concentrateHint": "Fewer chosen components yield a higher tier each.",
       "alreadyHarvested": "This corpse has already been harvested.",
       "componentAria": "Harvest {component}",
@@ -1111,7 +1112,8 @@ export const en: EnTranslations = {
       "resetErrInvalid": "This reset link is invalid or has expired. Request a new one."
     },
     "loot": {
-      "chestTitle": "Chest"
+      "chestTitle": "Chest",
+      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
     },
     "spellbook": {
       "addToBarAria": "Add {name} to action bar",

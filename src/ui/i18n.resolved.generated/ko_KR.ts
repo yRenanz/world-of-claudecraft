@@ -931,6 +931,7 @@ export const ko_KR: EnTranslations = {
     "corpseHarvest": {
       "title": "채집",
       "harvestButton": "채집",
+      "harvestButtonTooltip": "채집: 이 시체에서 전리품과 별개로 제작 재료(가죽, 송곳니, 실크 등)를 모읍니다. 누구나 채집할 수 있지만, 하나의 시체는 한 명의 플레이어만 채집할 수 있습니다.",
       "concentrateHint": "선택한 부위가 적을수록 부위당 등급이 더 높아집니다.",
       "alreadyHarvested": "이 시체는 이미 채집되었습니다.",
       "componentAria": "{component} 채집",
@@ -1111,7 +1112,8 @@ export const ko_KR: EnTranslations = {
       "resetErrInvalid": "이 재설정 링크가 유효하지 않거나 만료되었습니다. 새 링크를 요청하세요."
     },
     "loot": {
-      "chestTitle": "상자"
+      "chestTitle": "상자",
+      "takeAllTooltip": "모두 가져가기: 이 전리품 창의 모든 돈과 아이템을 가져갑니다."
     },
     "spellbook": {
       "addToBarAria": "{name}을(를) 행동 단축바에 추가",

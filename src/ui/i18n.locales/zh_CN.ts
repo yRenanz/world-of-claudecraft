@@ -112,6 +112,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.result':
     '准备确认：{ready} 人就绪，{notReady} 人未准备，{noResponse} 人未响应。',
   'hudChrome.loot.chestTitle': '宝箱',
+  'hudChrome.loot.takeAllTooltip': '全部拾取：收取此战利品窗口中的所有金币和物品。',
   'hudChrome.itemTooltip.requiresLevel': '需要等级 {level}',
   'hudChrome.spellbook.addToBarAria': '将{name}添加到动作条',
   'hudChrome.spellbook.removeFromBarAria': '从动作条移除{name}',
@@ -229,6 +230,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestButton': '采集',
   'hudChrome.corpseHarvest.concentrateHint': '选择的部位越少，每个部位的品质越高。',
   'hudChrome.corpseHarvest.alreadyHarvested': '这具尸体已经被采集过了。',
+  'hudChrome.corpseHarvest.harvestButtonTooltip':
+    '采集：从这具尸体上获取制作材料（兽皮、尖牙、丝线等类似部位），与战利品分开。任何人都可以采集，但每具尸体只能被一名玩家采集。',
   'hudChrome.corpseHarvest.componentAria': '采集{component}',
   'hudChrome.corpseHarvest.components.hide': '兽皮',
   'hudChrome.corpseHarvest.components.fang': '尖牙',

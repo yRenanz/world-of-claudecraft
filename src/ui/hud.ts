@@ -11491,6 +11491,7 @@ export class Hud {
       const btn = document.createElement('button');
       btn.className = 'btn';
       btn.textContent = t('itemUi.loot.takeAll');
+      btn.title = t('hudChrome.loot.takeAllTooltip');
       btn.addEventListener('click', () => {
         this.sim.lootCorpse(mobId);
         this.closeLoot();

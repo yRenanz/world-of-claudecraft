@@ -931,6 +931,7 @@ export const en_XA: EnTranslations = {
     "corpseHarvest": {
       "title": "[Ĥáŕʋéšţ]",
       "harvestButton": "[Ĥáŕʋéšţ]",
+      "harvestButtonTooltip": "[Ĥáŕʋéšţ: ĝáţĥéŕ çŕáƒţíñĝ ɱáţéŕíáļš ƒŕóɱ ţĥíš çóŕþšé (ĥíðé, ƒáñĝ, šíļķ, áñð šíɱíļáŕ çóɱþóñéñţš), šéþáŕáţé ƒŕóɱ áñý ļóóţ. Áñýóñé çáñ ĥáŕʋéšţ; óñļý óñé þļáýéŕ ɱáý ĥáŕʋéšţ á ĝíʋéñ çóŕþšé.]",
       "concentrateHint": "[Ƒéŵéŕ çĥóšéñ çóɱþóñéñţš ýíéļð á ĥíĝĥéŕ ţíéŕ éáçĥ.]",
       "alreadyHarvested": "[Ţĥíš çóŕþšé ĥáš áļŕéáðý ƀééñ ĥáŕʋéšţéð.]",
       "componentAria": "[Ĥáŕʋéšţ {component}]",
@@ -1111,7 +1112,8 @@ export const en_XA: EnTranslations = {
       "resetErrInvalid": "[Ţĥíš ŕéšéţ ļíñķ íš íñʋáļíð óŕ ĥáš éẋþíŕéð. Ŕéɋúéšţ á ñéŵ óñé.]"
     },
     "loot": {
-      "chestTitle": "[Çĥéšţ]"
+      "chestTitle": "[Çĥéšţ]",
+      "takeAllTooltip": "[Ţáķé Áļļ: çóļļéçţ éʋéŕý çóíñ áñð íţéɱ íñ ţĥíš ļóóţ ŵíñðóŵ.]"
     },
     "spellbook": {
       "addToBarAria": "[Áðð {name} ţó áçţíóñ ƀáŕ]",

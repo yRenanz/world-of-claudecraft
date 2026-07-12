@@ -931,6 +931,7 @@ export const ja_JP: EnTranslations = {
     "corpseHarvest": {
       "title": "採取",
       "harvestButton": "採取",
+      "harvestButtonTooltip": "採取：この死体から製作素材（毛皮、牙、絹糸など）を戦利品とは別に集めます。誰でも採取できますが、1体の死体を採取できるのは1人だけです。",
       "concentrateHint": "選ぶ部位が少ないほど、各部位の品質が高くなります。",
       "alreadyHarvested": "この死体はすでに採取されています。",
       "componentAria": "{component}を採取",
@@ -1111,7 +1112,8 @@ export const ja_JP: EnTranslations = {
       "resetErrInvalid": "このリセットリンクは無効か、有効期限が切れています。新しいリンクをリクエストしてください。"
     },
     "loot": {
-      "chestTitle": "宝箱"
+      "chestTitle": "宝箱",
+      "takeAllTooltip": "すべて取る：この戦利品ウィンドウ内のすべてのお金とアイテムを回収します。"
     },
     "spellbook": {
       "addToBarAria": "{name}をアクションバーに追加",

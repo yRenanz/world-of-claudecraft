@@ -535,7 +535,7 @@
       "tick": 470,
       "time": 23.5,
       "nextId": 412,
-      "state": "1fcd2fc1",
+      "state": "76afd6d6",
       "events": "40c3972b",
       "rng": {
         "draws": 2133,
@@ -546,7 +546,7 @@
       "tick": 480,
       "time": 24,
       "nextId": 412,
-      "state": "e895d7ce",
+      "state": "42b6c8cf",
       "events": "3b879573",
       "rng": {
         "draws": 2175,
@@ -557,7 +557,7 @@
       "tick": 490,
       "time": 24.5,
       "nextId": 412,
-      "state": "509b2c0f",
+      "state": "051fc358",
       "events": "3b879573",
       "rng": {
         "draws": 2218,
@@ -568,7 +568,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 412,
-      "state": "f1761404",
+      "state": "ad175973",
       "events": "dde65e41",
       "rng": {
         "draws": 2262,
@@ -579,7 +579,7 @@
       "tick": 510,
       "time": 25.5,
       "nextId": 412,
-      "state": "72a8c2ec",
+      "state": "98d34f2b",
       "events": "2222965b",
       "rng": {
         "draws": 2311,
@@ -590,7 +590,7 @@
       "tick": 520,
       "time": 26,
       "nextId": 412,
-      "state": "462328a8",
+      "state": "fcc7195f",
       "events": "2222965b",
       "rng": {
         "draws": 2369,
@@ -601,7 +601,7 @@
       "tick": 530,
       "time": 26.5,
       "nextId": 412,
-      "state": "b6925956",
+      "state": "1ca872d1",
       "events": "dc18739b",
       "rng": {
         "draws": 2430,
@@ -612,7 +612,7 @@
       "tick": 540,
       "time": 27,
       "nextId": 412,
-      "state": "877c1aae",
+      "state": "1e0ce779",
       "events": "b31b9bee",
       "rng": {
         "draws": 2473,
@@ -623,7 +623,7 @@
       "tick": 550,
       "time": 27.5,
       "nextId": 412,
-      "state": "740faa98",
+      "state": "0928e74f",
       "events": "b31b9bee",
       "rng": {
         "draws": 2527,
@@ -634,7 +634,7 @@
       "tick": 560,
       "time": 28,
       "nextId": 412,
-      "state": "2fb1a31e",
+      "state": "8a494ee9",
       "events": "58ec978b",
       "rng": {
         "draws": 2576,
@@ -645,7 +645,7 @@
       "tick": 570,
       "time": 28.5,
       "nextId": 412,
-      "state": "c00deca0",
+      "state": "2bb5d0a7",
       "events": "b97f49a6",
       "rng": {
         "draws": 2631,
@@ -656,7 +656,7 @@
       "tick": 573,
       "time": 28.65,
       "nextId": 412,
-      "state": "b8db08dc",
+      "state": "012cce9b",
       "events": "741638a5",
       "rng": {
         "draws": 2649,
@@ -686,7 +686,9 @@
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
-            "counters": {},
+            "counters": {
+              "damageDealt": 448
+            },
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",

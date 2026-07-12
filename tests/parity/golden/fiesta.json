@@ -74,7 +74,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 412,
-      "state": "72f58f98",
+      "state": "1802fe11",
       "events": "b509200e",
       "rng": {
         "draws": 385,
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 412,
-      "state": "07028bac",
+      "state": "a57ac7e5",
       "events": "741638a5",
       "rng": {
         "draws": 537,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 412,
-      "state": "7e137afb",
+      "state": "c8cc5040",
       "events": "ba8c5aac",
       "rng": {
         "draws": 606,
@@ -124,7 +124,9 @@
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
-            "counters": {},
+            "counters": {
+              "damageDealt": 510
+            },
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",

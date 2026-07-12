@@ -1047,7 +1047,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 412,
-      "state": "25904597",
+      "state": "42ab5a11",
       "events": "85d9b432",
       "rng": {
         "draws": 300,
@@ -1077,7 +1077,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 100
+              "damageDealt": 5000
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1534,7 +1534,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 412,
-      "state": "56d943cf",
+      "state": "308dbd19",
       "events": "741638a5",
       "rng": {
         "draws": 429,
@@ -1545,7 +1545,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 412,
-      "state": "8b0ba087",
+      "state": "35fa1f01",
       "events": "741638a5",
       "rng": {
         "draws": 524,
@@ -1575,7 +1575,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 100
+              "damageDealt": 5000
             },
             "dungeonClears": {},
             "itemsDiscovered": [

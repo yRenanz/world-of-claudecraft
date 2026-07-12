@@ -289,7 +289,7 @@
       "tick": 61,
       "time": 3.05,
       "nextId": 410,
-      "state": "b7bb5a2c",
+      "state": "20a24107",
       "events": "a8bd51a8",
       "rng": {
         "draws": 78,
@@ -317,6 +317,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
+              "damageDealt": 53,
               "duelsWon": 1
             },
             "dungeonClears": {},
@@ -520,7 +521,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 410,
-      "state": "c6cb0b97",
+      "state": "08259460",
       "events": "30ae529b",
       "rng": {
         "draws": 150,
@@ -531,7 +532,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 410,
-      "state": "41f2b49f",
+      "state": "1cf2c478",
       "events": "741638a5",
       "rng": {
         "draws": 262,
@@ -542,7 +543,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 410,
-      "state": "02f221c9",
+      "state": "491d9cb2",
       "events": "741638a5",
       "rng": {
         "draws": 263,
@@ -570,6 +571,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
+              "damageDealt": 53,
               "duelsWon": 1
             },
             "dungeonClears": {},

@@ -703,7 +703,12 @@ describe('Fiesta sites', () => {
     const winner = addMeta(sim, 'Champ');
     const loser = addMeta(sim, 'Runner');
     winner.fiestaAugments = ['a', 'b', 'c']; // one pick per wave, three waves
-    onArenaMatchEndForDeeds(sim.ctx, fiestaMatch(sim, [winner.entityId], [loser.entityId]), 'A');
+    onArenaMatchEndForDeeds(
+      sim.ctx,
+      fiestaMatch(sim, [winner.entityId], [loser.entityId]),
+      'A',
+      true,
+    );
     expect(winner.deedsEarned.has('pvp_fiesta_first_bout')).toBe(true);
     expect(loser.deedsEarned.has('pvp_fiesta_first_bout')).toBe(true);
     expect(winner.deedsEarned.has('pvp_fiesta_first_win')).toBe(true);
@@ -715,9 +720,65 @@ describe('Fiesta sites', () => {
     const w2 = addMeta(short, 'Champ');
     const l2 = addMeta(short, 'Runner');
     w2.fiestaAugments = ['a', 'b'];
-    onArenaMatchEndForDeeds(short.ctx, fiestaMatch(short, [w2.entityId], [l2.entityId]), 'A');
+    onArenaMatchEndForDeeds(short.ctx, fiestaMatch(short, [w2.entityId], [l2.entityId]), 'A', true);
     expect(w2.deedsEarned.has('pvp_fiesta_first_win')).toBe(true);
     expect(w2.deedsEarned.has('pvp_fiesta_full_build')).toBe(false);
+  });
+
+  it('a forfeit-ended bout grants the full-bout deed to nobody but keeps the win family', () => {
+    const sim = makeSim();
+    const winner = addMeta(sim, 'Champ');
+    const loser = addMeta(sim, 'Quitter');
+    winner.fiestaAugments = ['a', 'b', 'c'];
+    onArenaMatchEndForDeeds(
+      sim.ctx,
+      fiestaMatch(sim, [winner.entityId], [loser.entityId]),
+      'A',
+      false,
+    );
+    // The bout never ran to completion: no one fought a full bout.
+    expect(winner.deedsEarned.has('pvp_fiesta_first_bout')).toBe(false);
+    expect(loser.deedsEarned.has('pvp_fiesta_first_bout')).toBe(false);
+    // The win family still counts (mirrors the ranked ladder on forfeits).
+    expect(winner.deedsEarned.has('pvp_fiesta_first_win')).toBe(true);
+    expect(winner.deedsEarned.has('pvp_fiesta_full_build')).toBe(true);
+    expect(loser.deedsEarned.has('pvp_fiesta_first_win')).toBe(false);
+
+    // A forfeit winner one pick short keeps the win but not the full build.
+    const short = makeSim();
+    const w2 = addMeta(short, 'Champ');
+    const l2 = addMeta(short, 'Quitter');
+    w2.fiestaAugments = ['a', 'b'];
+    onArenaMatchEndForDeeds(
+      short.ctx,
+      fiestaMatch(short, [w2.entityId], [l2.entityId]),
+      'A',
+      false,
+    );
+    expect(w2.deedsEarned.has('pvp_fiesta_first_win')).toBe(true);
+    expect(w2.deedsEarned.has('pvp_fiesta_full_build')).toBe(false);
+  });
+
+  it('a ranked forfeit still grants the first-match deed', () => {
+    const sim = makeSim();
+    const stayer = addMeta(sim, 'Stayer');
+    const quitter = addMeta(sim, 'Quitter');
+    const match: ArenaMatch = {
+      id: 1,
+      format: '1v1',
+      teamA: [stayer.entityId],
+      teamB: [quitter.entityId],
+      slot: 0,
+      state: 'active',
+      timer: 0,
+      returns: new Map(),
+      ratingA: 1500,
+      ratingB: 1500,
+      defeated: new Set(),
+    };
+    onArenaMatchEndForDeeds(sim.ctx, match, 'A', false);
+    expect(stayer.deedsEarned.has('pvp_arena_first_match')).toBe(true);
+    expect(quitter.deedsEarned.has('pvp_arena_first_match')).toBe(true);
   });
 
   it('a bot-seated bout blocks all fiesta end-of-bout credit', () => {
@@ -725,7 +786,7 @@ describe('Fiesta sites', () => {
     const human = addMeta(sim, 'Human');
     const bot = addMeta(sim, 'Bot');
     sim.ctx.fiestaBotPids.push(bot.entityId);
-    onArenaMatchEndForDeeds(sim.ctx, fiestaMatch(sim, [human.entityId], [bot.entityId]), 'A');
+    onArenaMatchEndForDeeds(sim.ctx, fiestaMatch(sim, [human.entityId], [bot.entityId]), 'A', true);
     expect(human.deedsEarned.has('pvp_fiesta_first_bout')).toBe(false);
     expect(human.deedsEarned.has('pvp_fiesta_first_win')).toBe(false);
   });

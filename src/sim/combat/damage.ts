@@ -195,6 +195,9 @@ export function dealDamage(
         ability,
         kind,
       });
+      // Book of Deeds: the clamped terminal hit counts (zero rng; the early
+      // return skips the shared deed site and the session RewardCounters).
+      if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       ctx.endDuel(duel, sourcePlayer.id);
       return;
     }
@@ -237,6 +240,8 @@ export function dealDamage(
         ability,
         kind,
       });
+      // Book of Deeds: the clamped terminal hit counts (zero rng).
+      if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       ctx.fiestaTakedown(match, sourcePlayer.id, target);
       return;
     }
@@ -263,6 +268,8 @@ export function dealDamage(
         ability,
         kind,
       });
+      // Book of Deeds: the clamped terminal hit counts (zero rng).
+      if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       ctx.yumiPlayerDown(match, target, sourcePlayer.id);
       return;
     }
@@ -293,6 +300,8 @@ export function dealDamage(
         ability,
         kind,
       });
+      // Book of Deeds: the clamped terminal hit counts (zero rng).
+      if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       handleDeath(ctx, target, source);
       const loserTeam = ctx.arenaTeamOf(match, target.id);
       if (loserTeam && ctx.isArenaTeamWiped(match, loserTeam)) {

@@ -992,10 +992,13 @@ export function retroFallbackGrants(ctx: SimContext, meta: PlayerMeta): void {
 // ---------------------------------------------------------------------------
 
 /** Damage bookkeeping: the persisted lifetime counters beside the session
- *  RewardCounters (same site, same amounts, minus the training dummy), plus
- *  encounter participant tracking. Called from the dealDamage
- *  post-mitigation path with a non-null source; draws no rng and never
- *  branches sim behavior. */
+ *  RewardCounters (same shared site, same amounts, minus the training dummy),
+ *  plus encounter participant tracking. Unlike the session ledger, the deed
+ *  counters ALSO count the terminal PvP hits whose arms return before the
+ *  shared site (duel finisher, fiesta takedown, yumi player-down, ranked
+ *  arena elimination); the yumi cat stays uncounted (a mode-scoped objective
+ *  mob, not combat). Called from the dealDamage post-mitigation path with a
+ *  non-null source; draws no rng and never branches sim behavior. */
 export function onDamageDealtForDeeds(
   ctx: SimContext,
   source: Entity,
@@ -1389,11 +1392,16 @@ export function onFiestaPowerupForDeeds(
 /** Arena match resolution: ranked standings feed the meter deeds (marked
  *  dirty here so rating bands grant the same tick), the first-match grant
  *  covers draws the win/loss meters cannot see, and the Fiesta end-of-bout
- *  moments resolve while the augment picks are still on the meta. */
+ *  moments resolve while the augment picks are still on the meta.
+ *  completedBout is false when the bout ended on a forfeit: the win-family
+ *  grants and the ranked branch still count (mirroring the ranked ladder,
+ *  so a disconnect cannot grief an earned win), but the full-bout deed
+ *  requires the bout to run to completion (a timeout is a completed bout). */
 export function onArenaMatchEndForDeeds(
   ctx: SimContext,
   match: ArenaMatch,
   winnerTeam: 'A' | 'B' | null,
+  completedBout: boolean,
 ): void {
   const ranked = !match.fiesta && !match.yumi;
   const pids = [...match.teamA, ...match.teamB];
@@ -1409,9 +1417,11 @@ export function onArenaMatchEndForDeeds(
   }
   if (match.fiesta && fiestaBoutCountsForDeeds(ctx, match)) {
     const winners = winnerTeam === 'A' ? match.teamA : winnerTeam === 'B' ? match.teamB : [];
-    for (const pid of pids) {
-      const meta = ctx.players.get(pid);
-      if (meta) grantDeed(ctx, meta, 'pvp_fiesta_first_bout');
+    if (completedBout) {
+      for (const pid of pids) {
+        const meta = ctx.players.get(pid);
+        if (meta) grantDeed(ctx, meta, 'pvp_fiesta_first_bout');
+      }
     }
     for (const pid of winners) {
       const meta = ctx.players.get(pid);

@@ -493,7 +493,7 @@
       "tick": 102,
       "time": 5.1,
       "nextId": 412,
-      "state": "a1a6a625",
+      "state": "094501b0",
       "events": "f89dcd86",
       "rng": {
         "draws": 281,
@@ -519,7 +519,9 @@
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
-            "counters": {},
+            "counters": {
+              "damageDealt": 62
+            },
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
@@ -924,8 +926,8 @@
       "tick": 103,
       "time": 5.15,
       "nextId": 412,
-      "state": "418cedf4",
-      "events": "64ee4ed7",
+      "state": "c624241e",
+      "events": "0be01f7f",
       "rng": {
         "draws": 284,
         "digest": "22941d42"
@@ -951,7 +953,9 @@
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
-            "counters": {},
+            "counters": {
+              "damageDealt": 113
+            },
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
@@ -1400,7 +1404,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 412,
-      "state": "d135ca1c",
+      "state": "f5f97c86",
       "events": "741638a5",
       "rng": {
         "draws": 411,
@@ -1411,7 +1415,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 412,
-      "state": "dee3639e",
+      "state": "5f2477e0",
       "events": "741638a5",
       "rng": {
         "draws": 548,
@@ -1422,7 +1426,7 @@
       "tick": 175,
       "time": 8.75,
       "nextId": 412,
-      "state": "4cec2d58",
+      "state": "5f3586ea",
       "events": "741638a5",
       "rng": {
         "draws": 704,
@@ -1433,7 +1437,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 412,
-      "state": "2a04a78a",
+      "state": "481a08d4",
       "events": "741638a5",
       "rng": {
         "draws": 898,
@@ -1444,7 +1448,7 @@
       "tick": 225,
       "time": 11.25,
       "nextId": 412,
-      "state": "c7c3def0",
+      "state": "36a4f18a",
       "events": "2bbf670f",
       "rng": {
         "draws": 1011,
@@ -1455,7 +1459,7 @@
       "tick": 243,
       "time": 12.15,
       "nextId": 412,
-      "state": "e5e13ed0",
+      "state": "87db852a",
       "events": "741638a5",
       "rng": {
         "draws": 1087,
@@ -1482,7 +1486,9 @@
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
-            "counters": {},
+            "counters": {
+              "damageDealt": 113
+            },
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
@@ -1948,7 +1954,7 @@
       "tick": 243,
       "time": 12.15,
       "nextId": 412,
-      "state": "e5e13ed0",
+      "state": "87db852a",
       "events": "741638a5",
       "rng": {
         "draws": 1087,
@@ -1975,7 +1981,9 @@
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
-            "counters": {},
+            "counters": {
+              "damageDealt": 113
+            },
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",

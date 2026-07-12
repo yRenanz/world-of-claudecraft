@@ -944,8 +944,9 @@ export function endArenaMatch(
   scoreTeam('B', -deltaA, wonB);
 
   // Ranked standings feed the meter deeds; the Fiesta end-of-bout moments
-  // resolve while augment picks are still on the meta.
-  deedsMod.onArenaMatchEndForDeeds(ctx, match, winnerTeam);
+  // resolve while augment picks are still on the meta. A forfeit is not a
+  // completed bout (a timeout is: the bout ran its full clock).
+  deedsMod.onArenaMatchEndForDeeds(ctx, match, winnerTeam, reason !== 'forfeit');
 
   if (reason === 'forfeit') {
     returnFromArena(ctx, match);

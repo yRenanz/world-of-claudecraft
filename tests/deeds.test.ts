@@ -2,6 +2,7 @@
 // the meta fixpoint, Fiesta standardization safety, retro-on-join credit,
 // milestone unification, persistence round-trips, and determinism.
 import { describe, expect, it } from 'vitest';
+import { dealDamage } from '../src/sim/combat/damage';
 import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 import { emptyAllocation } from '../src/sim/content/talents';
 import { ITEMS, MOBS, QUESTS } from '../src/sim/data';
@@ -20,7 +21,7 @@ import {
 } from '../src/sim/deeds';
 import { queueGatheringGrant } from '../src/sim/professions/gathering';
 import { turnInQuestCore } from '../src/sim/quests/quest_commands';
-import { type CharacterState, Sim } from '../src/sim/sim';
+import { type ArenaMatch, type CharacterState, Sim } from '../src/sim/sim';
 import * as duelMod from '../src/sim/social/duel';
 import { type Entity, MAX_LEVEL, MILESTONES, type SimEvent } from '../src/sim/types';
 
@@ -1163,6 +1164,65 @@ describe('site wiring (real modules, not direct bumps)', () => {
     const c = sim.addPlayer('warrior', 'Bystander');
     duelMod.endDuel(sim.ctx, { a, b: c, state: 'active', timer: 0 }, null);
     expect(sim.players.get(c)!.deedStats.counters.duelsLost).toBe(0);
+  });
+
+  it('a duel finisher through dealDamage counts the clamped terminal hit and its crit', () => {
+    const sim = makeSim();
+    const a = sim.playerId;
+    const b = sim.addPlayer('warrior', 'Rival');
+    const duel = { a, b, state: 'active' as const, timer: 0 };
+    sim.ctx.duels.set(a, duel);
+    sim.ctx.duels.set(b, duel);
+    const attacker = sim.entities.get(a)!;
+    const victim = sim.entities.get(b)!;
+    const metaA = sim.players.get(a)!;
+
+    // A nonlethal hit takes the fall-through path and counts as before.
+    dealDamage(sim.ctx, attacker, victim, 10, false, 'physical', null, 'hit');
+    expect(victim.hp).toBeGreaterThan(1);
+    expect(metaA.deedStats.counters.damageDealt).toBe(10);
+    expect(metaA.deedStats.counters.crits).toBe(0);
+
+    // The finisher clamps to leave the victim at 1 hp and ends the duel; the
+    // clamped amount and the crit must still land on the deed counters.
+    const clamped = victim.hp - 1;
+    dealDamage(sim.ctx, attacker, victim, victim.hp + 500, true, 'physical', null, 'hit');
+    expect(victim.hp).toBe(1);
+    expect(sim.ctx.duels.has(a)).toBe(false);
+    expect(metaA.deedStats.counters.damageDealt).toBe(10 + clamped);
+    expect(metaA.deedStats.counters.crits).toBe(1);
+  });
+
+  it('a ranked-arena elimination through dealDamage counts the terminal hit beside the death', () => {
+    const sim = makeSim();
+    const a = sim.playerId;
+    const b = sim.addPlayer('warrior', 'Gladiator');
+    const match: ArenaMatch = {
+      id: 1,
+      format: '1v1',
+      teamA: [a],
+      teamB: [b],
+      slot: 0,
+      state: 'active',
+      timer: 0,
+      returns: new Map(),
+      ratingA: 1500,
+      ratingB: 1500,
+      defeated: new Set(),
+    };
+    sim.ctx.arenaMatches.set(a, match);
+    sim.ctx.arenaMatches.set(b, match);
+    const attacker = sim.entities.get(a)!;
+    const victim = sim.entities.get(b)!;
+    const metaA = sim.players.get(a)!;
+    const metaB = sim.players.get(b)!;
+
+    const clamped = victim.hp; // the elimination clamps overkill to remaining hp
+    dealDamage(sim.ctx, attacker, victim, victim.hp + 500, true, 'physical', null, 'hit');
+    expect(victim.dead).toBe(true);
+    expect(metaB.deedStats.counters.deaths).toBe(1); // victim accounting unchanged
+    expect(metaA.deedStats.counters.damageDealt).toBe(clamped);
+    expect(metaA.deedStats.counters.crits).toBe(1);
   });
 
   it('forming a party bumps partiesJoined for inviter and accepter through partyAccept', () => {

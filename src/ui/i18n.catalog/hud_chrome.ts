@@ -1114,6 +1114,12 @@ export const hudChromeStrings = {
   corpseHarvest: {
     title: 'Harvest',
     harvestButton: 'Harvest',
+    // Playtester-clarity fix: new players did not know Harvest is a separate,
+    // no-cost gathering action (not a profession skill check) that extracts raw
+    // crafting materials (hide, fang, silk, and the rest of the component list
+    // below) from the corpse, on top of any coin or items taken with Take All.
+    harvestButtonTooltip:
+      'Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.',
     concentrateHint: 'Fewer chosen components yield a higher tier each.',
     alreadyHarvested: 'This corpse has already been harvested.',
     componentAria: 'Harvest {component}',
@@ -1344,6 +1350,9 @@ export const hudChromeStrings = {
   // uses the chest's localized entity name); replaces a former hard-coded 'Chest'.
   loot: {
     chestTitle: 'Chest',
+    // Playtester-clarity fix: pairs with corpseHarvest.harvestButtonTooltip so
+    // the two loot-window buttons read as clearly distinct actions.
+    takeAllTooltip: 'Take All: collect every coin and item in this loot window.',
   },
   // Spellbook action-bar toggle accessible names. The visible glyph is +/-; the
   // accessible name states the action so a screen reader is not left with a bare

@@ -930,6 +930,7 @@ export const ru_RU: EnTranslations = {
     "corpseHarvest": {
       "title": "Сбор",
       "harvestButton": "Собрать",
+      "harvestButtonTooltip": "Добыча: собрать с этого трупа материалы для крафта (шкура, клык, шелк и подобные компоненты) отдельно от добычи. Добывать может любой, но каждый труп может обработать только один игрок.",
       "concentrateHint": "Чем меньше выбрано компонентов, тем выше их качество.",
       "alreadyHarvested": "Этот труп уже был собран.",
       "componentAria": "Собрать {component}",
@@ -1110,7 +1111,8 @@ export const ru_RU: EnTranslations = {
       "resetErrInvalid": "Эта ссылка для сброса недействительна или истекла. Запросите новую."
     },
     "loot": {
-      "chestTitle": "Сундук"
+      "chestTitle": "Сундук",
+      "takeAllTooltip": "Взять все: забрать все монеты и предметы из этого окна добычи."
     },
     "spellbook": {
       "addToBarAria": "Добавить {name} на панель действий",

@@ -52,4 +52,28 @@ describe('logoFadeOpacity', () => {
       expect(opacity).toBeLessThanOrEqual(1);
     }
   });
+
+  it('snaps straight to fully opaque with a zero-length fade-in window', () => {
+    const windows = { fadeInSec: 0, holdSec: 2.5, fadeOutSec: 1.5 };
+    expect(logoFadeOpacity(0.001, TOTAL, windows)).toBe(1);
+    expect(logoFadeOpacity(0.5, TOTAL, windows)).toBe(1);
+  });
+
+  it('snaps straight to fully transparent with a zero-length fade-out window', () => {
+    const windows = { fadeInSec: 1.5, holdSec: 2.5, fadeOutSec: 0 };
+    const holdEnd = windows.fadeInSec + windows.holdSec;
+    expect(logoFadeOpacity(holdEnd, TOTAL, windows)).toBe(0);
+    expect(logoFadeOpacity(holdEnd + 0.001, TOTAL, windows)).toBe(0);
+  });
+
+  it('snaps to fully transparent when totalDurationSec falls below the fade-out window mid-fade', () => {
+    const windows = DEFAULT_LOGO_FADE_WINDOWS;
+    const { fadeInSec, holdSec, fadeOutSec } = windows;
+    const fadeOutEnd = fadeInSec + holdSec + fadeOutSec;
+    // Without the totalDurationSec cutoff, t=3.5 would land inside the hold
+    // window (fadeInSec=1.5 to holdEnd=4.0) and return opacity 1.
+    const shortTotal = fadeInSec + holdSec - 0.5;
+    expect(shortTotal).toBeLessThan(fadeOutEnd);
+    expect(logoFadeOpacity(fadeInSec + holdSec - 0.5, shortTotal, windows)).toBe(0);
+  });
 });

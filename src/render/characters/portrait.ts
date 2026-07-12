@@ -133,8 +133,8 @@ export function visualPortraitDataUrl(
     // Settle the rig into a stable idle frame before measuring/capturing.
     visual.update(0.4, PORTRAIT_ANIM_STATE, true);
 
-    // Frame the model from its own bounds so every class — tall or short,
-    // helmeted or bare — lands the same in the circle/card.
+    // Frame the model from its own bounds so every class (tall or short,
+    // helmeted or bare) lands the same in the circle/card.
     scratchBox.setFromObject(visual.root);
     scratchBox.getCenter(scratchCenter);
     scratchBox.getSize(scratchSize);

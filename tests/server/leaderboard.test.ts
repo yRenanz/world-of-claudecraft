@@ -428,6 +428,23 @@ describe('readPublicSheet (FakeCharactersDb, resolved by name)', () => {
     expect(body.rank).toBeNull();
   });
 
+  it('renders a delisted subject with name and level intact but no rank', async () => {
+    // A banned or suspended subject: lifetimeXpRankForCharacter now returns null
+    // for a delisted account (server/db.ts gates the public read's own subquery on
+    // ELIGIBLE_ACCOUNT_SQL), so a banned top account no longer publicly shows rank
+    // #1. The public sheet must still render the character (name + level) with the
+    // rank line simply absent, never a 404. Modeled here as a null rank read.
+    const db = new FakeCharactersDb();
+    db.seed(characterRow(23, 'Delisted'));
+    // No seedStanding: the db-level eligibility gate surfaces as a null rank.
+    const out = await readPublicSheet(db, 'Delisted', sheetDeps);
+    expect(out.status).toBe(200);
+    const body = out.body as Record<string, unknown>;
+    expect(body.name).toBe('Delisted');
+    expect(body.level).toBe(42);
+    expect(body.rank).toBeNull();
+  });
+
   it('carries the deeds summary block, with the recent strip read through the sheet bound', async () => {
     const db = new FakeCharactersDb();
     const row = characterRow(31, 'Chronic');

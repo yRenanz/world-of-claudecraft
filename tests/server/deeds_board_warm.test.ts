@@ -56,7 +56,7 @@ describe('shouldWarmDeedsBoard', () => {
 
 describe('warmDeedsBoardIfDemanded', () => {
   it('skips the board read when there has been no request within the window', () => {
-    // `read` stands in for refreshDeedsBoard, whose one job is the deedsBoardRows
+    // `read` stands in for refreshDeedsBoard, whose one job is the deedsBoardRanked
     // full-table pull. Under no demand the gate must never invoke it.
     const read = vi.fn();
     const warmed = warmDeedsBoardIfDemanded(read, 0, NOW, DEEDS_BOARD_DEMAND_TTL_MS);

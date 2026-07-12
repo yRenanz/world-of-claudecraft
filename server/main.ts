@@ -81,7 +81,7 @@ import {
   createAccount,
   createCharacterCapped,
   createCompanionToken,
-  deedsBoardRows,
+  deedsBoardRanked,
   deleteCharacter,
   ensureSchema,
   findAccount,
@@ -120,7 +120,7 @@ import {
 import { configureDeedsRuntime } from './deeds';
 import {
   buildDeedsBoardEntries,
-  computeDeedsBoard,
+  DEEDS_BOARD_ENTRY_FLOOR,
   deedsBoardSelf,
   type RankedDeedsAccount,
 } from './deeds_board';
@@ -251,7 +251,6 @@ import {
   sfxBlobIntegrityMatches,
 } from './static_cache';
 import { readStaticSfxSnapshot, type StaticSfxSnapshot } from './static_sfx';
-import { steamEnabled } from './steam/config';
 import { stopSteamMirror } from './steam/mirror';
 import { passesTurnstile } from './turnstile';
 import { MAX_ASSET_BYTES } from './user_assets';
@@ -386,6 +385,15 @@ const LEADERBOARD_TTL_MS = 30_000;
 // Cache the full exposed depth (LEADERBOARD_MAX) once per scope; the REST handler
 // pages through it as an in-memory slice, so no extra query per page click.
 const LEADERBOARD_SIZE = LEADERBOARD_MAX;
+// Monotonic generation counter for every player-derived board cache. A refresh
+// captures it before its first await and installs its result only if it is still
+// unchanged when the read returns; bustBoardCaches (the moderation hook) bumps
+// it. This closes a lost-bust race: a ban landing while a refresh is in flight
+// would otherwise be overwritten by that refresh's pre-ban snapshot for up to
+// one TTL cycle. The in-flight caller still gets the computed snapshot; the cache
+// is left null so the NEXT read triggers a fresh refresh whose SQL delists the
+// account via ELIGIBLE_ACCOUNT_SQL.
+let boardEpoch = 0;
 // One cache per scope: 'realm' for the in-game panel, 'global' for the
 // cross-realm home-page board.
 const leaderboardCache: Record<
@@ -397,6 +405,7 @@ const leaderboardCache: Record<
 };
 
 async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<LeaderboardEntry[]> {
+  const epoch = boardEpoch;
   const rows = await topLifetimeXp(LEADERBOARD_SIZE, { global: scope === 'global' });
   const entries: LeaderboardEntry[] = rows.map((r, i) => ({
     rank: i + 1,
@@ -410,7 +419,8 @@ async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<Leaderboar
     title: r.activeTitle,
     ...(scope === 'global' ? { realm: r.realm } : {}),
   }));
-  leaderboardCache[scope] = { at: Date.now(), entries };
+  // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
+  if (boardEpoch === epoch) leaderboardCache[scope] = { at: Date.now(), entries };
   return entries;
 }
 
@@ -439,6 +449,7 @@ const guildLeaderboardCache: Record<
 async function refreshGuildLeaderboard(
   scope: 'realm' | 'global',
 ): Promise<GuildLeaderboardEntry[]> {
+  const epoch = boardEpoch;
   const rows = await topGuilds(LEADERBOARD_SIZE, { global: scope === 'global' });
   const entries: GuildLeaderboardEntry[] = rows.map((r, i) => ({
     rank: i + 1,
@@ -448,7 +459,8 @@ async function refreshGuildLeaderboard(
     topLevel: r.topLevel,
     ...(scope === 'global' ? { realm: r.realm } : {}),
   }));
-  guildLeaderboardCache[scope] = { at: Date.now(), entries };
+  // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
+  if (boardEpoch === epoch) guildLeaderboardCache[scope] = { at: Date.now(), entries };
   return entries;
 }
 
@@ -485,7 +497,14 @@ let deedsBoardCache: DeedsBoardCache | null = null;
 let deedsBoardLastRequestAt = 0;
 
 async function refreshDeedsBoard(): Promise<DeedsBoardCache> {
-  const board = computeDeedsBoard(await deedsBoardRows(), DEEDS);
+  const epoch = boardEpoch;
+  // Renown values are content-owned (never in SQL), so hand the whole content
+  // table to the SQL roll-up as two parallel arrays plus the floor. deedsBoardRanked
+  // aggregates IN Postgres and returns only the ranked accounts, 1:1 with the
+  // former computeDeedsBoard(rows).ranked shape.
+  const deedIds = Object.keys(DEEDS);
+  const renowns = deedIds.map((id) => DEEDS[id].renown);
+  const board = await deedsBoardRanked(deedIds, renowns, DEEDS_BOARD_ENTRY_FLOOR);
   if (board.unknownDeedIds.length > 0) {
     // Rows for removed/renamed content are skipped, never scored; surface the
     // ids so a content rename is noticed instead of silently shrinking scores.
@@ -499,13 +518,16 @@ async function refreshDeedsBoard(): Promise<DeedsBoardCache> {
     board.ranked,
     await charactersForDeedsBoard(board.ranked.map((a) => a.displayCharacterId)),
   );
-  deedsBoardCache = {
+  const cache: DeedsBoardCache = {
     at: Date.now(),
     entries,
     ranked: board.ranked,
     totalRanked: board.totalRanked,
   };
-  return deedsBoardCache;
+  // Skip the install if a moderation bust landed mid-refresh (see boardEpoch);
+  // the in-flight caller still gets this snapshot, the next read self-corrects.
+  if (boardEpoch === epoch) deedsBoardCache = cache;
+  return cache;
 }
 
 // Single-flight on the board refresh, covering BOTH read paths: the inline
@@ -555,8 +577,12 @@ async function deedsSelfRank(accountId: number): Promise<DeedsLeaderboardSelf | 
 // ceiling); the SQL exclusion makes their next refresh correct. Arena is
 // served uncached by design, and the daily-rewards board reads run per
 // request (the SQL exclusion in daily_rewards_db.ts is the whole mechanism),
-// so both are already exact fleet-wide with no cache to bust here.
+// so both are already exact fleet-wide with no cache to bust here. Bumping
+// boardEpoch as well as nulling the caches closes the lost-bust race: a refresh
+// already in flight when this fires will decline to install its pre-ban snapshot
+// (see boardEpoch), so a ban cannot be masked for up to a TTL cycle.
 function bustBoardCaches(): void {
+  boardEpoch++;
   leaderboardCache.realm = null;
   leaderboardCache.global = null;
   guildLeaderboardCache.realm = null;
@@ -1588,15 +1614,21 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       });
     }
     if (req.method === 'GET' && url === '/api/status') {
-      // steam.enabled is the capability advert clients read before rendering
-      // any Steam link UI (dual-arm edit: the migrated statusHandler in
-      // server/leaderboard.ts carries the same field).
+      // steam.enabled is the capability advert clients read before rendering any
+      // Steam link UI. HARDCODED false on the legacy ladder: the Steam surface
+      // exists only as RouteDefs (server/steam/routes.ts), which the legacy arm
+      // never serves, so every /api/steam/* 404s here. Advertising the capability
+      // on an arm that then 404s it would strand a client into a dead link flow.
+      // Under the default 'new' dispatch the migrated statusHandler
+      // (server/leaderboard.ts) reads the real steamEnabled(), where the routes
+      // are live. This is a deliberate divergence from the new arm under
+      // STEAM_ENABLED=1 (pinned in tests/server/http/parity.test.ts).
       return json(res, 200, {
         ok: true,
         realm: REALM,
         players_online: liveGame().clients.size,
         names: [...liveGame().clients.values()].map((s) => s.name),
-        steam: { enabled: steamEnabled() },
+        steam: { enabled: false },
       });
     }
     // Dev-only world-loop perf profile (per-phase tick p95/max), for the load

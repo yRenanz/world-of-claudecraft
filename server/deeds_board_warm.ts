@@ -1,7 +1,7 @@
 // Demand gate for the Renown (deeds) board warm loop.
 //
 // The board is a full-table roll-up of character_deeds joined to characters and
-// accounts (deedsBoardRows in db.ts). Refreshing it on every LEADERBOARD_TTL_MS
+// accounts (deedsBoardRanked in db.ts). Refreshing it on every LEADERBOARD_TTL_MS
 // tick in every realm process is wasted work when nobody is viewing it: at scale
 // that is the whole character_deeds table re-read on a fixed interval for a board
 // that may have no audience. So gate the warm refresh on real demand: a board

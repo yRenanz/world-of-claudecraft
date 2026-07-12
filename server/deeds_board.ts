@@ -1,12 +1,13 @@
 // The Renown board's pure scoring core: aggregates character_deeds rows into
 // the account-level lifetime Renown ranking.
 //
-// Host-agnostic by design (no db import, no I/O): the db read (deedsBoardRows
-// in db.ts) supplies the rows, src/sim/content/deeds.ts supplies the Renown
-// values, and the main.ts cache calls computeDeedsBoard + deedsBoardSelf.
-// Points are NEVER stored in SQL; the content table is the single source of
-// truth for Renown, so a rebalance needs no migration and the score can only
-// move when content or earns move.
+// Host-agnostic by design (no db import, no I/O): computeDeedsBoard is the
+// EXECUTABLE SPEC for the scoring, mirrored 1:1 by the SQL roll-up
+// deedsBoardRanked (db.ts) that production runs at scale; src/sim/content/deeds.ts
+// supplies the Renown values, and the main.ts cache calls deedsBoardSelf over the
+// ranked list. Points are NEVER stored in SQL; the content table is the single
+// source of truth for Renown, so a rebalance needs no migration and the score can
+// only move when content or earns move.
 //
 // The aggregation trusts character_deeds.account_id as the owner of every row.
 // Character transfer between accounts does not exist today; a future transfer
@@ -21,7 +22,7 @@ import type { DeedsLeaderboardEntry, DeedsLeaderboardSelf } from '../src/world_a
 // throwaway-account noise off the board entirely.
 export const DEEDS_BOARD_ENTRY_FLOOR = 50;
 
-/** One character_deeds row, as deedsBoardRows returns it. */
+/** One character_deeds row, the computeDeedsBoard scoring input. */
 export interface DeedsBoardSourceRow {
   accountId: number;
   characterId: number;

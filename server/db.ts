@@ -8,6 +8,7 @@ import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
 import type { BankBonusFacts } from './bank_entitlements';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
+import type { RankedDeedsAccount } from './deeds_board';
 import { DISCORD_SCHEMA } from './discord_db';
 import { GITHUB_SCHEMA } from './github_db';
 import { isUniqueViolation } from './http_util';
@@ -750,7 +751,7 @@ CREATE TABLE IF NOT EXISTS character_deeds (
 DROP INDEX IF EXISTS character_deeds_deed;
 -- Per-account roll-up reads: earnedDeedIdsForAccount (server/deeds_db.ts,
 -- the Steam reconcile-on-link push) filters on account_id through this
--- index. The Renown board's deedsBoardRows read stays a full-table
+-- index. The Renown board's deedsBoardRanked read stays a full-table hash
 -- aggregation (cached in main.ts) and does not use it.
 CREATE INDEX IF NOT EXISTS character_deeds_account ON character_deeds(account_id);
 CREATE INDEX IF NOT EXISTS character_deeds_character_earned
@@ -1860,9 +1861,14 @@ export async function lifetimeXpStanding(
 // shown for any player. Same expression-index predicate as lifetimeXpStanding,
 // and the same eligibility gate on both counts: total is the ELIGIBLE realm
 // population (same ELIGIBLE_ACCOUNT_SQL delisting as the boards), and a delisted
-// higher-XP account is not counted ahead. The `own` subquery stays ungated, so
-// the viewed character's own rank shows even when its account is delisted.
-// Returns null when no such character exists on this realm.
+// higher-XP account is not counted ahead. UNLIKE lifetimeXpStanding, the `own`
+// subquery is ALSO eligibility-gated here: this feeds UNAUTHENTICATED public
+// surfaces (GET /c/:name, GET /api/public/characters/:name/sheet), so a banned
+// or suspended account must not publicly show a rank at all. The bearer-only
+// self-view (lifetimeXpStanding) keeps its own subquery ungated so an owner
+// still sees their own rank. Returns null when no such character exists on this
+// realm OR when the viewed account is delisted (the callers render name/level
+// with no rank line on null, so this is not a 404).
 export async function lifetimeXpRankForCharacter(
   characterId: number,
 ): Promise<{ rank: number; total: number } | null> {
@@ -1876,11 +1882,16 @@ export async function lifetimeXpRankForCharacter(
          WHERE realm = $1
            AND EXISTS (SELECT 1 FROM accounts a
                         WHERE a.id = characters.account_id AND ${ELIGIBLE_ACCOUNT_SQL}))::int AS total
-     FROM (SELECT COALESCE(${LIFETIME_XP_EXPR}, 0) AS xp
+     FROM (SELECT COALESCE(${LIFETIME_XP_EXPR}, 0) AS xp,
+                  EXISTS (SELECT 1 FROM accounts a
+                           WHERE a.id = characters.account_id AND ${ELIGIBLE_ACCOUNT_SQL}) AS eligible
              FROM characters WHERE id = $2 AND realm = $1) own`,
     [REALM, characterId],
   );
   if ((res.rowCount ?? 0) === 0) return null;
+  // The subject's own account is banned or suspended: a public surface shows no
+  // rank for a delisted account (its bearer-authenticated self-view still does).
+  if (!res.rows[0]?.eligible) return null;
   return { rank: (res.rows[0]?.ahead ?? 0) + 1, total: res.rows[0]?.total ?? 0 };
 }
 
@@ -2522,40 +2533,102 @@ export async function topGuilds(
 }
 
 // ---------------------------------------------------------------------------
-// Renown board reads (the account-level deeds leaderboard). The scoring is
-// pure JS (server/deeds_board.ts) over the raw rows; Renown values come from
-// the in-memory content table, never SQL. Both reads are cache-fronted in
-// main.ts, never run per request under load.
+// Renown board read (the account-level deeds leaderboard). Renown values are
+// content-owned (server/deeds_board.ts doctrine: never stored in SQL, so a
+// rebalance needs no migration), so the caller passes the whole content table
+// as two parallel arrays plus the score floor and the roll-up runs IN Postgres.
+// The read is cache-fronted in main.ts, never run per request under load.
 // ---------------------------------------------------------------------------
 
-/** One character_deeds row for the Renown roll-up (deeds_board.ts input). */
-export interface DeedsBoardRow {
-  accountId: number;
-  characterId: number;
-  deedId: string;
-  earnedAt: Date | string;
-}
-
-// The full earned-deed row set for eligible accounts, cross-realm (the board
-// is account-level and accounts span realms, so it has exactly one global
-// scope). Deliberately no LIMIT: the aggregation needs the complete set, the
-// table is tiny at current scale, and the result is cached behind the board
-// TTL. If character_deeds ever outgrows memory the aggregation moves into
-// SQL; it must never become a capacity cap that can drop legitimate accounts.
-export async function deedsBoardRows(): Promise<DeedsBoardRow[]> {
+// The account-level Renown ranking, aggregated IN Postgres and cross-realm (the
+// board is account-level and accounts span realms, so it has exactly one global
+// scope). Renown values come in as `renowns` parallel to `deedIds` (the content
+// table, never SQL), and `floor` is the entry cutoff. The query pushes the
+// counted-set roll-up, the floor, the display-character pick, and the final
+// ordering into the database, so only the ranked accounts cross the wire, never
+// the whole character_deeds table (the roll-up is a full-table hash aggregate by
+// design; deliberately no LIMIT, so it can never become a cap that drops a
+// legitimate account). The output maps 1:1 onto computeDeedsBoard(...).ranked
+// (server/deeds_board.ts is the executable spec this mirrors): per account the
+// COUNTED SET is the distinct renown-bearing deed ids, so a deed earned by two
+// characters counts once; zero-renown deeds score and count nothing; the floor
+// is inclusive; completionTime is max over the counted set of each deed's
+// EARLIEST earn; the display character is the account's highest per-character
+// Renown character, ties to the lowest id; ordering is renown desc, completion
+// asc, accountId asc.
+export async function deedsBoardRanked(
+  deedIds: readonly string[],
+  renowns: readonly number[],
+  floor: number,
+): Promise<{ ranked: RankedDeedsAccount[]; totalRanked: number; unknownDeedIds: string[] }> {
   const res = await pool.query(
-    `SELECT cd.account_id, cd.character_id, cd.deed_id, cd.earned_at
-       FROM character_deeds cd
-       JOIN characters c ON c.id = cd.character_id
-       JOIN accounts a ON a.id = cd.account_id
-      WHERE ${ELIGIBLE_ACCOUNT_SQL}`,
+    `WITH renown(deed_id, renown) AS (
+       SELECT * FROM unnest($1::text[], $2::int[]) AS u(deed_id, renown) WHERE u.renown > 0
+     ),
+     per_deed AS (
+       SELECT cd.account_id, cd.deed_id, min(cd.earned_at) AS first_earned
+         FROM character_deeds cd
+         JOIN characters c ON c.id = cd.character_id
+         JOIN accounts a ON a.id = cd.account_id
+         JOIN renown r ON r.deed_id = cd.deed_id
+        WHERE ${ELIGIBLE_ACCOUNT_SQL}
+        GROUP BY cd.account_id, cd.deed_id
+     ),
+     account_agg AS (
+       SELECT pd.account_id,
+              sum(r.renown)::int AS renown,
+              count(*)::int AS deed_count,
+              max(pd.first_earned) AS completion_time
+         FROM per_deed pd
+         JOIN renown r ON r.deed_id = pd.deed_id
+        GROUP BY pd.account_id
+       HAVING sum(r.renown) >= $3
+     ),
+     per_char AS (
+       SELECT cd.account_id, cd.character_id, sum(r.renown)::int AS char_renown
+         FROM character_deeds cd
+         JOIN characters c ON c.id = cd.character_id
+         JOIN accounts a ON a.id = cd.account_id
+         JOIN renown r ON r.deed_id = cd.deed_id
+        WHERE ${ELIGIBLE_ACCOUNT_SQL}
+        GROUP BY cd.account_id, cd.character_id
+     ),
+     display AS (
+       SELECT DISTINCT ON (account_id) account_id, character_id
+         FROM per_char
+        ORDER BY account_id, char_renown DESC, character_id ASC
+     )
+     SELECT aa.account_id,
+            aa.renown,
+            aa.deed_count,
+            aa.completion_time,
+            d.character_id AS display_character_id
+       FROM account_agg aa
+       JOIN display d ON d.account_id = aa.account_id
+      ORDER BY aa.renown DESC, aa.completion_time ASC, aa.account_id ASC`,
+    [deedIds, renowns, floor],
   );
-  return res.rows.map((r) => ({
+  const ranked: RankedDeedsAccount[] = res.rows.map((r) => ({
     accountId: Number(r.account_id),
-    characterId: Number(r.character_id),
-    deedId: String(r.deed_id),
-    earnedAt: r.earned_at,
+    renown: Number(r.renown),
+    deedCount: Number(r.deed_count),
+    // TIMESTAMPTZ back to epoch ms (Date via pg; string tolerated for driver
+    // config drift), matching computeDeedsBoard's earnedMs.
+    completionTime: new Date(r.completion_time).getTime(),
+    displayCharacterId: Number(r.display_character_id),
   }));
+  // Deed ids present in character_deeds but absent from the content table
+  // entirely (removed or renamed content), for the same warn computeDeedsBoard
+  // emitted. A cheap side read kept off the aggregation's hot path: scored rows
+  // already excluded these via the renown join, so this never shrinks a score,
+  // only surfaces the ids. A zero-renown KNOWN deed is not flagged (its id is in
+  // $1), matching computeDeedsBoard's def-present test.
+  const unknown = await pool.query(
+    `SELECT DISTINCT deed_id FROM character_deeds WHERE deed_id <> ALL($1::text[])`,
+    [deedIds],
+  );
+  const unknownDeedIds = unknown.rows.map((r) => String(r.deed_id)).sort();
+  return { ranked, totalRanked: ranked.length, unknownDeedIds };
 }
 
 /** The display-character fill for ranked accounts: name, realm, class, level,

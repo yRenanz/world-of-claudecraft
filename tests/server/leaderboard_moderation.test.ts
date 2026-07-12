@@ -25,7 +25,7 @@ import type { PoolClient, QueryResult } from 'pg';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { PgDailyRewardDb } from '../../server/daily_rewards_db';
 import {
-  deedsBoardRows,
+  deedsBoardRanked,
   ELIGIBLE_ACCOUNT_SQL,
   lifetimeXpRankForCharacter,
   lifetimeXpStanding,
@@ -100,31 +100,46 @@ describe('every ranked board query embeds the fragment', () => {
     await expectExcludes(() => topGuilds(10, { global: true }), 'a.id = c.account_id');
   });
 
-  it('deeds (the Renown roll-up row read)', async () => {
-    const sql = await capturedSql(() => deedsBoardRows());
-    expect(sql).toHaveLength(1);
-    expect(sql[0]).toContain(ELIGIBLE_LITERAL);
-    expect(sql[0]).toContain('a.id = cd.account_id');
+  it('deeds (the Renown roll-up aggregation embeds the fragment at BOTH eligibility sites)', async () => {
+    // deedsBoardRanked issues two queries: the ranked aggregation and a cheap
+    // unknown-deed side read. The aggregation carries the fragment at BOTH the
+    // per-deed and per-character roll-up joins; the side read has no accounts join.
+    const sql = await capturedSql(() => deedsBoardRanked(['d50'], [50], 50));
+    const agg = sql.find((s) => s.includes(ELIGIBLE_LITERAL));
+    if (!agg) throw new Error('deedsBoardRanked aggregation query was not captured');
+    // Lands TWICE, once per eligibility site (per-deed earliest earn, per-character sum).
+    expect(agg.split(ELIGIBLE_LITERAL).length).toBe(3);
+    expect(agg).toContain('a.id = cd.account_id');
     // The roll-up reads only rows whose character still exists (belt over the
     // ON DELETE CASCADE braces).
-    expect(sql[0]).toContain('JOIN characters c ON c.id = cd.character_id');
+    expect(agg).toContain('JOIN characters c ON c.id = cd.character_id');
+    // The unknown-deed side read hunts removed content, never gates eligibility.
+    const side = sql.find((s) => !s.includes(ELIGIBLE_LITERAL));
+    expect(side).toContain('deed_id <> ALL($1::text[])');
   });
 
-  it('realm-rank reads (player card + public profile) gate BOTH count arms', async () => {
-    // lifetimeXpStanding (owned, the card's "Top N%") and
-    // lifetimeXpRankForCharacter (the public profile) each count `ahead` and
-    // `total` over the realm; both counts must exclude banned/suspended
-    // accounts or a delisted higher-XP account still inflates rank and total
-    // though it appears on no board. The fragment therefore lands TWICE per
-    // query, once per count arm; the `own`/ownership subquery stays ungated.
+  it('realm-rank reads gate both count arms; the public read ALSO gates its own subquery', async () => {
+    // Both count `ahead` and `total` over the ELIGIBLE realm, so the fragment
+    // lands at least twice per query (once per count arm) or a delisted higher-XP
+    // account still inflates rank and total though it appears on no board.
+    // lifetimeXpStanding is the BEARER-authenticated self-view, so its `own`
+    // subquery stays UNGATED (an owner sees their own rank even when delisted):
+    // exactly two occurrences. lifetimeXpRankForCharacter feeds UNAUTHENTICATED
+    // public surfaces, so its `own` subquery is ALSO gated (a banned account shows
+    // no public rank at all): three occurrences, plus the eligibility flag it
+    // returns null on.
     const occurrences = (haystack: string, needle: string): number =>
       haystack.split(needle).length - 1;
-    for (const run of [() => lifetimeXpStanding(1, 42), () => lifetimeXpRankForCharacter(42)]) {
-      const sql = await capturedSql(run);
-      expect(sql).toHaveLength(1);
-      expect(occurrences(sql[0], ELIGIBLE_LITERAL)).toBe(2);
-      expect(occurrences(sql[0], 'a.id = characters.account_id')).toBe(2);
-    }
+    const standingSql = await capturedSql(() => lifetimeXpStanding(1, 42));
+    expect(standingSql).toHaveLength(1);
+    expect(occurrences(standingSql[0], ELIGIBLE_LITERAL)).toBe(2);
+    expect(occurrences(standingSql[0], 'a.id = characters.account_id')).toBe(2);
+    expect(standingSql[0]).not.toContain('AS eligible');
+    const publicSql = await capturedSql(() => lifetimeXpRankForCharacter(42));
+    expect(publicSql).toHaveLength(1);
+    expect(occurrences(publicSql[0], ELIGIBLE_LITERAL)).toBe(3);
+    expect(occurrences(publicSql[0], 'a.id = characters.account_id')).toBe(3);
+    expect(publicSql[0]).toContain('AS eligible');
   });
 
   it('daily rewards: all five ranked reads agree on one population', async () => {
@@ -251,5 +266,31 @@ describe('main.ts wiring', () => {
     expect(body).toContain('guildLeaderboardCache.realm = null');
     expect(body).toContain('guildLeaderboardCache.global = null');
     expect(body).toContain('deedsBoardCache = null');
+  });
+
+  it('bumps the board epoch so an in-flight refresh cannot reinstall a pre-ban snapshot', () => {
+    // The lost-bust race: a ban landing WHILE a board refresh is in flight would
+    // be overwritten by that refresh's pre-ban snapshot for up to one TTL cycle.
+    // bustBoardCaches bumps a monotonic epoch, and each of the three player-derived
+    // refreshes captures the epoch before its first await and installs its result
+    // only if the epoch is unchanged, so the stale snapshot is declined.
+    const src = readFileSync(resolve(__dirname, '../../server/main.ts'), 'utf8');
+    const bustStart = src.indexOf('function bustBoardCaches');
+    expect(bustStart).toBeGreaterThan(-1);
+    const bustBody = src.slice(bustStart, src.indexOf('}', bustStart));
+    expect(bustBody).toContain('boardEpoch++');
+    for (const fn of ['refreshLeaderboard', 'refreshGuildLeaderboard', 'refreshDeedsBoard']) {
+      const start = src.indexOf(`async function ${fn}(`);
+      expect(start, `${fn} not found`).toBeGreaterThan(-1);
+      // The function body runs to its column-0 closing brace (every inner brace is
+      // indented), so `\n}\n` after the signature bounds it.
+      const fnBody = src.slice(start, src.indexOf('\n}\n', start));
+      expect(fnBody, `${fn} must capture the epoch before its await`).toContain(
+        'const epoch = boardEpoch;',
+      );
+      expect(fnBody, `${fn} must guard the install on the epoch`).toContain(
+        'if (boardEpoch === epoch)',
+      );
+    }
   });
 });

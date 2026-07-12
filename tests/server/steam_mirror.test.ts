@@ -15,8 +15,10 @@ import {
   onDeedRecorded,
   onLinkChanged,
   PUSH_BACKOFF_BASE_MS,
+  RECONCILE_STAMP_SWEEP_SIZE,
   reconcileLink,
   reconcileOnLogin,
+  reconcileStampCountForTests,
   resetSteamMirrorForTests,
   setSteamMirrorDepsForTests,
   steamMirrorIdle,
@@ -576,6 +578,27 @@ describe('reconcile-on-login: the durable heal for a dropped push', () => {
     await settle();
     expect(earnedMock).not.toHaveBeenCalled();
     expect(pushMock).not.toHaveBeenCalled();
+  });
+
+  it('sweeps expired throttle stamps once the map outgrows the bound', async () => {
+    enableSteam();
+    linkMock.mockResolvedValue(null);
+    // Unlinked accounts still take a stamp (by design), which makes filling
+    // the map cheap here.
+    for (let acct = 1; acct <= RECONCILE_STAMP_SWEEP_SIZE; acct++) reconcileOnLogin(acct);
+    await settle();
+    expect(reconcileStampCountForTests()).toBe(RECONCILE_STAMP_SWEEP_SIZE);
+    // Inside the TTL nothing has expired: the bound triggers a sweep that
+    // removes nothing and the map grows past it (a sweep trigger, not a cap).
+    reconcileOnLogin(RECONCILE_STAMP_SWEEP_SIZE + 1);
+    await settle();
+    expect(reconcileStampCountForTests()).toBe(RECONCILE_STAMP_SWEEP_SIZE + 1);
+    // Past the TTL every old stamp is dead weight: the next stamp sweeps them
+    // all, leaving only itself.
+    clock += LOGIN_RECONCILE_TTL_MS + 1;
+    reconcileOnLogin(RECONCILE_STAMP_SWEEP_SIZE + 2);
+    await settle();
+    expect(reconcileStampCountForTests()).toBe(1);
   });
 });
 

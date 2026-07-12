@@ -227,6 +227,11 @@ async function attemptPush(item: PushItem): Promise<void> {
 // account ran reconcileOnLogin, so login churn cannot re-push whole histories
 // every join. Bounded by LOGIN_RECONCILE_TTL_MS.
 const lastReconciledAt = new Map<number, number>();
+// A stamp older than the TTL no longer throttles anything, so once the map
+// outgrows this bound the expired entries are swept before the next stamp:
+// a long-lived process holds O(accounts active per TTL window) entries
+// instead of one per distinct account since boot.
+export const RECONCILE_STAMP_SWEEP_SIZE = 8192;
 
 /**
  * Mirror one recorded unlock. Called by server/deeds_records.ts AFTER the
@@ -299,6 +304,11 @@ export function reconcileOnLogin(accountId: number): void {
     const now = deps.now();
     const last = lastReconciledAt.get(accountId);
     if (last !== undefined && now - last < LOGIN_RECONCILE_TTL_MS) return;
+    if (lastReconciledAt.size >= RECONCILE_STAMP_SWEEP_SIZE) {
+      for (const [acct, at] of lastReconciledAt) {
+        if (now - at >= LOGIN_RECONCILE_TTL_MS) lastReconciledAt.delete(acct);
+      }
+    }
     lastReconciledAt.set(accountId, now);
     void cachedSteamId(accountId)
       .then((steamId) => {
@@ -321,6 +331,11 @@ export function reconcileOnLogin(accountId: number): void {
 /** The current drain tail, for tests to await deterministic queue settling. */
 export function steamMirrorIdle(): Promise<void> {
   return drain;
+}
+
+/** The live reconcile-stamp count, for the sweep-bound test only. */
+export function reconcileStampCountForTests(): number {
+  return lastReconciledAt.size;
 }
 
 /** Clear queue, dedupe, and cache state (test-only). */

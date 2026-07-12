@@ -492,6 +492,14 @@ export function assignMasterLoot(
   const targets = targetPids.filter((p) => roll.candidates.includes(p));
   if (targets.length === 0) return; // nothing valid selected: leave the prompt open
   if (targets.length === 1) {
+    // The target can have logged out during the up-to-5min curate window
+    // between the roll opening and the master looter's assignment click; a
+    // grant to a departed pid would silently destroy the item (see the
+    // matching guard in resolveLootRoll). Return it to the corpse instead.
+    if (!isPidResolvable(ctx, targets[0])) {
+      convertMasterRollToNeedGreed(ctx, roll, roll.candidates);
+      return;
+    }
     if (!ctx.pendingLootRolls.delete(roll.id)) return;
     const targetName = ctx.players.get(targets[0])?.name ?? 'Unknown';
     for (const pid of partyMembersForRoll(roll))
@@ -625,7 +633,33 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
       pid,
     });
   }
+  // The winner can have logged out during the up-to-60s roll window (need/greed)
+  // or the up-to-5min master-loot curate window that converts into one: addItem
+  // resolves nothing for a departed pid and silently no-ops, which would destroy
+  // the item outright, violating the "items are never destroyed" grant guarantee
+  // (see addItem's own comment in sim.ts). Fall back to returning it to the
+  // corpse, exactly like the everyone-passed branch above, so it is never lost.
+  if (!isPidResolvable(ctx, winner.pid)) {
+    returnLootRollItemToCorpse(ctx, roll);
+    for (const pid of partyMembersForRoll(roll))
+      ctx.emit({
+        type: 'loot',
+        text: `${winnerName} was offline; [[i:${roll.itemId}]] returned to the corpse.`,
+        pid,
+      });
+    return;
+  }
   ctx.addItem(roll.itemId, 1, winner.pid);
+}
+
+// Whether `pid` is a currently-connected player the loot hub's addItem/resolve
+// machinery can actually grant to. Mirrors Sim's private `resolve()` guard
+// (both the player record AND the live entity must exist) without needing the
+// full resolve() (which also requires the caller to be alive), since a
+// disconnect-time award should land regardless of the recipient's HP state
+// once they reconnect.
+function isPidResolvable(ctx: SimContext, pid: number): boolean {
+  return ctx.players.has(pid) && ctx.entities.has(pid);
 }
 
 function returnLootRollItemToCorpse(ctx: SimContext, roll: PendingLootRoll): void {

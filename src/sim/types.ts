@@ -1624,7 +1624,7 @@ export interface BuildingDef {
 export interface ZonePropsDef {
   buildings: BuildingDef[];
   wells: { x: number; z: number; r: number }[];
-  stalls: { x: number; z: number; rot: number; r: number }[];
+  stalls: { x: number; z: number; rot: number; r: number; smithy?: true }[];
   mines: { x: number; z: number; rot: number }[];
   docks: {
     x: number;

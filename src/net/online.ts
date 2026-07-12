@@ -1,11 +1,7 @@
 // Online play: REST auth client + WebSocket world mirror.
 
-import {
-  isDesktopAppRuntime,
-  normalizeOrigin,
-  runtimeApiOrigin,
-  runtimeWebSocketUrl,
-} from '../runtime';
+import { apiUrl, DESKTOP_API_ORIGIN, NATIVE_API_ORIGIN } from '../client_origin';
+import { normalizeOrigin, runtimeWebSocketUrl } from '../runtime';
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
 import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
@@ -128,16 +124,13 @@ export function buildWebSocketUrl(protocol: string, host: string): string {
   return runtimeWebSocketUrl(protocol, host, DESKTOP_API_ORIGIN);
 }
 
-export const NATIVE_APP = String(import.meta.env.VITE_NATIVE_APP ?? '') === '1';
-export const NATIVE_API_ORIGIN = normalizeOrigin(String(import.meta.env.VITE_API_ORIGIN ?? ''));
-export const DESKTOP_APP = isDesktopAppRuntime();
-export const DESKTOP_API_ORIGIN = DESKTOP_APP ? runtimeApiOrigin() : '';
-
-export function apiUrl(path: string, base = ''): string {
-  if (/^https?:\/\//.test(path)) return path;
-  const origin = normalizeOrigin(base) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
-  return origin ? `${origin}${path}` : path;
-}
+export {
+  apiUrl,
+  DESKTOP_API_ORIGIN,
+  DESKTOP_APP,
+  NATIVE_API_ORIGIN,
+  NATIVE_APP,
+} from '../client_origin';
 
 export function buildWebSocketAuthMessage(
   token: string,

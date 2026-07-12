@@ -1825,19 +1825,28 @@ export async function primarySlugForAccount(accountId: number): Promise<string |
 // canonical progression metric, encodes level plus post-cap overflow), for the
 // player card's "Top N%" flex. Ownership + realm are enforced via the caller's
 // account; returns null when the character isn't the caller's. rank is 1-based
-// (1 = highest lifetime XP on the realm); total is the realm population.
+// (1 = highest lifetime XP on the realm); total is the ELIGIBLE realm
+// population (both counts embed the same ELIGIBLE_ACCOUNT_SQL delisting as the
+// boards, so a banned/suspended account absent from every board is not counted
+// ahead or in the total here either).
 export async function lifetimeXpStanding(
   accountId: number,
   characterId: number,
 ): Promise<{ rank: number; total: number } | null> {
   // One round-trip: the `own` subquery yields this character's lifetime XP and
-  // gates ownership/realm. The count-ahead predicate uses the same expression
-  // as characters_lifetime_xp so PostgreSQL can use that expression index.
+  // gates ownership/realm (ungated by eligibility: the owner may view their own
+  // rank regardless). The count-ahead predicate uses the same expression as
+  // characters_lifetime_xp so PostgreSQL can use that expression index.
   const res = await pool.query(
     `SELECT
        (SELECT count(*) FROM characters
-         WHERE realm = $1 AND ${LIFETIME_XP_EXPR} > own.xp)::int AS ahead,
-       (SELECT count(*) FROM characters WHERE realm = $1)::int AS total
+         WHERE realm = $1 AND ${LIFETIME_XP_EXPR} > own.xp
+           AND EXISTS (SELECT 1 FROM accounts a
+                        WHERE a.id = characters.account_id AND ${ELIGIBLE_ACCOUNT_SQL}))::int AS ahead,
+       (SELECT count(*) FROM characters
+         WHERE realm = $1
+           AND EXISTS (SELECT 1 FROM accounts a
+                        WHERE a.id = characters.account_id AND ${ELIGIBLE_ACCOUNT_SQL}))::int AS total
      FROM (SELECT COALESCE(${LIFETIME_XP_EXPR}, 0) AS xp
              FROM characters WHERE id = $2 AND account_id = $3 AND realm = $1) own`,
     [REALM, characterId, accountId],
@@ -1848,7 +1857,11 @@ export async function lifetimeXpStanding(
 
 // Realm-scoped lifetime-XP rank for a character addressed by id, WITHOUT an
 // ownership check, for the public character sheet / profile page, where rank is
-// shown for any player. Same expression-index predicate as lifetimeXpStanding.
+// shown for any player. Same expression-index predicate as lifetimeXpStanding,
+// and the same eligibility gate on both counts: total is the ELIGIBLE realm
+// population (same ELIGIBLE_ACCOUNT_SQL delisting as the boards), and a delisted
+// higher-XP account is not counted ahead. The `own` subquery stays ungated, so
+// the viewed character's own rank shows even when its account is delisted.
 // Returns null when no such character exists on this realm.
 export async function lifetimeXpRankForCharacter(
   characterId: number,
@@ -1856,8 +1869,13 @@ export async function lifetimeXpRankForCharacter(
   const res = await pool.query(
     `SELECT
        (SELECT count(*) FROM characters
-         WHERE realm = $1 AND ${LIFETIME_XP_EXPR} > own.xp)::int AS ahead,
-       (SELECT count(*) FROM characters WHERE realm = $1)::int AS total
+         WHERE realm = $1 AND ${LIFETIME_XP_EXPR} > own.xp
+           AND EXISTS (SELECT 1 FROM accounts a
+                        WHERE a.id = characters.account_id AND ${ELIGIBLE_ACCOUNT_SQL}))::int AS ahead,
+       (SELECT count(*) FROM characters
+         WHERE realm = $1
+           AND EXISTS (SELECT 1 FROM accounts a
+                        WHERE a.id = characters.account_id AND ${ELIGIBLE_ACCOUNT_SQL}))::int AS total
      FROM (SELECT COALESCE(${LIFETIME_XP_EXPR}, 0) AS xp
              FROM characters WHERE id = $2 AND realm = $1) own`,
     [REALM, characterId],

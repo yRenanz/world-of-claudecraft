@@ -27,6 +27,8 @@ import { PgDailyRewardDb } from '../../server/daily_rewards_db';
 import {
   deedsBoardRows,
   ELIGIBLE_ACCOUNT_SQL,
+  lifetimeXpRankForCharacter,
+  lifetimeXpStanding,
   pool,
   topArenaRatings,
   topGuilds,
@@ -106,6 +108,23 @@ describe('every ranked board query embeds the fragment', () => {
     // The roll-up reads only rows whose character still exists (belt over the
     // ON DELETE CASCADE braces).
     expect(sql[0]).toContain('JOIN characters c ON c.id = cd.character_id');
+  });
+
+  it('realm-rank reads (player card + public profile) gate BOTH count arms', async () => {
+    // lifetimeXpStanding (owned, the card's "Top N%") and
+    // lifetimeXpRankForCharacter (the public profile) each count `ahead` and
+    // `total` over the realm; both counts must exclude banned/suspended
+    // accounts or a delisted higher-XP account still inflates rank and total
+    // though it appears on no board. The fragment therefore lands TWICE per
+    // query, once per count arm; the `own`/ownership subquery stays ungated.
+    const occurrences = (haystack: string, needle: string): number =>
+      haystack.split(needle).length - 1;
+    for (const run of [() => lifetimeXpStanding(1, 42), () => lifetimeXpRankForCharacter(42)]) {
+      const sql = await capturedSql(run);
+      expect(sql).toHaveLength(1);
+      expect(occurrences(sql[0], ELIGIBLE_LITERAL)).toBe(2);
+      expect(occurrences(sql[0], 'a.id = characters.account_id')).toBe(2);
+    }
   });
 
   it('daily rewards: all five ranked reads agree on one population', async () => {

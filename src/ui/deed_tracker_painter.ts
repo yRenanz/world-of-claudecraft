@@ -4,11 +4,13 @@
 // single innerHTML write, see the allowance in tests/hud_perf_budget.test.ts)
 // and every refresh routes through the PainterHostWriters elided facet only
 // (setText/setWidth/setDisplay/setAttr per line; a keyed line pool capped at
-// DEED_WATCH_CAP, never innerHTML per refresh). The container is aria-hidden
-// decoration (the chat log carries the durable unlock copy), so the collapse
-// header stays out of the tab order; Hud owns its click delegation and the
-// persisted collapse setting. Everything rendered here is player-chosen
-// cosmetic information and none of it varies with the graphics tier.
+// DEED_WATCH_CAP, never innerHTML per refresh). The collapse header is a real
+// tab stop carrying aria-expanded plus aria-controls on the watch list (the
+// quest-tracker contract); the chevron and progress-bar glyphs are decorative
+// aria-hidden, the .dt-count text carries the numbers. Hud owns the header's
+// click/keydown delegation and the persisted collapse setting. Everything
+// rendered here is player-chosen cosmetic information and none of it varies
+// with the graphics tier.
 
 import { deedName } from './deed_i18n';
 import { DEED_WATCH_CAP, type DeedTrackerView } from './deeds_view';
@@ -42,16 +44,17 @@ export class DeedTrackerPainter {
   constructor(private readonly deps: DeedTrackerPainterDeps) {
     this.root = deps.root();
     // Static skeleton, built once (chrome only; every visible string is
-    // painted through the elided writers below). The header is pointer-only
-    // by design: the container is aria-hidden, so no tab stop.
+    // painted through the elided writers below). The header is a native
+    // button tab stop; update() keeps its aria-expanded in sync with the
+    // collapse state, and the decorative glyphs stay aria-hidden.
     const lineHtml =
       `<div class="dt-line" style="display:none"><span class="dt-name"></span>` +
-      `<span class="dt-bar"><span class="dt-bar-fill"></span></span>` +
+      `<span class="dt-bar" aria-hidden="true"><span class="dt-bar-fill"></span></span>` +
       `<span class="dt-count"></span></div>`;
     this.root.innerHTML =
-      `<button type="button" class="dt-header" tabindex="-1">` +
-      `<span class="dt-chevron"></span><span class="dt-label"></span><span class="dt-tally"></span></button>` +
-      `<div class="dt-list">${lineHtml.repeat(DEED_WATCH_CAP)}</div>`;
+      `<button type="button" class="dt-header" aria-controls="deed-watch-list">` +
+      `<span class="dt-chevron" aria-hidden="true"></span><span class="dt-label"></span><span class="dt-tally"></span></button>` +
+      `<div class="dt-list" id="deed-watch-list">${lineHtml.repeat(DEED_WATCH_CAP)}</div>`;
     this.header = this.root.querySelector('.dt-header') as HTMLElement;
     this.chevron = this.root.querySelector('.dt-chevron') as HTMLElement;
     this.label = this.root.querySelector('.dt-label') as HTMLElement;
@@ -81,6 +84,7 @@ export class DeedTrackerPainter {
       'title',
       t(view.collapsed ? 'hudChrome.deeds.expandHint' : 'hudChrome.deeds.collapseHint'),
     );
+    w.setAttr(this.header, 'aria-expanded', view.collapsed ? 'false' : 'true');
     w.setDisplay(this.list, view.collapsed ? 'none' : '');
     if (view.collapsed) return;
     for (let i = 0; i < this.lines.length; i++) {

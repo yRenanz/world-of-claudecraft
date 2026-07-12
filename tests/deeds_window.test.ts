@@ -205,7 +205,10 @@ describe('entry HTMLs', () => {
   it('wires the window root and the tracker container in BOTH game entries', () => {
     for (const html of [indexHtml, playHtml]) {
       expect(html).toContain('id="deeds-window"');
-      expect(html).toContain('<div id="deed-tracker" aria-hidden="true"></div>');
+      // No aria-hidden on the container: the collapse header is a real,
+      // keyboard-reachable toggle (the quest-tracker contract).
+      expect(html).toContain('<div id="deed-tracker"></div>');
+      expect(html).not.toContain('id="deed-tracker" aria-hidden');
     }
   });
 
@@ -233,6 +236,43 @@ describe('entry HTMLs', () => {
     // hud.ts binds the click and repaints the keycap from the live binding.
     expect(hud).toContain("$('#mm-deeds').addEventListener('click', () => this.toggleDeeds());");
     expect(hud).toContain("['#mm-deeds', 'deeds', 'hudChrome.deeds.title'],");
+  });
+});
+
+describe('tracker accessibility (quest-tracker contract)', () => {
+  it('keeps the header a native tab stop with live expand/collapse semantics', () => {
+    expect(tracker).not.toContain('tabindex="-1"');
+    expect(tracker).toContain(
+      "w.setAttr(this.header, 'aria-expanded', view.collapsed ? 'false' : 'true');",
+    );
+    // aria-controls ties the toggle to the watch list it shows/hides.
+    expect(tracker).toContain('aria-controls="deed-watch-list"');
+    expect(tracker).toContain('id="deed-watch-list"');
+  });
+
+  it('hides the decorative glyphs from assistive tech (dt-count text carries the numbers)', () => {
+    expect(tracker).toMatch(/dt-chevron" aria-hidden="true"/);
+    expect(tracker).toMatch(/dt-bar" aria-hidden="true"/);
+  });
+
+  it('arms Enter/Space on #deed-tracker, stopped before the game binds hijack them', () => {
+    const arm = hud.match(
+      /\$\('#deed-tracker'\)\.addEventListener\('keydown',[\s\S]*?\n {4}\}\);/,
+    )?.[0] as string;
+    expect(arm).toBeTruthy();
+    expect(arm).toContain("if (e.key !== 'Enter' && e.key !== ' ' && e.code !== 'Space') return;");
+    expect(arm).toContain('e.preventDefault();');
+    expect(arm).toContain('e.stopPropagation();');
+    // The same compact-touch branch as the click delegation: the count chip
+    // opens the Book, the desktop header toggles the collapse.
+    expect(arm).toContain('this.openDeeds();');
+    expect(arm).toContain('this.toggleDeedTrackerCollapsed();');
+  });
+
+  it('paints the gold focus ring on the focused header', () => {
+    expect(hudCss).toMatch(
+      /#deed-tracker \.dt-header:focus-visible \{\s*outline: 2px solid var\(--gold\);\s*outline-offset: 2px;\s*border-radius: 2px;\s*\}/,
+    );
   });
 });
 

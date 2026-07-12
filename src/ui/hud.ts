@@ -1642,14 +1642,27 @@ export class Hud {
         this.questlogWindow.openWithQuest(row.dataset.quest);
       }
     });
-    // Collapse/expand the deed tracker by clicking its header (the quest
-    // tracker delegation pattern). The tracker is aria-hidden glanceable
-    // decoration, so the header is pointer-only by design (no keydown arm).
-    // On the compact touch tier the rows are folded away (hud.mobile.css) and
-    // the header is a count chip: that tap opens the Book of Deeds instead of
+    // Collapse/expand the deed tracker from its header (the quest tracker
+    // delegation pattern: click plus the Enter/Space keydown arm below,
+    // stopped before the window-level chat-open/jump binds hijack the
+    // focused header button; see the quest-tracker guard above). On the
+    // compact touch tier the rows are folded away (hud.mobile.css) and the
+    // header is a count chip: activation opens the Book of Deeds instead of
     // toggling a collapse the player cannot see.
     $('#deed-tracker').addEventListener('click', (e) => {
       if (!(e.target as HTMLElement).closest('.dt-header')) return;
+      const body = document.body.classList;
+      if (body.contains('mobile-touch') && body.contains('hud-mobile-compact')) {
+        this.openDeeds();
+        return;
+      }
+      this.toggleDeedTrackerCollapsed();
+    });
+    $('#deed-tracker').addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ' && e.code !== 'Space') return;
+      if (!(e.target as HTMLElement).closest('.dt-header')) return;
+      e.preventDefault();
+      e.stopPropagation();
       const body = document.body.classList;
       if (body.contains('mobile-touch') && body.contains('hud-mobile-compact')) {
         this.openDeeds();
@@ -11917,7 +11930,7 @@ export class Hud {
     );
   }
 
-  /** Flip the persisted deed-tracker collapse (header click delegation). */
+  /** Flip the persisted deed-tracker collapse (header click/keyboard delegation). */
   private toggleDeedTrackerCollapsed(): void {
     const settings = this.optionsHooks?.settings;
     if (!settings) return;

@@ -1980,11 +1980,10 @@
   }
 
   /* ---------- deed tracker ---------- */
-  /* Book of Deeds watchlist: a glanceable strip under the quest tracker
-     (aria-hidden decoration; the chat log carries the durable unlock copy).
-     The header mirrors the quest tracker's collapsible button chrome but is
-     pointer-only (tabindex -1 inside an aria-hidden container); the lines are
-     the painter's fixed pool, shown/hidden through the elided writers. */
+  /* Book of Deeds watchlist: a glanceable strip under the quest tracker.
+     The header mirrors the quest tracker's collapsible button chrome and is
+     a real tab stop (gold focus ring below, the qt-header shape); the lines
+     are the painter's fixed pool, shown/hidden through the elided writers. */
   #deed-tracker {
     width: 100%;
     font-size: 12px;
@@ -2012,6 +2011,11 @@
   }
   #deed-tracker .dt-header:hover {
     color: #fff;
+  }
+  #deed-tracker .dt-header:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+    border-radius: 2px;
   }
   #deed-tracker .dt-chevron {
     font-size: 10px;

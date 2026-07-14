@@ -26,6 +26,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.legend",
     "hudChrome.discord.roleTag.seniormods",
     "hudChrome.discord.roleTag.shill",
+    "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood"
@@ -47,6 +48,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.legend",
     "hudChrome.discord.roleTag.seniormods",
     "hudChrome.discord.roleTag.shill",
+    "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood"
@@ -68,6 +70,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.legend",
     "hudChrome.discord.roleTag.seniormods",
     "hudChrome.discord.roleTag.shill",
+    "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood"
@@ -89,6 +92,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.legend",
     "hudChrome.discord.roleTag.seniormods",
     "hudChrome.discord.roleTag.shill",
+    "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood"
@@ -111,6 +115,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.legend",
     "hudChrome.discord.roleTag.seniormods",
     "hudChrome.discord.roleTag.shill",
+    "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood"
@@ -132,6 +137,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.legend",
     "hudChrome.discord.roleTag.seniormods",
     "hudChrome.discord.roleTag.shill",
+    "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood"
@@ -169,6 +175,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.legend",
     "hudChrome.discord.roleTag.seniormods",
     "hudChrome.discord.roleTag.shill",
+    "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood"
@@ -194,6 +201,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.legend",
     "hudChrome.discord.roleTag.seniormods",
     "hudChrome.discord.roleTag.shill",
+    "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood"
@@ -215,6 +223,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.legend",
     "hudChrome.discord.roleTag.seniormods",
     "hudChrome.discord.roleTag.shill",
+    "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood"
@@ -236,6 +245,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.legend",
     "hudChrome.discord.roleTag.seniormods",
     "hudChrome.discord.roleTag.shill",
+    "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood"
@@ -257,6 +267,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.legend",
     "hudChrome.discord.roleTag.seniormods",
     "hudChrome.discord.roleTag.shill",
+    "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood"
@@ -278,6 +289,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.legend",
     "hudChrome.discord.roleTag.seniormods",
     "hudChrome.discord.roleTag.shill",
+    "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood"
@@ -299,6 +311,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.legend",
     "hudChrome.discord.roleTag.seniormods",
     "hudChrome.discord.roleTag.shill",
+    "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood"
@@ -320,6 +333,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.legend",
     "hudChrome.discord.roleTag.seniormods",
     "hudChrome.discord.roleTag.shill",
+    "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood"
@@ -341,6 +355,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.legend",
     "hudChrome.discord.roleTag.seniormods",
     "hudChrome.discord.roleTag.shill",
+    "hudChrome.keybinds.sheathe",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
     "hudChrome.petFeed.disabledNoFood"

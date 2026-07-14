@@ -218,6 +218,7 @@ import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
 import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overlay';
 import { createSpectateBadge } from './ui/spectate_badge';
 import { refreshSteamLinkStatus, wireSteamLink } from './ui/steam_link';
+import { shouldShowStorePromo } from './ui/store_promo_card';
 import { type PresetId, type ThemeKnob, ThemeStore } from './ui/theme';
 import {
   classifyAuthCode,
@@ -1986,7 +1987,18 @@ async function startGame(
         };
       },
     };
-    if (!NATIVE_APP) hud.attachClaudium(claudiumHooks);
+    if (!NATIVE_APP) {
+      hud.attachClaudium(claudiumHooks);
+      if (
+        shouldShowStorePromo({
+          nativeApp: NATIVE_APP,
+          desktopApp: DESKTOP_APP,
+          mobileTouch: document.body.classList.contains('mobile-touch'),
+        })
+      ) {
+        hud.attachStorePromoCard();
+      }
+    }
   }
   function interactKey(): void {
     const p = world.player;

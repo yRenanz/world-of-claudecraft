@@ -1703,6 +1703,11 @@
     border-top: 1px solid rgb(255 255 255 / 0.06);
     background: #0a1119;
   }
+  @media (min-width: 900px) {
+    body:not(.mobile-touch) .armory-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
   .armory-card {
     position: relative;
     border: 1px solid var(--rarity);

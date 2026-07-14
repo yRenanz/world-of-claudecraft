@@ -196,7 +196,13 @@ import {
 } from './chat_ignore_core';
 import { appendChatLineParts, CHAT_MESSAGE_TOKEN, CHAT_NAME_TOKEN, chatAiTagEl } from './chat_line';
 import { type ChatClock, clampChatClock, formatChatTimestamp } from './chat_timestamp';
-import { type ChatBoxGeometry, parseChatBox, placeChatBox, serializeChatBox } from './chat_window';
+import {
+  CHAT_BOX_LIMITS,
+  type ChatBoxGeometry,
+  parseChatBox,
+  placeChatBox,
+  serializeChatBox,
+} from './chat_window';
 import type { ClaudiumRail, ClaudiumSnapshot } from './claudium_window';
 import { ClaudiumWindow } from './claudium_window';
 import { formatClockTime } from './clock';
@@ -420,6 +426,11 @@ import {
   statNameKey,
   statTooltipHtml,
 } from './stat_tooltip_view';
+import {
+  mountStorePromoCard,
+  type StorePromoCardController,
+  storePromoReservedHeight,
+} from './store_promo_card';
 import { nearestSubzone } from './subzone';
 import { swingTimerState } from './swing_timer';
 import { SwingTimerPainter } from './swing_timer_painter';
@@ -1373,6 +1384,7 @@ export class Hud {
   private lastHudMediumAt = 0;
   private lastHudSlowAt = 0;
   private dailyRewardsButtonEl: HTMLButtonElement | null = null;
+  private storePromoCard: StorePromoCardController | null = null;
   // Mobile More-tray entry mirroring the desktop chest button's hidden/spin-ready
   // state (folded off the top-right rail so it never overlaps the buff/debuff bars).
   private mobileDailyRewardsButtonEl: HTMLButtonElement | null = null;
@@ -2669,6 +2681,8 @@ export class Hud {
       { w: window.innerWidth, h: window.innerHeight },
       chromeH,
       z,
+      CHAT_BOX_LIMITS,
+      this.storePromoCard ? (width) => storePromoReservedHeight(width, z) : 0,
     );
     this.chatBox = placement.geo;
     const { css } = placement;
@@ -4912,6 +4926,13 @@ export class Hud {
 
   private refreshLocalizedDynamicUi(): void {
     this.syncDailyRewardsSurfaceLabels();
+    this.storePromoCard?.relocalize({
+      open: t('hudChrome.wocStore.title'),
+      close: t('hudChrome.wocStore.close'),
+      season: t('hudChrome.wocStore.seasonOne'),
+      title: t('hudChrome.wocStore.armoryTitle'),
+      cta: t('hudChrome.wocStore.title'),
+    });
     this.refreshKeybindLabels();
     this.updateQuestTracker();
     this.updateDelveTracker();
@@ -13744,6 +13765,12 @@ export class Hud {
     this.refreshDailyRewardsLauncher(true);
   }
 
+  openWocStore(): void {
+    if (!this.dailyRewardsEnabled()) return;
+    this.dailyRewardsWindow.openStore();
+    this.refreshDailyRewardsLauncher(true);
+  }
+
   /** Inject the online economy hooks that back the Claudium window (main.ts, online only). */
   attachClaudium(hooks: ClaudiumHooks): void {
     this.claudiumHooks = hooks;
@@ -13753,6 +13780,29 @@ export class Hud {
     this.claudiumLauncherBalanceSeq++;
     this.claudiumLauncherBalancePending = false;
     this.refreshClaudiumLauncherBalance(true);
+  }
+
+  attachStorePromoCard(): void {
+    if (this.storePromoCard || !this.claudiumHooks) return;
+    const host = document.getElementById('chatlog-wrap');
+    if (!host) return;
+    this.storePromoCard = mountStorePromoCard(host, {
+      labels: {
+        open: t('hudChrome.wocStore.title'),
+        close: t('hudChrome.wocStore.close'),
+        season: t('hudChrome.wocStore.seasonOne'),
+        title: t('hudChrome.wocStore.armoryTitle'),
+        cta: t('hudChrome.wocStore.title'),
+      },
+      returnFocusTo: () => document.getElementById('daily-rewards-button'),
+      onOpenStore: () => this.openWocStore(),
+      onDismiss: () => {
+        this.storePromoCard = null;
+      },
+    });
+    const tabs = document.getElementById('chatlog-tabs');
+    if (tabs) this.ensureChatBoxGeometry(host, tabs);
+    this.applyChatBoxGeometry();
   }
 
   /**

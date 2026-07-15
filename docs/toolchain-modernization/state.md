@@ -357,6 +357,20 @@ Phase 3 (phase-03-ci-parallel-checks-ffmpeg.md).
   i18n:gen 4s, summary and freshness about 1s, malware 5s, typecheck 37s,
   builds about 10s). The critical path remains the vitest step, Phase 4's
   target.
+- Pre-push resync: the release tip moved again during QA (61fd49975 to
+  b3d789e83, one commit, the PR #1935 Drowned Litany delve fix; zero overlap
+  with the branch surfaces, no conflicts, clean regen; merged as f80f8e522
+  with the merge-audit trap checks re-run, all empty). That release commit
+  landed via the GitHub UI without the local floor and carried biome ERRORS
+  in tests/delves.test.ts (unsorted imports, format) and
+  tests/litany_spawn_collision.test.ts (format) that blocked descendant
+  pushes at the pre-push floor; healed by a scoped biome --write as its own
+  chore(tests) commit 0b6ff86a5 (both suites green before and after), the
+  GitHub-UI-merge failure-mode precedent now covering biome as well as the
+  union regen. Final QA-head run 29415139204 (head 0b6ff86a5, the full
+  post-fix stack): all green, wall 547s = pr-gate 544s parallel with
+  pr-checks 95s; the trailing docs stamp of this very record rides after the
+  observed green run per the packet convention.
 - Gate record (Node 24, bare ffmpeg-less PATH, no shim, the D8 condition
   re-verified by command -v on both tools): steps 1 to 6 green including the
   full vitest suite (14,235 passed; up from 13,957 with the release's new

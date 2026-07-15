@@ -237,8 +237,14 @@ tests added, dead code removed, deferrals.
   Gate (Node 24, bare ffmpeg-less PATH): steps 1 to 6 green (14,235 tests),
   browser red only at the known environmental armory assertion, manual tail
   (typecheck + three builds) green. Reviewers: privacy-security-review PASS,
-  test-coverage-auditor PASS, qa-checklist READY. PR #1945 marked ready for
-  review; merge timing owner-scheduled.
+  test-coverage-auditor PASS, qa-checklist READY. Pre-push resync: the release
+  tip moved again during QA (to b3d789e83, the PR #1935 delve fix; zero
+  branch-surface overlap, merged clean as f80f8e522), and that GitHub-UI merge
+  carried biome errors in two delve test files that blocked the pre-push
+  floor; healed by a scoped biome --write as chore(tests) 0b6ff86a5. Final
+  QA-head run 29415139204 all green (wall 547s = pr-gate 544s parallel with
+  pr-checks 95s). PR #1945 marked ready for review; merge timing
+  owner-scheduled.
 - Phase 4 QA:
 - Phase 5 QA (includes the packet-teardown offer):
 

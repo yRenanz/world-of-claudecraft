@@ -50,6 +50,7 @@ Same seed, same world, everywhere. And almost nothing is a shipped asset: the to
 - **Real multiplayer**: parties, guilds, trading, duels, tap rights, party-split XP, whispers, away status, and a **Dungeon Finder** with role queues and premade listings.
 - **Procedural everything**: timber-framed towns, rigged creature families, painted spell icons drawn on canvas, WebAudio sound, biome weather, and real-time shadows. No 3D model files for the world.
 - **Localized into 22 locales** through a deterministic, sim-emits-keys pipeline.
+- **Full desktop apps for Windows, Linux, and macOS**, with native installers, automatic updates, and the same online world as the browser.
 - **Headless RL environment** with Gymnasium bindings, reward shaping, and a benchmark mode.
 - **$WOC utility, fully optional**: link a Solana wallet for holder flair, Daily Rewards, and a discounted payment option in the cosmetic store. The game remains free to play and non-custodial.
 - **Season 1 Armory**: collect cosmetic weapon skins through the WOC Store, using Claudium purchased with fiat, SOL, or $WOC. Cosmetics never provide combat power.
@@ -73,7 +74,7 @@ Weather is biome-driven and render-only, so it never touches the deterministic s
 
 ## Play it
 
-You have two ways in, and they run the same world.
+Play in your browser or install the full desktop app for Windows, Linux, or macOS. Every client connects to the same online world.
 
 ### Offline, in your browser
 
@@ -88,9 +89,11 @@ Name your character, pick any of the nine classes, and you start in **Eastbrook 
 
 See [Host your own world](#host-your-own-world-one-command) below to stand up the real client/server game with accounts and persistent characters.
 
-### Desktop app
+### Desktop apps for Windows, Linux, and macOS
 
-The Electron desktop shell wraps the same Vite client. Online sign-in is Discord and email only, exactly the web flow: email/password logs in inside the app, and "Continue with Discord" opens your default browser on the `/desktop-login` page, which hands a one-time code back to the app over a `worldofclaudecraft://` deep link that the app exchanges for a normal World of ClaudeCraft session token.
+World of ClaudeCraft ships as full desktop apps for all three major desktop platforms: signed Windows installers, Linux AppImage and deb packages, and signed and notarized universal macOS builds. They use the same game client and online world as the browser, with native packaging and automatic updates.
+
+Online sign-in is Discord and email only, exactly the web flow: email/password logs in inside the app, and "Continue with Discord" opens your default browser on the `/desktop-login` page, which hands a one-time code back to the app over a `worldofclaudecraft://` deep link that the app exchanges for a normal World of ClaudeCraft session token.
 
 ```bash
 npm run electron:dev          # Vite + Electron dev shell

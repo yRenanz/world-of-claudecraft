@@ -6,10 +6,7 @@ import {
   litanyModuleLosColliders,
 } from '../src/sim/delve_litany_layout';
 import { riteSiteLocalOffsets } from '../src/sim/delves/drowned_litany_rite';
-import {
-  BAPTISTRY_EGG_SAC_SPOTS,
-  BAPTISTRY_WAVES,
-} from '../src/sim/delves/drowned_litany_rooms';
+import { BAPTISTRY_EGG_SAC_SPOTS, BAPTISTRY_WAVES } from '../src/sim/delves/drowned_litany_rooms';
 
 // Every authored Drowned Litany spawn (trash packs, baptistry waves, room
 // interactables, and the finale rite objects) must sit on walkable floor: inside

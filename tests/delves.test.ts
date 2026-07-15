@@ -28,8 +28,8 @@ import {
 import {
   BAPTISTRY_EGG_SAC_SPOTS,
   isLitanyPuzzleKind,
-  litanyHatchlingSpawnClear,
   LITANY_PUZZLE_KINDS,
+  litanyHatchlingSpawnClear,
 } from '../src/sim/delves/drowned_litany_rooms';
 import { clampDelveModuleBounds, rollDelveAffixes } from '../src/sim/delves/runs';
 import { createMob } from '../src/sim/entity';
@@ -2238,7 +2238,9 @@ describe('The Drowned Litany (Phase 5 room puzzles)', () => {
           sim.player.prevPos = { ...obj.pos };
           if (room.kind === 'bell_rope') sim.delveInteract(id);
           sim.tick();
-          expect(run.objectState[id].triggered, `${room.moduleId} ${room.kind} triggered`).toBe(true);
+          expect(run.objectState[id].triggered, `${room.moduleId} ${room.kind} triggered`).toBe(
+            true,
+          );
           expect(obj.templateId, `${room.moduleId} ${room.kind} mesh state`).toBe(room.template);
         }
       }
@@ -2265,11 +2267,7 @@ describe('The Drowned Litany (Phase 5 room puzzles)', () => {
     const zBase = delveModuleZOffset(run.modules, 0);
     for (const spot of BAPTISTRY_EGG_SAC_SPOTS) {
       expect(
-        litanyHatchlingSpawnClear(
-          run,
-          run.origin.x + spot.x,
-          run.origin.z + zBase + spot.z,
-        ),
+        litanyHatchlingSpawnClear(run, run.origin.x + spot.x, run.origin.z + zBase + spot.z),
         `egg-sac fallback (${spot.x},${spot.z})`,
       ).toBe(true);
     }

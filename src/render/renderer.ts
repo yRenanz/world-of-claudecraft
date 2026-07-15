@@ -5663,6 +5663,16 @@ export class Renderer {
   }
 
   pick(clientX: number, clientY: number): number | null {
+    const direct = this.pickDirect(clientX, clientY);
+    if (direct !== null) return direct;
+    return this.pickSloppy(clientX, clientY);
+  }
+
+  // The direct-raycast half of pick(): only a hit that actually lands on an
+  // entity's mesh. Split out so callers that also raycast gather nodes (a
+  // click that lands on a node must not be stolen by the sloppy assist below)
+  // can slot the node raycast in between this and pickSloppy.
+  pickDirect(clientX: number, clientY: number): number | null {
     const ndc = new THREE.Vector2(
       (clientX / this.viewport.width) * 2 - 1,
       -(clientY / this.viewport.height) * 2 + 1,
@@ -5691,12 +5701,13 @@ export class Renderer {
         o = o.parent;
       }
     }
-    const directPick = resolveDirectPickEntityId(
-      directHitIds,
-      this.sim.entities,
-      this.sim.player.targetId,
-    );
-    if (directHitIds.length > 0) return directPick;
+    if (directHitIds.length === 0) return null;
+    return resolveDirectPickEntityId(directHitIds, this.sim.entities, this.sim.player.targetId);
+  }
+
+  // The forgiving-assist half of pick(): snap to the nearest targetable
+  // character within a small screen radius when nothing was hit directly.
+  pickSloppy(clientX: number, clientY: number): number | null {
     // Forgiving assist: nothing under the ray, so snap to the nearest
     // targetable character within a small screen radius — chibi proportions
     // and melee scrums (often hidden behind the player's own model) make

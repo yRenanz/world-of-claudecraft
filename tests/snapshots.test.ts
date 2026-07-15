@@ -2857,6 +2857,39 @@ describe('full self-state snapshot delta fixture', () => {
   });
 });
 
+describe('gather node cooldown wire round trip (ncd)', () => {
+  it('flips a node from not-ready back to ready once the server-side cooldown clears', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Gatherer');
+    const sim = (server as any).sim;
+    const meta = sim.players.get(session.pid);
+    const nodeId = GATHER_NODES[0].id;
+    meta.nodeHarvestReadyAt[nodeId] = sim.time + 30;
+
+    broadcast(server);
+    const notReadySnap = lastSnap(fc.sent);
+    expect(notReadySnap.self.ncd).toMatchObject({ [nodeId]: expect.any(Number) });
+
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(notReadySnap);
+    expect(client.nodeHarvestableByMe(nodeId)).toBe(false);
+
+    // Server-side cooldown clears (readyAt passes): the next broadcast omits the
+    // node from `ncd` entirely (server/game.ts's until > sim.time filter), and
+    // applying THAT snapshot, not a hand-reassigned map, must flip the client
+    // back to ready -- the exact transition a permanent-lockout regression would
+    // fail to make.
+    meta.nodeHarvestReadyAt[nodeId] = sim.time - 1;
+    broadcast(server);
+    const readySnap = lastSnap(fc.sent);
+    expect(readySnap.self.ncd).toEqual({});
+
+    (client as any).applySnapshot(readySnap);
+    expect(client.nodeHarvestableByMe(nodeId)).toBe(true);
+  });
+});
+
 describe('delta-key contract pins (anti-drift)', () => {
   it('ALL_DELTA_KEYS contains exactly 45 unique keys in sorted order', () => {
     expect(ALL_DELTA_KEYS).toHaveLength(45);

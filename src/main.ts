@@ -2060,7 +2060,11 @@ async function startGame(
         bestObj = e.id;
         bestObjD = d;
       }
-      if (e.kind === 'npc' && d < bestNpcD) {
+      // The graveyard angel is hidden from (and not interactable by) the living,
+      // same filter renderer.pick() applies to the click path: skip it here too
+      // unless the local player is a released spirit, so it cannot starve a
+      // node sharing its graveyard's interact range for keyboard/gamepad/mobile.
+      if (e.kind === 'npc' && d < bestNpcD && (e.templateId !== 'spirit_healer' || p.ghost)) {
         bestNpc = e.id;
         bestNpcD = d;
       }
@@ -2177,12 +2181,14 @@ async function startGame(
         return;
       }
     }
-    const id = renderer.pick(x, y);
-    // Gather nodes (#1866) are static content, not entities, so they never
-    // compete with `renderer.pick()`'s entity hit: only tried once the entity
-    // raycast comes up empty, and it wins outright over the ground-click/
-    // click-to-move fallback below (a click that lands on a node harvests it,
-    // it does not also walk you there or deselect your target).
+    // Gather nodes (#1866) are static content, not entities, so they get their
+    // own raycast rather than living in `renderer.pick()`. Ordered: a direct
+    // entity hit always wins (it must not be overridden by a nearby node), then
+    // a direct node hit (it must not be stolen by the sloppy assist below when
+    // a mob/player camps the node), then the sloppy character assist, then the
+    // ground-click/click-to-move fallback. A click that lands on a node
+    // harvests it; it does not also walk you there or deselect your target.
+    let id = renderer.pickDirect(x, y);
     if (id === null) {
       const nodeId = renderer.pickGatherNode(x, y);
       const node = nodeId !== null ? GATHER_NODES.find((n) => n.id === nodeId) : undefined;
@@ -2198,6 +2204,7 @@ async function startGame(
         );
         return;
       }
+      id = renderer.pickSloppy(x, y);
     }
     // OSRS-style click feedback (its own toggle): a brief ground marker, gold for a
     // neutral click and red on a hostile. Both reference games only mark a real action,
